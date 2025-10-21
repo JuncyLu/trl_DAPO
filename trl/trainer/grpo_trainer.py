@@ -15,6 +15,8 @@
 import inspect
 import os
 import textwrap
+import json
+from datetime import datetime
 from collections import defaultdict, deque
 from contextlib import nullcontext
 from functools import partial
@@ -52,6 +54,7 @@ from ..extras.vllm_client import VLLMClient
 from ..import_utils import is_liger_kernel_available, is_vllm_available
 from ..models import prepare_deepspeed, prepare_fsdp, prepare_peft_model, unwrap_model_for_generation
 from ..models.utils import _ForwardRedirection
+from .attention_metrics import AttentionSampleResult, compute_qwen_attention_metrics_for_batch
 from .base_trainer import BaseTrainer
 from .callbacks import SyncRefModelCallback
 from .grpo_config import GRPOConfig
@@ -86,6 +89,16 @@ if is_vllm_available():
 
 if is_wandb_available():
     import wandb
+
+# Optional rich console for colored output
+try:  # optional dependency
+    from rich.console import Console
+    from rich.table import Table
+    from rich import box
+except Exception:
+    Console = None
+    Table = None
+    box = None
 
 
 logger = logging.get_logger(__name__)
@@ -340,6 +353,58 @@ class GRPOTrainer(BaseTrainer):
 
         self.reward_processing_classes = reward_processing_classes
 
+        # Realtime rollout logging setup (main process only)
+        self._rollout_step_count = 0
+        self._console = None
+        
+        # 确保training_logs目录存在（无论是否启用realtime_rollout_logging）
+        if self.accelerator.is_main_process:
+            try:
+                training_logs_dir = "/home/lujunxi57/trl/training_logs"
+                os.makedirs(training_logs_dir, exist_ok=True)
+                print(f"📁 Training logs directory: {training_logs_dir}")
+            except Exception as e:
+                print(f"⚠️  Warning: Failed to create training logs directory: {e}")
+        
+        if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
+            try:
+                if getattr(self.args, "rollout_log_path", None):
+                    os.makedirs(os.path.dirname(self.args.rollout_log_path), exist_ok=True)
+                    if not os.path.exists(self.args.rollout_log_path):
+                        with open(self.args.rollout_log_path, "w", encoding="utf-8") as f:
+                            f.write("# Rollout Results Log\n\n")
+                            f.write("This file contains detailed rollout results from GRPO training.\n\n")
+                    print(f"📝 Rollout log file: {self.args.rollout_log_path}")
+                    
+                if getattr(self.args, "attention_diag_log_path", None):
+                    os.makedirs(os.path.dirname(self.args.attention_diag_log_path), exist_ok=True)
+                    if not os.path.exists(self.args.attention_diag_log_path):
+                        with open(self.args.attention_diag_log_path, "w", encoding="utf-8") as f:
+                            f.write("# Attention Diagnostics Log\n\n")
+                            f.write("This file contains MDI attention diagnostics from GRPO training.\n\n")
+                    print(f"🧠 Attention diagnostics file: {self.args.attention_diag_log_path}")
+            except Exception as e:
+                print(f"⚠️  Warning: Failed to initialize log files: {e}")
+                import traceback
+                traceback.print_exc()
+            if getattr(self.args, "colorize_output", False) and Console is not None:
+                try:
+                    self._console = Console()
+                except Exception:
+                    self._console = None
+
+        # Attention diagnostics flags
+        self.compute_attention_metrics = getattr(self.args, "compute_attention_metrics", False)
+        if self.compute_attention_metrics and self.use_vllm:
+            logger.warning("`compute_attention_metrics=True` is not supported when using vLLM. Disabling attention diagnostics.")
+            self.compute_attention_metrics = False
+        if self.compute_attention_metrics and self.use_transformers_paged:
+            logger.warning("`compute_attention_metrics=True` is not supported with paged generation. Disabling attention diagnostics.")
+            self.compute_attention_metrics = False
+
+        # current batch mdi balance cache for reward
+        self._mdi_balance_scores_current_batch = []
+
         # Training arguments
         self.max_prompt_length = args.max_prompt_length
         self.max_completion_length = args.max_completion_length  # = |o_i| in the GRPO paper
@@ -476,6 +541,11 @@ class GRPOTrainer(BaseTrainer):
             "rewards": defaultdict(lambda: deque(maxlen=args.generation_batch_size)),
             "advantages": deque(maxlen=args.generation_batch_size),
         }
+        # Keep attention sample results if enabled
+        if self.compute_attention_metrics:
+            self._logs["attention"] = deque(maxlen=args.generation_batch_size)
+        else:
+            self._logs["attention"] = None
 
         # Ensure each process receives a unique seed to prevent duplicate completions when generating with
         # transformers if num_generations exceeds per_device_train_batch_size. We could skip it if we use vLLM, but
@@ -698,6 +768,114 @@ class GRPOTrainer(BaseTrainer):
             mini_repeat_count=self.num_generations,
             seed=self.args.seed,
         )
+
+    # ---------- Attention metrics processing ----------
+    def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> None:
+        if not self.compute_attention_metrics or attention_context is None:
+            return
+        outputs = attention_context.get("outputs")
+        generate_inputs = attention_context.get("inputs")
+        if outputs is None or getattr(outputs, "attentions", None) is None:
+            return
+        if generate_inputs is None or "input_ids" not in generate_inputs:
+            return
+        input_ids = generate_inputs["input_ids"].detach().cpu()
+        sequences = outputs.sequences.detach().cpu()
+        image_grid_thw = generate_inputs.get("image_grid_thw")
+        if isinstance(image_grid_thw, torch.Tensor):
+            image_grid_thw_cpu = image_grid_thw.detach().cpu()
+        else:
+            image_grid_thw_cpu = None
+        sample_results = compute_qwen_attention_metrics_for_batch(
+            self.model,
+            self.processing_class,
+            outputs.attentions,
+            input_ids,
+            sequences,
+            image_grid_thw=image_grid_thw_cpu,
+        )
+        outputs.attentions = None
+        attention_context["outputs"] = None
+        attention_context["inputs"] = None
+        if not sample_results:
+            return
+        self._log_attention_metrics(sample_results, mode)
+
+    def _log_attention_metrics(self, sample_results: list[AttentionSampleResult], mode: str) -> None:
+        device = self.accelerator.device
+        segments = ["early", "middle", "late", "all"]
+
+        for segment in segments:
+            mdi_vals = []
+            aei_text_vals = []
+            aei_vision_vals = []
+            for result in sample_results:
+                segment_result = result.segments.get(segment)
+                if segment_result is None:
+                    continue
+                mdi_vals.append(segment_result.mdi)
+                aei_text_vals.append(segment_result.aei_text)
+                aei_vision_vals.append(segment_result.aei_vision)
+
+            if mdi_vals:
+                mdi_tensor = torch.tensor(mdi_vals, device=device, dtype=torch.float32)
+                mdi_tensor = torch.where(torch.isfinite(mdi_tensor), mdi_tensor, torch.full_like(mdi_tensor, float("nan")))
+                gathered_mdi = self.accelerator.gather(mdi_tensor)
+                self._metrics[mode][f"attention/{segment}/mdi"].append(torch.nanmean(gathered_mdi).item())
+
+                ratio = getattr(self.args, "mdi_balance_ratio", 2.0)
+                if ratio <= 1.0:
+                    ratio = 2.0
+                logR = torch.tensor(float(torch.log(torch.tensor(ratio)).item()), device=device)
+                mdi_pos = torch.where(gathered_mdi > 0, gathered_mdi, torch.full_like(gathered_mdi, float("nan")))
+                balance = 1.0 - torch.abs(torch.log(mdi_pos)) / logR
+                balance = torch.clamp(balance, min=0.0, max=1.0)
+                self._metrics[mode][f"attention/{segment}/mdi_balance"].append(torch.nanmean(balance).item())
+                self._metrics[mode][f"attention/{segment}/mdi_penalty"].append(1.0 - torch.nanmean(balance).item())
+
+            if aei_text_vals:
+                aei_text_tensor = torch.tensor(aei_text_vals, device=device, dtype=torch.float32)
+                aei_text_tensor = torch.where(
+                    torch.isfinite(aei_text_tensor), aei_text_tensor, torch.full_like(aei_text_tensor, float("nan"))
+                )
+                gathered_aei_text = self.accelerator.gather(aei_text_tensor)
+                self._metrics[mode][f"attention/{segment}/aei_text"].append(torch.nanmean(gathered_aei_text).item())
+
+            if aei_vision_vals:
+                aei_vision_tensor = torch.tensor(aei_vision_vals, device=device, dtype=torch.float32)
+                aei_vision_tensor = torch.where(
+                    torch.isfinite(aei_vision_tensor),
+                    aei_vision_tensor,
+                    torch.full_like(aei_vision_tensor, float("nan")),
+                )
+                gathered_aei_vision = self.accelerator.gather(aei_vision_tensor)
+                self._metrics[mode][f"attention/{segment}/aei_vision"].append(
+                    torch.nanmean(gathered_aei_vision).item()
+                )
+
+        # Maintain the per-batch sample results for local logging and reward integration
+        if isinstance(self._logs.get("attention"), deque):
+            self._logs["attention"].extend(sample_results)
+
+        # Expose per-sample balance scores for reward usage
+        try:
+            ratio = getattr(self.args, "mdi_balance_ratio", 2.0)
+            if ratio <= 1.0:
+                ratio = 2.0
+            import math
+            logR = math.log(ratio)
+            balances = []
+            for r in sample_results:
+                seg = r.segments.get("late") or r.segments.get("all")
+                mdi = float(seg.mdi) if seg and seg.mdi is not None else None
+                if mdi is None or not (mdi > 0) or not math.isfinite(mdi):
+                    balances.append(0.5)
+                else:
+                    b = max(0.0, min(1.0, 1.0 - abs(math.log(mdi)) / logR))
+                    balances.append(float(b))
+            self._mdi_balance_scores_current_batch = balances
+        except Exception:
+            self._mdi_balance_scores_current_batch = []
 
     @profiling_decorator
     def _get_last_hidden_state(
@@ -1282,9 +1460,19 @@ class GRPOTrainer(BaseTrainer):
                 torch.no_grad(),
                 FSDP.summon_full_params(self.model_wrapped, recurse=False) if self.is_fsdp_enabled else nullcontext(),
             ):
-                prompt_completion_ids = unwrapped_model.generate(
-                    **generate_inputs, generation_config=self.generation_config, disable_compile=True
-                )
+                if self.compute_attention_metrics:
+                    attention_outputs = unwrapped_model.generate(
+                        **generate_inputs,
+                        generation_config=self.generation_config,
+                        disable_compile=True,
+                        return_dict_in_generate=True,
+                        output_attentions=True,
+                    )
+                    prompt_completion_ids = attention_outputs.sequences
+                else:
+                    prompt_completion_ids = unwrapped_model.generate(
+                        **generate_inputs, generation_config=self.generation_config, disable_compile=True
+                    )
             # Compute prompt length and extract completion ids
             prompt_ids, prompt_mask = generate_inputs["input_ids"], generate_inputs["attention_mask"]
             prompt_length = prompt_ids.size(1)
@@ -1300,13 +1488,16 @@ class GRPOTrainer(BaseTrainer):
             completion_ids = [c[m].tolist() for c, m in zip(completion_ids, completion_mask.bool())]
             logprobs = None  # not used in this case
 
-        return prompt_ids, completion_ids, logprobs
+        attention_context = None
+        if self.compute_attention_metrics and 'attention_outputs' in locals():
+            attention_context = {"outputs": attention_outputs, "inputs": generate_inputs}
+        return prompt_ids, completion_ids, logprobs, attention_context
 
     def _generate(self, prompts: list[str], images: Optional[list]):
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
 
-        prompt_ids, completion_ids, logprobs = self._generate_single_turn(prompts, images)
+        prompt_ids, completion_ids, logprobs, attention_context = self._generate_single_turn(prompts, images)
 
         # Get completion length per sequence, used for logging
         prompt_lengths = torch.tensor([len(ids) for ids in prompt_ids], device=device)
@@ -1338,7 +1529,181 @@ class GRPOTrainer(BaseTrainer):
         self._metrics[mode]["completions/min_terminated_length"].append(term_completion_lengths.float().min().item())
         self._metrics[mode]["completions/max_terminated_length"].append(term_completion_lengths.float().max().item())
 
+        # Process attentions into metrics if enabled
+        try:
+            if self.compute_attention_metrics:
+                self._process_attention_metrics(attention_context, mode)
+        except Exception:
+            pass
         return prompt_ids, completion_ids, total_completion_tokens, logprobs
+
+    # ---------- Rollout logging helpers ----------
+    def _truncate_text(self, s: str, n: int) -> str:
+        s = s or ""
+        return (s[:n] + "…") if len(s) > n else s
+
+    def _compute_real_mdi_metrics(self, sample_results: list) -> list[dict]:
+        import math
+        ratio_R = getattr(self.args, "mdi_balance_ratio", 2.0)
+        if ratio_R <= 1.0:
+            ratio_R = 2.0
+        logR = math.log(ratio_R)
+        results = []
+        for res in sample_results:
+            segments = getattr(res, "segments", {}) if res is not None else {}
+            segment = segments.get("late") or segments.get("all") if isinstance(segments, dict) else None
+            if segment is None or not hasattr(segment, "mdi") or segment.mdi is None:
+                results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
+                continue
+            mdi = float(segment.mdi)
+            if not (mdi > 0) or not (mdi < float("inf")):
+                results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
+                continue
+            balance = max(0.0, min(1.0, 1.0 - abs(math.log(mdi)) / logR))
+            text_ratio = mdi / (1.0 + mdi)
+            vision_ratio = 1.0 / (1.0 + mdi)
+            results.append({
+                "mdi": round(float(mdi), 6),
+                "balance": round(float(balance), 6),
+                "text_ratio": round(float(text_ratio), 6),
+                "vision_ratio": round(float(vision_ratio), 6),
+                "attention_distribution": [round(float(text_ratio), 6), round(float(vision_ratio), 6)],
+            })
+        return results
+
+    def _emit_rollout_logs(
+        self,
+        prompts_text: list[str],
+        completions_text: list[str],
+        solutions: list[Optional[str]],
+        rewards_per_func_local: torch.Tensor,
+        total_rewards_local: torch.Tensor,
+        reward_names: list[str],
+        mdi_info: list[dict],
+    ) -> None:
+        if not (self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False)):
+            return
+        # Build header and progress
+        self._rollout_step_count += 1
+        try:
+            max_steps = getattr(self.state, "max_steps", None)
+        except Exception:
+            max_steps = None
+        header = f"=== Rollout Step {self._rollout_step_count} ===\nStep: {self.state.global_step}/{max_steps if max_steps is not None else '?'}"
+
+        # Prepare per-sample summary rows
+        rows = []
+        name_to_idx = {n: i for i, n in enumerate(reward_names)}
+        for idx, (p, c, sol) in enumerate(zip(prompts_text, completions_text, solutions)):
+            preview_p = self._truncate_text(p.replace("\n", " "), self.args.prompt_preview_chars)
+            preview_c = self._truncate_text(c.replace("\n", " "), self.args.completion_preview_chars)
+            acc = float(rewards_per_func_local[idx, name_to_idx.get("accuracy_reward", 0)].item()) if rewards_per_func_local.numel() and "accuracy_reward" in name_to_idx else 0.0
+            fmt = float(rewards_per_func_local[idx, name_to_idx.get("think_format_reward", 0)].item()) if rewards_per_func_local.numel() and "think_format_reward" in name_to_idx else 0.0
+            mdi_val = float(rewards_per_func_local[idx, name_to_idx.get("mdi_reward", 0)].item()) if rewards_per_func_local.numel() and ("mdi_reward" in name_to_idx) else 0.0
+            tot = float(total_rewards_local[idx].item()) if total_rewards_local.numel() else 0.0
+            rows.append((idx + 1, preview_p, preview_c, sol or "", acc, fmt, mdi_val, tot))
+
+        # Console pretty print
+        if 'Console' in globals() and Console is not None and hasattr(self, "_console") and self._console is not None:
+            self._console.print(f"\n[bold cyan]{header}[/bold cyan]")
+            table = Table(box=box.MINIMAL, show_lines=False)
+            table.add_column("#", style="dim")
+            table.add_column("Prompt")
+            table.add_column("Completion")
+            table.add_column("Solution", style="italic")
+            table.add_column("acc", style="green")
+            table.add_column("format", style="magenta")
+            table.add_column("mdi", style="yellow")
+            table.add_column("total", style="bold")
+            for r in rows:
+                table.add_row(str(r[0]), r[1], r[2], r[3], f"{r[4]:.3f}", f"{r[5]:.3f}", f"{r[6]:.3f}", f"{r[7]:.3f}")
+            self._console.print(table)
+
+            # MDI section
+            self._console.print("\n[bold]MDI Attention Info:[/bold]")
+            for i, info in enumerate(mdi_info, start=1):
+                self._console.print(
+                    json.dumps(
+                        {
+                            "sample": i,
+                            "MDI Value": info.get("mdi"),
+                            "Balance Score": info.get("balance"),
+                            "Text-Vision Ratio": f"{info.get('text_ratio')}:{info.get('vision_ratio')}",
+                            "Attention Distribution": info.get("attention_distribution"),
+                        },
+                        ensure_ascii=False,
+                    )
+                )
+        else:
+            # 添加美观的分割线
+            separator = "=" * 80
+            print(f"\n{separator}")
+            print(f"🎯 {header}")
+            print(f"{separator}")
+            
+            for i, (r, info) in enumerate(zip(rows, mdi_info)):
+                # 每个样本之间添加分隔线
+                if i > 0:
+                    print("-" * 60)
+                
+                print(f"\n📝 Sample {r[0]}:")
+                print(f"   Prompt: \"{r[1]}\"")
+                print(f"   Completion: \"{r[2]}\"")
+                print(f"   Solution: \"{r[3]}\"")
+                print(f"   📊 Rewards: accuracy={r[4]:.3f}, format={r[5]:.3f}, mdi={r[6]:.3f}, total={r[7]:.3f}")
+                
+                # MDI信息格式化
+                print(f"   🧠 MDI Attention Info:")
+                print(f"      MDI Value: {info.get('mdi', 'N/A')}")
+                print(f"      Balance Score: {info.get('balance', 'N/A')}")
+                print(f"      Text-Vision Ratio: {info.get('text_ratio', 'N/A')}:{info.get('vision_ratio', 'N/A')}")
+                print(f"      Attention Distribution: {info.get('attention_distribution', 'N/A')}")
+            
+            print(f"\n{separator}")
+
+        # Append to files with better error handling and formatting
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            if getattr(self.args, "rollout_log_path", None):
+                # 确保目录存在
+                os.makedirs(os.path.dirname(self.args.rollout_log_path), exist_ok=True)
+                with open(self.args.rollout_log_path, "a", encoding="utf-8") as f:
+                    f.write(f"\n## {header} | {ts}\n\n")
+                    for r in rows:
+                        f.write(f"### Sample {r[0]}\n\n")
+                        f.write(f"**Prompt:** {r[1]}\n\n")
+                        f.write(f"**Completion:** {r[2]}\n\n")
+                        f.write(f"**Solution:** {r[3]}\n\n")
+                        f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, mdi={r[6]:.3f}, total={r[7]:.3f}\n\n")
+                        f.write("---\n\n")
+            if getattr(self.args, "attention_diag_log_path", None):
+                # 确保目录存在
+                os.makedirs(os.path.dirname(self.args.attention_diag_log_path), exist_ok=True)
+                with open(self.args.attention_diag_log_path, "a", encoding="utf-8") as f:
+                    f.write(f"\n## {header} | {ts}\n\n")
+                    f.write("### MDI Attention Diagnostics\n\n")
+                    for i, info in enumerate(mdi_info, start=1):
+                        f.write(f"#### Sample {i}\n\n")
+                        f.write(f"```json\n")
+                        f.write(
+                            json.dumps(
+                                {
+                                    "sample": i,
+                                    "MDI Value": info.get("mdi"),
+                                    "Balance Score": info.get("balance"),
+                                    "Text-Vision Ratio": f"{info.get('text_ratio')}:{info.get('vision_ratio')}",
+                                    "Attention Distribution": info.get("attention_distribution"),
+                                },
+                                ensure_ascii=False,
+                                indent=2
+                            )
+                        )
+                        f.write(f"\n```\n\n")
+        except Exception as e:
+            # 添加调试信息
+            print(f"⚠️  Warning: Failed to write to log files: {e}")
+            import traceback
+            traceback.print_exc()
 
     def _generate_and_score_completions(
         self, inputs: list[dict[str, Union[torch.Tensor, Any]]]
@@ -1520,11 +1885,28 @@ class GRPOTrainer(BaseTrainer):
         # Calculate mean reward per function, but only for samples where the function was applied (non-NaN values)
         for i, reward_func_name in enumerate(self.reward_func_names):
             mean_rewards = torch.nanmean(rewards_per_func[:, i]).item()
-            self._metrics[mode][f"rewards/{reward_func_name}/mean"].append(mean_rewards)
             std_func_rewards = nanstd(rewards_per_func[:, i]).item()
+            
+            # 检查数值是否异常
+            if torch.isnan(torch.tensor(mean_rewards)) or torch.isinf(torch.tensor(mean_rewards)):
+                print(f"⚠️  Warning: {reward_func_name} mean reward is NaN/Inf: {mean_rewards}")
+            if torch.isnan(torch.tensor(std_func_rewards)) or torch.isinf(torch.tensor(std_func_rewards)):
+                print(f"⚠️  Warning: {reward_func_name} std reward is NaN/Inf: {std_func_rewards}")
+            
+            self._metrics[mode][f"rewards/{reward_func_name}/mean"].append(mean_rewards)
             self._metrics[mode][f"rewards/{reward_func_name}/std"].append(std_func_rewards)
-        self._metrics[mode]["reward"].append(mean_grouped_rewards.mean().item())
-        self._metrics[mode]["reward_std"].append(std_rewards.mean().item())
+        
+        # 检查总奖励是否异常
+        total_reward_mean = mean_grouped_rewards.mean().item()
+        total_reward_std = std_rewards.mean().item()
+        
+        if torch.isnan(torch.tensor(total_reward_mean)) or torch.isinf(torch.tensor(total_reward_mean)):
+            print(f"⚠️  Warning: Total reward mean is NaN/Inf: {total_reward_mean}")
+        if torch.isnan(torch.tensor(total_reward_std)) or torch.isinf(torch.tensor(total_reward_std)):
+            print(f"⚠️  Warning: Total reward std is NaN/Inf: {total_reward_std}")
+            
+        self._metrics[mode]["reward"].append(total_reward_mean)
+        self._metrics[mode]["reward_std"].append(total_reward_std)
         self._metrics[mode]["frac_reward_zero_std"].append(is_std_zero.float().mean().item())
 
         # Log prompt and completion texts
@@ -1568,6 +1950,42 @@ class GRPOTrainer(BaseTrainer):
             self._metrics[mode]["sampling/importance_sampling_ratio/max"].append(
                 nanmax(self.accelerator.gather(max_importance_sampling_ratio)).item()
             )
+
+        # Realtime rollout logging
+        try:
+            if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
+                local_rewards_per_func = rewards_per_func[process_slice]
+                local_total_rewards = rewards[process_slice]
+                solutions = []
+                for ex in inputs:
+                    sol = ex.get("solution") or ex.get("answer") or ex.get("label")
+                    if isinstance(sol, (list, tuple)) and len(sol) > 0:
+                        sol = sol[0]
+                    solutions.append(str(sol) if sol is not None else "")
+                if self.compute_attention_metrics and isinstance(self._logs.get("attention"), deque):
+                    att_list = list(self._logs["attention"])  # recent items
+                    sample_results = att_list[-len(prompts_text):] if len(att_list) >= len(prompts_text) else att_list
+                    mdi_info = self._compute_real_mdi_metrics(sample_results)
+                else:
+                    mdi_info = [{} for _ in inputs]
+                # 确保_emit_rollout_logs被调用
+                try:
+                    self._emit_rollout_logs(
+                        prompts_text=prompts_text,
+                        completions_text=completions_text,
+                        solutions=solutions,
+                        rewards_per_func_local=local_rewards_per_func.detach().cpu(),
+                        total_rewards_local=local_total_rewards.detach().cpu(),
+                        reward_names=self.reward_func_names,
+                        mdi_info=mdi_info,
+                    )
+                    print(f"✅ Successfully logged rollout results for {len(prompts_text)} samples")
+                except Exception as e:
+                    print(f"❌ Failed to emit rollout logs: {e}")
+                    import traceback
+                    traceback.print_exc()
+        except Exception:
+            pass
 
         output = {
             "prompt_ids": prompt_ids,
@@ -1790,16 +2208,56 @@ class GRPOTrainer(BaseTrainer):
 
     def log(self, logs: dict[str, float], start_time: Optional[float] = None) -> None:
         mode = "train" if self.model.training else "eval"
-        metrics = {key: sum(val) / len(val) for key, val in self._metrics[mode].items()}  # average the metrics
+        
+        # 计算平均指标，添加异常值检查
+        metrics = {}
+        for key, val in self._metrics[mode].items():
+            if val:  # 确保列表不为空
+                avg_val = sum(val) / len(val)
+                # 检查数值是否异常
+                if torch.isnan(torch.tensor(avg_val)) or torch.isinf(torch.tensor(avg_val)):
+                    print(f"⚠️  Warning: Metric {key} is NaN/Inf: {avg_val}")
+                    # 用0替换异常值
+                    avg_val = 0.0
+                metrics[key] = avg_val
+            else:
+                metrics[key] = 0.0
 
         # This method can be called both in training and evaluation. When called in evaluation, the keys in `logs`
         # start with "eval_". We need to add the prefix "eval_" to the keys in `metrics` to match the format.
         if mode == "eval":
             metrics = {f"eval_{key}": val for key, val in metrics.items()}
 
+        # Also expose total reward under a structured key for TB
+        if "reward" in metrics:
+            metrics.setdefault("rewards/total_reward", metrics["reward"])
+        
+        # 合并日志，添加调试信息
         logs = {**logs, **metrics}
+        
+        # 添加调试信息（仅在主进程）
+        if self.accelerator.is_main_process and len(metrics) > 0:
+            print(f"📊 Logging {len(metrics)} metrics for {mode} mode")
+            for key, val in list(metrics.items())[:5]:  # 只显示前5个指标
+                print(f"   {key}: {val:.4f}")
+            if len(metrics) > 5:
+                print(f"   ... and {len(metrics) - 5} more metrics")
+        
         super().log(logs, start_time)
         self._metrics[mode].clear()
+
+        # Optional concise MDI print
+        try:
+            if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
+                key = ("eval_attention/late/mdi" if mode == "eval" else "attention/late/mdi")
+                if key in logs:
+                    val = logs[key]
+                    if is_rich_available() and 'Console' in globals() and Console is not None and hasattr(self, "_console") and self._console is not None:
+                        self._console.print(f"MDI(late) ≈ {val:.3f}")
+                    else:
+                        print(f"MDI(late): {val:.3f}")
+        except Exception:
+            pass
 
         if self.accelerator.is_main_process and self.log_completions:
             if is_rich_available():

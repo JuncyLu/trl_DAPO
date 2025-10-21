@@ -635,6 +635,55 @@ class GRPOConfig(TrainingArguments):
             "all prompts are logged."
         },
     )
+    # Realtime rollout logging and attention diagnostics
+    realtime_rollout_logging: bool = field(
+        default=True,
+        metadata={
+            "help": "If True, print and persist per-rollout sample results (prompts, completions, rewards, MDI)."
+        },
+    )
+    compute_attention_metrics: bool = field(
+        default=False,
+        metadata={
+            "help": "If True, compute and log simplified attention/MDI diagnostics using generated attentions."
+        },
+    )
+    rollout_log_path: Optional[str] = field(
+        default="/home/lujunxi57/trl/training_logs/rollout_results.md",
+        metadata={
+            "help": "Absolute path to append per-rollout results in Markdown format."
+        },
+    )
+    attention_diag_log_path: Optional[str] = field(
+        default="/home/lujunxi57/trl/training_logs/attention_diagnostics.md",
+        metadata={
+            "help": "Absolute path to append per-rollout attention/MDI diagnostics in Markdown format."
+        },
+    )
+    tb_priority_rewards_first: bool = field(
+        default=True,
+        metadata={
+            "help": "If True, prioritizes writing reward metrics to TensorBoard (handled by report_to=tensorboard)."
+        },
+    )
+    mdi_balance_ratio: float = field(
+        default=2.0,
+        metadata={
+            "help": "Tolerance ratio R for MDI balance: balance = clip(1 - |log(MDI)|/log(R), 0, 1)."
+        },
+    )
+    prompt_preview_chars: int = field(
+        default=100,
+        metadata={"help": "Number of prompt characters to include in rollout console/file previews."},
+    )
+    completion_preview_chars: int = field(
+        default=200,
+        metadata={"help": "Number of completion characters to include in rollout console/file previews."},
+    )
+    colorize_output: bool = field(
+        default=True,
+        metadata={"help": "If True, use colored console output (rich) when available."},
+    )
 
     def __post_init__(self):
         self.bf16 = not (self.fp16) if self.bf16 is None else self.bf16
