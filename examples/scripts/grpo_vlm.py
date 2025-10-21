@@ -75,6 +75,7 @@ from typing import Optional, Union, Dict
 
 import torch
 from datasets import load_dataset, DatasetDict, Dataset
+from PIL import Image
 
 from trl import (
     GRPOConfig,
@@ -327,7 +328,6 @@ if __name__ == "__main__":
         # 检查数据格式，适应不同的数据结构
         if "image_path" in example:
             # 我们的 A-OKVQA 数据格式：从路径加载图片
-            from PIL import Image
             image_path = _resolve_image_path(example["image_path"])
             try:
                 pil_image = Image.open(image_path)
@@ -338,7 +338,6 @@ if __name__ == "__main__":
             image = example["image"]
             if isinstance(image, dict):
                 # 嵌套格式：从路径加载图片
-                from PIL import Image
                 image_path = _resolve_image_path(image["path"])
                 try:
                     pil_image = Image.open(image_path)
@@ -359,7 +358,6 @@ if __name__ == "__main__":
         # 检查数据格式，适应不同的数据结构
         if "image_path" in example:
             # 我们的 A-OKVQA 数据格式：从路径加载并转换
-            from PIL import Image
             image_path = _resolve_image_path(example["image_path"])
             pil_image = Image.open(image_path)
             if pil_image.mode != "RGB":
@@ -369,7 +367,6 @@ if __name__ == "__main__":
             image = example["image"]
             if isinstance(image, dict):
                 # 嵌套格式：从路径加载并转换
-                from PIL import Image
                 image_path = _resolve_image_path(image["path"])
                 pil_image = Image.open(image_path)
                 if pil_image.mode != "RGB":

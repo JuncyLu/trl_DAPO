@@ -643,7 +643,7 @@ class GRPOConfig(TrainingArguments):
         },
     )
     compute_attention_metrics: bool = field(
-        default=False,
+        default=True,
         metadata={
             "help": "If True, compute and log simplified attention/MDI diagnostics using generated attentions."
         },

@@ -1951,9 +1951,9 @@ class GRPOTrainer(BaseTrainer):
                 nanmax(self.accelerator.gather(max_importance_sampling_ratio)).item()
             )
 
-        # Realtime rollout logging
-        try:
-            if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
+        # Realtime rollout logging - 移出大的try-except块确保执行
+        if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
+            try:
                 local_rewards_per_func = rewards_per_func[process_slice]
                 local_total_rewards = rewards[process_slice]
                 solutions = []
@@ -1965,27 +1965,27 @@ class GRPOTrainer(BaseTrainer):
                 if self.compute_attention_metrics and isinstance(self._logs.get("attention"), deque):
                     att_list = list(self._logs["attention"])  # recent items
                     sample_results = att_list[-len(prompts_text):] if len(att_list) >= len(prompts_text) else att_list
+                    print(f"🔍 Debug: Found {len(sample_results)} attention samples")
                     mdi_info = self._compute_real_mdi_metrics(sample_results)
                 else:
+                    print(f"🔍 Debug: compute_attention_metrics={self.compute_attention_metrics}, attention_logs_type={type(self._logs.get('attention'))}")
                     mdi_info = [{} for _ in inputs]
-                # 确保_emit_rollout_logs被调用
-                try:
-                    self._emit_rollout_logs(
-                        prompts_text=prompts_text,
-                        completions_text=completions_text,
-                        solutions=solutions,
-                        rewards_per_func_local=local_rewards_per_func.detach().cpu(),
-                        total_rewards_local=local_total_rewards.detach().cpu(),
-                        reward_names=self.reward_func_names,
-                        mdi_info=mdi_info,
-                    )
-                    print(f"✅ Successfully logged rollout results for {len(prompts_text)} samples")
-                except Exception as e:
-                    print(f"❌ Failed to emit rollout logs: {e}")
-                    import traceback
-                    traceback.print_exc()
-        except Exception:
-            pass
+                
+                # 调用rollout日志记录
+                self._emit_rollout_logs(
+                    prompts_text=prompts_text,
+                    completions_text=completions_text,
+                    solutions=solutions,
+                    rewards_per_func_local=local_rewards_per_func.detach().cpu(),
+                    total_rewards_local=local_total_rewards.detach().cpu(),
+                    reward_names=self.reward_func_names,
+                    mdi_info=mdi_info,
+                )
+                print(f"✅ Successfully logged rollout results for {len(prompts_text)} samples")
+            except Exception as e:
+                print(f"❌ Failed to emit rollout logs: {e}")
+                import traceback
+                traceback.print_exc()
 
         output = {
             "prompt_ids": prompt_ids,
@@ -2237,11 +2237,36 @@ class GRPOTrainer(BaseTrainer):
         
         # 添加调试信息（仅在主进程）
         if self.accelerator.is_main_process and len(metrics) > 0:
-            print(f"📊 Logging {len(metrics)} metrics for {mode} mode")
-            for key, val in list(metrics.items())[:5]:  # 只显示前5个指标
-                print(f"   {key}: {val:.4f}")
-            if len(metrics) > 5:
-                print(f"   ... and {len(metrics) - 5} more metrics")
+            print(f"\n📊 Logging {len(metrics)} metrics for {mode} mode")
+            print("=" * 60)
+            
+            # 按类别分组显示指标
+            reward_metrics = {k: v for k, v in metrics.items() if 'reward' in k}
+            attention_metrics = {k: v for k, v in metrics.items() if 'attention' in k}
+            other_metrics = {k: v for k, v in metrics.items() if 'reward' not in k and 'attention' not in k}
+            
+            if reward_metrics:
+                print("🎯 Reward Metrics:")
+                for key, val in list(reward_metrics.items())[:3]:
+                    print(f"   {key}: {val:.4f}")
+                if len(reward_metrics) > 3:
+                    print(f"   ... and {len(reward_metrics) - 3} more reward metrics")
+            
+            if attention_metrics:
+                print("🧠 Attention Metrics:")
+                for key, val in list(attention_metrics.items())[:3]:
+                    print(f"   {key}: {val:.4f}")
+                if len(attention_metrics) > 3:
+                    print(f"   ... and {len(attention_metrics) - 3} more attention metrics")
+            
+            if other_metrics:
+                print("📈 Other Metrics:")
+                for key, val in list(other_metrics.items())[:3]:
+                    print(f"   {key}: {val:.4f}")
+                if len(other_metrics) > 3:
+                    print(f"   ... and {len(other_metrics) - 3} more metrics")
+            
+            print("=" * 60)
         
         super().log(logs, start_time)
         self._metrics[mode].clear()
