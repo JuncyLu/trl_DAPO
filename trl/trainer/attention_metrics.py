@@ -107,13 +107,29 @@ def _collect_llm_attention_for_sample(
 
 
 def _compute_mdi(attn_text: float, attn_vision: float, tokens_text: int, tokens_vision: int) -> float:
+    print(f"🔍 Debug _compute_mdi: attn_text={attn_text}, attn_vision={attn_vision}, tokens_text={tokens_text}, tokens_vision={tokens_vision}")
+    
     if tokens_text <= 0:
+        print(f"❌ tokens_text <= 0: {tokens_text}")
         raise ValueError("tokens_text must be > 0")
     if tokens_vision < 0:
+        print(f"❌ tokens_vision < 0: {tokens_vision}")
         raise ValueError("tokens_vision must be >= 0")
     if tokens_vision == 0:
+        print(f"⚠️ tokens_vision == 0, returning inf")
         return float("inf")
-    return (attn_text / tokens_text) / (attn_vision / tokens_vision)
+    
+    text_ratio = attn_text / tokens_text
+    vision_ratio = attn_vision / tokens_vision
+    mdi = text_ratio / vision_ratio
+    
+    print(f"🔍 Debug _compute_mdi计算: text_ratio={text_ratio}, vision_ratio={vision_ratio}, mdi={mdi}")
+    
+    if not (mdi > 0) or not (mdi < float("inf")):
+        print(f"❌ MDI计算结果无效: {mdi}")
+        return float("nan")
+    
+    return mdi
 
 
 def _compute_aei(
@@ -216,6 +232,12 @@ def _compute_segment_metrics(
     num_prompt_queries: int,
     actual_prompt_length: int,
 ) -> AttentionSegmentResult:
+    """
+    计算指定层段的MDI/AEI，严格参考本地Qwen流程：
+    - 使用“生成阶段”的query行（即从num_prompt_queries开始的行）。
+    - 仅对“提示词键”（前actual_prompt_length列）累积注意力，并按行归一化。
+    - 按文本/视觉键掩码分别汇总，再在层维度做平均。
+    """
     if not layer_indices:
         return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
 
@@ -228,10 +250,9 @@ def _compute_segment_metrics(
     if total_queries == 0:
         return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
 
-    # Use prompt-only attention rows (ignore generated tokens). This computes metrics from
-    # attentions of the prompt query positions over the prompt keys.
-    prompt_tokens = min(total_queries, max(num_prompt_queries, 0))
-    if prompt_tokens <= 0:
+    # 生成阶段的query行数
+    gen_row_start = max(num_prompt_queries, 0)
+    if gen_row_start >= total_queries:
         return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
 
     attn_text_total = 0.0
@@ -242,9 +263,11 @@ def _compute_segment_metrics(
         attn = per_layer_attn.get(layer_idx)
         if attn is None or attn.shape[0] == 0:
             continue
-        # Select the prompt query rows and restrict attention to prompt keys only
-        prompt_attn = attn[:prompt_tokens, :actual_prompt_length]
 
+        # 取生成阶段queries对应的注意力行，并裁剪到提示词键列
+        gen_attn = attn[gen_row_start:, :actual_prompt_length]
+
+        # 将vision/text键掩码对齐到actual_prompt_length
         if vision_mask.shape[0] != actual_prompt_length:
             if vision_mask.shape[0] < actual_prompt_length:
                 pad = torch.zeros(actual_prompt_length - vision_mask.shape[0], dtype=vision_mask.dtype)
@@ -254,15 +277,16 @@ def _compute_segment_metrics(
         else:
             vision_mask_prompt = vision_mask
 
-        text_keys_mask = (~vision_mask_prompt).to(prompt_attn.device)
-        vision_keys_mask = vision_mask_prompt.to(prompt_attn.device)
+        text_keys_mask = (~vision_mask_prompt).to(gen_attn.device)
+        vision_keys_mask = vision_mask_prompt.to(gen_attn.device)
 
-        prompt_attn_sum = prompt_attn.sum(dim=1, keepdim=True)
-        prompt_attn_sum = torch.where(prompt_attn_sum > 1e-12, prompt_attn_sum, torch.ones_like(prompt_attn_sum))
-        prompt_attn_norm = prompt_attn / prompt_attn_sum
+        # 行归一化
+        gen_attn_sum = gen_attn.sum(dim=1, keepdim=True)
+        gen_attn_sum = torch.where(gen_attn_sum > 1e-12, gen_attn_sum, torch.ones_like(gen_attn_sum))
+        gen_attn_norm = gen_attn / gen_attn_sum
 
-        attn_text_total += prompt_attn_norm[:, text_keys_mask].sum().item()
-        attn_vision_total += prompt_attn_norm[:, vision_keys_mask].sum().item()
+        attn_text_total += gen_attn_norm[:, text_keys_mask].sum().item()
+        attn_vision_total += gen_attn_norm[:, vision_keys_mask].sum().item()
         num_layers_with_data += 1
 
     if num_layers_with_data == 0:
@@ -419,4 +443,3 @@ def extract_vision_token_spans_qwen(
         end_pos = search_start + relative[0].item()
         spans.append((pos, end_pos + 1))
     return spans
-

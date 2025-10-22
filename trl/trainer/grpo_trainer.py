@@ -356,54 +356,12 @@ class GRPOTrainer(BaseTrainer):
         # Realtime rollout logging setup (main process only)
         self._rollout_step_count = 0
         self._console = None
-        
-        # 确保training_logs目录存在（无论是否启用realtime_rollout_logging）
-        if self.accelerator.is_main_process:
-            try:
-                training_logs_dir = "/home/lujunxi57/trl/training_logs"
-                os.makedirs(training_logs_dir, exist_ok=True)
-                print(f"📁 Training logs directory: {training_logs_dir}")
-            except Exception as e:
-                print(f"⚠️  Warning: Failed to create training logs directory: {e}")
-        
-        if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
-            try:
-                if getattr(self.args, "rollout_log_path", None):
-                    os.makedirs(os.path.dirname(self.args.rollout_log_path), exist_ok=True)
-                    if not os.path.exists(self.args.rollout_log_path):
-                        with open(self.args.rollout_log_path, "w", encoding="utf-8") as f:
-                            f.write("# Rollout Results Log\n\n")
-                            f.write("This file contains detailed rollout results from GRPO training.\n\n")
-                    print(f"📝 Rollout log file: {self.args.rollout_log_path}")
-                    
-                if getattr(self.args, "attention_diag_log_path", None):
-                    os.makedirs(os.path.dirname(self.args.attention_diag_log_path), exist_ok=True)
-                    if not os.path.exists(self.args.attention_diag_log_path):
-                        with open(self.args.attention_diag_log_path, "w", encoding="utf-8") as f:
-                            f.write("# Attention Diagnostics Log\n\n")
-                            f.write("This file contains MDI attention diagnostics from GRPO training.\n\n")
-                    print(f"🧠 Attention diagnostics file: {self.args.attention_diag_log_path}")
-            except Exception as e:
-                print(f"⚠️  Warning: Failed to initialize log files: {e}")
-                import traceback
-                traceback.print_exc()
-            if getattr(self.args, "colorize_output", False) and Console is not None:
-                try:
-                    self._console = Console()
-                except Exception:
-                    self._console = None
-
-        # Attention diagnostics flags
-        self.compute_attention_metrics = getattr(self.args, "compute_attention_metrics", False)
-        if self.compute_attention_metrics and self.use_vllm:
-            logger.warning("`compute_attention_metrics=True` is not supported when using vLLM. Disabling attention diagnostics.")
-            self.compute_attention_metrics = False
-        if self.compute_attention_metrics and self.use_transformers_paged:
-            logger.warning("`compute_attention_metrics=True` is not supported with paged generation. Disabling attention diagnostics.")
-            self.compute_attention_metrics = False
 
         # current batch mdi balance cache for reward
         self._mdi_balance_scores_current_batch = []
+        
+        # 设置注意力诊断标志（在super().__init__之前）
+        self.compute_attention_metrics = args.compute_attention_metrics
 
         # Training arguments
         self.max_prompt_length = args.max_prompt_length
@@ -655,6 +613,50 @@ class GRPOTrainer(BaseTrainer):
 
         # Add tags to the model
         self.model.add_model_tags(self._tag_names)
+
+        # 检查并禁用不兼容的注意力诊断选项
+        if self.compute_attention_metrics and self.use_vllm:
+            logger.warning("`compute_attention_metrics=True` is not supported when using vLLM. Disabling attention diagnostics.")
+            self.compute_attention_metrics = False
+        if self.compute_attention_metrics and self.use_transformers_paged:
+            logger.warning("`compute_attention_metrics=True` is not supported with paged generation. Disabling attention diagnostics.")
+            self.compute_attention_metrics = False
+
+        # 确保training_logs目录存在（无论是否启用realtime_rollout_logging）
+        if self.accelerator.is_main_process:
+            try:
+                training_logs_dir = "/home/lujunxi57/trl/training_logs"
+                os.makedirs(training_logs_dir, exist_ok=True)
+                print(f"📁 Training logs directory: {training_logs_dir}")
+            except Exception as e:
+                print(f"⚠️  Warning: Failed to create training logs directory: {e}")
+        
+        if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
+            try:
+                if getattr(self.args, "rollout_log_path", None):
+                    os.makedirs(os.path.dirname(self.args.rollout_log_path), exist_ok=True)
+                    if not os.path.exists(self.args.rollout_log_path):
+                        with open(self.args.rollout_log_path, "w", encoding="utf-8") as f:
+                            f.write("# Rollout Results Log\n\n")
+                            f.write("This file contains detailed rollout results from GRPO training.\n\n")
+                    print(f"📝 Rollout log file: {self.args.rollout_log_path}")
+
+                if getattr(self.args, "attention_diag_log_path", None):
+                    os.makedirs(os.path.dirname(self.args.attention_diag_log_path), exist_ok=True)
+                    if not os.path.exists(self.args.attention_diag_log_path):
+                        with open(self.args.attention_diag_log_path, "w", encoding="utf-8") as f:
+                            f.write("# Attention Diagnostics Log\n\n")
+                            f.write("This file contains MDI attention diagnostics from GRPO training.\n\n")
+                    print(f"🧠 Attention diagnostics file: {self.args.attention_diag_log_path}")
+            except Exception as e:
+                print(f"⚠️  Warning: Failed to setup logging files: {e}")
+                import traceback
+                traceback.print_exc()
+            if getattr(self.args, "colorize_output", False) and Console is not None:
+                try:
+                    self._console = Console()
+                except Exception:
+                    self._console = None
 
         if self.ref_model is not None:
             if self.is_deepspeed_enabled:
@@ -1261,7 +1263,8 @@ class GRPOTrainer(BaseTrainer):
                     prepare_multimodal_messages(prompt, num_images=len(image_list))
 
         prompts_text = [
-            maybe_apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"] for prompt in prompts
+            maybe_apply_chat_template({"prompt": prompt}, self.processing_class, add_generation_prompt=True)["prompt"]
+            for prompt in prompts
         ]
 
         # Generate completions using either vLLM or regular generation
@@ -1461,6 +1464,12 @@ class GRPOTrainer(BaseTrainer):
                 FSDP.summon_full_params(self.model_wrapped, recurse=False) if self.is_fsdp_enabled else nullcontext(),
             ):
                 if self.compute_attention_metrics:
+                    # Force eager attention implementation during attention capture
+                    previous_attn_impl = getattr(self.model_wrapped.config, "_attn_implementation", None)
+                    try:
+                        self.model_wrapped.config._attn_implementation = "eager"
+                    except Exception:
+                        pass
                     attention_outputs = unwrapped_model.generate(
                         **generate_inputs,
                         generation_config=self.generation_config,
@@ -1468,6 +1477,11 @@ class GRPOTrainer(BaseTrainer):
                         return_dict_in_generate=True,
                         output_attentions=True,
                     )
+                    # Restore previous attention implementation
+                    try:
+                        self.model_wrapped.config._attn_implementation = previous_attn_impl
+                    except Exception:
+                        pass
                     prompt_completion_ids = attention_outputs.sequences
                 else:
                     prompt_completion_ids = unwrapped_model.generate(
@@ -1549,26 +1563,51 @@ class GRPOTrainer(BaseTrainer):
             ratio_R = 2.0
         logR = math.log(ratio_R)
         results = []
-        for res in sample_results:
+        
+        print(f"🔍 Debug MDI计算: 处理{len(sample_results)}个样本")
+        
+        for i, res in enumerate(sample_results):
+            print(f"  样本{i+1}: res类型={type(res)}, res={res}")
+            
+            if res is None:
+                print(f"    ❌ res为None，使用默认值")
+                results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
+                continue
+                
             segments = getattr(res, "segments", {}) if res is not None else {}
+            print(f"    segments类型={type(segments)}, segments={segments}")
+            
             segment = segments.get("late") or segments.get("all") if isinstance(segments, dict) else None
+            print(f"    segment类型={type(segment)}, segment={segment}")
+            
             if segment is None or not hasattr(segment, "mdi") or segment.mdi is None:
+                print(f"    ❌ segment无效，使用默认值")
                 results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
                 continue
+                
             mdi = float(segment.mdi)
+            print(f"    MDI原始值={mdi}")
+            
             if not (mdi > 0) or not (mdi < float("inf")):
+                print(f"    ❌ MDI值无效，使用默认值")
                 results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
                 continue
+                
             balance = max(0.0, min(1.0, 1.0 - abs(math.log(mdi)) / logR))
             text_ratio = mdi / (1.0 + mdi)
             vision_ratio = 1.0 / (1.0 + mdi)
-            results.append({
+            
+            result = {
                 "mdi": round(float(mdi), 6),
                 "balance": round(float(balance), 6),
                 "text_ratio": round(float(text_ratio), 6),
                 "vision_ratio": round(float(vision_ratio), 6),
                 "attention_distribution": [round(float(text_ratio), 6), round(float(vision_ratio), 6)],
-            })
+            }
+            print(f"    ✅ 计算结果={result}")
+            results.append(result)
+            
+        print(f"🔍 Debug MDI计算完成，返回{len(results)}个结果")
         return results
 
     def _emit_rollout_logs(
@@ -1597,7 +1636,11 @@ class GRPOTrainer(BaseTrainer):
         for idx, (p, c, sol) in enumerate(zip(prompts_text, completions_text, solutions)):
             preview_p = self._truncate_text(p.replace("\n", " "), self.args.prompt_preview_chars)
             preview_c = self._truncate_text(c.replace("\n", " "), self.args.completion_preview_chars)
-            acc = float(rewards_per_func_local[idx, name_to_idx.get("accuracy_reward", 0)].item()) if rewards_per_func_local.numel() and "accuracy_reward" in name_to_idx else 0.0
+            # prefer named accuracy_reward; fallback to mc_idx_reward if present
+            acc_idx = name_to_idx.get("accuracy_reward")
+            if acc_idx is None:
+                acc_idx = name_to_idx.get("mc_idx_reward")
+            acc = float(rewards_per_func_local[idx, acc_idx].item()) if rewards_per_func_local.numel() and acc_idx is not None else 0.0
             fmt = float(rewards_per_func_local[idx, name_to_idx.get("think_format_reward", 0)].item()) if rewards_per_func_local.numel() and "think_format_reward" in name_to_idx else 0.0
             mdi_val = float(rewards_per_func_local[idx, name_to_idx.get("mdi_reward", 0)].item()) if rewards_per_func_local.numel() and ("mdi_reward" in name_to_idx) else 0.0
             tot = float(total_rewards_local[idx].item()) if total_rewards_local.numel() else 0.0
@@ -1635,31 +1678,8 @@ class GRPOTrainer(BaseTrainer):
                     )
                 )
         else:
-            # 添加美观的分割线
-            separator = "=" * 80
-            print(f"\n{separator}")
-            print(f"🎯 {header}")
-            print(f"{separator}")
-            
-            for i, (r, info) in enumerate(zip(rows, mdi_info)):
-                # 每个样本之间添加分隔线
-                if i > 0:
-                    print("-" * 60)
-                
-                print(f"\n📝 Sample {r[0]}:")
-                print(f"   Prompt: \"{r[1]}\"")
-                print(f"   Completion: \"{r[2]}\"")
-                print(f"   Solution: \"{r[3]}\"")
-                print(f"   📊 Rewards: accuracy={r[4]:.3f}, format={r[5]:.3f}, mdi={r[6]:.3f}, total={r[7]:.3f}")
-                
-                # MDI信息格式化
-                print(f"   🧠 MDI Attention Info:")
-                print(f"      MDI Value: {info.get('mdi', 'N/A')}")
-                print(f"      Balance Score: {info.get('balance', 'N/A')}")
-                print(f"      Text-Vision Ratio: {info.get('text_ratio', 'N/A')}:{info.get('vision_ratio', 'N/A')}")
-                print(f"      Attention Distribution: {info.get('attention_distribution', 'N/A')}")
-            
-            print(f"\n{separator}")
+            # 不再在终端打印rollout信息，只记录到文件
+            pass
 
         # Append to files with better error handling and formatting
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1958,9 +1978,20 @@ class GRPOTrainer(BaseTrainer):
                 local_total_rewards = rewards[process_slice]
                 solutions = []
                 for ex in inputs:
-                    sol = ex.get("solution") or ex.get("answer") or ex.get("label")
-                    if isinstance(sol, (list, tuple)) and len(sol) > 0:
-                        sol = sol[0]
+                    # prefer label_idx -> letter if available
+                    if "label_idx" in ex and ex["label_idx"] is not None:
+                        try:
+                            li = int(ex["label_idx"]) if not isinstance(ex["label_idx"], (list, tuple)) else int(ex["label_idx"][0])
+                            if 0 <= li <= 25:
+                                sol = chr(ord('A') + li)
+                            else:
+                                sol = str(li)
+                        except Exception:
+                            sol = ""
+                    else:
+                        sol = ex.get("solution") or ex.get("answer") or ex.get("label")
+                        if isinstance(sol, (list, tuple)) and len(sol) > 0:
+                            sol = sol[0]
                     solutions.append(str(sol) if sol is not None else "")
                 if self.compute_attention_metrics and isinstance(self._logs.get("attention"), deque):
                     att_list = list(self._logs["attention"])  # recent items

@@ -76,6 +76,17 @@ from typing import Optional, Union, Dict
 import torch
 from datasets import load_dataset, DatasetDict, Dataset
 from PIL import Image
+from datetime import datetime
+import atexit
+import io
+
+# Ensure we import the local `trl` package from the repo root (two levels up)
+# When running this file directly (e.g., via accelerate), Python may set sys.path[0]
+# to the script directory (examples/scripts), which can shadow the repo root and
+# cause an installed `trl` package to be imported instead of the local one.
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if _REPO_ROOT not in sys.path:
+    sys.path.insert(0, _REPO_ROOT)
 
 from trl import (
     GRPOConfig,
@@ -114,6 +125,15 @@ class DataArguments:
     )
     eval_size: Optional[int] = field(
         default=100, metadata={"help": "If no eval split exists, take this many examples from train for eval."}
+    )
+    terminal_markdown_log: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": (
+                "Optional path to a Markdown file. If set, a pretty copy of the terminal output is tee'd "
+                "into this file (with a header and fenced code blocks)."
+            )
+        },
     )
 
 
@@ -193,11 +213,105 @@ if __name__ == "__main__":
         training_args.generation_kwargs["return_dict_in_generate"] = True
     except Exception:
         pass
-    # Ensure training log directory for rollout/attention files only
+    # Ensure training log directory for rollout/attention files only and configure markdown tee
     try:
-        os.makedirs("/home/lujunxi57/trl/training_logs/", exist_ok=True)
+        default_logs_dir = "/home/lujunxi57/trl/training_logs/"
+        os.makedirs(default_logs_dir, exist_ok=True)
     except Exception:
+        default_logs_dir = os.path.join(os.getcwd(), "training_logs")
+        os.makedirs(default_logs_dir, exist_ok=True)
+
+    # Configure rollout/attention diagnostics log paths if available on this TRL version
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    try:
+        # 强制启用实时rollout日志记录
+        if getattr(training_args, "realtime_rollout_logging", None) is None:
+            setattr(training_args, "realtime_rollout_logging", True)
+        
+        # 设置rollout日志路径
+        if getattr(training_args, "rollout_log_path", None) in (None, ""):
+            training_args.rollout_log_path = os.path.join(default_logs_dir, f"rollout_results_{ts}.md")
+        
+        # 设置注意力诊断日志路径
+        if getattr(training_args, "attention_diag_log_path", None) in (None, ""):
+            training_args.attention_diag_log_path = os.path.join(default_logs_dir, f"attention_diagnostics_{ts}.md")
+        
+        # 启用彩色输出以支持美观的表格显示
+        if getattr(training_args, "colorize_output", None) is None:
+            setattr(training_args, "colorize_output", True)
+            
+        print(f"📝 Rollout log will be saved to: {training_args.rollout_log_path}")
+        print(f"🧠 Attention diagnostics will be saved to: {training_args.attention_diag_log_path}")
+    except Exception as e:
+        print(f"⚠️ Failed to configure logging paths: {e}")
+        # Older TRL versions may not expose these attributes; ignore silently
         pass
+
+    # Pretty tee of terminal output into a Markdown file if requested
+    if data_args.terminal_markdown_log:
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(data_args.terminal_markdown_log)), exist_ok=True)
+
+            class _MarkdownTee(io.TextIOBase):
+                def __init__(self, stream, file_path: str):
+                    self._stream = stream
+                    self._file = open(file_path, "a", encoding="utf-8")
+                    # Header
+                    self._file.write(f"# Training Logs\n\n")
+                    self._file.write(
+                        f"- Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                        f"- Model: {getattr(model_args, 'model_name_or_path', '')}\n"
+                        f"- Dataset: {getattr(data_args, 'dataset_path', '') or getattr(script_args, 'dataset_name', '')}\n"
+                        f"- Output Dir: {getattr(training_args, 'output_dir', '')}\n"
+                    )
+                    self._file.write("\n---\n\n")
+                    self._file.write("```text\n")
+                    self._file.flush()
+
+                def write(self, s):
+                    try:
+                        self._file.write(s)
+                        self._file.flush()
+                    except Exception:
+                        pass
+                    return self._stream.write(s)
+
+                def flush(self):
+                    try:
+                        self._file.flush()
+                    except Exception:
+                        pass
+                    return self._stream.flush()
+
+                def close(self):
+                    try:
+                        # Close fenced block nicely
+                        self._file.write("\n```\n")
+                        self._file.flush()
+                        self._file.close()
+                    except Exception:
+                        pass
+                    return self._stream.close()
+
+            # Install tee for stdout and stderr
+            _orig_stdout, _orig_stderr = sys.stdout, sys.stderr
+            sys.stdout = _MarkdownTee(_orig_stdout, data_args.terminal_markdown_log)
+            sys.stderr = _MarkdownTee(_orig_stderr, data_args.terminal_markdown_log)
+
+            @atexit.register
+            def _close_markdown_tee():
+                try:
+                    if hasattr(sys.stdout, "close"):
+                        sys.stdout.close()
+                except Exception:
+                    pass
+                try:
+                    if hasattr(sys.stderr, "close"):
+                        sys.stderr.close()
+                except Exception:
+                    pass
+        except Exception as _e:
+            print(f"⚠️ Failed to enable terminal markdown logging: {_e}")
     ################
     # Model
     ################
@@ -304,6 +418,8 @@ if __name__ == "__main__":
         else:
             raise KeyError("数据集必须包含 'problem' 或 'prompt' 字段")
         
+        # 使用模型自带的 chat_template，并保留带“思考”说明的系统提示
+        # 多模态占位符由后续 prepare_multimodal_messages 注入
         prompt = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_content},
@@ -426,14 +542,26 @@ if __name__ == "__main__":
                 else:
                     content = str(comp)
                 text = str(content)
-                # Prefer explicit Answer: X patterns
+                # Prefer explicit Answer patterns (English/Chinese)
                 m = re.search(r"(?i)(?:final\s*answer|answer)\s*[:\-]?\s*([A-J])", text)
+                if not m:
+                    m = re.search(r"答案\s*[:：]?\s*([A-JＡ-Ｊ])", text)  # Chinese full-width letters as well
+                if not m:
+                    m = re.search(r"选项\s*[:：]?\s*([A-JＡ-Ｊ])", text)
+                if not m:
+                    m = re.search(r"(?:option|choose|选择)\s*([A-J])", text, flags=re.IGNORECASE)
                 if not m:
                     # Fallback: last standalone capital letter A-J
                     cands = re.findall(r"\b([A-J])\b", text)
                     pred = cands[-1].upper() if cands else None
                 else:
-                    pred = m.group(1).upper()
+                    pred = m.group(1)
+                    # Normalize full-width A-J to ASCII
+                    full2ascii = {
+                        "Ａ": "A", "Ｂ": "B", "Ｃ": "C", "Ｄ": "D", "Ｅ": "E",
+                        "Ｆ": "F", "Ｇ": "G", "Ｈ": "H", "Ｉ": "I", "Ｊ": "J",
+                    }
+                    pred = full2ascii.get(pred, pred).upper()
                 # Gold from index
                 try:
                     gi = int(idx)
