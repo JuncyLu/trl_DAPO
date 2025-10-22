@@ -107,26 +107,28 @@ def _collect_llm_attention_for_sample(
 
 
 def _compute_mdi(attn_text: float, attn_vision: float, tokens_text: int, tokens_vision: int) -> float:
-    print(f"🔍 Debug _compute_mdi: attn_text={attn_text}, attn_vision={attn_vision}, tokens_text={tokens_text}, tokens_vision={tokens_vision}")
+    """计算模态主导指数 (MDI)。
     
-    if tokens_text <= 0:
-        print(f"❌ tokens_text <= 0: {tokens_text}")
-        raise ValueError("tokens_text must be > 0")
-    if tokens_vision < 0:
-        print(f"❌ tokens_vision < 0: {tokens_vision}")
-        raise ValueError("tokens_vision must be >= 0")
+    Args:
+        attn_text: 对文本 tokens 的总注意力。
+        attn_vision: 对非文本 tokens 的总注意力。
+        tokens_text: 文本 tokens 数量。
+        tokens_vision: 非文本 tokens 数量。
+        
+    Returns:
+        MDI 值。
+    """
+    assert tokens_text > 0, "tokens_text must be > 0"
+    assert tokens_vision >= 0, "tokens_vision must be >= 0"
+    
     if tokens_vision == 0:
-        print(f"⚠️ tokens_vision == 0, returning inf")
         return float("inf")
     
     text_ratio = attn_text / tokens_text
     vision_ratio = attn_vision / tokens_vision
     mdi = text_ratio / vision_ratio
     
-    print(f"🔍 Debug _compute_mdi计算: text_ratio={text_ratio}, vision_ratio={vision_ratio}, mdi={mdi}")
-    
     if not (mdi > 0) or not (mdi < float("inf")):
-        print(f"❌ MDI计算结果无效: {mdi}")
         return float("nan")
     
     return mdi
@@ -253,6 +255,11 @@ def _compute_segment_metrics(
     # 生成阶段的query行数
     gen_row_start = max(num_prompt_queries, 0)
     if gen_row_start >= total_queries:
+        return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
+    
+    # 验证生成阶段是否有足够的tokens
+    generated_tokens = total_queries - num_prompt_queries
+    if generated_tokens <= 0:
         return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
 
     attn_text_total = 0.0

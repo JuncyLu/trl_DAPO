@@ -79,6 +79,7 @@ from PIL import Image
 from datetime import datetime
 import atexit
 import io
+from functools import wraps
 
 # Ensure we import the local `trl` package from the repo root (two levels up)
 # When running this file directly (e.g., via accelerate), Python may set sys.path[0]
@@ -215,7 +216,7 @@ if __name__ == "__main__":
         pass
     # Ensure training log directory for rollout/attention files only and configure markdown tee
     try:
-        default_logs_dir = "/home/lujunxi57/trl/training_logs/"
+        default_logs_dir = os.path.join(_REPO_ROOT, "training_logs")
         os.makedirs(default_logs_dir, exist_ok=True)
     except Exception:
         default_logs_dir = os.path.join(os.getcwd(), "training_logs")
@@ -518,11 +519,20 @@ if __name__ == "__main__":
         if trainer is None:
             return [0.0] * len(completions)
         balances = getattr(trainer, "_mdi_balance_scores_current_batch", None)
-        if balances is None or len(balances) < len(completions):
+        if not balances:
             return [0.0] * len(completions)
+        try:
+            balances = list(balances)
+        except TypeError:
+            balances = [balances]
+        if len(balances) < len(completions):
+            repeats = (len(completions) + len(balances) - 1) // len(balances)
+            balances = (balances * repeats)[: len(completions)]
+        elif len(balances) > len(completions):
+            balances = balances[: len(completions)]
         weight = 1.0
         rewards = []
-        for b in balances[: len(completions)]:
+        for b in balances:
             try:
                 rewards.append(weight * (2.0 * float(b) - 1.0))
             except Exception:
@@ -533,41 +543,79 @@ if __name__ == "__main__":
         """Match predicted letter to gold letter from label_idx (0->A, 1->B, ...).
         Robustly extracts letter via 'Answer: X' or last standalone A-J.
         """
+
+        fullwidth_map = {
+            "Ａ": "A",
+            "Ｂ": "B",
+            "Ｃ": "C",
+            "Ｄ": "D",
+            "Ｅ": "E",
+            "Ｆ": "F",
+            "Ｇ": "G",
+            "Ｈ": "H",
+            "Ｉ": "I",
+            "Ｊ": "J",
+        }
+        explicit_patterns = [
+            re.compile(r"(?i)(?:final\s*answer|answer|答案)\s*(?:is|为|是)?\s*[:：\-]?\s*(?:option|choice|选项)?\s*[\(\[\s]*([A-JＡ-Ｊ])"),
+            re.compile(r"(?i)(?:option|choice|选项)\s*(?:is|为|是)?\s*[:：\-]?\s*[\(\[\s]*([A-JＡ-Ｊ])"),
+            re.compile(r"(?i)[（(]?([A-JＡ-Ｊ])[)）]?$"),
+        ]
+
+        def _collect_text(node) -> list[str]:
+            if isinstance(node, str):
+                return [node]
+            if isinstance(node, dict):
+                texts = []
+                if "text" in node and isinstance(node["text"], str):
+                    texts.append(node["text"])
+                if "content" in node:
+                    texts.extend(_collect_text(node["content"]))
+                return texts
+            if isinstance(node, list):
+                texts = []
+                for item in node:
+                    texts.extend(_collect_text(item))
+                return texts
+            return []
+
         scores = []
         for comp, idx in zip(completions, label_idx):
             try:
-                # Extract model text
-                if isinstance(comp, list) and comp and isinstance(comp[0], dict):
-                    content = comp[0].get("content", "")
-                else:
-                    content = str(comp)
-                text = str(content)
-                # Prefer explicit Answer patterns (English/Chinese)
-                m = re.search(r"(?i)(?:final\s*answer|answer)\s*[:\-]?\s*([A-J])", text)
-                if not m:
-                    m = re.search(r"答案\s*[:：]?\s*([A-JＡ-Ｊ])", text)  # Chinese full-width letters as well
-                if not m:
-                    m = re.search(r"选项\s*[:：]?\s*([A-JＡ-Ｊ])", text)
-                if not m:
-                    m = re.search(r"(?:option|choose|选择)\s*([A-J])", text, flags=re.IGNORECASE)
-                if not m:
-                    # Fallback: last standalone capital letter A-J
-                    cands = re.findall(r"\b([A-J])\b", text)
-                    pred = cands[-1].upper() if cands else None
-                else:
-                    pred = m.group(1)
-                    # Normalize full-width A-J to ASCII
-                    full2ascii = {
-                        "Ａ": "A", "Ｂ": "B", "Ｃ": "C", "Ｄ": "D", "Ｅ": "E",
-                        "Ｆ": "F", "Ｇ": "G", "Ｈ": "H", "Ｉ": "I", "Ｊ": "J",
-                    }
-                    pred = full2ascii.get(pred, pred).upper()
-                # Gold from index
+                pieces = _collect_text(comp)
+                text = "\n".join(pieces) if pieces else str(comp)
+                text = re.sub(r"<think>.*?</think>", " ", text, flags=re.IGNORECASE | re.DOTALL)
+
+                pred = None
+                lines = [line.strip() for line in text.splitlines() if line.strip()]
+                keywords = ("answer", "答案", "选项", "choice", "option")
+                for line in reversed(lines):
+                    if not any(k in line.lower() for k in keywords):
+                        continue
+                    for pattern in explicit_patterns:
+                        match = pattern.search(line)
+                        if match:
+                            pred = match.group(1)
+                            break
+                    if pred:
+                        break
+
+                if pred is None:
+                    cands = re.findall(r"\b([A-JＡ-Ｊ])\b", text)
+                    pred = cands[-1] if cands else None
+
+                if pred:
+                    pred = fullwidth_map.get(pred, pred).upper()
+
+                gold = None
                 try:
+                    if isinstance(idx, (list, tuple)):
+                        idx = idx[0]
                     gi = int(idx)
-                    gold = chr(ord('A') + gi) if 0 <= gi <= 25 else None
+                    gold = chr(ord("A") + gi) if 0 <= gi <= 25 else None
                 except Exception:
                     gold = None
+
                 scores.append(1.0 if (pred and gold and pred == gold) else 0.0)
             except Exception:
                 scores.append(0.0)
@@ -576,8 +624,11 @@ if __name__ == "__main__":
     # 设置奖励函数权重：mc_idx_reward:think_format_reward:mdi_reward = 4:1:1
     # 将trainer注入MDI奖励函数
     trainer_ref = {"t": None}
+
+    @wraps(mdi_reward)
     def mdi_reward_with_trainer(completions, **kwargs):
-        return mdi_reward(completions, trainer=trainer_ref["t"], **kwargs)
+        trainer = trainer_ref["t"]
+        return mdi_reward(completions, trainer=trainer, **kwargs)
     reward_funcs = [mc_idx_reward, think_format_reward, mdi_reward_with_trainer]
     reward_weights = [4.0, 1.0, 1.0]
 

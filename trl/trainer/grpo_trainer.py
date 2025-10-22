@@ -1263,7 +1263,7 @@ class GRPOTrainer(BaseTrainer):
                     prepare_multimodal_messages(prompt, num_images=len(image_list))
 
         prompts_text = [
-            maybe_apply_chat_template({"prompt": prompt}, self.processing_class, add_generation_prompt=True)["prompt"]
+            maybe_apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"]
             for prompt in prompts
         ]
 
@@ -1564,32 +1564,21 @@ class GRPOTrainer(BaseTrainer):
         logR = math.log(ratio_R)
         results = []
         
-        print(f"🔍 Debug MDI计算: 处理{len(sample_results)}个样本")
-        
-        for i, res in enumerate(sample_results):
-            print(f"  样本{i+1}: res类型={type(res)}, res={res}")
-            
+        for res in sample_results:
             if res is None:
-                print(f"    ❌ res为None，使用默认值")
                 results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
                 continue
                 
             segments = getattr(res, "segments", {}) if res is not None else {}
-            print(f"    segments类型={type(segments)}, segments={segments}")
-            
             segment = segments.get("late") or segments.get("all") if isinstance(segments, dict) else None
-            print(f"    segment类型={type(segment)}, segment={segment}")
             
             if segment is None or not hasattr(segment, "mdi") or segment.mdi is None:
-                print(f"    ❌ segment无效，使用默认值")
                 results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
                 continue
                 
             mdi = float(segment.mdi)
-            print(f"    MDI原始值={mdi}")
             
             if not (mdi > 0) or not (mdi < float("inf")):
-                print(f"    ❌ MDI值无效，使用默认值")
                 results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
                 continue
                 
@@ -1604,10 +1593,8 @@ class GRPOTrainer(BaseTrainer):
                 "vision_ratio": round(float(vision_ratio), 6),
                 "attention_distribution": [round(float(text_ratio), 6), round(float(vision_ratio), 6)],
             }
-            print(f"    ✅ 计算结果={result}")
             results.append(result)
             
-        print(f"🔍 Debug MDI计算完成，返回{len(results)}个结果")
         return results
 
     def _emit_rollout_logs(
@@ -1996,10 +1983,8 @@ class GRPOTrainer(BaseTrainer):
                 if self.compute_attention_metrics and isinstance(self._logs.get("attention"), deque):
                     att_list = list(self._logs["attention"])  # recent items
                     sample_results = att_list[-len(prompts_text):] if len(att_list) >= len(prompts_text) else att_list
-                    print(f"🔍 Debug: Found {len(sample_results)} attention samples")
                     mdi_info = self._compute_real_mdi_metrics(sample_results)
                 else:
-                    print(f"🔍 Debug: compute_attention_metrics={self.compute_attention_metrics}, attention_logs_type={type(self._logs.get('attention'))}")
                     mdi_info = [{} for _ in inputs]
                 
                 # 调用rollout日志记录
@@ -2012,11 +1997,10 @@ class GRPOTrainer(BaseTrainer):
                     reward_names=self.reward_func_names,
                     mdi_info=mdi_info,
                 )
-                print(f"✅ Successfully logged rollout results for {len(prompts_text)} samples")
+                pass  # Successfully logged rollout results
             except Exception as e:
-                print(f"❌ Failed to emit rollout logs: {e}")
-                import traceback
-                traceback.print_exc()
+                # Failed to emit rollout logs - continue training
+                pass
 
         output = {
             "prompt_ids": prompt_ids,
