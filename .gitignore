@@ -1,6 +1,7 @@
 /aokvqa_trl_test_small/
 A-OKVQA_question_id.txt
 prepare_aokvqa_for_trl_test.py
+runs/
 # Python
 __pycache__/
 *.py[cod]

@@ -90,4 +90,50 @@
 ============================================================
                                                {'loss': 0.0, 'grad_norm': 0.0, 'learning_rate': 3.2558139534883724e-06, 'num_tokens': 1432250.0, 'completions/mean_length': 255.7640625, 'completions/min_length': 241.8, 'completions/max_length': 256.0, 'completions/clipped_ratio': 0.9953125, 'completions/mean_terminated_length': 42.0, 'completions/min_terminated_length': 37.0, 'completions/max_terminated_length': 47.0, 'attention/early/mdi': 43.67305717468262, 'attention/early/mdi_balance': 0.0, 'attention/early/mdi_penalty': 1.0, 'attention/early/aei_text': 2.9941179513931275, 'attention/early/aei_vision': 0.08520474284887314, 'attention/middle/mdi': 53.923907089233396, 'attention/middle/mdi_balance': 0.0, 'attention/middle/mdi_penalty': 1.0, 'attention/middle/aei_text': 3.004776382446289, 'attention/middle/aei_vision': 0.08001000136137008, 'attention/late/mdi': 44.616035079956056, 'attention/late/mdi_balance': 0.0, 'attention/late/mdi_penalty': 1.0, 'attention/late/aei_text': 3.0010396957397463, 'attention/late/aei_vision': 0.08361794054508209, 'attention/all/mdi': 45.65910453796387, 'attention/all/mdi_balance': 0.0, 'attention/all/mdi_penalty': 1.0, 'attention/all/aei_text': 2.9999778032302857, 'attention/all/aei_vision': 0.08294433876872062, 'rewards/mc_idx_reward/mean': 0.48125, 'rewards/mc_idx_reward/std': 0.4992718011140823, 'rewards/think_format_reward/mean': 0.0, 'rewards/think_format_reward/std': 0.0, 'rewards/mdi_reward/mean': -1.0, 'rewards/mdi_reward/std': 0.0, 'reward': 0.925, 'reward_std': 1.1844038248062134, 'frac_reward_zero_std': 0.58125, 'entropy': 0.008489236235618591, 'clip_ratio/low_mean': 0.0, 'clip_ratio/low_min': 0.0, 'clip_ratio/high_mean': 0.0, 'clip_ratio/high_max': 0.0, 'clip_ratio/region_mean': 0.0, 'rewards/total_reward': 0.925, 'epoch': 0.7}
  70%|######9   | 30/43 [39:59<16:42, 77.09s/it]MDI(late): 44.616
- 72%|#######2  | 31/43 [41:16<15:25, 77.12s/it] 74%|#######4  | 32/43 [42:32<14:02, 76.63s/it] 77%|#######6  | 33/43 [43:50<12:50, 77.06s/it] 79%|#######9  | 34/43 [45:07<11:33, 77.02s/it] 81%|########1 | 35/43 [46:25<10:20, 77.57s/it] 84%|########3 | 36/43 [47:42<09:00, 77.24s/it] 86%|########6 | 37/43 [49:00<07:44, 77.39s/it]
+ 72%|#######2  | 31/43 [41:16<15:25, 77.12s/it] 74%|#######4  | 32/43 [42:32<14:02, 76.63s/it] 77%|#######6  | 33/43 [43:50<12:50, 77.06s/it] 79%|#######9  | 34/43 [45:07<11:33, 77.02s/it] 81%|########1 | 35/43 [46:25<10:20, 77.57s/it] 84%|########3 | 36/43 [47:42<09:00, 77.24s/it] 86%|########6 | 37/43 [49:00<07:44, 77.39s/it] 88%|########8 | 38/43 [50:17<06:27, 77.42s/it] 91%|######### | 39/43 [51:34<05:08, 77.16s/it] 93%|#########3| 40/43 [52:50<03:51, 77.01s/it]
+📊 Logging 44 metrics for train mode
+============================================================
+🎯 Reward Metrics:
+   rewards/mc_idx_reward/mean: 0.4844
+   rewards/mc_idx_reward/std: 0.5000
+   rewards/think_format_reward/mean: 0.0000
+   ... and 7 more reward metrics
+🧠 Attention Metrics:
+   attention/early/mdi: 43.1203
+   attention/early/mdi_balance: 0.0000
+   attention/early/mdi_penalty: 1.0000
+   ... and 17 more attention metrics
+📈 Other Metrics:
+   num_tokens: 1927614.0000
+   completions/mean_length: 255.6125
+   completions/min_length: 231.2000
+   ... and 11 more metrics
+============================================================
+                                               {'loss': 0.0, 'grad_norm': 0.0, 'learning_rate': 9.30232558139535e-07, 'num_tokens': 1927614.0, 'completions/mean_length': 255.6125, 'completions/min_length': 231.2, 'completions/max_length': 256.0, 'completions/clipped_ratio': 0.9953125, 'completions/mean_terminated_length': 52.0, 'completions/min_terminated_length': 52.0, 'completions/max_terminated_length': 52.0, 'attention/early/mdi': 43.12032127380371, 'attention/early/mdi_balance': 0.0, 'attention/early/mdi_penalty': 1.0, 'attention/early/aei_text': 2.939665651321411, 'attention/early/aei_vision': 0.08449391275644302, 'attention/middle/mdi': 55.03574714660645, 'attention/middle/mdi_balance': 0.0, 'attention/middle/mdi_penalty': 1.0, 'attention/middle/aei_text': 2.9500077247619627, 'attention/middle/aei_vision': 0.07882730215787888, 'attention/late/mdi': 45.83549537658691, 'attention/late/mdi_balance': 0.0, 'attention/late/mdi_penalty': 1.0, 'attention/late/aei_text': 2.9485891819000245, 'attention/late/aei_vision': 0.08112612515687942, 'attention/all/mdi': 46.236306762695314, 'attention/all/mdi_balance': 0.0, 'attention/all/mdi_penalty': 1.0, 'attention/all/aei_text': 2.946087288856506, 'attention/all/aei_vision': 0.08148257061839104, 'rewards/mc_idx_reward/mean': 0.484375, 'rewards/mc_idx_reward/std': 0.5000389516353607, 'rewards/think_format_reward/mean': 0.0, 'rewards/think_format_reward/std': 0.0, 'rewards/mdi_reward/mean': -1.0, 'rewards/mdi_reward/std': 0.0, 'reward': 0.9375, 'reward_std': 1.2727921843528747, 'frac_reward_zero_std': 0.55, 'entropy': 0.012475739046931267, 'clip_ratio/low_mean': 0.0, 'clip_ratio/low_min': 0.0, 'clip_ratio/high_mean': 0.0, 'clip_ratio/high_max': 0.0, 'clip_ratio/region_mean': 0.0, 'rewards/total_reward': 0.9375, 'epoch': 0.93}
+ 93%|#########3| 40/43 [52:50<03:51, 77.01s/it]MDI(late): 45.835
+ 95%|#########5| 41/43 [54:08<02:34, 77.09s/it] 98%|#########7| 42/43 [55:26<01:17, 77.55s/it]100%|##########| 43/43 [56:46<00:00, 78.10s/it]
+📊 Logging 44 metrics for train mode
+============================================================
+🎯 Reward Metrics:
+   rewards/mc_idx_reward/mean: 0.5000
+   rewards/mc_idx_reward/std: 0.5013
+   rewards/think_format_reward/mean: 0.0000
+   ... and 7 more reward metrics
+🧠 Attention Metrics:
+   attention/early/mdi: 45.4244
+   attention/early/mdi_balance: 0.0000
+   attention/early/mdi_penalty: 1.0000
+   ... and 17 more attention metrics
+📈 Other Metrics:
+   num_tokens: 2079223.0000
+   completions/mean_length: 255.6198
+   completions/min_length: 231.6667
+   ... and 11 more metrics
+============================================================
+                                               {'train_runtime': 3462.7809, 'train_samples_per_second': 0.404, 'train_steps_per_second': 0.012, 'train_loss': -0.012203498808450477, 'num_tokens': 2079223.0, 'completions/mean_length': 255.61979166666666, 'completions/min_length': 231.66666666666666, 'completions/max_length': 256.0, 'completions/clipped_ratio': 0.9895833333333334, 'completions/mean_terminated_length': 73.16666666666667, 'completions/min_terminated_length': 61.0, 'completions/max_terminated_length': 85.33333333333333, 'attention/early/mdi': 45.42444610595703, 'attention/early/mdi_balance': 0.0, 'attention/early/mdi_penalty': 1.0, 'attention/early/aei_text': 3.0477753480275473, 'attention/early/aei_vision': 0.08113360901673634, 'attention/middle/mdi': 59.57175064086914, 'attention/middle/mdi_balance': 0.0, 'attention/middle/mdi_penalty': 1.0, 'attention/middle/aei_text': 3.0686922868092856, 'attention/middle/aei_vision': 0.07162460188070933, 'attention/late/mdi': 49.808886210123696, 'attention/late/mdi_balance': 0.0, 'attention/late/mdi_penalty': 1.0, 'attention/late/aei_text': 3.066371281941732, 'attention/late/aei_vision': 0.07472372551759084, 'attention/all/mdi': 49.55951182047526, 'attention/all/mdi_balance': 0.0, 'attention/all/mdi_penalty': 1.0, 'attention/all/aei_text': 3.0609453519185386, 'attention/all/aei_vision': 0.07582759112119675, 'rewards/mc_idx_reward/mean': 0.5, 'rewards/mc_idx_reward/std': 0.501317540804545, 'rewards/think_format_reward/mean': 0.0, 'rewards/think_format_reward/std': 0.0, 'rewards/mdi_reward/mean': -1.0, 'rewards/mdi_reward/std': 0.0, 'reward': 1.0, 'reward_std': 1.3552879492441814, 'frac_reward_zero_std': 0.5208333333333334, 'entropy': 0.03444739679495493, 'clip_ratio/low_mean': 0.0, 'clip_ratio/low_min': 0.0, 'clip_ratio/high_mean': 0.0, 'clip_ratio/high_max': 0.0, 'clip_ratio/region_mean': 0.0, 'rewards/total_reward': 1.0, 'epoch': 1.0}
+100%|##########| 43/43 [57:42<00:00, 78.10s/it]MDI(late): 49.809
+100%|##########| 43/43 [57:42<00:00, 80.53s/it]
+
+```
+
+```

@@ -15,7 +15,6 @@ export PYTORCH_ALLOC_CONF=expandable_segments:True
 accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml \
     examples/scripts/grpo_vlm.py \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-    --output_dir runs/grpo-Qwen2.5-VL-3B-Instruct \
     --learning_rate 1e-5 \
     --dtype bfloat16 \
     --max_prompt_length 1024 \
@@ -34,4 +33,5 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --eval_strategy steps \
     --eval_steps 50 \
     --report_to tensorboard \
-    --enable_detailed_logging      
+    --output_dir runs/grpo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
+    --enable_detailed_logging
