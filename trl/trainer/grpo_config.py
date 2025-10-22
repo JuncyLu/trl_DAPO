@@ -673,7 +673,7 @@ class GRPOConfig(TrainingArguments):
         },
     )
     prompt_preview_chars: int = field(
-        default=500,
+        default=2000,
         metadata={"help": "Number of prompt characters to include in rollout console/file previews."},
     )
     completion_preview_chars: int = field(

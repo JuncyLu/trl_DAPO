@@ -67,6 +67,7 @@ accelerate launch \
 
 """
 
+import logging
 import os
 import sys
 import re
@@ -104,6 +105,24 @@ from trl.rewards import accuracy_reward, think_format_reward
 
 # Enable logging in a Hugging Face Space
 os.environ.setdefault("TRACKIO_SPACE_ID", "trl-trackio")
+
+logger = logging.getLogger(__name__)
+
+
+def _is_main_process() -> bool:
+    """
+    Determine whether the current process is the primary training process.
+    Falls back to True if distributed environment variables are not set.
+    """
+    for key in ("ACCELERATE_PROCESS_INDEX", "RANK", "GLOBAL_RANK", "SLURM_PROCID"):
+        value = os.environ.get(key)
+        if value is None:
+            continue
+        try:
+            return int(value) == 0
+        except ValueError:
+            logger.debug("Unable to parse %s=%s as int", key, value)
+    return True
 
 
 @dataclass
@@ -250,17 +269,14 @@ if __name__ == "__main__":
             # 启用彩色输出以支持美观的表格显示
             if getattr(training_args, "colorize_output", None) is None:
                 setattr(training_args, "colorize_output", True)
-                
-            print(f"📁 Training logs directory: {os.path.abspath(logs_dir)}")
-            print(f"📝 Rollout log will be saved to: {training_args.rollout_log_path}")
-            print(f"🧠 Attention diagnostics will be saved to: {training_args.attention_diag_log_path}")
-            print(f"📄 Terminal markdown log: {data_args.terminal_markdown_log}")
         except Exception as e:
-            print(f"⚠️ Failed to configure detailed logging: {e}")
-            # Fallback to basic logging
-            pass
+            logger.warning("Failed to configure detailed logging: %s", e)
 
     # Pretty tee of terminal output into a Markdown file if requested
+    markdown_log_path = data_args.terminal_markdown_log
+    if markdown_log_path and not _is_main_process():
+        data_args.terminal_markdown_log = None
+
     if data_args.terminal_markdown_log:
         try:
             os.makedirs(os.path.dirname(os.path.abspath(data_args.terminal_markdown_log)), exist_ok=True)
@@ -413,11 +429,11 @@ if __name__ == "__main__":
             eval_dataset = None
 
     SYSTEM_PROMPT = (
-        "A conversation between user and assistant. The user asks a question, and the assistant solves it. The "
-        "assistant first thinks about the reasoning process in the mind and then provides the user with the answer. "
-        "The reasoning process is enclosed within <think></think> tags, i.e., <think>\nThis is my reasoning.\n</think>. "
-        "For multiple-choice questions (A-J), conclude your response with a single line: 'Answer: X' where X is the "
-        "correct option letter."
+        "You are a precise assistant. For each question, first think privately and output exactly one reasoning block: "
+        "<think> This is my reasoning.\n </think>; then on a new line output the final choice "
+        "exactly as Answer: X. Rules: produce exactly one pair of <think>…</think> before the "
+        "answer; no text before <think> or after Answer: X; no code fences; X must be a single uppercase "
+        "letter from the options provided (e.g., A/B/C/D); if more options exist, extend accordingly; be concise and accurate."
     )
 
     def make_conversation(example):
@@ -431,13 +447,20 @@ if __name__ == "__main__":
         else:
             raise KeyError("数据集必须包含 'problem' 或 'prompt' 字段")
         
-        # 使用模型自带的 chat_template，并保留带“思考”说明的系统提示
-        # 多模态占位符由后续 prepare_multimodal_messages 注入
+        # 构建多模态对话格式
         prompt = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_content},
         ]
-        return {"prompt": prompt}
+        
+        # 添加图像信息到示例中
+        result = {"prompt": prompt}
+        if "image_path" in example:
+            result["image_path"] = example["image_path"]
+        elif "image" in example:
+            result["image"] = example["image"]
+            
+        return result
 
     train_dataset = train_dataset.map(make_conversation)
     if eval_dataset is not None:
@@ -512,11 +535,24 @@ if __name__ == "__main__":
     if eval_dataset is not None:
         eval_dataset = eval_dataset.map(convert_to_rgb)
 
+    # 添加多模态消息处理
+    def prepare_multimodal(example):
+        from trl.data_utils import prepare_multimodal_messages
+        # 确定图像数量（每个样本1张图像）
+        num_images = 1
+        prepare_multimodal_messages(example["prompt"], num_images)
+        return example
+
+    train_dataset = train_dataset.map(prepare_multimodal)
+    if eval_dataset is not None:
+        eval_dataset = eval_dataset.map(prepare_multimodal)
+
     if not script_args.dataset_streaming:
         try:
-            print(f"Loaded train size: {len(train_dataset)}")
-            if eval_dataset is not None:
-                print(f"Loaded eval size: {len(eval_dataset)}")
+            if _is_main_process():
+                logger.info("Loaded train size: %d", len(train_dataset))
+                if eval_dataset is not None:
+                    logger.info("Loaded eval size: %d", len(eval_dataset))
         except Exception:
             pass
 

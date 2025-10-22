@@ -161,7 +161,6 @@ def _build_modality_masks(
     input_ids: torch.Tensor,
     vision_token_spans: List[Tuple[int, int]],
     special_token_ids: Dict[str, int],
-    image_token_index: int = -200,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     if input_ids.ndim != 1:
         raise ValueError("input_ids must be 1D")
@@ -169,10 +168,7 @@ def _build_modality_masks(
     if input_ids.device.type != "cpu":
         input_ids = input_ids.cpu()
 
-    num_placeholders = int((input_ids == image_token_index).sum().item())
-    num_text = len(input_ids) - num_placeholders
-    num_vision = sum(max(0, end - start) for start, end in vision_token_spans)
-    seq_len = num_text + num_vision
+    seq_len = int(input_ids.shape[0])
     if seq_len <= 0:
         raise ValueError("Sequence length must be > 0 to build masks")
 
@@ -180,36 +176,22 @@ def _build_modality_masks(
 
     vision_mask = torch.zeros(seq_len, dtype=torch.bool, device=device)
     for start, end in vision_token_spans:
-        if start is None or end is None or start < 0 or end <= start:
+        if start is None or end is None:
             continue
-        s = max(0, start)
-        e = min(seq_len, end)
+        s = max(0, int(start))
+        e = min(seq_len, int(end))
         if e > s:
             vision_mask[s:e] = True
 
     instruction_mask = torch.ones(seq_len, dtype=torch.bool, device=device)
     instruction_mask &= ~vision_mask
 
-    if special_token_ids is not None:
-        specials = set(special_token_ids.values())
-    else:
-        specials = set()
-
-    expanded_pos = 0
-    for token_id in input_ids.tolist():
-        if token_id == image_token_index:
-            matched = False
-            for start, end in vision_token_spans:
-                if expanded_pos == start:
-                    expanded_pos = end
-                    matched = True
-                    break
-            if not matched:
-                continue
-        else:
-            if token_id in specials and 0 <= expanded_pos < instruction_mask.shape[0]:
-                instruction_mask[expanded_pos] = False
-            expanded_pos += 1
+    specials = set(special_token_ids.values()) if special_token_ids is not None else set()
+    if specials:
+        input_list = input_ids.tolist()
+        for idx, token_id in enumerate(input_list):
+            if token_id in specials:
+                instruction_mask[idx] = False
 
     return instruction_mask, vision_mask
 
@@ -313,22 +295,22 @@ def _compute_segment_metrics(
 
 
 def compute_qwen_attention_metrics_for_batch(
-    model,
+    _model,
     processor,
     outputs_attentions,
     input_ids: torch.Tensor,
     sequences: torch.Tensor,
     image_grid_thw: Optional[torch.Tensor] = None,
-) -> List[AttentionSampleResult]:
+) -> Tuple[List[Optional[AttentionSampleResult]], List[Optional[str]]]:
     batch_size = input_ids.size(0)
-    results: List[AttentionSampleResult] = []
+    results: List[Optional[AttentionSampleResult]] = []
+    skip_reasons: List[Optional[str]] = []
 
     if outputs_attentions is None or len(outputs_attentions) == 0:
-        return results
+        return results, skip_reasons
 
     segments = _split_layers_to_segments(len(outputs_attentions[0]))
     special_token_ids = get_qwen_special_token_ids(processor)
-    image_token_id = getattr(model.config, "image_token_id", -200)
 
     if image_grid_thw is not None and image_grid_thw.dim() == 3:
         grid_items = [image_grid_thw[i] for i in range(image_grid_thw.size(0))]
@@ -340,11 +322,13 @@ def compute_qwen_attention_metrics_for_batch(
     for batch_idx in range(batch_size):
         per_layer_attn = _collect_llm_attention_for_sample(outputs_attentions, batch_idx)
         if not per_layer_attn:
+            results.append(None)
+            skip_reasons.append("no_attention")
             continue
 
         input_ids_sample = input_ids[batch_idx].detach().cpu()
         spans = extract_vision_token_spans_qwen(
-            model,
+            _model,
             processor,
             input_ids_sample,
             grid_items[batch_idx] if grid_items else None,
@@ -354,19 +338,27 @@ def compute_qwen_attention_metrics_for_batch(
             input_ids_sample,
             spans,
             special_token_ids,
-            image_token_index=image_token_id,
         )
 
-        num_text_tokens = int((input_ids_sample != image_token_id).sum().item())
-        num_vision_tokens = sum(max(0, end - start) for start, end in spans)
-        actual_prompt_length = num_text_tokens + num_vision_tokens
+        num_text_tokens = int(instruction_mask.sum().item())
+        num_vision_tokens = int(vision_mask.sum().item())
+        actual_prompt_length = instruction_mask.numel()
         num_prompt_queries = max(actual_prompt_length - 1, 0)
 
         total_queries = 0
-        any_layer = next(iter(per_layer_attn.values()))
-        if any_layer is not None:
+        any_layer = next(iter(per_layer_attn.values()), None)
+        if any_layer is not None and any_layer.numel() > 0:
             total_queries = any_layer.shape[0]
         num_generated_tokens = max(total_queries - num_prompt_queries, 0)
+
+        if total_queries <= num_prompt_queries:
+            results.append(None)
+            skip_reasons.append("no_generated_queries")
+            continue
+        if num_vision_tokens <= 0:
+            results.append(None)
+            skip_reasons.append("no_vision_tokens")
+            continue
 
         segment_results: Dict[str, AttentionSegmentResult] = {}
         for segment_name, layer_indices in segments.items():
@@ -390,8 +382,9 @@ def compute_qwen_attention_metrics_for_batch(
                 actual_prompt_length=actual_prompt_length,
             )
         )
+        skip_reasons.append(None)
 
-    return results
+    return results, skip_reasons
 
 
 def get_qwen_special_token_ids(processor) -> Dict[str, int]:
@@ -425,7 +418,7 @@ def get_qwen_special_token_ids(processor) -> Dict[str, int]:
 
 
 def extract_vision_token_spans_qwen(
-    model,
+    _model,
     processor,
     input_ids: torch.Tensor,
     image_grid_thw: Optional[torch.Tensor] = None,

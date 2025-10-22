@@ -18,7 +18,7 @@ import textwrap
 import json
 from datetime import datetime
 from collections import defaultdict, deque
-from contextlib import nullcontext
+from contextlib import nullcontext, contextmanager
 from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
@@ -287,7 +287,11 @@ class GRPOTrainer(BaseTrainer):
 
         # Processing class
         if processing_class is None:
-            processing_class = AutoProcessor.from_pretrained(model.config._name_or_path, truncation_side="left")
+            processing_class = AutoProcessor.from_pretrained(
+                model.config._name_or_path, 
+                truncation_side="left",
+                use_fast=False
+            )
 
         # Handle pad token for processors or tokenizers
         if isinstance(processing_class, ProcessorMixin):
@@ -299,6 +303,16 @@ class GRPOTrainer(BaseTrainer):
 
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
+
+        if hasattr(model, 'config'):
+            model.config.pad_token_id = tokenizer.pad_token_id
+            model.config.bos_token_id = tokenizer.bos_token_id
+            model.config.eos_token_id = tokenizer.eos_token_id
+            
+            if hasattr(model, 'generation_config') and model.generation_config is not None:
+                model.generation_config.pad_token_id = tokenizer.pad_token_id
+                model.generation_config.bos_token_id = tokenizer.bos_token_id
+                model.generation_config.eos_token_id = tokenizer.eos_token_id
 
         self.pad_token = tokenizer.pad_token
         self.pad_token_id = tokenizer.pad_token_id
@@ -313,6 +327,18 @@ class GRPOTrainer(BaseTrainer):
                 reward_funcs[i] = AutoModelForSequenceClassification.from_pretrained(
                     reward_func, num_labels=1, **model_init_kwargs
                 )
+                
+                # 对齐奖励模型的token配置
+                if hasattr(reward_funcs[i], 'config'):
+                    reward_funcs[i].config.pad_token_id = tokenizer.pad_token_id
+                    reward_funcs[i].config.bos_token_id = tokenizer.bos_token_id
+                    reward_funcs[i].config.eos_token_id = tokenizer.eos_token_id
+                    
+                    if hasattr(reward_funcs[i], 'generation_config') and reward_funcs[i].generation_config is not None:
+                        reward_funcs[i].generation_config.pad_token_id = tokenizer.pad_token_id
+                        reward_funcs[i].generation_config.bos_token_id = tokenizer.bos_token_id
+                        reward_funcs[i].generation_config.eos_token_id = tokenizer.eos_token_id
+                        
             if isinstance(reward_funcs[i], nn.Module):  # Use Module over PretrainedModel for compat w/ compiled models
                 self.reward_func_names.append(reward_funcs[i].config._name_or_path.split("/")[-1])
             else:
@@ -446,6 +472,9 @@ class GRPOTrainer(BaseTrainer):
             compute_loss_func="non-None value to disable scaling",
         )
 
+        # 添加模型解包工具函数和注意力实现切换上下文管理器
+        self._add_model_unwrap_utilities()
+
         # Reference model
         self.beta = args.beta
         if self.beta == 0.0:
@@ -460,6 +489,17 @@ class GRPOTrainer(BaseTrainer):
             config = AutoConfig.from_pretrained(model_id)
             architecture = getattr(transformers, config.architectures[0])
             self.ref_model = architecture.from_pretrained(model_id, **model_init_kwargs)
+            
+            # 对齐参考模型的token配置
+            if hasattr(self.ref_model, 'config'):
+                self.ref_model.config.pad_token_id = tokenizer.pad_token_id
+                self.ref_model.config.bos_token_id = tokenizer.bos_token_id
+                self.ref_model.config.eos_token_id = tokenizer.eos_token_id
+                
+                if hasattr(self.ref_model, 'generation_config') and self.ref_model.generation_config is not None:
+                    self.ref_model.generation_config.pad_token_id = tokenizer.pad_token_id
+                    self.ref_model.generation_config.bos_token_id = tokenizer.bos_token_id
+                    self.ref_model.generation_config.eos_token_id = tokenizer.eos_token_id
 
         # Disable dropout in the models
         if args.disable_dropout:
@@ -503,8 +543,10 @@ class GRPOTrainer(BaseTrainer):
         # Keep attention sample results if enabled
         if self.compute_attention_metrics:
             self._logs["attention"] = deque(maxlen=args.generation_batch_size)
+            self._attention_skip_reasons = deque(maxlen=args.generation_batch_size)
         else:
             self._logs["attention"] = None
+            self._attention_skip_reasons = None
 
         # Ensure each process receives a unique seed to prevent duplicate completions when generating with
         # transformers if num_generations exceeds per_device_train_batch_size. We could skip it if we use vLLM, but
@@ -628,9 +670,8 @@ class GRPOTrainer(BaseTrainer):
             try:
                 training_logs_dir = "/home/lujunxi57/trl/training_logs"
                 os.makedirs(training_logs_dir, exist_ok=True)
-                print(f"📁 Training logs directory: {training_logs_dir}")
             except Exception as e:
-                print(f"⚠️  Warning: Failed to create training logs directory: {e}")
+                logger.warning("Failed to create training logs directory: %s", e)
         
         if self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False):
             try:
@@ -640,7 +681,6 @@ class GRPOTrainer(BaseTrainer):
                         with open(self.args.rollout_log_path, "w", encoding="utf-8") as f:
                             f.write("# Rollout Results Log\n\n")
                             f.write("This file contains detailed rollout results from GRPO training.\n\n")
-                    print(f"📝 Rollout log file: {self.args.rollout_log_path}")
 
                 if getattr(self.args, "attention_diag_log_path", None):
                     os.makedirs(os.path.dirname(self.args.attention_diag_log_path), exist_ok=True)
@@ -648,11 +688,8 @@ class GRPOTrainer(BaseTrainer):
                         with open(self.args.attention_diag_log_path, "w", encoding="utf-8") as f:
                             f.write("# Attention Diagnostics Log\n\n")
                             f.write("This file contains MDI attention diagnostics from GRPO training.\n\n")
-                    print(f"🧠 Attention diagnostics file: {self.args.attention_diag_log_path}")
             except Exception as e:
-                print(f"⚠️  Warning: Failed to setup logging files: {e}")
-                import traceback
-                traceback.print_exc()
+                logger.exception("Failed to set up logging files: %s", e)
             if getattr(self.args, "colorize_output", False) and Console is not None:
                 try:
                     self._console = Console()
@@ -789,7 +826,7 @@ class GRPOTrainer(BaseTrainer):
             image_grid_thw_cpu = image_grid_thw.detach().cpu()
         else:
             image_grid_thw_cpu = None
-        sample_results = compute_qwen_attention_metrics_for_batch(
+        sample_results_tuple = compute_qwen_attention_metrics_for_batch(
             self.model,
             self.processing_class,
             outputs.attentions,
@@ -797,22 +834,44 @@ class GRPOTrainer(BaseTrainer):
             sequences,
             image_grid_thw=image_grid_thw_cpu,
         )
+        if isinstance(sample_results_tuple, tuple):
+            sample_results, skip_reasons = sample_results_tuple
+        else:
+            sample_results = sample_results_tuple
+            skip_reasons = [None] * len(sample_results)
         outputs.attentions = None
         attention_context["outputs"] = None
         attention_context["inputs"] = None
         if not sample_results:
             return
-        self._log_attention_metrics(sample_results, mode)
+        self._log_attention_metrics(sample_results, mode, skip_reasons)
 
-    def _log_attention_metrics(self, sample_results: list[AttentionSampleResult], mode: str) -> None:
+    def _log_attention_metrics(
+        self,
+        sample_results: list[Optional[AttentionSampleResult]],
+        mode: str,
+        skip_reasons: Optional[list[Optional[str]]] = None,
+    ) -> None:
         device = self.accelerator.device
         segments = ["early", "middle", "late", "all"]
+
+        if skip_reasons is None:
+            skip_reasons = [None] * len(sample_results)
+
+        valid_results = [(idx, res) for idx, res in enumerate(sample_results) if res is not None]
+        if not valid_results:
+            if isinstance(self._logs.get("attention"), deque):
+                self._logs["attention"].extend(sample_results)
+            if isinstance(self._attention_skip_reasons, deque):
+                self._attention_skip_reasons.extend(skip_reasons)
+            self._mdi_balance_scores_current_batch = [0.5 for _ in sample_results]
+            return
 
         for segment in segments:
             mdi_vals = []
             aei_text_vals = []
             aei_vision_vals = []
-            for result in sample_results:
+            for _, result in valid_results:
                 segment_result = result.segments.get(segment)
                 if segment_result is None:
                     continue
@@ -859,6 +918,8 @@ class GRPOTrainer(BaseTrainer):
         # Maintain the per-batch sample results for local logging and reward integration
         if isinstance(self._logs.get("attention"), deque):
             self._logs["attention"].extend(sample_results)
+        if isinstance(self._attention_skip_reasons, deque):
+            self._attention_skip_reasons.extend(skip_reasons)
 
         # Expose per-sample balance scores for reward usage
         try:
@@ -868,8 +929,11 @@ class GRPOTrainer(BaseTrainer):
             import math
             logR = math.log(ratio)
             balances = []
-            for r in sample_results:
-                seg = r.segments.get("late") or r.segments.get("all")
+            for res in sample_results:
+                if res is None:
+                    balances.append(0.5)
+                    continue
+                seg = res.segments.get("late") or res.segments.get("all")
                 mdi = float(seg.mdi) if seg and seg.mdi is not None else None
                 if mdi is None or not (mdi > 0) or not math.isfinite(mdi):
                     balances.append(0.5)
@@ -1412,12 +1476,13 @@ class GRPOTrainer(BaseTrainer):
             # Re-process inputs for paged generation if needed
             # Note: images are already validated and preprocessed above
             paged_prompt_inputs = self.processing_class(text=prompts_text, **kwargs)
-            previous_attn = self.model_wrapped.config._attn_implementation
+            base_model = self._unwrap_model_for_config()
+            previous_attn = getattr(base_model.config, "_attn_implementation", None)
 
             if is_flash_attn_2_available():
-                self.model_wrapped.config._attn_implementation = "paged_attention"
+                base_model.config._attn_implementation = "paged_attention"
             else:
-                self.model_wrapped.config._attn_implementation = "sdpa_paged"
+                base_model.config._attn_implementation = "sdpa_paged"
             with (
                 profiling_context(self, "transformers.generate_batch"),
                 unwrap_model_for_generation(
@@ -1439,7 +1504,13 @@ class GRPOTrainer(BaseTrainer):
             completion_ids = [output.generated_tokens for output in all_outputs.values()]
             prompt_ids = paged_prompt_inputs.input_ids
             # Restore the original attention implementation, training mode
-            self.model_wrapped.config._attn_implementation = previous_attn
+            if previous_attn is not None:
+                base_model.config._attn_implementation = previous_attn
+            else:
+                try:
+                    delattr(base_model.config, "_attn_implementation")
+                except Exception:
+                    pass
             logprobs = None  # not used in this case
 
         else:
@@ -1466,23 +1537,14 @@ class GRPOTrainer(BaseTrainer):
             ):
                 if self.compute_attention_metrics:
                     # Force eager attention implementation during attention capture
-                    previous_attn_impl = getattr(self.model_wrapped.config, "_attn_implementation", None)
-                    try:
-                        self.model_wrapped.config._attn_implementation = "eager"
-                    except Exception:
-                        pass
-                    attention_outputs = unwrapped_model.generate(
-                        **generate_inputs,
-                        generation_config=self.generation_config,
-                        disable_compile=True,
-                        return_dict_in_generate=True,
-                        output_attentions=True,
-                    )
-                    # Restore previous attention implementation
-                    try:
-                        self.model_wrapped.config._attn_implementation = previous_attn_impl
-                    except Exception:
-                        pass
+                    with self._temporary_attn_impl("eager"):
+                        attention_outputs = unwrapped_model.generate(
+                            **generate_inputs,
+                            generation_config=self.generation_config,
+                            disable_compile=True,
+                            return_dict_in_generate=True,
+                            output_attentions=True,
+                        )
                     prompt_completion_ids = attention_outputs.sequences
                 else:
                     prompt_completion_ids = unwrapped_model.generate(
@@ -1557,99 +1619,117 @@ class GRPOTrainer(BaseTrainer):
         s = s or ""
         return (s[:n] + "…") if len(s) > n else s
 
-    def _compute_real_mdi_metrics(self, sample_results: list) -> list[dict]:
+    def _compute_real_mdi_metrics(
+        self,
+        sample_results: list,
+        skip_reasons: Optional[list[Optional[str]]] = None,
+    ) -> list[dict]:
         import math
+
         ratio_R = getattr(self.args, "mdi_balance_ratio", 2.0)
         if ratio_R <= 1.0:
             ratio_R = 2.0
         logR = math.log(ratio_R)
         results = []
-        
-        for res in sample_results:
+        if skip_reasons is None:
+            skip_reasons = [None] * len(sample_results)
+
+        for idx, res in enumerate(sample_results):
             if res is None:
+                reason = skip_reasons[idx] if idx < len(skip_reasons) else None
                 default_result = {
-                    "mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, 
+                    "mdi": 1.0,
+                    "balance": 0.5,
+                    "text_ratio": 0.5,
+                    "vision_ratio": 0.5,
                     "attention_distribution": [0.5, 0.5],
-                    "num_vision_tokens": 0, "num_text_tokens": 0,
-                    "early_mdi": 1.0, "middle_mdi": 1.0, "late_mdi": 1.0,
-                    "early_aei_text": 0.0, "early_aei_vision": 0.0,
-                    "middle_aei_text": 0.0, "middle_aei_vision": 0.0,
-                    "late_aei_text": 0.0, "late_aei_vision": 0.0,
-                    "aei_text": 0.0, "aei_vision": 0.0,
-                    "early_text_ratio": 0.5, "early_vision_ratio": 0.5,
-                    "middle_text_ratio": 0.5, "middle_vision_ratio": 0.5,
-                    "late_text_ratio": 0.5, "late_vision_ratio": 0.5
+                    "num_vision_tokens": 0,
+                    "num_text_tokens": 0,
+                    "early_mdi": 1.0,
+                    "middle_mdi": 1.0,
+                    "late_mdi": 1.0,
+                    "early_aei_text": 0.0,
+                    "early_aei_vision": 0.0,
+                    "middle_aei_text": 0.0,
+                    "middle_aei_vision": 0.0,
+                    "late_aei_text": 0.0,
+                    "late_aei_vision": 0.0,
+                    "aei_text": 0.0,
+                    "aei_vision": 0.0,
+                    "early_text_ratio": 0.5,
+                    "early_vision_ratio": 0.5,
+                    "middle_text_ratio": 0.5,
+                    "middle_vision_ratio": 0.5,
+                    "late_text_ratio": 0.5,
+                    "late_vision_ratio": 0.5,
+                    "skip_reason": reason,
                 }
                 results.append(default_result)
                 continue
-                
+
             segments = getattr(res, "segments", {}) if res is not None else {}
-            
-            # 获取token计数信息
+            # Align with attention_metrics.AttentionSampleResult fields:
+            # text tokens are stored as `num_instruction_tokens` in the result.
             num_vision_tokens = getattr(res, "num_vision_tokens", 0)
-            num_text_tokens = getattr(res, "num_text_tokens", 0)
-            
-            # 处理各个阶段的metrics
+            num_text_tokens = getattr(res, "num_instruction_tokens", getattr(res, "num_text_tokens", 0))
+
             def process_segment(segment_name):
                 segment = segments.get(segment_name)
                 if segment is None or not hasattr(segment, "mdi") or segment.mdi is None:
                     return {
-                        "mdi": 1.0, "aei_text": 0.0, "aei_vision": 0.0,
-                        "text_ratio": 0.5, "vision_ratio": 0.5
+                        "mdi": 1.0,
+                        "aei_text": 0.0,
+                        "aei_vision": 0.0,
+                        "text_ratio": 0.5,
+                        "vision_ratio": 0.5,
                     }
-                
+
                 mdi = float(segment.mdi)
-                if not (mdi > 0) or not (mdi < float("inf")):
+                if not (mdi > 0) or not math.isfinite(mdi):
                     return {
-                        "mdi": 1.0, "aei_text": 0.0, "aei_vision": 0.0,
-                        "text_ratio": 0.5, "vision_ratio": 0.5
+                        "mdi": 1.0,
+                        "aei_text": 0.0,
+                        "aei_vision": 0.0,
+                        "text_ratio": 0.5,
+                        "vision_ratio": 0.5,
                     }
-                
+
                 aei_text = float(getattr(segment, "aei_text", 0.0))
                 aei_vision = float(getattr(segment, "aei_vision", 0.0))
                 text_ratio = mdi / (1.0 + mdi)
                 vision_ratio = 1.0 / (1.0 + mdi)
-                
+
                 return {
                     "mdi": round(float(mdi), 6),
                     "aei_text": round(float(aei_text), 6),
                     "aei_vision": round(float(aei_vision), 6),
                     "text_ratio": round(float(text_ratio), 6),
-                    "vision_ratio": round(float(vision_ratio), 6)
+                    "vision_ratio": round(float(vision_ratio), 6),
                 }
-            
-            # 处理所有阶段
+
             early_data = process_segment("early")
             middle_data = process_segment("middle")
             late_data = process_segment("late")
             all_data = process_segment("all")
-            
-            # 使用late或all作为主要指标
+
             main_segment = late_data if late_data["mdi"] != 1.0 else all_data
             mdi = main_segment["mdi"]
-            
+
             balance = max(0.0, min(1.0, 1.0 - abs(math.log(mdi)) / logR))
             text_ratio = mdi / (1.0 + mdi)
             vision_ratio = 1.0 / (1.0 + mdi)
-            
+
             result = {
-                # 主要指标
                 "mdi": round(float(mdi), 6),
                 "balance": round(float(balance), 6),
                 "text_ratio": round(float(text_ratio), 6),
                 "vision_ratio": round(float(vision_ratio), 6),
                 "attention_distribution": [round(float(text_ratio), 6), round(float(vision_ratio), 6)],
-                
-                # Token计数
                 "num_vision_tokens": int(num_vision_tokens),
                 "num_text_tokens": int(num_text_tokens),
-                
-                # 各阶段MDI
                 "early_mdi": early_data["mdi"],
                 "middle_mdi": middle_data["mdi"],
                 "late_mdi": late_data["mdi"],
-                
-                # 各阶段AEI
                 "early_aei_text": early_data["aei_text"],
                 "early_aei_vision": early_data["aei_vision"],
                 "middle_aei_text": middle_data["aei_text"],
@@ -1658,17 +1738,16 @@ class GRPOTrainer(BaseTrainer):
                 "late_aei_vision": late_data["aei_vision"],
                 "aei_text": all_data["aei_text"],
                 "aei_vision": all_data["aei_vision"],
-                
-                # 各阶段比例
                 "early_text_ratio": early_data["text_ratio"],
                 "early_vision_ratio": early_data["vision_ratio"],
                 "middle_text_ratio": middle_data["text_ratio"],
                 "middle_vision_ratio": middle_data["vision_ratio"],
                 "late_text_ratio": late_data["text_ratio"],
-                "late_vision_ratio": late_data["vision_ratio"]
+                "late_vision_ratio": late_data["vision_ratio"],
+                "skip_reason": None,
             }
             results.append(result)
-            
+
         return results
 
     def _emit_rollout_logs(
@@ -1695,8 +1774,8 @@ class GRPOTrainer(BaseTrainer):
         rows = []
         name_to_idx = {n: i for i, n in enumerate(reward_names)}
         for idx, (p, c, sol) in enumerate(zip(prompts_text, completions_text, solutions)):
-            preview_p = self._truncate_text(p.replace("\n", " "), self.args.prompt_preview_chars)
-            preview_c = self._truncate_text(c.replace("\n", " "), self.args.completion_preview_chars)
+            preview_p = self._truncate_text(p, self.args.prompt_preview_chars)
+            preview_c = self._truncate_text(c, self.args.completion_preview_chars)
             # prefer named accuracy_reward; fallback to mc_idx_reward if present
             acc_idx = name_to_idx.get("accuracy_reward")
             if acc_idx is None:
@@ -1846,14 +1925,15 @@ class GRPOTrainer(BaseTrainer):
                                     }
                                 },
                                 "token_counts": {
-                                    "vision_tokens": info.get("num_vision_tokens", 0),
-                                    "text_tokens": info.get("num_text_tokens", 0),
-                                    "total_tokens": info.get("num_vision_tokens", 0) + info.get("num_text_tokens", 0)
+                                    "vision_tokens": float(info.get("num_vision_tokens", 0) or 0),
+                                    "text_tokens": float(info.get("num_text_tokens", 0) or 0),
+                                    "total_tokens": float((info.get("num_vision_tokens", 0) or 0) + (info.get("num_text_tokens", 0) or 0)),
                                 },
                                 "overall": {
                                     "balance_score": info.get("balance"),
-                                    "attention_distribution": info.get("attention_distribution")
-                                }
+                                    "attention_distribution": info.get("attention_distribution"),
+                                    "skip_reason": info.get("skip_reason"),
+                                },
                             }
                             f.write(json.dumps(detailed_metrics, ensure_ascii=False, indent=2))
                             f.write("\n```\n\n")
@@ -1889,8 +1969,13 @@ class GRPOTrainer(BaseTrainer):
                         f.write(f"| Vision Tokens | {np.mean(vision_tokens):.1f} ± {np.std(vision_tokens):.1f} |\n")
                         f.write(f"| Text Tokens | {np.mean(text_tokens):.1f} ± {np.std(text_tokens):.1f} |\n")
                         f.write(f"| Total Tokens | {np.mean(total_tokens):.1f} ± {np.std(total_tokens):.1f} |\n")
-                        f.write(f"| Vision Ratio | {np.mean([v/t if t > 0 else 0 for v, t in zip(vision_tokens, total_tokens)]):.3f} |\n")
-                        f.write(f"| Text Ratio | {np.mean([t/v if v > 0 else 0 for v, t in zip(vision_tokens, total_tokens)]):.3f} |\n\n")
+                        # Ratios are computed against total tokens per sample
+                        f.write(
+                            f"| Vision Ratio | {np.mean([v/tt if tt > 0 else 0 for v, tt in zip(vision_tokens, total_tokens)]):.3f} |\n"
+                        )
+                        f.write(
+                            f"| Text Ratio | {np.mean([(tt - v)/tt if tt > 0 else 0 for v, tt in zip(vision_tokens, total_tokens)]):.3f} |\n\n"
+                        )
                     
                     # 详细的样本信息
                     for i, info in enumerate(mdi_info, start=1):
@@ -1901,9 +1986,9 @@ class GRPOTrainer(BaseTrainer):
                         sample_data = {
                             "sample": i,
                             "token_counts": {
-                                "vision_tokens": info.get("num_vision_tokens", 0),
-                                "text_tokens": info.get("num_text_tokens", 0),
-                                "total_tokens": info.get("num_vision_tokens", 0) + info.get("num_text_tokens", 0)
+                                "vision_tokens": float(info.get("num_vision_tokens", 0) or 0),
+                                "text_tokens": float(info.get("num_text_tokens", 0) or 0),
+                                "total_tokens": float((info.get("num_vision_tokens", 0) or 0) + (info.get("num_text_tokens", 0) or 0)),
                             },
                             "attention_metrics": {
                                 "early": {
@@ -1938,8 +2023,9 @@ class GRPOTrainer(BaseTrainer):
                             "overall": {
                                 "balance_score": info.get("balance"),
                                 "attention_distribution": info.get("attention_distribution"),
-                                "text_vision_ratio": f"{info.get('text_ratio', 0):.6f}:{info.get('vision_ratio', 0):.6f}"
-                            }
+                                "text_vision_ratio": f"{info.get('text_ratio', 0):.6f}:{info.get('vision_ratio', 0):.6f}",
+                                "skip_reason": info.get("skip_reason"),
+                            },
                         }
                         
                         f.write(
@@ -2224,10 +2310,24 @@ class GRPOTrainer(BaseTrainer):
                         if isinstance(sol, (list, tuple)) and len(sol) > 0:
                             sol = sol[0]
                     solutions.append(str(sol) if sol is not None else "")
-                if self.compute_attention_metrics and isinstance(self._logs.get("attention"), deque):
+                if (
+                    self.compute_attention_metrics
+                    and isinstance(self._logs.get("attention"), deque)
+                ):
                     att_list = list(self._logs["attention"])  # recent items
                     sample_results = att_list[-len(prompts_text):] if len(att_list) >= len(prompts_text) else att_list
-                    mdi_info = self._compute_real_mdi_metrics(sample_results)
+                    if isinstance(self._attention_skip_reasons, deque):
+                        skip_list = list(self._attention_skip_reasons)
+                        skip_slice = (
+                            skip_list[-len(prompts_text):]
+                            if len(skip_list) >= len(prompts_text)
+                            else skip_list
+                        )
+                    else:
+                        skip_slice = []
+                    if len(skip_slice) < len(sample_results):
+                        skip_slice = list(skip_slice) + [None] * (len(sample_results) - len(skip_slice))
+                    mdi_info = self._compute_real_mdi_metrics(sample_results, skip_slice)
                 else:
                     mdi_info = [{} for _ in inputs]
                 
@@ -2584,3 +2684,52 @@ class GRPOTrainer(BaseTrainer):
             model_name = self.args.hub_model_id.split("/")[-1]
         self.create_model_card(model_name=model_name)
         super()._save_checkpoint(model, trial)
+
+    def _add_model_unwrap_utilities(self):
+        """添加模型解包工具函数和注意力实现切换上下文管理器"""
+        pass
+
+    def _unwrap_model_for_config(self, model=None):
+        """
+        Return the base (unwrapped) HF model object that has `.config` and `.generation_config`.
+        Works with DDP, FSDP, and Deepspeed ZeRO.
+        """
+        m = model if model is not None else getattr(self, "model", None)
+        # 优先用 accelerate 的 unwrap（Trainer 有 self.accelerator）
+        try:
+            if hasattr(self, "accelerator"):
+                m = self.accelerator.unwrap_model(m)
+        except Exception:
+            pass
+        # 兜底：常见包装层
+        for attr in ("module", "model"):
+            if hasattr(m, attr):
+                m = getattr(m, attr)
+        return m
+
+    @contextmanager
+    def _temporary_attn_impl(self, attn_impl: str = "eager"):
+        """
+        Context manager for temporarily switching attention implementation.
+        Works with any parallel wrapper (DDP/FSDP/Deepspeed ZeRO).
+        """
+        base = self._unwrap_model_for_config()
+        cfg = getattr(base, "config", None)
+        if cfg is None:
+            # 没有 config 就直接不改，继续执行
+            yield
+            return
+        prev = getattr(cfg, "_attn_implementation", None)
+        try:
+            # 仅当属性存在或我们确实需要设置时才写入
+            setattr(cfg, "_attn_implementation", attn_impl)
+            yield
+        finally:
+            # 恢复（包括不存在时删除）
+            if prev is None:
+                try:
+                    delattr(cfg, "_attn_implementation")
+                except Exception:
+                    pass
+            else:
+                setattr(cfg, "_attn_implementation", prev)
