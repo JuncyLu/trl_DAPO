@@ -43,8 +43,8 @@ accelerate launch \
     --log_completions
 
 # Or explicitly pass data_files (JSON or comma pairs):
-#   --data_files '{"train": "./aokvqa_trl_data_simple/train.parquet", "test": "./aokvqa_trl_data_simple/sample_200.parquet"}'
-#   --data_files train=./aokvqa_trl_data_simple/train.parquet,test=./aokvqa_trl_data_simple/sample_200.parquet
+#   --data_files '{"train": "./aokvqa_trl_data_simple/train.parquet", "test": "./aokvqa_trl_data_simple/test.parquet"}'
+#   --data_files train=./aokvqa_trl_data_simple/train.parquet,test=./aokvqa_trl_data_simple/test.parquet
 
 # For HuggingFaceTB/SmolVLM2-2.2B-Instruct
 pip install num2words==0.5.14
@@ -193,7 +193,6 @@ def _infer_parquet_files(base_dir: str) -> Optional[Dict[str, Union[str, list[st
         ("train", os.path.join(base_dir, "train.parquet")),
         ("validation", os.path.join(base_dir, "validation.parquet")),
         ("test", os.path.join(base_dir, "test.parquet")),
-        ("test", os.path.join(base_dir, "sample_200.parquet")),
     ]
     mapping: Dict[str, str] = {}
     for split, path in candidates:

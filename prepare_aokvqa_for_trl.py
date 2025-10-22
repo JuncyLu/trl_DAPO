@@ -404,7 +404,6 @@ A: 使用 `--use_chat_template` 参数，prompt 字段将变为 JSON 格式。
 ├── train.parquet          # 训练集
 ├── validation.parquet     # 验证集  
 ├── test.parquet          # 测试集
-├── sample_200.parquet    # 小样本（前200个）
 ├── images/               # 图片目录
 │   ├── question_id_hash.jpg
 │   └── ...
@@ -473,27 +472,7 @@ def main():
         
         all_stats[split_name] = stats
     
-    # 生成 sample_200.parquet（从 train 取前200个）
-    if "train" in all_stats and all_stats["train"]:
-        logger.info("生成 sample_200.parquet")
-        # 重新处理 train split，只取前200个
-        train_dataset = dataset["train"]
-        if args.subset_size > 0:
-            train_dataset = train_dataset.select(range(min(200, len(train_dataset))))
-        else:
-            train_dataset = train_dataset.select(range(min(200, len(train_dataset))))
-        
-        train_data, _ = process_split(
-            train_dataset,
-            question_ids,
-            images_dir,
-            args.use_chat_template,
-            0  # 不使用额外的subset限制
-        )
-        
-        if train_data:
-            sample_path = out_dir / "sample_200.parquet"
-            save_parquet(train_data, sample_path, "sample_200")
+    
     
     # 生成 README
     generate_readme(out_dir, all_stats, args.use_chat_template)

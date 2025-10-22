@@ -1,31 +1,37 @@
 #!/bin/bash
 
-accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml \
-	examples/scripts/grpo_vlm.py \
-  --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-  --output_dir grpo-Qwen2.5-VL-3B-Instruct \
-  --learning_rate 1e-5 \
-  --dtype bfloat16 \
-  --max_prompt_length 2048 \
-  --max_completion_length 2048 \
-  --dataset_path /home/lujunxi57/aokvqa_trl_data \
-  --per_device_train_batch_size 4 \
-  --gradient_accumulation_steps 2 \
-  --num_generations 8 \
-  --report_to tensorboard \
-  --enable_detailed_logging
+# 线程与并行
+export OMP_NUM_THREADS=6
+export MKL_NUM_THREADS=6
+export TOKENIZERS_PARALLELISM=false
 
-# accelerate launch --config_file examples/accelerate_configs/deepspeed_zero3.yaml \
-# 	examples/scripts/grpo_vlm.py \
-#   --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-#   --output_dir grpo-Qwen2.5-VL-3B-Instruct \
-#   --learning_rate 1e-5 \
-#   --dtype bfloat16 \
-#   --max_prompt_length 2048 \
-#   --max_completion_length 2048 \
-#   --dataset_path /home/lujunxi57/aokvqa_trl_data \
-#   --per_device_train_batch_size 1 \
-#   --gradient_accumulation_steps 2 \
-#   --num_generations 4 \
-#   --report_to tensorboard \
-#   --enable_detailed_logging
+# 通信与容错
+export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
+export CUDA_DEVICE_MAX_CONNECTIONS=1
+
+# 内存碎片缓解
+export PYTORCH_ALLOC_CONF=expandable_segments:True
+
+accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml \
+    examples/scripts/grpo_vlm.py \
+    --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
+    --output_dir runs/grpo-Qwen2.5-VL-3B-Instruct \
+    --learning_rate 1e-5 \
+    --dtype bfloat16 \
+    --max_prompt_length 1024 \
+    --max_completion_length 256 \
+    --data_files '{"train": "./aokvqa_trl_test_small/train.parquet", "test": "./aokvqa_trl_test_small/test.parquet"}' \
+    --per_device_train_batch_size 4 \
+    --gradient_accumulation_steps 4 \
+    --num_train_epochs 1 \
+    --num_generations 2 \
+    --temperature 1.0 \
+    --top_p 1.0 \
+    --logging_steps 10 \
+    --eval_size 0 \
+    --save_strategy steps \
+    --save_steps 50 \
+    --eval_strategy steps \
+    --eval_steps 50 \
+    --report_to tensorboard \
+    --enable_detailed_logging      
