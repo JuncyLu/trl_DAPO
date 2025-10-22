@@ -22682,3 +22682,37203 @@ Step: 188/29790 | 2025-10-22 12:17:13
 }
 ```
 
+
+## === Rollout Step 190 ===
+Step: 189/29790 | 2025-10-22 12:17:17
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 24.360 | 10.953 | 19.380 | 19.380 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.359954,
+      "aei_text": 3.189394,
+      "aei_vision": 0.130928,
+      "text_ratio": 0.960568,
+      "vision_ratio": 0.039432
+    },
+    "middle": {
+      "mdi": 10.953267,
+      "aei_text": 2.861168,
+      "aei_vision": 0.261216,
+      "text_ratio": 0.916341,
+      "vision_ratio": 0.083659
+    },
+    "late": {
+      "mdi": 19.379784,
+      "aei_text": 3.114384,
+      "aei_vision": 0.160703,
+      "text_ratio": 0.950932,
+      "vision_ratio": 0.049068
+    },
+    "all": {
+      "mdi": 19.379784,
+      "aei_text": 3.054982,
+      "aei_vision": 0.184282,
+      "text_ratio": 0.950932,
+      "vision_ratio": 0.049068
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950932,
+      0.049068
+    ],
+    "text_vision_ratio": "0.950932:0.049068"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.359954,
+      "aei_text": 3.189394,
+      "aei_vision": 0.130928,
+      "text_ratio": 0.960568,
+      "vision_ratio": 0.039432
+    },
+    "middle": {
+      "mdi": 10.953267,
+      "aei_text": 2.861168,
+      "aei_vision": 0.261216,
+      "text_ratio": 0.916341,
+      "vision_ratio": 0.083659
+    },
+    "late": {
+      "mdi": 19.379784,
+      "aei_text": 3.114384,
+      "aei_vision": 0.160703,
+      "text_ratio": 0.950932,
+      "vision_ratio": 0.049068
+    },
+    "all": {
+      "mdi": 19.379784,
+      "aei_text": 3.054982,
+      "aei_vision": 0.184282,
+      "text_ratio": 0.950932,
+      "vision_ratio": 0.049068
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950932,
+      0.049068
+    ],
+    "text_vision_ratio": "0.950932:0.049068"
+  }
+}
+```
+
+
+## === Rollout Step 191 ===
+Step: 190/29790 | 2025-10-22 12:17:21
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.338 | 16.249 | 27.633 | 27.633 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.338102,
+      "aei_text": 3.180177,
+      "aei_vision": 0.173419,
+      "text_ratio": 0.948289,
+      "vision_ratio": 0.051711
+    },
+    "middle": {
+      "mdi": 16.248539,
+      "aei_text": 3.129569,
+      "aei_vision": 0.192606,
+      "text_ratio": 0.942024,
+      "vision_ratio": 0.057976
+    },
+    "late": {
+      "mdi": 27.633016,
+      "aei_text": 3.320628,
+      "aei_vision": 0.120169,
+      "text_ratio": 0.965075,
+      "vision_ratio": 0.034925
+    },
+    "all": {
+      "mdi": 27.633016,
+      "aei_text": 3.210125,
+      "aei_vision": 0.162065,
+      "text_ratio": 0.965075,
+      "vision_ratio": 0.034925
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.965075,
+      0.034925
+    ],
+    "text_vision_ratio": "0.965075:0.034925"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.338102,
+      "aei_text": 3.180177,
+      "aei_vision": 0.173419,
+      "text_ratio": 0.948289,
+      "vision_ratio": 0.051711
+    },
+    "middle": {
+      "mdi": 16.248539,
+      "aei_text": 3.129569,
+      "aei_vision": 0.192606,
+      "text_ratio": 0.942024,
+      "vision_ratio": 0.057976
+    },
+    "late": {
+      "mdi": 27.633016,
+      "aei_text": 3.320628,
+      "aei_vision": 0.120169,
+      "text_ratio": 0.965075,
+      "vision_ratio": 0.034925
+    },
+    "all": {
+      "mdi": 27.633016,
+      "aei_text": 3.210125,
+      "aei_vision": 0.162065,
+      "text_ratio": 0.965075,
+      "vision_ratio": 0.034925
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.965075,
+      0.034925
+    ],
+    "text_vision_ratio": "0.965075:0.034925"
+  }
+}
+```
+
+
+## === Rollout Step 192 ===
+Step: 191/29790 | 2025-10-22 12:17:24
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.296 | 8.095 | 18.043 | 18.043 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.296255,
+      "aei_text": 3.024106,
+      "aei_vision": 0.22744,
+      "text_ratio": 0.930052,
+      "vision_ratio": 0.069948
+    },
+    "middle": {
+      "mdi": 8.095445,
+      "aei_text": 2.734885,
+      "aei_vision": 0.33783,
+      "text_ratio": 0.890055,
+      "vision_ratio": 0.109945
+    },
+    "late": {
+      "mdi": 18.043499,
+      "aei_text": 3.161007,
+      "aei_vision": 0.175188,
+      "text_ratio": 0.947489,
+      "vision_ratio": 0.052511
+    },
+    "all": {
+      "mdi": 18.043499,
+      "aei_text": 2.973333,
+      "aei_vision": 0.24682,
+      "text_ratio": 0.947489,
+      "vision_ratio": 0.052511
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947489,
+      0.052511
+    ],
+    "text_vision_ratio": "0.947489:0.052511"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.296255,
+      "aei_text": 3.024106,
+      "aei_vision": 0.22744,
+      "text_ratio": 0.930052,
+      "vision_ratio": 0.069948
+    },
+    "middle": {
+      "mdi": 8.095445,
+      "aei_text": 2.734885,
+      "aei_vision": 0.33783,
+      "text_ratio": 0.890055,
+      "vision_ratio": 0.109945
+    },
+    "late": {
+      "mdi": 18.043499,
+      "aei_text": 3.161007,
+      "aei_vision": 0.175188,
+      "text_ratio": 0.947489,
+      "vision_ratio": 0.052511
+    },
+    "all": {
+      "mdi": 18.043499,
+      "aei_text": 2.973333,
+      "aei_vision": 0.24682,
+      "text_ratio": 0.947489,
+      "vision_ratio": 0.052511
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947489,
+      0.052511
+    ],
+    "text_vision_ratio": "0.947489:0.052511"
+  }
+}
+```
+
+
+## === Rollout Step 193 ===
+Step: 192/29790 | 2025-10-22 12:17:28
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.703 | 8.669 | 16.241 | 16.241 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.703139,
+      "aei_text": 2.899149,
+      "aei_vision": 0.173569,
+      "text_ratio": 0.943513,
+      "vision_ratio": 0.056487
+    },
+    "middle": {
+      "mdi": 8.668952,
+      "aei_text": 2.606949,
+      "aei_vision": 0.300722,
+      "text_ratio": 0.896576,
+      "vision_ratio": 0.103424
+    },
+    "late": {
+      "mdi": 16.240987,
+      "aei_text": 2.889206,
+      "aei_vision": 0.177896,
+      "text_ratio": 0.941999,
+      "vision_ratio": 0.058001
+    },
+    "all": {
+      "mdi": 16.240987,
+      "aei_text": 2.798435,
+      "aei_vision": 0.217396,
+      "text_ratio": 0.941999,
+      "vision_ratio": 0.058001
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941999,
+      0.058001
+    ],
+    "text_vision_ratio": "0.941999:0.058001"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.703139,
+      "aei_text": 2.899149,
+      "aei_vision": 0.173569,
+      "text_ratio": 0.943513,
+      "vision_ratio": 0.056487
+    },
+    "middle": {
+      "mdi": 8.668952,
+      "aei_text": 2.606949,
+      "aei_vision": 0.300722,
+      "text_ratio": 0.896576,
+      "vision_ratio": 0.103424
+    },
+    "late": {
+      "mdi": 16.240987,
+      "aei_text": 2.889206,
+      "aei_vision": 0.177896,
+      "text_ratio": 0.941999,
+      "vision_ratio": 0.058001
+    },
+    "all": {
+      "mdi": 16.240987,
+      "aei_text": 2.798435,
+      "aei_vision": 0.217396,
+      "text_ratio": 0.941999,
+      "vision_ratio": 0.058001
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941999,
+      0.058001
+    ],
+    "text_vision_ratio": "0.941999:0.058001"
+  }
+}
+```
+
+
+## === Rollout Step 194 ===
+Step: 193/29790 | 2025-10-22 12:17:31
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.192 | 8.154 | 12.775 | 12.775 |
+| MDI Std | 2.339 | 1.789 | 0.461 | 0.461 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.531205,
+      "aei_text": 2.701435,
+      "aei_vision": 0.163414,
+      "text_ratio": 0.942959,
+      "vision_ratio": 0.057041
+    },
+    "middle": {
+      "mdi": 9.943057,
+      "aei_text": 2.518618,
+      "aei_vision": 0.253304,
+      "text_ratio": 0.908618,
+      "vision_ratio": 0.091382
+    },
+    "late": {
+      "mdi": 13.235824,
+      "aei_text": 2.629709,
+      "aei_vision": 0.198681,
+      "text_ratio": 0.929755,
+      "vision_ratio": 0.070245
+    },
+    "all": {
+      "mdi": 13.235824,
+      "aei_text": 2.616587,
+      "aei_vision": 0.205133,
+      "text_ratio": 0.929755,
+      "vision_ratio": 0.070245
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.929755,
+      0.070245
+    ],
+    "text_vision_ratio": "0.929755:0.070245"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.852531,
+      "aei_text": 2.589457,
+      "aei_vision": 0.218473,
+      "text_ratio": 0.922194,
+      "vision_ratio": 0.077806
+    },
+    "middle": {
+      "mdi": 6.364105,
+      "aei_text": 2.299068,
+      "aei_vision": 0.361256,
+      "text_ratio": 0.864206,
+      "vision_ratio": 0.135794
+    },
+    "late": {
+      "mdi": 12.31394,
+      "aei_text": 2.603746,
+      "aei_vision": 0.211447,
+      "text_ratio": 0.924891,
+      "vision_ratio": 0.075109
+    },
+    "all": {
+      "mdi": 12.31394,
+      "aei_text": 2.497424,
+      "aei_vision": 0.263725,
+      "text_ratio": 0.924891,
+      "vision_ratio": 0.075109
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.924891,
+      0.075109
+    ],
+    "text_vision_ratio": "0.924891:0.075109"
+  }
+}
+```
+
+
+## === Rollout Step 195 ===
+Step: 194/29790 | 2025-10-22 12:17:34
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.358 | 9.494 | 25.083 | 25.083 |
+| MDI Std | 0.413 | 0.516 | 0.647 | 0.647 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.944353,
+      "aei_text": 3.180182,
+      "aei_vision": 0.16787,
+      "text_ratio": 0.94986,
+      "vision_ratio": 0.05014
+    },
+    "middle": {
+      "mdi": 10.009581,
+      "aei_text": 2.869033,
+      "aei_vision": 0.286629,
+      "text_ratio": 0.90917,
+      "vision_ratio": 0.09083
+    },
+    "late": {
+      "mdi": 25.730344,
+      "aei_text": 3.285457,
+      "aei_vision": 0.127688,
+      "text_ratio": 0.962589,
+      "vision_ratio": 0.037411
+    },
+    "all": {
+      "mdi": 25.730344,
+      "aei_text": 3.111557,
+      "aei_vision": 0.194062,
+      "text_ratio": 0.962589,
+      "vision_ratio": 0.037411
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962589,
+      0.037411
+    ],
+    "text_vision_ratio": "0.962589:0.037411"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.771351,
+      "aei_text": 3.196426,
+      "aei_vision": 0.16167,
+      "text_ratio": 0.951857,
+      "vision_ratio": 0.048143
+    },
+    "middle": {
+      "mdi": 8.978124,
+      "aei_text": 2.802247,
+      "aei_vision": 0.312119,
+      "text_ratio": 0.899781,
+      "vision_ratio": 0.100219
+    },
+    "late": {
+      "mdi": 24.435564,
+      "aei_text": 3.269447,
+      "aei_vision": 0.133799,
+      "text_ratio": 0.960685,
+      "vision_ratio": 0.039315
+    },
+    "all": {
+      "mdi": 24.435564,
+      "aei_text": 3.089373,
+      "aei_vision": 0.202529,
+      "text_ratio": 0.960685,
+      "vision_ratio": 0.039315
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960685,
+      0.039315
+    ],
+    "text_vision_ratio": "0.960685:0.039315"
+  }
+}
+```
+
+
+## === Rollout Step 196 ===
+Step: 195/29790 | 2025-10-22 12:17:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.556 | 11.922 | 18.114 | 18.114 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.555929,
+      "aei_text": 2.762771,
+      "aei_vision": 0.166875,
+      "text_ratio": 0.943039,
+      "vision_ratio": 0.056961
+    },
+    "middle": {
+      "mdi": 11.922109,
+      "aei_text": 2.646221,
+      "aei_vision": 0.221959,
+      "text_ratio": 0.922613,
+      "vision_ratio": 0.077387
+    },
+    "late": {
+      "mdi": 18.114194,
+      "aei_text": 2.789968,
+      "aei_vision": 0.154021,
+      "text_ratio": 0.947683,
+      "vision_ratio": 0.052317
+    },
+    "all": {
+      "mdi": 18.114194,
+      "aei_text": 2.732986,
+      "aei_vision": 0.180952,
+      "text_ratio": 0.947683,
+      "vision_ratio": 0.052317
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947683,
+      0.052317
+    ],
+    "text_vision_ratio": "0.947683:0.052317"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.555929,
+      "aei_text": 2.762771,
+      "aei_vision": 0.166875,
+      "text_ratio": 0.943039,
+      "vision_ratio": 0.056961
+    },
+    "middle": {
+      "mdi": 11.922109,
+      "aei_text": 2.646221,
+      "aei_vision": 0.221959,
+      "text_ratio": 0.922613,
+      "vision_ratio": 0.077387
+    },
+    "late": {
+      "mdi": 18.114194,
+      "aei_text": 2.789968,
+      "aei_vision": 0.154021,
+      "text_ratio": 0.947683,
+      "vision_ratio": 0.052317
+    },
+    "all": {
+      "mdi": 18.114194,
+      "aei_text": 2.732986,
+      "aei_vision": 0.180952,
+      "text_ratio": 0.947683,
+      "vision_ratio": 0.052317
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947683,
+      0.052317
+    ],
+    "text_vision_ratio": "0.947683:0.052317"
+  }
+}
+```
+
+
+## === Rollout Step 197 ===
+Step: 196/29790 | 2025-10-22 12:17:41
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 7.532 | 4.998 | 14.828 | 14.828 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 7.531691,
+      "aei_text": 2.141253,
+      "aei_vision": 0.284299,
+      "text_ratio": 0.88279,
+      "vision_ratio": 0.11721
+    },
+    "middle": {
+      "mdi": 4.998091,
+      "aei_text": 1.967031,
+      "aei_vision": 0.393557,
+      "text_ratio": 0.83328,
+      "vision_ratio": 0.16672
+    },
+    "late": {
+      "mdi": 14.827524,
+      "aei_text": 2.342658,
+      "aei_vision": 0.157994,
+      "text_ratio": 0.936819,
+      "vision_ratio": 0.063181
+    },
+    "all": {
+      "mdi": 14.827524,
+      "aei_text": 2.150314,
+      "aei_vision": 0.278617,
+      "text_ratio": 0.936819,
+      "vision_ratio": 0.063181
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.936819,
+      0.063181
+    ],
+    "text_vision_ratio": "0.936819:0.063181"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 7.531691,
+      "aei_text": 2.141253,
+      "aei_vision": 0.284299,
+      "text_ratio": 0.88279,
+      "vision_ratio": 0.11721
+    },
+    "middle": {
+      "mdi": 4.998091,
+      "aei_text": 1.967031,
+      "aei_vision": 0.393557,
+      "text_ratio": 0.83328,
+      "vision_ratio": 0.16672
+    },
+    "late": {
+      "mdi": 14.827524,
+      "aei_text": 2.342658,
+      "aei_vision": 0.157994,
+      "text_ratio": 0.936819,
+      "vision_ratio": 0.063181
+    },
+    "all": {
+      "mdi": 14.827524,
+      "aei_text": 2.150314,
+      "aei_vision": 0.278617,
+      "text_ratio": 0.936819,
+      "vision_ratio": 0.063181
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.936819,
+      0.063181
+    ],
+    "text_vision_ratio": "0.936819:0.063181"
+  }
+}
+```
+
+
+## === Rollout Step 198 ===
+Step: 197/29790 | 2025-10-22 12:17:44
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.587 | 8.973 | 16.995 | 16.995 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.586978,
+      "aei_text": 2.874885,
+      "aei_vision": 0.173322,
+      "text_ratio": 0.94314,
+      "vision_ratio": 0.05686
+    },
+    "middle": {
+      "mdi": 8.972851,
+      "aei_text": 2.60862,
+      "aei_vision": 0.290724,
+      "text_ratio": 0.899728,
+      "vision_ratio": 0.100272
+    },
+    "late": {
+      "mdi": 16.994516,
+      "aei_text": 2.883201,
+      "aei_vision": 0.169655,
+      "text_ratio": 0.944428,
+      "vision_ratio": 0.055572
+    },
+    "all": {
+      "mdi": 16.994516,
+      "aei_text": 2.788902,
+      "aei_vision": 0.211233,
+      "text_ratio": 0.944428,
+      "vision_ratio": 0.055572
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944428,
+      0.055572
+    ],
+    "text_vision_ratio": "0.944428:0.055572"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.586978,
+      "aei_text": 2.874885,
+      "aei_vision": 0.173322,
+      "text_ratio": 0.94314,
+      "vision_ratio": 0.05686
+    },
+    "middle": {
+      "mdi": 8.972851,
+      "aei_text": 2.60862,
+      "aei_vision": 0.290724,
+      "text_ratio": 0.899728,
+      "vision_ratio": 0.100272
+    },
+    "late": {
+      "mdi": 16.994516,
+      "aei_text": 2.883201,
+      "aei_vision": 0.169655,
+      "text_ratio": 0.944428,
+      "vision_ratio": 0.055572
+    },
+    "all": {
+      "mdi": 16.994516,
+      "aei_text": 2.788902,
+      "aei_vision": 0.211233,
+      "text_ratio": 0.944428,
+      "vision_ratio": 0.055572
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944428,
+      0.055572
+    ],
+    "text_vision_ratio": "0.944428:0.055572"
+  }
+}
+```
+
+
+## === Rollout Step 199 ===
+Step: 198/29790 | 2025-10-22 12:17:47
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.260 | 25.897 | 24.157 | 24.157 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.260172,
+      "aei_text": 3.050923,
+      "aei_vision": 0.131165,
+      "text_ratio": 0.95878,
+      "vision_ratio": 0.04122
+    },
+    "middle": {
+      "mdi": 25.896533,
+      "aei_text": 3.079811,
+      "aei_vision": 0.118928,
+      "text_ratio": 0.96282,
+      "vision_ratio": 0.03718
+    },
+    "late": {
+      "mdi": 24.157199,
+      "aei_text": 3.061397,
+      "aei_vision": 0.126728,
+      "text_ratio": 0.96025,
+      "vision_ratio": 0.03975
+    },
+    "all": {
+      "mdi": 24.157199,
+      "aei_text": 3.064044,
+      "aei_vision": 0.125607,
+      "text_ratio": 0.96025,
+      "vision_ratio": 0.03975
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96025,
+      0.03975
+    ],
+    "text_vision_ratio": "0.960250:0.039750"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.260172,
+      "aei_text": 3.050923,
+      "aei_vision": 0.131165,
+      "text_ratio": 0.95878,
+      "vision_ratio": 0.04122
+    },
+    "middle": {
+      "mdi": 25.896533,
+      "aei_text": 3.079811,
+      "aei_vision": 0.118928,
+      "text_ratio": 0.96282,
+      "vision_ratio": 0.03718
+    },
+    "late": {
+      "mdi": 24.157199,
+      "aei_text": 3.061397,
+      "aei_vision": 0.126728,
+      "text_ratio": 0.96025,
+      "vision_ratio": 0.03975
+    },
+    "all": {
+      "mdi": 24.157199,
+      "aei_text": 3.064044,
+      "aei_vision": 0.125607,
+      "text_ratio": 0.96025,
+      "vision_ratio": 0.03975
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96025,
+      0.03975
+    ],
+    "text_vision_ratio": "0.960250:0.039750"
+  }
+}
+```
+
+
+## === Rollout Step 200 ===
+Step: 199/29790 | 2025-10-22 12:17:51
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.240 | 6.592 | 11.910 | 11.910 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.239769,
+      "aei_text": 2.817219,
+      "aei_vision": 0.230169,
+      "text_ratio": 0.92447,
+      "vision_ratio": 0.07553
+    },
+    "middle": {
+      "mdi": 6.592453,
+      "aei_text": 2.474504,
+      "aei_vision": 0.375354,
+      "text_ratio": 0.86829,
+      "vision_ratio": 0.13171
+    },
+    "late": {
+      "mdi": 11.91025,
+      "aei_text": 2.804674,
+      "aei_vision": 0.235484,
+      "text_ratio": 0.922542,
+      "vision_ratio": 0.077458
+    },
+    "all": {
+      "mdi": 11.91025,
+      "aei_text": 2.698799,
+      "aei_vision": 0.280336,
+      "text_ratio": 0.922542,
+      "vision_ratio": 0.077458
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.922542,
+      0.077458
+    ],
+    "text_vision_ratio": "0.922542:0.077458"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.239769,
+      "aei_text": 2.817219,
+      "aei_vision": 0.230169,
+      "text_ratio": 0.92447,
+      "vision_ratio": 0.07553
+    },
+    "middle": {
+      "mdi": 6.592453,
+      "aei_text": 2.474504,
+      "aei_vision": 0.375354,
+      "text_ratio": 0.86829,
+      "vision_ratio": 0.13171
+    },
+    "late": {
+      "mdi": 11.91025,
+      "aei_text": 2.804674,
+      "aei_vision": 0.235484,
+      "text_ratio": 0.922542,
+      "vision_ratio": 0.077458
+    },
+    "all": {
+      "mdi": 11.91025,
+      "aei_text": 2.698799,
+      "aei_vision": 0.280336,
+      "text_ratio": 0.922542,
+      "vision_ratio": 0.077458
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.922542,
+      0.077458
+    ],
+    "text_vision_ratio": "0.922542:0.077458"
+  }
+}
+```
+
+
+## === Rollout Step 201 ===
+Step: 200/29790 | 2025-10-22 12:17:54
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.108 | 11.808 | 13.467 | 13.467 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.108473,
+      "aei_text": 2.16775,
+      "aei_vision": 0.153649,
+      "text_ratio": 0.933812,
+      "vision_ratio": 0.066188
+    },
+    "middle": {
+      "mdi": 11.807853,
+      "aei_text": 2.130767,
+      "aei_vision": 0.180453,
+      "text_ratio": 0.921923,
+      "vision_ratio": 0.078077
+    },
+    "late": {
+      "mdi": 13.467094,
+      "aei_text": 2.158592,
+      "aei_vision": 0.160286,
+      "text_ratio": 0.930878,
+      "vision_ratio": 0.069122
+    },
+    "all": {
+      "mdi": 13.467094,
+      "aei_text": 2.15237,
+      "aei_vision": 0.164796,
+      "text_ratio": 0.930878,
+      "vision_ratio": 0.069122
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930878,
+      0.069122
+    ],
+    "text_vision_ratio": "0.930878:0.069122"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.108473,
+      "aei_text": 2.16775,
+      "aei_vision": 0.153649,
+      "text_ratio": 0.933812,
+      "vision_ratio": 0.066188
+    },
+    "middle": {
+      "mdi": 11.807853,
+      "aei_text": 2.130767,
+      "aei_vision": 0.180453,
+      "text_ratio": 0.921923,
+      "vision_ratio": 0.078077
+    },
+    "late": {
+      "mdi": 13.467094,
+      "aei_text": 2.158592,
+      "aei_vision": 0.160286,
+      "text_ratio": 0.930878,
+      "vision_ratio": 0.069122
+    },
+    "all": {
+      "mdi": 13.467094,
+      "aei_text": 2.15237,
+      "aei_vision": 0.164796,
+      "text_ratio": 0.930878,
+      "vision_ratio": 0.069122
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930878,
+      0.069122
+    ],
+    "text_vision_ratio": "0.930878:0.069122"
+  }
+}
+```
+
+
+## === Rollout Step 202 ===
+Step: 201/29790 | 2025-10-22 12:17:57
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.533 | 7.810 | 19.213 | 19.213 |
+| MDI Std | 0.161 | 0.099 | 0.030 | 0.030 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.693861,
+      "aei_text": 2.909872,
+      "aei_vision": 0.185415,
+      "text_ratio": 0.940098,
+      "vision_ratio": 0.059902
+    },
+    "middle": {
+      "mdi": 7.71048,
+      "aei_text": 2.564718,
+      "aei_vision": 0.332628,
+      "text_ratio": 0.885196,
+      "vision_ratio": 0.114804
+    },
+    "late": {
+      "mdi": 19.243049,
+      "aei_text": 2.981344,
+      "aei_vision": 0.154931,
+      "text_ratio": 0.9506,
+      "vision_ratio": 0.0494
+    },
+    "all": {
+      "mdi": 19.243049,
+      "aei_text": 2.818645,
+      "aei_vision": 0.224324,
+      "text_ratio": 0.9506,
+      "vision_ratio": 0.0494
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.9506,
+      0.0494
+    ],
+    "text_vision_ratio": "0.950600:0.049400"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.372703,
+      "aei_text": 2.901992,
+      "aei_vision": 0.188776,
+      "text_ratio": 0.938923,
+      "vision_ratio": 0.061077
+    },
+    "middle": {
+      "mdi": 7.909005,
+      "aei_text": 2.579817,
+      "aei_vision": 0.326187,
+      "text_ratio": 0.887754,
+      "vision_ratio": 0.112246
+    },
+    "late": {
+      "mdi": 19.183519,
+      "aei_text": 2.98034,
+      "aei_vision": 0.155359,
+      "text_ratio": 0.950455,
+      "vision_ratio": 0.049545
+    },
+    "all": {
+      "mdi": 19.183519,
+      "aei_text": 2.820716,
+      "aei_vision": 0.223441,
+      "text_ratio": 0.950455,
+      "vision_ratio": 0.049545
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950455,
+      0.049545
+    ],
+    "text_vision_ratio": "0.950455:0.049545"
+  }
+}
+```
+
+
+## === Rollout Step 203 ===
+Step: 202/29790 | 2025-10-22 12:18:00
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.525 | 8.679 | 19.683 | 19.683 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.524954,
+      "aei_text": 3.284647,
+      "aei_vision": 0.139624,
+      "text_ratio": 0.959225,
+      "vision_ratio": 0.040775
+    },
+    "middle": {
+      "mdi": 8.67914,
+      "aei_text": 2.799034,
+      "aei_vision": 0.322501,
+      "text_ratio": 0.896685,
+      "vision_ratio": 0.103315
+    },
+    "late": {
+      "mdi": 19.68344,
+      "aei_text": 3.22089,
+      "aei_vision": 0.163634,
+      "text_ratio": 0.951652,
+      "vision_ratio": 0.048348
+    },
+    "all": {
+      "mdi": 19.68344,
+      "aei_text": 3.101523,
+      "aei_vision": 0.208587,
+      "text_ratio": 0.951652,
+      "vision_ratio": 0.048348
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951652,
+      0.048348
+    ],
+    "text_vision_ratio": "0.951652:0.048348"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.524954,
+      "aei_text": 3.284647,
+      "aei_vision": 0.139624,
+      "text_ratio": 0.959225,
+      "vision_ratio": 0.040775
+    },
+    "middle": {
+      "mdi": 8.67914,
+      "aei_text": 2.799034,
+      "aei_vision": 0.322501,
+      "text_ratio": 0.896685,
+      "vision_ratio": 0.103315
+    },
+    "late": {
+      "mdi": 19.68344,
+      "aei_text": 3.22089,
+      "aei_vision": 0.163634,
+      "text_ratio": 0.951652,
+      "vision_ratio": 0.048348
+    },
+    "all": {
+      "mdi": 19.68344,
+      "aei_text": 3.101523,
+      "aei_vision": 0.208587,
+      "text_ratio": 0.951652,
+      "vision_ratio": 0.048348
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951652,
+      0.048348
+    ],
+    "text_vision_ratio": "0.951652:0.048348"
+  }
+}
+```
+
+
+## === Rollout Step 204 ===
+Step: 203/29790 | 2025-10-22 12:18:04
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.292 | 7.795 | 13.954 | 13.954 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.291747,
+      "aei_text": 2.996604,
+      "aei_vision": 0.195962,
+      "text_ratio": 0.938619,
+      "vision_ratio": 0.061381
+    },
+    "middle": {
+      "mdi": 7.795377,
+      "aei_text": 2.641705,
+      "aei_vision": 0.338881,
+      "text_ratio": 0.886304,
+      "vision_ratio": 0.113696
+    },
+    "late": {
+      "mdi": 13.954469,
+      "aei_text": 2.957016,
+      "aei_vision": 0.211905,
+      "text_ratio": 0.93313,
+      "vision_ratio": 0.06687
+    },
+    "all": {
+      "mdi": 13.954469,
+      "aei_text": 2.865108,
+      "aei_vision": 0.248916,
+      "text_ratio": 0.93313,
+      "vision_ratio": 0.06687
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93313,
+      0.06687
+    ],
+    "text_vision_ratio": "0.933130:0.066870"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.291747,
+      "aei_text": 2.996604,
+      "aei_vision": 0.195962,
+      "text_ratio": 0.938619,
+      "vision_ratio": 0.061381
+    },
+    "middle": {
+      "mdi": 7.795377,
+      "aei_text": 2.641705,
+      "aei_vision": 0.338881,
+      "text_ratio": 0.886304,
+      "vision_ratio": 0.113696
+    },
+    "late": {
+      "mdi": 13.954469,
+      "aei_text": 2.957016,
+      "aei_vision": 0.211905,
+      "text_ratio": 0.93313,
+      "vision_ratio": 0.06687
+    },
+    "all": {
+      "mdi": 13.954469,
+      "aei_text": 2.865108,
+      "aei_vision": 0.248916,
+      "text_ratio": 0.93313,
+      "vision_ratio": 0.06687
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93313,
+      0.06687
+    ],
+    "text_vision_ratio": "0.933130:0.066870"
+  }
+}
+```
+
+
+## === Rollout Step 205 ===
+Step: 204/29790 | 2025-10-22 12:18:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.223 | 11.761 | 19.985 | 19.985 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.222807,
+      "aei_text": 3.323534,
+      "aei_vision": 0.156602,
+      "text_ratio": 0.955001,
+      "vision_ratio": 0.044999
+    },
+    "middle": {
+      "mdi": 11.761439,
+      "aei_text": 3.042338,
+      "aei_vision": 0.258671,
+      "text_ratio": 0.921639,
+      "vision_ratio": 0.078361
+    },
+    "late": {
+      "mdi": 19.98461,
+      "aei_text": 3.300042,
+      "aei_vision": 0.165129,
+      "text_ratio": 0.952346,
+      "vision_ratio": 0.047654
+    },
+    "all": {
+      "mdi": 19.98461,
+      "aei_text": 3.221971,
+      "aei_vision": 0.193467,
+      "text_ratio": 0.952346,
+      "vision_ratio": 0.047654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952346,
+      0.047654
+    ],
+    "text_vision_ratio": "0.952346:0.047654"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.222807,
+      "aei_text": 3.323534,
+      "aei_vision": 0.156602,
+      "text_ratio": 0.955001,
+      "vision_ratio": 0.044999
+    },
+    "middle": {
+      "mdi": 11.761439,
+      "aei_text": 3.042338,
+      "aei_vision": 0.258671,
+      "text_ratio": 0.921639,
+      "vision_ratio": 0.078361
+    },
+    "late": {
+      "mdi": 19.98461,
+      "aei_text": 3.300042,
+      "aei_vision": 0.165129,
+      "text_ratio": 0.952346,
+      "vision_ratio": 0.047654
+    },
+    "all": {
+      "mdi": 19.98461,
+      "aei_text": 3.221971,
+      "aei_vision": 0.193467,
+      "text_ratio": 0.952346,
+      "vision_ratio": 0.047654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952346,
+      0.047654
+    ],
+    "text_vision_ratio": "0.952346:0.047654"
+  }
+}
+```
+
+
+## === Rollout Step 206 ===
+Step: 205/29790 | 2025-10-22 12:18:11
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.244 | 5.527 | 14.127 | 14.127 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 278.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 278.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 278,
+    "text_tokens": 0,
+    "total_tokens": 278
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.24358,
+      "aei_text": 2.44058,
+      "aei_vision": 0.238255,
+      "text_ratio": 0.91106,
+      "vision_ratio": 0.08894
+    },
+    "middle": {
+      "mdi": 5.527161,
+      "aei_text": 2.154112,
+      "aei_vision": 0.389732,
+      "text_ratio": 0.846794,
+      "vision_ratio": 0.153206
+    },
+    "late": {
+      "mdi": 14.127007,
+      "aei_text": 2.549817,
+      "aei_vision": 0.180492,
+      "text_ratio": 0.933893,
+      "vision_ratio": 0.066107
+    },
+    "all": {
+      "mdi": 14.127007,
+      "aei_text": 2.381503,
+      "aei_vision": 0.269493,
+      "text_ratio": 0.933893,
+      "vision_ratio": 0.066107
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.933893,
+      0.066107
+    ],
+    "text_vision_ratio": "0.933893:0.066107"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 278,
+    "text_tokens": 0,
+    "total_tokens": 278
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.24358,
+      "aei_text": 2.44058,
+      "aei_vision": 0.238255,
+      "text_ratio": 0.91106,
+      "vision_ratio": 0.08894
+    },
+    "middle": {
+      "mdi": 5.527161,
+      "aei_text": 2.154112,
+      "aei_vision": 0.389732,
+      "text_ratio": 0.846794,
+      "vision_ratio": 0.153206
+    },
+    "late": {
+      "mdi": 14.127007,
+      "aei_text": 2.549817,
+      "aei_vision": 0.180492,
+      "text_ratio": 0.933893,
+      "vision_ratio": 0.066107
+    },
+    "all": {
+      "mdi": 14.127007,
+      "aei_text": 2.381503,
+      "aei_vision": 0.269493,
+      "text_ratio": 0.933893,
+      "vision_ratio": 0.066107
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.933893,
+      0.066107
+    ],
+    "text_vision_ratio": "0.933893:0.066107"
+  }
+}
+```
+
+
+## === Rollout Step 207 ===
+Step: 206/29790 | 2025-10-22 12:18:14
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.688 | 10.113 | 20.391 | 20.391 |
+| MDI Std | 0.004 | 2.011 | 1.472 | 1.472 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.691509,
+      "aei_text": 2.978843,
+      "aei_vision": 0.254787,
+      "text_ratio": 0.921207,
+      "vision_ratio": 0.078793
+    },
+    "middle": {
+      "mdi": 12.123952,
+      "aei_text": 2.998639,
+      "aei_vision": 0.247332,
+      "text_ratio": 0.923803,
+      "vision_ratio": 0.076197
+    },
+    "late": {
+      "mdi": 21.862501,
+      "aei_text": 3.259508,
+      "aei_vision": 0.149091,
+      "text_ratio": 0.95626,
+      "vision_ratio": 0.04374
+    },
+    "all": {
+      "mdi": 21.862501,
+      "aei_text": 3.078997,
+      "aei_vision": 0.21707,
+      "text_ratio": 0.95626,
+      "vision_ratio": 0.04374
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95626,
+      0.04374
+    ],
+    "text_vision_ratio": "0.956260:0.043740"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.684392,
+      "aei_text": 2.978507,
+      "aei_vision": 0.254913,
+      "text_ratio": 0.921163,
+      "vision_ratio": 0.078837
+    },
+    "middle": {
+      "mdi": 8.102596,
+      "aei_text": 2.753139,
+      "aei_vision": 0.339785,
+      "text_ratio": 0.890141,
+      "vision_ratio": 0.109859
+    },
+    "late": {
+      "mdi": 18.918665,
+      "aei_text": 3.205486,
+      "aei_vision": 0.169435,
+      "text_ratio": 0.949796,
+      "vision_ratio": 0.050204
+    },
+    "all": {
+      "mdi": 18.918665,
+      "aei_text": 2.979044,
+      "aei_vision": 0.254711,
+      "text_ratio": 0.949796,
+      "vision_ratio": 0.050204
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949796,
+      0.050204
+    ],
+    "text_vision_ratio": "0.949796:0.050204"
+  }
+}
+```
+
+
+## === Rollout Step 208 ===
+Step: 207/29790 | 2025-10-22 12:18:18
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.867 | 17.098 | 25.159 | 25.159 |
+| MDI Std | 1.639 | 1.208 | 0.619 | 0.619 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.505487,
+      "aei_text": 3.25599,
+      "aei_vision": 0.144675,
+      "text_ratio": 0.957457,
+      "vision_ratio": 0.042543
+    },
+    "middle": {
+      "mdi": 18.305267,
+      "aei_text": 3.179459,
+      "aei_vision": 0.173691,
+      "text_ratio": 0.948201,
+      "vision_ratio": 0.051799
+    },
+    "late": {
+      "mdi": 25.777958,
+      "aei_text": 3.299937,
+      "aei_vision": 0.128014,
+      "text_ratio": 0.962656,
+      "vision_ratio": 0.037344
+    },
+    "all": {
+      "mdi": 25.777958,
+      "aei_text": 3.245129,
+      "aei_vision": 0.148793,
+      "text_ratio": 0.962656,
+      "vision_ratio": 0.037344
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962656,
+      0.037344
+    ],
+    "text_vision_ratio": "0.962656:0.037344"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.227648,
+      "aei_text": 3.198785,
+      "aei_vision": 0.166364,
+      "text_ratio": 0.950563,
+      "vision_ratio": 0.049437
+    },
+    "middle": {
+      "mdi": 15.889912,
+      "aei_text": 3.119736,
+      "aei_vision": 0.196334,
+      "text_ratio": 0.940793,
+      "vision_ratio": 0.059207
+    },
+    "late": {
+      "mdi": 24.540317,
+      "aei_text": 3.284561,
+      "aei_vision": 0.133843,
+      "text_ratio": 0.960846,
+      "vision_ratio": 0.039154
+    },
+    "all": {
+      "mdi": 24.540317,
+      "aei_text": 3.201027,
+      "aei_vision": 0.165514,
+      "text_ratio": 0.960846,
+      "vision_ratio": 0.039154
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960846,
+      0.039154
+    ],
+    "text_vision_ratio": "0.960846:0.039154"
+  }
+}
+```
+
+
+## === Rollout Step 209 ===
+Step: 208/29790 | 2025-10-22 12:18:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 28.692 | 26.633 | 23.958 | 23.958 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 462.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 462.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 462,
+    "text_tokens": 0,
+    "total_tokens": 462
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.692218,
+      "aei_text": 3.561132,
+      "aei_vision": 0.124115,
+      "text_ratio": 0.966321,
+      "vision_ratio": 0.033679
+    },
+    "middle": {
+      "mdi": 26.633464,
+      "aei_text": 3.535854,
+      "aei_vision": 0.13276,
+      "text_ratio": 0.963812,
+      "vision_ratio": 0.036188
+    },
+    "late": {
+      "mdi": 23.95834,
+      "aei_text": 3.497224,
+      "aei_vision": 0.145971,
+      "text_ratio": 0.959933,
+      "vision_ratio": 0.040067
+    },
+    "all": {
+      "mdi": 23.95834,
+      "aei_text": 3.531403,
+      "aei_vision": 0.134282,
+      "text_ratio": 0.959933,
+      "vision_ratio": 0.040067
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.959933,
+      0.040067
+    ],
+    "text_vision_ratio": "0.959933:0.040067"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 462,
+    "text_tokens": 0,
+    "total_tokens": 462
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.692218,
+      "aei_text": 3.561132,
+      "aei_vision": 0.124115,
+      "text_ratio": 0.966321,
+      "vision_ratio": 0.033679
+    },
+    "middle": {
+      "mdi": 26.633464,
+      "aei_text": 3.535854,
+      "aei_vision": 0.13276,
+      "text_ratio": 0.963812,
+      "vision_ratio": 0.036188
+    },
+    "late": {
+      "mdi": 23.95834,
+      "aei_text": 3.497224,
+      "aei_vision": 0.145971,
+      "text_ratio": 0.959933,
+      "vision_ratio": 0.040067
+    },
+    "all": {
+      "mdi": 23.95834,
+      "aei_text": 3.531403,
+      "aei_vision": 0.134282,
+      "text_ratio": 0.959933,
+      "vision_ratio": 0.040067
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.959933,
+      0.040067
+    ],
+    "text_vision_ratio": "0.959933:0.040067"
+  }
+}
+```
+
+
+## === Rollout Step 210 ===
+Step: 209/29790 | 2025-10-22 12:18:26
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.677 | 12.013 | 25.058 | 25.058 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.677133,
+      "aei_text": 3.061096,
+      "aei_vision": 0.223811,
+      "text_ratio": 0.931867,
+      "vision_ratio": 0.068133
+    },
+    "middle": {
+      "mdi": 12.013059,
+      "aei_text": 2.993674,
+      "aei_vision": 0.249202,
+      "text_ratio": 0.923154,
+      "vision_ratio": 0.076846
+    },
+    "late": {
+      "mdi": 25.058135,
+      "aei_text": 3.305158,
+      "aei_vision": 0.1319,
+      "text_ratio": 0.961624,
+      "vision_ratio": 0.038376
+    },
+    "all": {
+      "mdi": 25.058135,
+      "aei_text": 3.119976,
+      "aei_vision": 0.201637,
+      "text_ratio": 0.961624,
+      "vision_ratio": 0.038376
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961624,
+      0.038376
+    ],
+    "text_vision_ratio": "0.961624:0.038376"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.677133,
+      "aei_text": 3.061096,
+      "aei_vision": 0.223811,
+      "text_ratio": 0.931867,
+      "vision_ratio": 0.068133
+    },
+    "middle": {
+      "mdi": 12.013059,
+      "aei_text": 2.993674,
+      "aei_vision": 0.249202,
+      "text_ratio": 0.923154,
+      "vision_ratio": 0.076846
+    },
+    "late": {
+      "mdi": 25.058135,
+      "aei_text": 3.305158,
+      "aei_vision": 0.1319,
+      "text_ratio": 0.961624,
+      "vision_ratio": 0.038376
+    },
+    "all": {
+      "mdi": 25.058135,
+      "aei_text": 3.119976,
+      "aei_vision": 0.201637,
+      "text_ratio": 0.961624,
+      "vision_ratio": 0.038376
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961624,
+      0.038376
+    ],
+    "text_vision_ratio": "0.961624:0.038376"
+  }
+}
+```
+
+
+## === Rollout Step 211 ===
+Step: 210/29790 | 2025-10-22 12:18:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.303 | 5.623 | 13.282 | 13.282 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.30349,
+      "aei_text": 2.225355,
+      "aei_vision": 0.215981,
+      "text_ratio": 0.911532,
+      "vision_ratio": 0.088468
+    },
+    "middle": {
+      "mdi": 5.622655,
+      "aei_text": 2.005461,
+      "aei_vision": 0.356675,
+      "text_ratio": 0.849003,
+      "vision_ratio": 0.150997
+    },
+    "late": {
+      "mdi": 13.282382,
+      "aei_text": 2.29309,
+      "aei_vision": 0.172641,
+      "text_ratio": 0.929984,
+      "vision_ratio": 0.070016
+    },
+    "all": {
+      "mdi": 13.282382,
+      "aei_text": 2.174635,
+      "aei_vision": 0.248432,
+      "text_ratio": 0.929984,
+      "vision_ratio": 0.070016
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.929984,
+      0.070016
+    ],
+    "text_vision_ratio": "0.929984:0.070016"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.30349,
+      "aei_text": 2.225355,
+      "aei_vision": 0.215981,
+      "text_ratio": 0.911532,
+      "vision_ratio": 0.088468
+    },
+    "middle": {
+      "mdi": 5.622655,
+      "aei_text": 2.005461,
+      "aei_vision": 0.356675,
+      "text_ratio": 0.849003,
+      "vision_ratio": 0.150997
+    },
+    "late": {
+      "mdi": 13.282382,
+      "aei_text": 2.29309,
+      "aei_vision": 0.172641,
+      "text_ratio": 0.929984,
+      "vision_ratio": 0.070016
+    },
+    "all": {
+      "mdi": 13.282382,
+      "aei_text": 2.174635,
+      "aei_vision": 0.248432,
+      "text_ratio": 0.929984,
+      "vision_ratio": 0.070016
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.929984,
+      0.070016
+    ],
+    "text_vision_ratio": "0.929984:0.070016"
+  }
+}
+```
+
+
+## === Rollout Step 212 ===
+Step: 211/29790 | 2025-10-22 12:18:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.831 | 12.299 | 31.323 | 31.323 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.830965,
+      "aei_text": 3.057671,
+      "aei_vision": 0.128307,
+      "text_ratio": 0.959728,
+      "vision_ratio": 0.040272
+    },
+    "middle": {
+      "mdi": 12.299441,
+      "aei_text": 2.819431,
+      "aei_vision": 0.229232,
+      "text_ratio": 0.924809,
+      "vision_ratio": 0.075191
+    },
+    "late": {
+      "mdi": 31.322563,
+      "aei_text": 3.125034,
+      "aei_vision": 0.099769,
+      "text_ratio": 0.969062,
+      "vision_ratio": 0.030938
+    },
+    "all": {
+      "mdi": 31.322563,
+      "aei_text": 3.000712,
+      "aei_vision": 0.152436,
+      "text_ratio": 0.969062,
+      "vision_ratio": 0.030938
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.969062,
+      0.030938
+    ],
+    "text_vision_ratio": "0.969062:0.030938"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.830965,
+      "aei_text": 3.057671,
+      "aei_vision": 0.128307,
+      "text_ratio": 0.959728,
+      "vision_ratio": 0.040272
+    },
+    "middle": {
+      "mdi": 12.299441,
+      "aei_text": 2.819431,
+      "aei_vision": 0.229232,
+      "text_ratio": 0.924809,
+      "vision_ratio": 0.075191
+    },
+    "late": {
+      "mdi": 31.322563,
+      "aei_text": 3.125034,
+      "aei_vision": 0.099769,
+      "text_ratio": 0.969062,
+      "vision_ratio": 0.030938
+    },
+    "all": {
+      "mdi": 31.322563,
+      "aei_text": 3.000712,
+      "aei_vision": 0.152436,
+      "text_ratio": 0.969062,
+      "vision_ratio": 0.030938
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.969062,
+      0.030938
+    ],
+    "text_vision_ratio": "0.969062:0.030938"
+  }
+}
+```
+
+
+## === Rollout Step 213 ===
+Step: 212/29790 | 2025-10-22 12:18:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.422 | 9.118 | 27.946 | 27.946 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.421647,
+      "aei_text": 3.199372,
+      "aei_vision": 0.149352,
+      "text_ratio": 0.9554,
+      "vision_ratio": 0.0446
+    },
+    "middle": {
+      "mdi": 9.117905,
+      "aei_text": 2.793411,
+      "aei_vision": 0.306365,
+      "text_ratio": 0.901165,
+      "vision_ratio": 0.098835
+    },
+    "late": {
+      "mdi": 27.946004,
+      "aei_text": 3.28189,
+      "aei_vision": 0.117437,
+      "text_ratio": 0.965453,
+      "vision_ratio": 0.034547
+    },
+    "all": {
+      "mdi": 27.946004,
+      "aei_text": 3.091558,
+      "aei_vision": 0.191052,
+      "text_ratio": 0.965453,
+      "vision_ratio": 0.034547
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.965453,
+      0.034547
+    ],
+    "text_vision_ratio": "0.965453:0.034547"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.421647,
+      "aei_text": 3.199372,
+      "aei_vision": 0.149352,
+      "text_ratio": 0.9554,
+      "vision_ratio": 0.0446
+    },
+    "middle": {
+      "mdi": 9.117905,
+      "aei_text": 2.793411,
+      "aei_vision": 0.306365,
+      "text_ratio": 0.901165,
+      "vision_ratio": 0.098835
+    },
+    "late": {
+      "mdi": 27.946004,
+      "aei_text": 3.28189,
+      "aei_vision": 0.117437,
+      "text_ratio": 0.965453,
+      "vision_ratio": 0.034547
+    },
+    "all": {
+      "mdi": 27.946004,
+      "aei_text": 3.091558,
+      "aei_vision": 0.191052,
+      "text_ratio": 0.965453,
+      "vision_ratio": 0.034547
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.965453,
+      0.034547
+    ],
+    "text_vision_ratio": "0.965453:0.034547"
+  }
+}
+```
+
+
+## === Rollout Step 214 ===
+Step: 213/29790 | 2025-10-22 12:18:39
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.488 | 9.152 | 22.296 | 22.296 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.487748,
+      "aei_text": 3.222579,
+      "aei_vision": 0.174309,
+      "text_ratio": 0.948686,
+      "vision_ratio": 0.051314
+    },
+    "middle": {
+      "mdi": 9.152083,
+      "aei_text": 2.852742,
+      "aei_vision": 0.311704,
+      "text_ratio": 0.901498,
+      "vision_ratio": 0.098502
+    },
+    "late": {
+      "mdi": 22.29607,
+      "aei_text": 3.294089,
+      "aei_vision": 0.147743,
+      "text_ratio": 0.957074,
+      "vision_ratio": 0.042926
+    },
+    "all": {
+      "mdi": 22.29607,
+      "aei_text": 3.123137,
+      "aei_vision": 0.211252,
+      "text_ratio": 0.957074,
+      "vision_ratio": 0.042926
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957074,
+      0.042926
+    ],
+    "text_vision_ratio": "0.957074:0.042926"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.487748,
+      "aei_text": 3.222579,
+      "aei_vision": 0.174309,
+      "text_ratio": 0.948686,
+      "vision_ratio": 0.051314
+    },
+    "middle": {
+      "mdi": 9.152083,
+      "aei_text": 2.852742,
+      "aei_vision": 0.311704,
+      "text_ratio": 0.901498,
+      "vision_ratio": 0.098502
+    },
+    "late": {
+      "mdi": 22.29607,
+      "aei_text": 3.294089,
+      "aei_vision": 0.147743,
+      "text_ratio": 0.957074,
+      "vision_ratio": 0.042926
+    },
+    "all": {
+      "mdi": 22.29607,
+      "aei_text": 3.123137,
+      "aei_vision": 0.211252,
+      "text_ratio": 0.957074,
+      "vision_ratio": 0.042926
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957074,
+      0.042926
+    ],
+    "text_vision_ratio": "0.957074:0.042926"
+  }
+}
+```
+
+
+## === Rollout Step 215 ===
+Step: 214/29790 | 2025-10-22 12:18:43
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 26.148 | 17.755 | 25.531 | 25.531 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.14758,
+      "aei_text": 3.262886,
+      "aei_vision": 0.124787,
+      "text_ratio": 0.963164,
+      "vision_ratio": 0.036836
+    },
+    "middle": {
+      "mdi": 17.754831,
+      "aei_text": 3.129759,
+      "aei_vision": 0.176276,
+      "text_ratio": 0.94668,
+      "vision_ratio": 0.05332
+    },
+    "late": {
+      "mdi": 25.531156,
+      "aei_text": 3.255812,
+      "aei_vision": 0.127523,
+      "text_ratio": 0.962308,
+      "vision_ratio": 0.037692
+    },
+    "all": {
+      "mdi": 25.531156,
+      "aei_text": 3.216152,
+      "aei_vision": 0.142862,
+      "text_ratio": 0.962308,
+      "vision_ratio": 0.037692
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962308,
+      0.037692
+    ],
+    "text_vision_ratio": "0.962308:0.037692"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.14758,
+      "aei_text": 3.262886,
+      "aei_vision": 0.124787,
+      "text_ratio": 0.963164,
+      "vision_ratio": 0.036836
+    },
+    "middle": {
+      "mdi": 17.754831,
+      "aei_text": 3.129759,
+      "aei_vision": 0.176276,
+      "text_ratio": 0.94668,
+      "vision_ratio": 0.05332
+    },
+    "late": {
+      "mdi": 25.531156,
+      "aei_text": 3.255812,
+      "aei_vision": 0.127523,
+      "text_ratio": 0.962308,
+      "vision_ratio": 0.037692
+    },
+    "all": {
+      "mdi": 25.531156,
+      "aei_text": 3.216152,
+      "aei_vision": 0.142862,
+      "text_ratio": 0.962308,
+      "vision_ratio": 0.037692
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962308,
+      0.037692
+    ],
+    "text_vision_ratio": "0.962308:0.037692"
+  }
+}
+```
+
+
+## === Rollout Step 216 ===
+Step: 215/29790 | 2025-10-22 12:18:47
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.361 | 6.436 | 16.255 | 16.255 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.360531,
+      "aei_text": 2.978099,
+      "aei_vision": 0.182029,
+      "text_ratio": 0.942398,
+      "vision_ratio": 0.057602
+    },
+    "middle": {
+      "mdi": 6.435891,
+      "aei_text": 2.484677,
+      "aei_vision": 0.386066,
+      "text_ratio": 0.865517,
+      "vision_ratio": 0.134483
+    },
+    "late": {
+      "mdi": 16.254897,
+      "aei_text": 2.975608,
+      "aei_vision": 0.183059,
+      "text_ratio": 0.942045,
+      "vision_ratio": 0.057955
+    },
+    "all": {
+      "mdi": 16.254897,
+      "aei_text": 2.812795,
+      "aei_vision": 0.250385,
+      "text_ratio": 0.942045,
+      "vision_ratio": 0.057955
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942045,
+      0.057955
+    ],
+    "text_vision_ratio": "0.942045:0.057955"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.360531,
+      "aei_text": 2.978099,
+      "aei_vision": 0.182029,
+      "text_ratio": 0.942398,
+      "vision_ratio": 0.057602
+    },
+    "middle": {
+      "mdi": 6.435891,
+      "aei_text": 2.484677,
+      "aei_vision": 0.386066,
+      "text_ratio": 0.865517,
+      "vision_ratio": 0.134483
+    },
+    "late": {
+      "mdi": 16.254897,
+      "aei_text": 2.975608,
+      "aei_vision": 0.183059,
+      "text_ratio": 0.942045,
+      "vision_ratio": 0.057955
+    },
+    "all": {
+      "mdi": 16.254897,
+      "aei_text": 2.812795,
+      "aei_vision": 0.250385,
+      "text_ratio": 0.942045,
+      "vision_ratio": 0.057955
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942045,
+      0.057955
+    ],
+    "text_vision_ratio": "0.942045:0.057955"
+  }
+}
+```
+
+
+## === Rollout Step 217 ===
+Step: 216/29790 | 2025-10-22 12:18:50
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.913 | 8.612 | 25.343 | 25.343 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.91309,
+      "aei_text": 3.20537,
+      "aei_vision": 0.169479,
+      "text_ratio": 0.949782,
+      "vision_ratio": 0.050218
+    },
+    "middle": {
+      "mdi": 8.61159,
+      "aei_text": 2.7939,
+      "aei_vision": 0.324435,
+      "text_ratio": 0.895959,
+      "vision_ratio": 0.104041
+    },
+    "late": {
+      "mdi": 25.34303,
+      "aei_text": 3.308722,
+      "aei_vision": 0.130557,
+      "text_ratio": 0.962039,
+      "vision_ratio": 0.037961
+    },
+    "all": {
+      "mdi": 25.34303,
+      "aei_text": 3.102664,
+      "aei_vision": 0.208157,
+      "text_ratio": 0.962039,
+      "vision_ratio": 0.037961
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962039,
+      0.037961
+    ],
+    "text_vision_ratio": "0.962039:0.037961"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.91309,
+      "aei_text": 3.20537,
+      "aei_vision": 0.169479,
+      "text_ratio": 0.949782,
+      "vision_ratio": 0.050218
+    },
+    "middle": {
+      "mdi": 8.61159,
+      "aei_text": 2.7939,
+      "aei_vision": 0.324435,
+      "text_ratio": 0.895959,
+      "vision_ratio": 0.104041
+    },
+    "late": {
+      "mdi": 25.34303,
+      "aei_text": 3.308722,
+      "aei_vision": 0.130557,
+      "text_ratio": 0.962039,
+      "vision_ratio": 0.037961
+    },
+    "all": {
+      "mdi": 25.34303,
+      "aei_text": 3.102664,
+      "aei_vision": 0.208157,
+      "text_ratio": 0.962039,
+      "vision_ratio": 0.037961
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962039,
+      0.037961
+    ],
+    "text_vision_ratio": "0.962039:0.037961"
+  }
+}
+```
+
+
+## === Rollout Step 218 ===
+Step: 217/29790 | 2025-10-22 12:18:54
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.371 | 16.601 | 17.694 | 17.694 |
+| MDI Std | 6.874 | 4.131 | 7.401 | 7.401 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.497751,
+      "aei_text": 2.980452,
+      "aei_vision": 0.25922,
+      "text_ratio": 0.919986,
+      "vision_ratio": 0.080014
+    },
+    "middle": {
+      "mdi": 12.470044,
+      "aei_text": 3.024947,
+      "aei_vision": 0.242577,
+      "text_ratio": 0.925761,
+      "vision_ratio": 0.074239
+    },
+    "late": {
+      "mdi": 10.293313,
+      "aei_text": 2.91608,
+      "aei_vision": 0.283298,
+      "text_ratio": 0.911452,
+      "vision_ratio": 0.088548
+    },
+    "all": {
+      "mdi": 10.293313,
+      "aei_text": 2.973826,
+      "aei_vision": 0.261699,
+      "text_ratio": 0.911452,
+      "vision_ratio": 0.088548
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.911452,
+      0.088548
+    ],
+    "text_vision_ratio": "0.911452:0.088548"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.244767,
+      "aei_text": 3.321695,
+      "aei_vision": 0.13158,
+      "text_ratio": 0.961897,
+      "vision_ratio": 0.038103
+    },
+    "middle": {
+      "mdi": 20.732437,
+      "aei_text": 3.253878,
+      "aei_vision": 0.156946,
+      "text_ratio": 0.953986,
+      "vision_ratio": 0.046014
+    },
+    "late": {
+      "mdi": 25.095646,
+      "aei_text": 3.319806,
+      "aei_vision": 0.132286,
+      "text_ratio": 0.961679,
+      "vision_ratio": 0.038321
+    },
+    "all": {
+      "mdi": 25.095646,
+      "aei_text": 3.29846,
+      "aei_vision": 0.140271,
+      "text_ratio": 0.961679,
+      "vision_ratio": 0.038321
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961679,
+      0.038321
+    ],
+    "text_vision_ratio": "0.961679:0.038321"
+  }
+}
+```
+
+
+## === Rollout Step 219 ===
+Step: 218/29790 | 2025-10-22 12:18:58
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 25.228 | 19.867 | 21.112 | 21.112 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 486.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 486.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.228469,
+      "aei_text": 3.74125,
+      "aei_vision": 0.148295,
+      "text_ratio": 0.961873,
+      "vision_ratio": 0.038127
+    },
+    "middle": {
+      "mdi": 19.866749,
+      "aei_text": 3.630395,
+      "aei_vision": 0.182737,
+      "text_ratio": 0.952077,
+      "vision_ratio": 0.047923
+    },
+    "late": {
+      "mdi": 21.111538,
+      "aei_text": 3.660486,
+      "aei_vision": 0.173388,
+      "text_ratio": 0.954775,
+      "vision_ratio": 0.045225
+    },
+    "all": {
+      "mdi": 21.111538,
+      "aei_text": 3.677377,
+      "aei_vision": 0.16814,
+      "text_ratio": 0.954775,
+      "vision_ratio": 0.045225
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954775,
+      0.045225
+    ],
+    "text_vision_ratio": "0.954775:0.045225"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.228469,
+      "aei_text": 3.74125,
+      "aei_vision": 0.148295,
+      "text_ratio": 0.961873,
+      "vision_ratio": 0.038127
+    },
+    "middle": {
+      "mdi": 19.866749,
+      "aei_text": 3.630395,
+      "aei_vision": 0.182737,
+      "text_ratio": 0.952077,
+      "vision_ratio": 0.047923
+    },
+    "late": {
+      "mdi": 21.111538,
+      "aei_text": 3.660486,
+      "aei_vision": 0.173388,
+      "text_ratio": 0.954775,
+      "vision_ratio": 0.045225
+    },
+    "all": {
+      "mdi": 21.111538,
+      "aei_text": 3.677377,
+      "aei_vision": 0.16814,
+      "text_ratio": 0.954775,
+      "vision_ratio": 0.045225
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954775,
+      0.045225
+    ],
+    "text_vision_ratio": "0.954775:0.045225"
+  }
+}
+```
+
+
+## === Rollout Step 220 ===
+Step: 219/29790 | 2025-10-22 12:19:02
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.870 | 11.669 | 18.605 | 18.605 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.869752,
+      "aei_text": 3.16973,
+      "aei_vision": 0.17738,
+      "text_ratio": 0.947005,
+      "vision_ratio": 0.052995
+    },
+    "middle": {
+      "mdi": 11.668957,
+      "aei_text": 2.966951,
+      "aei_vision": 0.25426,
+      "text_ratio": 0.921067,
+      "vision_ratio": 0.078933
+    },
+    "late": {
+      "mdi": 18.605135,
+      "aei_text": 3.185926,
+      "aei_vision": 0.171239,
+      "text_ratio": 0.948993,
+      "vision_ratio": 0.051007
+    },
+    "all": {
+      "mdi": 18.605135,
+      "aei_text": 3.107536,
+      "aei_vision": 0.20096,
+      "text_ratio": 0.948993,
+      "vision_ratio": 0.051007
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948993,
+      0.051007
+    ],
+    "text_vision_ratio": "0.948993:0.051007"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.869752,
+      "aei_text": 3.16973,
+      "aei_vision": 0.17738,
+      "text_ratio": 0.947005,
+      "vision_ratio": 0.052995
+    },
+    "middle": {
+      "mdi": 11.668957,
+      "aei_text": 2.966951,
+      "aei_vision": 0.25426,
+      "text_ratio": 0.921067,
+      "vision_ratio": 0.078933
+    },
+    "late": {
+      "mdi": 18.605135,
+      "aei_text": 3.185926,
+      "aei_vision": 0.171239,
+      "text_ratio": 0.948993,
+      "vision_ratio": 0.051007
+    },
+    "all": {
+      "mdi": 18.605135,
+      "aei_text": 3.107536,
+      "aei_vision": 0.20096,
+      "text_ratio": 0.948993,
+      "vision_ratio": 0.051007
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948993,
+      0.051007
+    ],
+    "text_vision_ratio": "0.948993:0.051007"
+  }
+}
+```
+
+
+## === Rollout Step 221 ===
+Step: 220/29790 | 2025-10-22 12:19:05
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.821 | 24.958 | 32.519 | 32.519 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.821222,
+      "aei_text": 3.270348,
+      "aei_vision": 0.164992,
+      "text_ratio": 0.951972,
+      "vision_ratio": 0.048028
+    },
+    "middle": {
+      "mdi": 24.957988,
+      "aei_text": 3.353608,
+      "aei_vision": 0.13437,
+      "text_ratio": 0.961476,
+      "vision_ratio": 0.038524
+    },
+    "late": {
+      "mdi": 32.518557,
+      "aei_text": 3.431997,
+      "aei_vision": 0.10554,
+      "text_ratio": 0.970166,
+      "vision_ratio": 0.029834
+    },
+    "all": {
+      "mdi": 32.518557,
+      "aei_text": 3.351984,
+      "aei_vision": 0.134967,
+      "text_ratio": 0.970166,
+      "vision_ratio": 0.029834
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.970166,
+      0.029834
+    ],
+    "text_vision_ratio": "0.970166:0.029834"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.821222,
+      "aei_text": 3.270348,
+      "aei_vision": 0.164992,
+      "text_ratio": 0.951972,
+      "vision_ratio": 0.048028
+    },
+    "middle": {
+      "mdi": 24.957988,
+      "aei_text": 3.353608,
+      "aei_vision": 0.13437,
+      "text_ratio": 0.961476,
+      "vision_ratio": 0.038524
+    },
+    "late": {
+      "mdi": 32.518557,
+      "aei_text": 3.431997,
+      "aei_vision": 0.10554,
+      "text_ratio": 0.970166,
+      "vision_ratio": 0.029834
+    },
+    "all": {
+      "mdi": 32.518557,
+      "aei_text": 3.351984,
+      "aei_vision": 0.134967,
+      "text_ratio": 0.970166,
+      "vision_ratio": 0.029834
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.970166,
+      0.029834
+    ],
+    "text_vision_ratio": "0.970166:0.029834"
+  }
+}
+```
+
+
+## === Rollout Step 222 ===
+Step: 221/29790 | 2025-10-22 12:19:09
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.504 | 6.625 | 18.828 | 18.828 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.503732,
+      "aei_text": 2.890159,
+      "aei_vision": 0.19927,
+      "text_ratio": 0.935499,
+      "vision_ratio": 0.064501
+    },
+    "middle": {
+      "mdi": 6.624949,
+      "aei_text": 2.477709,
+      "aei_vision": 0.373997,
+      "text_ratio": 0.868852,
+      "vision_ratio": 0.131148
+    },
+    "late": {
+      "mdi": 18.82751,
+      "aei_text": 2.986149,
+      "aei_vision": 0.158606,
+      "text_ratio": 0.949565,
+      "vision_ratio": 0.050435
+    },
+    "all": {
+      "mdi": 18.82751,
+      "aei_text": 2.784672,
+      "aei_vision": 0.243957,
+      "text_ratio": 0.949565,
+      "vision_ratio": 0.050435
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949565,
+      0.050435
+    ],
+    "text_vision_ratio": "0.949565:0.050435"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.503732,
+      "aei_text": 2.890159,
+      "aei_vision": 0.19927,
+      "text_ratio": 0.935499,
+      "vision_ratio": 0.064501
+    },
+    "middle": {
+      "mdi": 6.624949,
+      "aei_text": 2.477709,
+      "aei_vision": 0.373997,
+      "text_ratio": 0.868852,
+      "vision_ratio": 0.131148
+    },
+    "late": {
+      "mdi": 18.82751,
+      "aei_text": 2.986149,
+      "aei_vision": 0.158606,
+      "text_ratio": 0.949565,
+      "vision_ratio": 0.050435
+    },
+    "all": {
+      "mdi": 18.82751,
+      "aei_text": 2.784672,
+      "aei_vision": 0.243957,
+      "text_ratio": 0.949565,
+      "vision_ratio": 0.050435
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949565,
+      0.050435
+    ],
+    "text_vision_ratio": "0.949565:0.050435"
+  }
+}
+```
+
+
+## === Rollout Step 223 ===
+Step: 222/29790 | 2025-10-22 12:19:12
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.665 | 10.559 | 30.589 | 30.589 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.66469,
+      "aei_text": 2.724577,
+      "aei_vision": 0.163494,
+      "text_ratio": 0.94339,
+      "vision_ratio": 0.05661
+    },
+    "middle": {
+      "mdi": 10.558947,
+      "aei_text": 2.561507,
+      "aei_vision": 0.242591,
+      "text_ratio": 0.913487,
+      "vision_ratio": 0.086513
+    },
+    "late": {
+      "mdi": 30.589082,
+      "aei_text": 2.868324,
+      "aei_vision": 0.09377,
+      "text_ratio": 0.968343,
+      "vision_ratio": 0.031657
+    },
+    "all": {
+      "mdi": 30.589082,
+      "aei_text": 2.718136,
+      "aei_vision": 0.166618,
+      "text_ratio": 0.968343,
+      "vision_ratio": 0.031657
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.968343,
+      0.031657
+    ],
+    "text_vision_ratio": "0.968343:0.031657"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.66469,
+      "aei_text": 2.724577,
+      "aei_vision": 0.163494,
+      "text_ratio": 0.94339,
+      "vision_ratio": 0.05661
+    },
+    "middle": {
+      "mdi": 10.558947,
+      "aei_text": 2.561507,
+      "aei_vision": 0.242591,
+      "text_ratio": 0.913487,
+      "vision_ratio": 0.086513
+    },
+    "late": {
+      "mdi": 30.589082,
+      "aei_text": 2.868324,
+      "aei_vision": 0.09377,
+      "text_ratio": 0.968343,
+      "vision_ratio": 0.031657
+    },
+    "all": {
+      "mdi": 30.589082,
+      "aei_text": 2.718136,
+      "aei_vision": 0.166618,
+      "text_ratio": 0.968343,
+      "vision_ratio": 0.031657
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.968343,
+      0.031657
+    ],
+    "text_vision_ratio": "0.968343:0.031657"
+  }
+}
+```
+
+
+## === Rollout Step 224 ===
+Step: 223/29790 | 2025-10-22 12:19:16
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.723 | 9.720 | 11.615 | 11.615 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.723412,
+      "aei_text": 2.864813,
+      "aei_vision": 0.16164,
+      "text_ratio": 0.946591,
+      "vision_ratio": 0.053409
+    },
+    "middle": {
+      "mdi": 9.719591,
+      "aei_text": 2.623877,
+      "aei_vision": 0.269958,
+      "text_ratio": 0.906713,
+      "vision_ratio": 0.093287
+    },
+    "late": {
+      "mdi": 11.615052,
+      "aei_text": 2.706119,
+      "aei_vision": 0.232984,
+      "text_ratio": 0.92073,
+      "vision_ratio": 0.07927
+    },
+    "all": {
+      "mdi": 11.615052,
+      "aei_text": 2.731603,
+      "aei_vision": 0.221527,
+      "text_ratio": 0.92073,
+      "vision_ratio": 0.07927
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.92073,
+      0.07927
+    ],
+    "text_vision_ratio": "0.920730:0.079270"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.723412,
+      "aei_text": 2.864813,
+      "aei_vision": 0.16164,
+      "text_ratio": 0.946591,
+      "vision_ratio": 0.053409
+    },
+    "middle": {
+      "mdi": 9.719591,
+      "aei_text": 2.623877,
+      "aei_vision": 0.269958,
+      "text_ratio": 0.906713,
+      "vision_ratio": 0.093287
+    },
+    "late": {
+      "mdi": 11.615052,
+      "aei_text": 2.706119,
+      "aei_vision": 0.232984,
+      "text_ratio": 0.92073,
+      "vision_ratio": 0.07927
+    },
+    "all": {
+      "mdi": 11.615052,
+      "aei_text": 2.731603,
+      "aei_vision": 0.221527,
+      "text_ratio": 0.92073,
+      "vision_ratio": 0.07927
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.92073,
+      0.07927
+    ],
+    "text_vision_ratio": "0.920730:0.079270"
+  }
+}
+```
+
+
+## === Rollout Step 225 ===
+Step: 224/29790 | 2025-10-22 12:19:19
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.972 | 22.919 | 24.366 | 24.366 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.97163,
+      "aei_text": 3.117581,
+      "aei_vision": 0.148657,
+      "text_ratio": 0.954487,
+      "vision_ratio": 0.045513
+    },
+    "middle": {
+      "mdi": 22.91905,
+      "aei_text": 3.145923,
+      "aei_vision": 0.137262,
+      "text_ratio": 0.958192,
+      "vision_ratio": 0.041808
+    },
+    "late": {
+      "mdi": 24.36637,
+      "aei_text": 3.164325,
+      "aei_vision": 0.129864,
+      "text_ratio": 0.960578,
+      "vision_ratio": 0.039422
+    },
+    "all": {
+      "mdi": 24.36637,
+      "aei_text": 3.14261,
+      "aei_vision": 0.138595,
+      "text_ratio": 0.960578,
+      "vision_ratio": 0.039422
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960578,
+      0.039422
+    ],
+    "text_vision_ratio": "0.960578:0.039422"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.97163,
+      "aei_text": 3.117581,
+      "aei_vision": 0.148657,
+      "text_ratio": 0.954487,
+      "vision_ratio": 0.045513
+    },
+    "middle": {
+      "mdi": 22.91905,
+      "aei_text": 3.145923,
+      "aei_vision": 0.137262,
+      "text_ratio": 0.958192,
+      "vision_ratio": 0.041808
+    },
+    "late": {
+      "mdi": 24.36637,
+      "aei_text": 3.164325,
+      "aei_vision": 0.129864,
+      "text_ratio": 0.960578,
+      "vision_ratio": 0.039422
+    },
+    "all": {
+      "mdi": 24.36637,
+      "aei_text": 3.14261,
+      "aei_vision": 0.138595,
+      "text_ratio": 0.960578,
+      "vision_ratio": 0.039422
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960578,
+      0.039422
+    ],
+    "text_vision_ratio": "0.960578:0.039422"
+  }
+}
+```
+
+
+## === Rollout Step 226 ===
+Step: 225/29790 | 2025-10-22 12:19:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.988 | 7.875 | 10.152 | 10.152 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.988192,
+      "aei_text": 2.258361,
+      "aei_vision": 0.205526,
+      "text_ratio": 0.916585,
+      "vision_ratio": 0.083415
+    },
+    "middle": {
+      "mdi": 7.874848,
+      "aei_text": 2.151213,
+      "aei_vision": 0.273175,
+      "text_ratio": 0.887322,
+      "vision_ratio": 0.112678
+    },
+    "late": {
+      "mdi": 10.152333,
+      "aei_text": 2.235177,
+      "aei_vision": 0.220164,
+      "text_ratio": 0.910333,
+      "vision_ratio": 0.089667
+    },
+    "all": {
+      "mdi": 10.152333,
+      "aei_text": 2.214917,
+      "aei_vision": 0.232955,
+      "text_ratio": 0.910333,
+      "vision_ratio": 0.089667
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.910333,
+      0.089667
+    ],
+    "text_vision_ratio": "0.910333:0.089667"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.988192,
+      "aei_text": 2.258361,
+      "aei_vision": 0.205526,
+      "text_ratio": 0.916585,
+      "vision_ratio": 0.083415
+    },
+    "middle": {
+      "mdi": 7.874848,
+      "aei_text": 2.151213,
+      "aei_vision": 0.273175,
+      "text_ratio": 0.887322,
+      "vision_ratio": 0.112678
+    },
+    "late": {
+      "mdi": 10.152333,
+      "aei_text": 2.235177,
+      "aei_vision": 0.220164,
+      "text_ratio": 0.910333,
+      "vision_ratio": 0.089667
+    },
+    "all": {
+      "mdi": 10.152333,
+      "aei_text": 2.214917,
+      "aei_vision": 0.232955,
+      "text_ratio": 0.910333,
+      "vision_ratio": 0.089667
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.910333,
+      0.089667
+    ],
+    "text_vision_ratio": "0.910333:0.089667"
+  }
+}
+```
+
+
+## === Rollout Step 227 ===
+Step: 226/29790 | 2025-10-22 12:19:25
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.976 | 7.561 | 19.146 | 19.146 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.97647,
+      "aei_text": 2.791565,
+      "aei_vision": 0.199733,
+      "text_ratio": 0.933229,
+      "vision_ratio": 0.066771
+    },
+    "middle": {
+      "mdi": 7.561294,
+      "aei_text": 2.49886,
+      "aei_vision": 0.33048,
+      "text_ratio": 0.883195,
+      "vision_ratio": 0.116805
+    },
+    "late": {
+      "mdi": 19.145507,
+      "aei_text": 2.89965,
+      "aei_vision": 0.151453,
+      "text_ratio": 0.950361,
+      "vision_ratio": 0.049639
+    },
+    "all": {
+      "mdi": 19.145507,
+      "aei_text": 2.730025,
+      "aei_vision": 0.227222,
+      "text_ratio": 0.950361,
+      "vision_ratio": 0.049639
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950361,
+      0.049639
+    ],
+    "text_vision_ratio": "0.950361:0.049639"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.97647,
+      "aei_text": 2.791565,
+      "aei_vision": 0.199733,
+      "text_ratio": 0.933229,
+      "vision_ratio": 0.066771
+    },
+    "middle": {
+      "mdi": 7.561294,
+      "aei_text": 2.49886,
+      "aei_vision": 0.33048,
+      "text_ratio": 0.883195,
+      "vision_ratio": 0.116805
+    },
+    "late": {
+      "mdi": 19.145507,
+      "aei_text": 2.89965,
+      "aei_vision": 0.151453,
+      "text_ratio": 0.950361,
+      "vision_ratio": 0.049639
+    },
+    "all": {
+      "mdi": 19.145507,
+      "aei_text": 2.730025,
+      "aei_vision": 0.227222,
+      "text_ratio": 0.950361,
+      "vision_ratio": 0.049639
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950361,
+      0.049639
+    ],
+    "text_vision_ratio": "0.950361:0.049639"
+  }
+}
+```
+
+
+## === Rollout Step 228 ===
+Step: 227/29790 | 2025-10-22 12:19:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.250 | 5.116 | 19.936 | 19.936 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.250147,
+      "aei_text": 3.058302,
+      "aei_vision": 0.188201,
+      "text_ratio": 0.942029,
+      "vision_ratio": 0.057971
+    },
+    "middle": {
+      "mdi": 5.115693,
+      "aei_text": 2.363878,
+      "aei_vision": 0.462084,
+      "text_ratio": 0.836486,
+      "vision_ratio": 0.163514
+    },
+    "late": {
+      "mdi": 19.936054,
+      "aei_text": 3.136572,
+      "aei_vision": 0.157332,
+      "text_ratio": 0.952236,
+      "vision_ratio": 0.047764
+    },
+    "all": {
+      "mdi": 19.936054,
+      "aei_text": 2.852917,
+      "aei_vision": 0.269206,
+      "text_ratio": 0.952236,
+      "vision_ratio": 0.047764
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952236,
+      0.047764
+    ],
+    "text_vision_ratio": "0.952236:0.047764"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.250147,
+      "aei_text": 3.058302,
+      "aei_vision": 0.188201,
+      "text_ratio": 0.942029,
+      "vision_ratio": 0.057971
+    },
+    "middle": {
+      "mdi": 5.115693,
+      "aei_text": 2.363878,
+      "aei_vision": 0.462084,
+      "text_ratio": 0.836486,
+      "vision_ratio": 0.163514
+    },
+    "late": {
+      "mdi": 19.936054,
+      "aei_text": 3.136572,
+      "aei_vision": 0.157332,
+      "text_ratio": 0.952236,
+      "vision_ratio": 0.047764
+    },
+    "all": {
+      "mdi": 19.936054,
+      "aei_text": 2.852917,
+      "aei_vision": 0.269206,
+      "text_ratio": 0.952236,
+      "vision_ratio": 0.047764
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952236,
+      0.047764
+    ],
+    "text_vision_ratio": "0.952236:0.047764"
+  }
+}
+```
+
+
+## === Rollout Step 229 ===
+Step: 228/29790 | 2025-10-22 12:19:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.287 | 10.455 | 20.435 | 20.435 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.287174,
+      "aei_text": 3.057794,
+      "aei_vision": 0.176882,
+      "text_ratio": 0.945317,
+      "vision_ratio": 0.054683
+    },
+    "middle": {
+      "mdi": 10.455415,
+      "aei_text": 2.824607,
+      "aei_vision": 0.270157,
+      "text_ratio": 0.912705,
+      "vision_ratio": 0.087295
+    },
+    "late": {
+      "mdi": 20.434512,
+      "aei_text": 3.118479,
+      "aei_vision": 0.152608,
+      "text_ratio": 0.953346,
+      "vision_ratio": 0.046654
+    },
+    "all": {
+      "mdi": 20.434512,
+      "aei_text": 3.000293,
+      "aei_vision": 0.199883,
+      "text_ratio": 0.953346,
+      "vision_ratio": 0.046654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953346,
+      0.046654
+    ],
+    "text_vision_ratio": "0.953346:0.046654"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.287174,
+      "aei_text": 3.057794,
+      "aei_vision": 0.176882,
+      "text_ratio": 0.945317,
+      "vision_ratio": 0.054683
+    },
+    "middle": {
+      "mdi": 10.455415,
+      "aei_text": 2.824607,
+      "aei_vision": 0.270157,
+      "text_ratio": 0.912705,
+      "vision_ratio": 0.087295
+    },
+    "late": {
+      "mdi": 20.434512,
+      "aei_text": 3.118479,
+      "aei_vision": 0.152608,
+      "text_ratio": 0.953346,
+      "vision_ratio": 0.046654
+    },
+    "all": {
+      "mdi": 20.434512,
+      "aei_text": 3.000293,
+      "aei_vision": 0.199883,
+      "text_ratio": 0.953346,
+      "vision_ratio": 0.046654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953346,
+      0.046654
+    ],
+    "text_vision_ratio": "0.953346:0.046654"
+  }
+}
+```
+
+
+## === Rollout Step 230 ===
+Step: 229/29790 | 2025-10-22 12:19:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.422 | 6.608 | 16.839 | 16.839 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.42195,
+      "aei_text": 2.880678,
+      "aei_vision": 0.165348,
+      "text_ratio": 0.945717,
+      "vision_ratio": 0.054283
+    },
+    "middle": {
+      "mdi": 6.608297,
+      "aei_text": 2.426036,
+      "aei_vision": 0.36712,
+      "text_ratio": 0.868565,
+      "vision_ratio": 0.131435
+    },
+    "late": {
+      "mdi": 16.838668,
+      "aei_text": 2.869295,
+      "aei_vision": 0.170399,
+      "text_ratio": 0.943942,
+      "vision_ratio": 0.056058
+    },
+    "all": {
+      "mdi": 16.838668,
+      "aei_text": 2.725336,
+      "aei_vision": 0.234289,
+      "text_ratio": 0.943942,
+      "vision_ratio": 0.056058
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943942,
+      0.056058
+    ],
+    "text_vision_ratio": "0.943942:0.056058"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.42195,
+      "aei_text": 2.880678,
+      "aei_vision": 0.165348,
+      "text_ratio": 0.945717,
+      "vision_ratio": 0.054283
+    },
+    "middle": {
+      "mdi": 6.608297,
+      "aei_text": 2.426036,
+      "aei_vision": 0.36712,
+      "text_ratio": 0.868565,
+      "vision_ratio": 0.131435
+    },
+    "late": {
+      "mdi": 16.838668,
+      "aei_text": 2.869295,
+      "aei_vision": 0.170399,
+      "text_ratio": 0.943942,
+      "vision_ratio": 0.056058
+    },
+    "all": {
+      "mdi": 16.838668,
+      "aei_text": 2.725336,
+      "aei_vision": 0.234289,
+      "text_ratio": 0.943942,
+      "vision_ratio": 0.056058
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943942,
+      0.056058
+    ],
+    "text_vision_ratio": "0.943942:0.056058"
+  }
+}
+```
+
+
+## === Rollout Step 231 ===
+Step: 230/29790 | 2025-10-22 12:19:39
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.419 | 11.792 | 18.624 | 18.624 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.419216,
+      "aei_text": 3.075085,
+      "aei_vision": 0.213263,
+      "text_ratio": 0.935146,
+      "vision_ratio": 0.064854
+    },
+    "middle": {
+      "mdi": 11.792432,
+      "aei_text": 2.97269,
+      "aei_vision": 0.252085,
+      "text_ratio": 0.921829,
+      "vision_ratio": 0.078171
+    },
+    "late": {
+      "mdi": 18.623784,
+      "aei_text": 3.186323,
+      "aei_vision": 0.171089,
+      "text_ratio": 0.949041,
+      "vision_ratio": 0.050959
+    },
+    "all": {
+      "mdi": 18.623784,
+      "aei_text": 3.078032,
+      "aei_vision": 0.212145,
+      "text_ratio": 0.949041,
+      "vision_ratio": 0.050959
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949041,
+      0.050959
+    ],
+    "text_vision_ratio": "0.949041:0.050959"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.419216,
+      "aei_text": 3.075085,
+      "aei_vision": 0.213263,
+      "text_ratio": 0.935146,
+      "vision_ratio": 0.064854
+    },
+    "middle": {
+      "mdi": 11.792432,
+      "aei_text": 2.97269,
+      "aei_vision": 0.252085,
+      "text_ratio": 0.921829,
+      "vision_ratio": 0.078171
+    },
+    "late": {
+      "mdi": 18.623784,
+      "aei_text": 3.186323,
+      "aei_vision": 0.171089,
+      "text_ratio": 0.949041,
+      "vision_ratio": 0.050959
+    },
+    "all": {
+      "mdi": 18.623784,
+      "aei_text": 3.078032,
+      "aei_vision": 0.212145,
+      "text_ratio": 0.949041,
+      "vision_ratio": 0.050959
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949041,
+      0.050959
+    ],
+    "text_vision_ratio": "0.949041:0.050959"
+  }
+}
+```
+
+
+## === Rollout Step 232 ===
+Step: 231/29790 | 2025-10-22 12:19:43
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.606 | 6.389 | 21.101 | 21.101 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.605963,
+      "aei_text": 2.953648,
+      "aei_vision": 0.189264,
+      "text_ratio": 0.939781,
+      "vision_ratio": 0.060219
+    },
+    "middle": {
+      "mdi": 6.389471,
+      "aei_text": 2.475945,
+      "aei_vision": 0.387504,
+      "text_ratio": 0.864672,
+      "vision_ratio": 0.135328
+    },
+    "late": {
+      "mdi": 21.100711,
+      "aei_text": 3.06024,
+      "aei_vision": 0.14503,
+      "text_ratio": 0.954753,
+      "vision_ratio": 0.045247
+    },
+    "all": {
+      "mdi": 21.100711,
+      "aei_text": 2.829944,
+      "aei_vision": 0.240599,
+      "text_ratio": 0.954753,
+      "vision_ratio": 0.045247
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954753,
+      0.045247
+    ],
+    "text_vision_ratio": "0.954753:0.045247"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.605963,
+      "aei_text": 2.953648,
+      "aei_vision": 0.189264,
+      "text_ratio": 0.939781,
+      "vision_ratio": 0.060219
+    },
+    "middle": {
+      "mdi": 6.389471,
+      "aei_text": 2.475945,
+      "aei_vision": 0.387504,
+      "text_ratio": 0.864672,
+      "vision_ratio": 0.135328
+    },
+    "late": {
+      "mdi": 21.100711,
+      "aei_text": 3.06024,
+      "aei_vision": 0.14503,
+      "text_ratio": 0.954753,
+      "vision_ratio": 0.045247
+    },
+    "all": {
+      "mdi": 21.100711,
+      "aei_text": 2.829944,
+      "aei_vision": 0.240599,
+      "text_ratio": 0.954753,
+      "vision_ratio": 0.045247
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954753,
+      0.045247
+    ],
+    "text_vision_ratio": "0.954753:0.045247"
+  }
+}
+```
+
+
+## === Rollout Step 233 ===
+Step: 232/29790 | 2025-10-22 12:19:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 8.445 | 6.114 | 14.017 | 14.017 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.444648,
+      "aei_text": 2.162655,
+      "aei_vision": 0.256098,
+      "text_ratio": 0.89412,
+      "vision_ratio": 0.10588
+    },
+    "middle": {
+      "mdi": 6.113963,
+      "aei_text": 2.041137,
+      "aei_vision": 0.333848,
+      "text_ratio": 0.859431,
+      "vision_ratio": 0.140569
+    },
+    "late": {
+      "mdi": 14.016851,
+      "aei_text": 2.30581,
+      "aei_vision": 0.164503,
+      "text_ratio": 0.933408,
+      "vision_ratio": 0.066592
+    },
+    "all": {
+      "mdi": 14.016851,
+      "aei_text": 2.169868,
+      "aei_vision": 0.251483,
+      "text_ratio": 0.933408,
+      "vision_ratio": 0.066592
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.933408,
+      0.066592
+    ],
+    "text_vision_ratio": "0.933408:0.066592"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.444648,
+      "aei_text": 2.162655,
+      "aei_vision": 0.256098,
+      "text_ratio": 0.89412,
+      "vision_ratio": 0.10588
+    },
+    "middle": {
+      "mdi": 6.113963,
+      "aei_text": 2.041137,
+      "aei_vision": 0.333848,
+      "text_ratio": 0.859431,
+      "vision_ratio": 0.140569
+    },
+    "late": {
+      "mdi": 14.016851,
+      "aei_text": 2.30581,
+      "aei_vision": 0.164503,
+      "text_ratio": 0.933408,
+      "vision_ratio": 0.066592
+    },
+    "all": {
+      "mdi": 14.016851,
+      "aei_text": 2.169868,
+      "aei_vision": 0.251483,
+      "text_ratio": 0.933408,
+      "vision_ratio": 0.066592
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.933408,
+      0.066592
+    ],
+    "text_vision_ratio": "0.933408:0.066592"
+  }
+}
+```
+
+
+## === Rollout Step 234 ===
+Step: 233/29790 | 2025-10-22 12:19:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.389 | 7.832 | 18.234 | 18.234 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.389116,
+      "aei_text": 3.09124,
+      "aei_vision": 0.132166,
+      "text_ratio": 0.958998,
+      "vision_ratio": 0.041002
+    },
+    "middle": {
+      "mdi": 7.8321,
+      "aei_text": 2.607474,
+      "aei_vision": 0.332921,
+      "text_ratio": 0.886777,
+      "vision_ratio": 0.113223
+    },
+    "late": {
+      "mdi": 18.233615,
+      "aei_text": 3.011701,
+      "aei_vision": 0.165173,
+      "text_ratio": 0.948008,
+      "vision_ratio": 0.051992
+    },
+    "all": {
+      "mdi": 18.233615,
+      "aei_text": 2.903472,
+      "aei_vision": 0.210087,
+      "text_ratio": 0.948008,
+      "vision_ratio": 0.051992
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948008,
+      0.051992
+    ],
+    "text_vision_ratio": "0.948008:0.051992"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.389116,
+      "aei_text": 3.09124,
+      "aei_vision": 0.132166,
+      "text_ratio": 0.958998,
+      "vision_ratio": 0.041002
+    },
+    "middle": {
+      "mdi": 7.8321,
+      "aei_text": 2.607474,
+      "aei_vision": 0.332921,
+      "text_ratio": 0.886777,
+      "vision_ratio": 0.113223
+    },
+    "late": {
+      "mdi": 18.233615,
+      "aei_text": 3.011701,
+      "aei_vision": 0.165173,
+      "text_ratio": 0.948008,
+      "vision_ratio": 0.051992
+    },
+    "all": {
+      "mdi": 18.233615,
+      "aei_text": 2.903472,
+      "aei_vision": 0.210087,
+      "text_ratio": 0.948008,
+      "vision_ratio": 0.051992
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948008,
+      0.051992
+    ],
+    "text_vision_ratio": "0.948008:0.051992"
+  }
+}
+```
+
+
+## === Rollout Step 235 ===
+Step: 234/29790 | 2025-10-22 12:19:52
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.327 | 6.735 | 21.481 | 21.481 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.327272,
+      "aei_text": 2.533015,
+      "aei_vision": 0.205481,
+      "text_ratio": 0.924966,
+      "vision_ratio": 0.075034
+    },
+    "middle": {
+      "mdi": 6.734529,
+      "aei_text": 2.277087,
+      "aei_vision": 0.338121,
+      "text_ratio": 0.87071,
+      "vision_ratio": 0.12929
+    },
+    "late": {
+      "mdi": 21.481129,
+      "aei_text": 2.688041,
+      "aei_vision": 0.125135,
+      "text_ratio": 0.955518,
+      "vision_ratio": 0.044482
+    },
+    "all": {
+      "mdi": 21.481129,
+      "aei_text": 2.499381,
+      "aei_vision": 0.222912,
+      "text_ratio": 0.955518,
+      "vision_ratio": 0.044482
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955518,
+      0.044482
+    ],
+    "text_vision_ratio": "0.955518:0.044482"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.327272,
+      "aei_text": 2.533015,
+      "aei_vision": 0.205481,
+      "text_ratio": 0.924966,
+      "vision_ratio": 0.075034
+    },
+    "middle": {
+      "mdi": 6.734529,
+      "aei_text": 2.277087,
+      "aei_vision": 0.338121,
+      "text_ratio": 0.87071,
+      "vision_ratio": 0.12929
+    },
+    "late": {
+      "mdi": 21.481129,
+      "aei_text": 2.688041,
+      "aei_vision": 0.125135,
+      "text_ratio": 0.955518,
+      "vision_ratio": 0.044482
+    },
+    "all": {
+      "mdi": 21.481129,
+      "aei_text": 2.499381,
+      "aei_vision": 0.222912,
+      "text_ratio": 0.955518,
+      "vision_ratio": 0.044482
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955518,
+      0.044482
+    ],
+    "text_vision_ratio": "0.955518:0.044482"
+  }
+}
+```
+
+
+## === Rollout Step 236 ===
+Step: 235/29790 | 2025-10-22 12:19:55
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.636 | 27.666 | 20.755 | 20.755 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.636491,
+      "aei_text": 3.029974,
+      "aei_vision": 0.14004,
+      "text_ratio": 0.955824,
+      "vision_ratio": 0.044176
+    },
+    "middle": {
+      "mdi": 27.665615,
+      "aei_text": 3.096351,
+      "aei_vision": 0.111921,
+      "text_ratio": 0.965115,
+      "vision_ratio": 0.034885
+    },
+    "late": {
+      "mdi": 20.755292,
+      "aei_text": 3.017372,
+      "aei_vision": 0.145378,
+      "text_ratio": 0.954034,
+      "vision_ratio": 0.045966
+    },
+    "all": {
+      "mdi": 20.755292,
+      "aei_text": 3.047899,
+      "aei_vision": 0.132446,
+      "text_ratio": 0.954034,
+      "vision_ratio": 0.045966
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954034,
+      0.045966
+    ],
+    "text_vision_ratio": "0.954034:0.045966"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.636491,
+      "aei_text": 3.029974,
+      "aei_vision": 0.14004,
+      "text_ratio": 0.955824,
+      "vision_ratio": 0.044176
+    },
+    "middle": {
+      "mdi": 27.665615,
+      "aei_text": 3.096351,
+      "aei_vision": 0.111921,
+      "text_ratio": 0.965115,
+      "vision_ratio": 0.034885
+    },
+    "late": {
+      "mdi": 20.755292,
+      "aei_text": 3.017372,
+      "aei_vision": 0.145378,
+      "text_ratio": 0.954034,
+      "vision_ratio": 0.045966
+    },
+    "all": {
+      "mdi": 20.755292,
+      "aei_text": 3.047899,
+      "aei_vision": 0.132446,
+      "text_ratio": 0.954034,
+      "vision_ratio": 0.045966
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954034,
+      0.045966
+    ],
+    "text_vision_ratio": "0.954034:0.045966"
+  }
+}
+```
+
+
+## === Rollout Step 237 ===
+Step: 236/29790 | 2025-10-22 12:19:58
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.195 | 7.303 | 21.230 | 21.230 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.194875,
+      "aei_text": 2.306968,
+      "aei_vision": 0.174838,
+      "text_ratio": 0.929552,
+      "vision_ratio": 0.070448
+    },
+    "middle": {
+      "mdi": 7.30339,
+      "aei_text": 2.123391,
+      "aei_vision": 0.29074,
+      "text_ratio": 0.879567,
+      "vision_ratio": 0.120433
+    },
+    "late": {
+      "mdi": 21.229599,
+      "aei_text": 2.404498,
+      "aei_vision": 0.113262,
+      "text_ratio": 0.955015,
+      "vision_ratio": 0.044985
+    },
+    "all": {
+      "mdi": 21.229599,
+      "aei_text": 2.278286,
+      "aei_vision": 0.192947,
+      "text_ratio": 0.955015,
+      "vision_ratio": 0.044985
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955015,
+      0.044985
+    ],
+    "text_vision_ratio": "0.955015:0.044985"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.194875,
+      "aei_text": 2.306968,
+      "aei_vision": 0.174838,
+      "text_ratio": 0.929552,
+      "vision_ratio": 0.070448
+    },
+    "middle": {
+      "mdi": 7.30339,
+      "aei_text": 2.123391,
+      "aei_vision": 0.29074,
+      "text_ratio": 0.879567,
+      "vision_ratio": 0.120433
+    },
+    "late": {
+      "mdi": 21.229599,
+      "aei_text": 2.404498,
+      "aei_vision": 0.113262,
+      "text_ratio": 0.955015,
+      "vision_ratio": 0.044985
+    },
+    "all": {
+      "mdi": 21.229599,
+      "aei_text": 2.278286,
+      "aei_vision": 0.192947,
+      "text_ratio": 0.955015,
+      "vision_ratio": 0.044985
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955015,
+      0.044985
+    ],
+    "text_vision_ratio": "0.955015:0.044985"
+  }
+}
+```
+
+
+## === Rollout Step 238 ===
+Step: 237/29790 | 2025-10-22 12:20:01
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.499 | 14.608 | 17.544 | 17.544 |
+| MDI Std | 0.630 | 0.029 | 2.192 | 2.192 |
+| Vision Tokens | 324.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 324.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 324,
+    "text_tokens": 0,
+    "total_tokens": 324
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.868205,
+      "aei_text": 2.830085,
+      "aei_vision": 0.158387,
+      "text_ratio": 0.947001,
+      "vision_ratio": 0.052999
+    },
+    "middle": {
+      "mdi": 14.637798,
+      "aei_text": 2.763908,
+      "aei_vision": 0.18882,
+      "text_ratio": 0.936052,
+      "vision_ratio": 0.063948
+    },
+    "late": {
+      "mdi": 15.351569,
+      "aei_text": 2.78063,
+      "aei_vision": 0.18113,
+      "text_ratio": 0.938844,
+      "vision_ratio": 0.061156
+    },
+    "all": {
+      "mdi": 15.351569,
+      "aei_text": 2.791541,
+      "aei_vision": 0.176112,
+      "text_ratio": 0.938844,
+      "vision_ratio": 0.061156
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938844,
+      0.061156
+    ],
+    "text_vision_ratio": "0.938844:0.061156"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 324,
+    "text_tokens": 0,
+    "total_tokens": 324
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.128967,
+      "aei_text": 2.850468,
+      "aei_vision": 0.149013,
+      "text_ratio": 0.95032,
+      "vision_ratio": 0.04968
+    },
+    "middle": {
+      "mdi": 14.579154,
+      "aei_text": 2.762471,
+      "aei_vision": 0.189481,
+      "text_ratio": 0.935812,
+      "vision_ratio": 0.064188
+    },
+    "late": {
+      "mdi": 19.735784,
+      "aei_text": 2.859442,
+      "aei_vision": 0.144886,
+      "text_ratio": 0.951774,
+      "vision_ratio": 0.048226
+    },
+    "all": {
+      "mdi": 19.735784,
+      "aei_text": 2.824127,
+      "aei_vision": 0.161127,
+      "text_ratio": 0.951774,
+      "vision_ratio": 0.048226
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951774,
+      0.048226
+    ],
+    "text_vision_ratio": "0.951774:0.048226"
+  }
+}
+```
+
+
+## === Rollout Step 239 ===
+Step: 238/29790 | 2025-10-22 12:20:05
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.780 | 8.024 | 12.969 | 12.969 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.779669,
+      "aei_text": 3.041671,
+      "aei_vision": 0.220736,
+      "text_ratio": 0.932339,
+      "vision_ratio": 0.067661
+    },
+    "middle": {
+      "mdi": 8.023854,
+      "aei_text": 2.728932,
+      "aei_vision": 0.340102,
+      "text_ratio": 0.889183,
+      "vision_ratio": 0.110817
+    },
+    "late": {
+      "mdi": 12.969351,
+      "aei_text": 3.01161,
+      "aei_vision": 0.23221,
+      "text_ratio": 0.928415,
+      "vision_ratio": 0.071585
+    },
+    "all": {
+      "mdi": 12.969351,
+      "aei_text": 2.927404,
+      "aei_vision": 0.264349,
+      "text_ratio": 0.928415,
+      "vision_ratio": 0.071585
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.928415,
+      0.071585
+    ],
+    "text_vision_ratio": "0.928415:0.071585"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.779669,
+      "aei_text": 3.041671,
+      "aei_vision": 0.220736,
+      "text_ratio": 0.932339,
+      "vision_ratio": 0.067661
+    },
+    "middle": {
+      "mdi": 8.023854,
+      "aei_text": 2.728932,
+      "aei_vision": 0.340102,
+      "text_ratio": 0.889183,
+      "vision_ratio": 0.110817
+    },
+    "late": {
+      "mdi": 12.969351,
+      "aei_text": 3.01161,
+      "aei_vision": 0.23221,
+      "text_ratio": 0.928415,
+      "vision_ratio": 0.071585
+    },
+    "all": {
+      "mdi": 12.969351,
+      "aei_text": 2.927404,
+      "aei_vision": 0.264349,
+      "text_ratio": 0.928415,
+      "vision_ratio": 0.071585
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.928415,
+      0.071585
+    ],
+    "text_vision_ratio": "0.928415:0.071585"
+  }
+}
+```
+
+
+## === Rollout Step 240 ===
+Step: 239/29790 | 2025-10-22 12:20:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.448 | 12.241 | 14.638 | 14.638 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.448421,
+      "aei_text": 2.238984,
+      "aei_vision": 0.136121,
+      "text_ratio": 0.942688,
+      "vision_ratio": 0.057312
+    },
+    "middle": {
+      "mdi": 12.240569,
+      "aei_text": 2.178911,
+      "aei_vision": 0.178007,
+      "text_ratio": 0.924475,
+      "vision_ratio": 0.075525
+    },
+    "late": {
+      "mdi": 14.638094,
+      "aei_text": 2.216994,
+      "aei_vision": 0.151454,
+      "text_ratio": 0.936054,
+      "vision_ratio": 0.063946
+    },
+    "all": {
+      "mdi": 14.638094,
+      "aei_text": 2.211629,
+      "aei_vision": 0.155194,
+      "text_ratio": 0.936054,
+      "vision_ratio": 0.063946
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.936054,
+      0.063946
+    ],
+    "text_vision_ratio": "0.936054:0.063946"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.448421,
+      "aei_text": 2.238984,
+      "aei_vision": 0.136121,
+      "text_ratio": 0.942688,
+      "vision_ratio": 0.057312
+    },
+    "middle": {
+      "mdi": 12.240569,
+      "aei_text": 2.178911,
+      "aei_vision": 0.178007,
+      "text_ratio": 0.924475,
+      "vision_ratio": 0.075525
+    },
+    "late": {
+      "mdi": 14.638094,
+      "aei_text": 2.216994,
+      "aei_vision": 0.151454,
+      "text_ratio": 0.936054,
+      "vision_ratio": 0.063946
+    },
+    "all": {
+      "mdi": 14.638094,
+      "aei_text": 2.211629,
+      "aei_vision": 0.155194,
+      "text_ratio": 0.936054,
+      "vision_ratio": 0.063946
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.936054,
+      0.063946
+    ],
+    "text_vision_ratio": "0.936054:0.063946"
+  }
+}
+```
+
+
+## === Rollout Step 241 ===
+Step: 240/29790 | 2025-10-22 12:20:11
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.719 | 9.289 | 18.247 | 18.247 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.718665,
+      "aei_text": 2.863307,
+      "aei_vision": 0.194536,
+      "text_ratio": 0.936381,
+      "vision_ratio": 0.063619
+    },
+    "middle": {
+      "mdi": 9.288618,
+      "aei_text": 2.652682,
+      "aei_vision": 0.285584,
+      "text_ratio": 0.902805,
+      "vision_ratio": 0.097195
+    },
+    "late": {
+      "mdi": 18.247356,
+      "aei_text": 2.940542,
+      "aei_vision": 0.161149,
+      "text_ratio": 0.948045,
+      "vision_ratio": 0.051955
+    },
+    "all": {
+      "mdi": 18.247356,
+      "aei_text": 2.818844,
+      "aei_vision": 0.213756,
+      "text_ratio": 0.948045,
+      "vision_ratio": 0.051955
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948045,
+      0.051955
+    ],
+    "text_vision_ratio": "0.948045:0.051955"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.718665,
+      "aei_text": 2.863307,
+      "aei_vision": 0.194536,
+      "text_ratio": 0.936381,
+      "vision_ratio": 0.063619
+    },
+    "middle": {
+      "mdi": 9.288618,
+      "aei_text": 2.652682,
+      "aei_vision": 0.285584,
+      "text_ratio": 0.902805,
+      "vision_ratio": 0.097195
+    },
+    "late": {
+      "mdi": 18.247356,
+      "aei_text": 2.940542,
+      "aei_vision": 0.161149,
+      "text_ratio": 0.948045,
+      "vision_ratio": 0.051955
+    },
+    "all": {
+      "mdi": 18.247356,
+      "aei_text": 2.818844,
+      "aei_vision": 0.213756,
+      "text_ratio": 0.948045,
+      "vision_ratio": 0.051955
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948045,
+      0.051955
+    ],
+    "text_vision_ratio": "0.948045:0.051955"
+  }
+}
+```
+
+
+## === Rollout Step 242 ===
+Step: 241/29790 | 2025-10-22 12:20:14
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.149 | 8.953 | 16.577 | 16.577 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.149328,
+      "aei_text": 2.869164,
+      "aei_vision": 0.202777,
+      "text_ratio": 0.93399,
+      "vision_ratio": 0.06601
+    },
+    "middle": {
+      "mdi": 8.952929,
+      "aei_text": 2.650485,
+      "aei_vision": 0.296047,
+      "text_ratio": 0.899527,
+      "vision_ratio": 0.100473
+    },
+    "late": {
+      "mdi": 16.577104,
+      "aei_text": 2.930165,
+      "aei_vision": 0.17676,
+      "text_ratio": 0.943108,
+      "vision_ratio": 0.056892
+    },
+    "all": {
+      "mdi": 16.577104,
+      "aei_text": 2.816605,
+      "aei_vision": 0.225195,
+      "text_ratio": 0.943108,
+      "vision_ratio": 0.056892
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943108,
+      0.056892
+    ],
+    "text_vision_ratio": "0.943108:0.056892"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.149328,
+      "aei_text": 2.869164,
+      "aei_vision": 0.202777,
+      "text_ratio": 0.93399,
+      "vision_ratio": 0.06601
+    },
+    "middle": {
+      "mdi": 8.952929,
+      "aei_text": 2.650485,
+      "aei_vision": 0.296047,
+      "text_ratio": 0.899527,
+      "vision_ratio": 0.100473
+    },
+    "late": {
+      "mdi": 16.577104,
+      "aei_text": 2.930165,
+      "aei_vision": 0.17676,
+      "text_ratio": 0.943108,
+      "vision_ratio": 0.056892
+    },
+    "all": {
+      "mdi": 16.577104,
+      "aei_text": 2.816605,
+      "aei_vision": 0.225195,
+      "text_ratio": 0.943108,
+      "vision_ratio": 0.056892
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943108,
+      0.056892
+    ],
+    "text_vision_ratio": "0.943108:0.056892"
+  }
+}
+```
+
+
+## === Rollout Step 243 ===
+Step: 242/29790 | 2025-10-22 12:20:18
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.096 | 10.721 | 17.992 | 17.992 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.095885,
+      "aei_text": 3.004913,
+      "aei_vision": 0.199055,
+      "text_ratio": 0.937872,
+      "vision_ratio": 0.062128
+    },
+    "middle": {
+      "mdi": 10.720892,
+      "aei_text": 2.840067,
+      "aei_vision": 0.26491,
+      "text_ratio": 0.914682,
+      "vision_ratio": 0.085318
+    },
+    "late": {
+      "mdi": 17.991831,
+      "aei_text": 3.075319,
+      "aei_vision": 0.170929,
+      "text_ratio": 0.947346,
+      "vision_ratio": 0.052654
+    },
+    "all": {
+      "mdi": 17.991831,
+      "aei_text": 2.973433,
+      "aei_vision": 0.211631,
+      "text_ratio": 0.947346,
+      "vision_ratio": 0.052654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947346,
+      0.052654
+    ],
+    "text_vision_ratio": "0.947346:0.052654"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.095885,
+      "aei_text": 3.004913,
+      "aei_vision": 0.199055,
+      "text_ratio": 0.937872,
+      "vision_ratio": 0.062128
+    },
+    "middle": {
+      "mdi": 10.720892,
+      "aei_text": 2.840067,
+      "aei_vision": 0.26491,
+      "text_ratio": 0.914682,
+      "vision_ratio": 0.085318
+    },
+    "late": {
+      "mdi": 17.991831,
+      "aei_text": 3.075319,
+      "aei_vision": 0.170929,
+      "text_ratio": 0.947346,
+      "vision_ratio": 0.052654
+    },
+    "all": {
+      "mdi": 17.991831,
+      "aei_text": 2.973433,
+      "aei_vision": 0.211631,
+      "text_ratio": 0.947346,
+      "vision_ratio": 0.052654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947346,
+      0.052654
+    ],
+    "text_vision_ratio": "0.947346:0.052654"
+  }
+}
+```
+
+
+## === Rollout Step 244 ===
+Step: 243/29790 | 2025-10-22 12:20:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 22.842 | 19.145 | 18.978 | 18.978 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.841931,
+      "aei_text": 3.261029,
+      "aei_vision": 0.142765,
+      "text_ratio": 0.958057,
+      "vision_ratio": 0.041943
+    },
+    "middle": {
+      "mdi": 19.145408,
+      "aei_text": 3.197129,
+      "aei_vision": 0.166992,
+      "text_ratio": 0.950361,
+      "vision_ratio": 0.049639
+    },
+    "late": {
+      "mdi": 18.978155,
+      "aei_text": 3.193721,
+      "aei_vision": 0.168284,
+      "text_ratio": 0.949945,
+      "vision_ratio": 0.050055
+    },
+    "all": {
+      "mdi": 18.978155,
+      "aei_text": 3.217293,
+      "aei_vision": 0.159347,
+      "text_ratio": 0.949945,
+      "vision_ratio": 0.050055
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949945,
+      0.050055
+    ],
+    "text_vision_ratio": "0.949945:0.050055"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.841931,
+      "aei_text": 3.261029,
+      "aei_vision": 0.142765,
+      "text_ratio": 0.958057,
+      "vision_ratio": 0.041943
+    },
+    "middle": {
+      "mdi": 19.145408,
+      "aei_text": 3.197129,
+      "aei_vision": 0.166992,
+      "text_ratio": 0.950361,
+      "vision_ratio": 0.049639
+    },
+    "late": {
+      "mdi": 18.978155,
+      "aei_text": 3.193721,
+      "aei_vision": 0.168284,
+      "text_ratio": 0.949945,
+      "vision_ratio": 0.050055
+    },
+    "all": {
+      "mdi": 18.978155,
+      "aei_text": 3.217293,
+      "aei_vision": 0.159347,
+      "text_ratio": 0.949945,
+      "vision_ratio": 0.050055
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949945,
+      0.050055
+    ],
+    "text_vision_ratio": "0.949945:0.050055"
+  }
+}
+```
+
+
+## === Rollout Step 245 ===
+Step: 244/29790 | 2025-10-22 12:20:25
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.715 | 14.426 | 17.388 | 17.388 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.71455,
+      "aei_text": 2.800947,
+      "aei_vision": 0.190352,
+      "text_ratio": 0.936365,
+      "vision_ratio": 0.063635
+    },
+    "middle": {
+      "mdi": 14.425518,
+      "aei_text": 2.793597,
+      "aei_vision": 0.193657,
+      "text_ratio": 0.935172,
+      "vision_ratio": 0.064828
+    },
+    "late": {
+      "mdi": 17.388275,
+      "aei_text": 2.85867,
+      "aei_vision": 0.164402,
+      "text_ratio": 0.945618,
+      "vision_ratio": 0.054382
+    },
+    "all": {
+      "mdi": 17.388275,
+      "aei_text": 2.817738,
+      "aei_vision": 0.182804,
+      "text_ratio": 0.945618,
+      "vision_ratio": 0.054382
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945618,
+      0.054382
+    ],
+    "text_vision_ratio": "0.945618:0.054382"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.71455,
+      "aei_text": 2.800947,
+      "aei_vision": 0.190352,
+      "text_ratio": 0.936365,
+      "vision_ratio": 0.063635
+    },
+    "middle": {
+      "mdi": 14.425518,
+      "aei_text": 2.793597,
+      "aei_vision": 0.193657,
+      "text_ratio": 0.935172,
+      "vision_ratio": 0.064828
+    },
+    "late": {
+      "mdi": 17.388275,
+      "aei_text": 2.85867,
+      "aei_vision": 0.164402,
+      "text_ratio": 0.945618,
+      "vision_ratio": 0.054382
+    },
+    "all": {
+      "mdi": 17.388275,
+      "aei_text": 2.817738,
+      "aei_vision": 0.182804,
+      "text_ratio": 0.945618,
+      "vision_ratio": 0.054382
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945618,
+      0.054382
+    ],
+    "text_vision_ratio": "0.945618:0.054382"
+  }
+}
+```
+
+
+## === Rollout Step 246 ===
+Step: 245/29790 | 2025-10-22 12:20:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.991 | 16.662 | 18.304 | 18.304 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.991059,
+      "aei_text": 2.939397,
+      "aei_vision": 0.122521,
+      "text_ratio": 0.959986,
+      "vision_ratio": 0.040014
+    },
+    "middle": {
+      "mdi": 16.661681,
+      "aei_text": 2.834228,
+      "aei_vision": 0.170105,
+      "text_ratio": 0.94338,
+      "vision_ratio": 0.05662
+    },
+    "late": {
+      "mdi": 18.304483,
+      "aei_text": 2.864334,
+      "aei_vision": 0.156483,
+      "text_ratio": 0.948199,
+      "vision_ratio": 0.051801
+    },
+    "all": {
+      "mdi": 18.304483,
+      "aei_text": 2.87932,
+      "aei_vision": 0.149703,
+      "text_ratio": 0.948199,
+      "vision_ratio": 0.051801
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948199,
+      0.051801
+    ],
+    "text_vision_ratio": "0.948199:0.051801"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.991059,
+      "aei_text": 2.939397,
+      "aei_vision": 0.122521,
+      "text_ratio": 0.959986,
+      "vision_ratio": 0.040014
+    },
+    "middle": {
+      "mdi": 16.661681,
+      "aei_text": 2.834228,
+      "aei_vision": 0.170105,
+      "text_ratio": 0.94338,
+      "vision_ratio": 0.05662
+    },
+    "late": {
+      "mdi": 18.304483,
+      "aei_text": 2.864334,
+      "aei_vision": 0.156483,
+      "text_ratio": 0.948199,
+      "vision_ratio": 0.051801
+    },
+    "all": {
+      "mdi": 18.304483,
+      "aei_text": 2.87932,
+      "aei_vision": 0.149703,
+      "text_ratio": 0.948199,
+      "vision_ratio": 0.051801
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948199,
+      0.051801
+    ],
+    "text_vision_ratio": "0.948199:0.051801"
+  }
+}
+```
+
+
+## === Rollout Step 247 ===
+Step: 246/29790 | 2025-10-22 12:20:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.220 | 7.468 | 21.018 | 21.018 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 439.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 439.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 439,
+    "text_tokens": 0,
+    "total_tokens": 439
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.219567,
+      "aei_text": 3.424998,
+      "aei_vision": 0.187985,
+      "text_ratio": 0.94797,
+      "vision_ratio": 0.05203
+    },
+    "middle": {
+      "mdi": 7.468349,
+      "aei_text": 2.847682,
+      "aei_vision": 0.3813,
+      "text_ratio": 0.881913,
+      "vision_ratio": 0.118087
+    },
+    "late": {
+      "mdi": 21.017861,
+      "aei_text": 3.490443,
+      "aei_vision": 0.16607,
+      "text_ratio": 0.954582,
+      "vision_ratio": 0.045418
+    },
+    "all": {
+      "mdi": 21.017861,
+      "aei_text": 3.254374,
+      "aei_vision": 0.245118,
+      "text_ratio": 0.954582,
+      "vision_ratio": 0.045418
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954582,
+      0.045418
+    ],
+    "text_vision_ratio": "0.954582:0.045418"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 439,
+    "text_tokens": 0,
+    "total_tokens": 439
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.219567,
+      "aei_text": 3.424998,
+      "aei_vision": 0.187985,
+      "text_ratio": 0.94797,
+      "vision_ratio": 0.05203
+    },
+    "middle": {
+      "mdi": 7.468349,
+      "aei_text": 2.847682,
+      "aei_vision": 0.3813,
+      "text_ratio": 0.881913,
+      "vision_ratio": 0.118087
+    },
+    "late": {
+      "mdi": 21.017861,
+      "aei_text": 3.490443,
+      "aei_vision": 0.16607,
+      "text_ratio": 0.954582,
+      "vision_ratio": 0.045418
+    },
+    "all": {
+      "mdi": 21.017861,
+      "aei_text": 3.254374,
+      "aei_vision": 0.245118,
+      "text_ratio": 0.954582,
+      "vision_ratio": 0.045418
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954582,
+      0.045418
+    ],
+    "text_vision_ratio": "0.954582:0.045418"
+  }
+}
+```
+
+
+## === Rollout Step 248 ===
+Step: 247/29790 | 2025-10-22 12:20:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.029 | 10.182 | 16.503 | 16.503 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.029196,
+      "aei_text": 2.759246,
+      "aei_vision": 0.229379,
+      "text_ratio": 0.923249,
+      "vision_ratio": 0.076751
+    },
+    "middle": {
+      "mdi": 10.181894,
+      "aei_text": 2.681641,
+      "aei_vision": 0.263373,
+      "text_ratio": 0.91057,
+      "vision_ratio": 0.08943
+    },
+    "late": {
+      "mdi": 16.503466,
+      "aei_text": 2.883962,
+      "aei_vision": 0.174749,
+      "text_ratio": 0.942868,
+      "vision_ratio": 0.057132
+    },
+    "all": {
+      "mdi": 16.503466,
+      "aei_text": 2.77495,
+      "aei_vision": 0.2225,
+      "text_ratio": 0.942868,
+      "vision_ratio": 0.057132
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942868,
+      0.057132
+    ],
+    "text_vision_ratio": "0.942868:0.057132"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.029196,
+      "aei_text": 2.759246,
+      "aei_vision": 0.229379,
+      "text_ratio": 0.923249,
+      "vision_ratio": 0.076751
+    },
+    "middle": {
+      "mdi": 10.181894,
+      "aei_text": 2.681641,
+      "aei_vision": 0.263373,
+      "text_ratio": 0.91057,
+      "vision_ratio": 0.08943
+    },
+    "late": {
+      "mdi": 16.503466,
+      "aei_text": 2.883962,
+      "aei_vision": 0.174749,
+      "text_ratio": 0.942868,
+      "vision_ratio": 0.057132
+    },
+    "all": {
+      "mdi": 16.503466,
+      "aei_text": 2.77495,
+      "aei_vision": 0.2225,
+      "text_ratio": 0.942868,
+      "vision_ratio": 0.057132
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942868,
+      0.057132
+    ],
+    "text_vision_ratio": "0.942868:0.057132"
+  }
+}
+```
+
+
+## === Rollout Step 249 ===
+Step: 248/29790 | 2025-10-22 12:20:39
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.978 | 14.968 | 22.919 | 22.919 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.977587,
+      "aei_text": 2.875011,
+      "aei_vision": 0.205687,
+      "text_ratio": 0.933234,
+      "vision_ratio": 0.066766
+    },
+    "middle": {
+      "mdi": 14.967988,
+      "aei_text": 2.902761,
+      "aei_vision": 0.193931,
+      "text_ratio": 0.937375,
+      "vision_ratio": 0.062625
+    },
+    "late": {
+      "mdi": 22.918594,
+      "aei_text": 3.046739,
+      "aei_vision": 0.132937,
+      "text_ratio": 0.958192,
+      "vision_ratio": 0.041808
+    },
+    "all": {
+      "mdi": 22.918594,
+      "aei_text": 2.941504,
+      "aei_vision": 0.177519,
+      "text_ratio": 0.958192,
+      "vision_ratio": 0.041808
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958192,
+      0.041808
+    ],
+    "text_vision_ratio": "0.958192:0.041808"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.977587,
+      "aei_text": 2.875011,
+      "aei_vision": 0.205687,
+      "text_ratio": 0.933234,
+      "vision_ratio": 0.066766
+    },
+    "middle": {
+      "mdi": 14.967988,
+      "aei_text": 2.902761,
+      "aei_vision": 0.193931,
+      "text_ratio": 0.937375,
+      "vision_ratio": 0.062625
+    },
+    "late": {
+      "mdi": 22.918594,
+      "aei_text": 3.046739,
+      "aei_vision": 0.132937,
+      "text_ratio": 0.958192,
+      "vision_ratio": 0.041808
+    },
+    "all": {
+      "mdi": 22.918594,
+      "aei_text": 2.941504,
+      "aei_vision": 0.177519,
+      "text_ratio": 0.958192,
+      "vision_ratio": 0.041808
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958192,
+      0.041808
+    ],
+    "text_vision_ratio": "0.958192:0.041808"
+  }
+}
+```
+
+
+## === Rollout Step 250 ===
+Step: 249/29790 | 2025-10-22 12:20:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.803 | 10.501 | 16.671 | 16.671 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.803321,
+      "aei_text": 2.869776,
+      "aei_vision": 0.207905,
+      "text_ratio": 0.932448,
+      "vision_ratio": 0.067552
+    },
+    "middle": {
+      "mdi": 10.50066,
+      "aei_text": 2.74375,
+      "aei_vision": 0.261293,
+      "text_ratio": 0.913048,
+      "vision_ratio": 0.086952
+    },
+    "late": {
+      "mdi": 16.671323,
+      "aei_text": 2.943732,
+      "aei_vision": 0.176575,
+      "text_ratio": 0.943411,
+      "vision_ratio": 0.056589
+    },
+    "all": {
+      "mdi": 16.671323,
+      "aei_text": 2.852419,
+      "aei_vision": 0.215257,
+      "text_ratio": 0.943411,
+      "vision_ratio": 0.056589
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943411,
+      0.056589
+    ],
+    "text_vision_ratio": "0.943411:0.056589"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.803321,
+      "aei_text": 2.869776,
+      "aei_vision": 0.207905,
+      "text_ratio": 0.932448,
+      "vision_ratio": 0.067552
+    },
+    "middle": {
+      "mdi": 10.50066,
+      "aei_text": 2.74375,
+      "aei_vision": 0.261293,
+      "text_ratio": 0.913048,
+      "vision_ratio": 0.086952
+    },
+    "late": {
+      "mdi": 16.671323,
+      "aei_text": 2.943732,
+      "aei_vision": 0.176575,
+      "text_ratio": 0.943411,
+      "vision_ratio": 0.056589
+    },
+    "all": {
+      "mdi": 16.671323,
+      "aei_text": 2.852419,
+      "aei_vision": 0.215257,
+      "text_ratio": 0.943411,
+      "vision_ratio": 0.056589
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943411,
+      0.056589
+    ],
+    "text_vision_ratio": "0.943411:0.056589"
+  }
+}
+```
+
+
+## === Rollout Step 251 ===
+Step: 250/29790 | 2025-10-22 12:20:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.332 | 15.449 | 19.869 | 19.869 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.331667,
+      "aei_text": 2.953629,
+      "aei_vision": 0.161122,
+      "text_ratio": 0.948271,
+      "vision_ratio": 0.051729
+    },
+    "middle": {
+      "mdi": 15.449309,
+      "aei_text": 2.892794,
+      "aei_vision": 0.187244,
+      "text_ratio": 0.939207,
+      "vision_ratio": 0.060793
+    },
+    "late": {
+      "mdi": 19.868537,
+      "aei_text": 2.979609,
+      "aei_vision": 0.149966,
+      "text_ratio": 0.952081,
+      "vision_ratio": 0.047919
+    },
+    "all": {
+      "mdi": 19.868537,
+      "aei_text": 2.942011,
+      "aei_vision": 0.166111,
+      "text_ratio": 0.952081,
+      "vision_ratio": 0.047919
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952081,
+      0.047919
+    ],
+    "text_vision_ratio": "0.952081:0.047919"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.331667,
+      "aei_text": 2.953629,
+      "aei_vision": 0.161122,
+      "text_ratio": 0.948271,
+      "vision_ratio": 0.051729
+    },
+    "middle": {
+      "mdi": 15.449309,
+      "aei_text": 2.892794,
+      "aei_vision": 0.187244,
+      "text_ratio": 0.939207,
+      "vision_ratio": 0.060793
+    },
+    "late": {
+      "mdi": 19.868537,
+      "aei_text": 2.979609,
+      "aei_vision": 0.149966,
+      "text_ratio": 0.952081,
+      "vision_ratio": 0.047919
+    },
+    "all": {
+      "mdi": 19.868537,
+      "aei_text": 2.942011,
+      "aei_vision": 0.166111,
+      "text_ratio": 0.952081,
+      "vision_ratio": 0.047919
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952081,
+      0.047919
+    ],
+    "text_vision_ratio": "0.952081:0.047919"
+  }
+}
+```
+
+
+## === Rollout Step 252 ===
+Step: 251/29790 | 2025-10-22 12:20:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.961 | 9.806 | 18.142 | 18.142 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.96073,
+      "aei_text": 2.86138,
+      "aei_vision": 0.179276,
+      "text_ratio": 0.94104,
+      "vision_ratio": 0.05896
+    },
+    "middle": {
+      "mdi": 9.80606,
+      "aei_text": 2.654121,
+      "aei_vision": 0.270661,
+      "text_ratio": 0.907459,
+      "vision_ratio": 0.092541
+    },
+    "late": {
+      "mdi": 18.141685,
+      "aei_text": 2.904828,
+      "aei_vision": 0.160119,
+      "text_ratio": 0.947758,
+      "vision_ratio": 0.052242
+    },
+    "all": {
+      "mdi": 18.141685,
+      "aei_text": 2.806776,
+      "aei_vision": 0.203352,
+      "text_ratio": 0.947758,
+      "vision_ratio": 0.052242
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947758,
+      0.052242
+    ],
+    "text_vision_ratio": "0.947758:0.052242"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.96073,
+      "aei_text": 2.86138,
+      "aei_vision": 0.179276,
+      "text_ratio": 0.94104,
+      "vision_ratio": 0.05896
+    },
+    "middle": {
+      "mdi": 9.80606,
+      "aei_text": 2.654121,
+      "aei_vision": 0.270661,
+      "text_ratio": 0.907459,
+      "vision_ratio": 0.092541
+    },
+    "late": {
+      "mdi": 18.141685,
+      "aei_text": 2.904828,
+      "aei_vision": 0.160119,
+      "text_ratio": 0.947758,
+      "vision_ratio": 0.052242
+    },
+    "all": {
+      "mdi": 18.141685,
+      "aei_text": 2.806776,
+      "aei_vision": 0.203352,
+      "text_ratio": 0.947758,
+      "vision_ratio": 0.052242
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947758,
+      0.052242
+    ],
+    "text_vision_ratio": "0.947758:0.052242"
+  }
+}
+```
+
+
+## === Rollout Step 253 ===
+Step: 252/29790 | 2025-10-22 12:20:53
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.872 | 9.548 | 16.339 | 16.339 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.872423,
+      "aei_text": 3.066089,
+      "aei_vision": 0.206159,
+      "text_ratio": 0.936998,
+      "vision_ratio": 0.063002
+    },
+    "middle": {
+      "mdi": 9.547794,
+      "aei_text": 2.830954,
+      "aei_vision": 0.296504,
+      "text_ratio": 0.905193,
+      "vision_ratio": 0.094807
+    },
+    "late": {
+      "mdi": 16.338956,
+      "aei_text": 3.107631,
+      "aei_vision": 0.190198,
+      "text_ratio": 0.942326,
+      "vision_ratio": 0.057674
+    },
+    "all": {
+      "mdi": 16.338956,
+      "aei_text": 3.001558,
+      "aei_vision": 0.230953,
+      "text_ratio": 0.942326,
+      "vision_ratio": 0.057674
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942326,
+      0.057674
+    ],
+    "text_vision_ratio": "0.942326:0.057674"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.872423,
+      "aei_text": 3.066089,
+      "aei_vision": 0.206159,
+      "text_ratio": 0.936998,
+      "vision_ratio": 0.063002
+    },
+    "middle": {
+      "mdi": 9.547794,
+      "aei_text": 2.830954,
+      "aei_vision": 0.296504,
+      "text_ratio": 0.905193,
+      "vision_ratio": 0.094807
+    },
+    "late": {
+      "mdi": 16.338956,
+      "aei_text": 3.107631,
+      "aei_vision": 0.190198,
+      "text_ratio": 0.942326,
+      "vision_ratio": 0.057674
+    },
+    "all": {
+      "mdi": 16.338956,
+      "aei_text": 3.001558,
+      "aei_vision": 0.230953,
+      "text_ratio": 0.942326,
+      "vision_ratio": 0.057674
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942326,
+      0.057674
+    ],
+    "text_vision_ratio": "0.942326:0.057674"
+  }
+}
+```
+
+
+## === Rollout Step 254 ===
+Step: 253/29790 | 2025-10-22 12:20:56
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.652 | 8.193 | 18.596 | 18.596 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.65178,
+      "aei_text": 2.909178,
+      "aei_vision": 0.174707,
+      "text_ratio": 0.943348,
+      "vision_ratio": 0.056652
+    },
+    "middle": {
+      "mdi": 8.19305,
+      "aei_text": 2.583792,
+      "aei_vision": 0.315364,
+      "text_ratio": 0.891222,
+      "vision_ratio": 0.108778
+    },
+    "late": {
+      "mdi": 18.596181,
+      "aei_text": 2.946761,
+      "aei_vision": 0.158461,
+      "text_ratio": 0.94897,
+      "vision_ratio": 0.05103
+    },
+    "all": {
+      "mdi": 18.596181,
+      "aei_text": 2.813244,
+      "aei_vision": 0.216177,
+      "text_ratio": 0.94897,
+      "vision_ratio": 0.05103
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94897,
+      0.05103
+    ],
+    "text_vision_ratio": "0.948970:0.051030"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.65178,
+      "aei_text": 2.909178,
+      "aei_vision": 0.174707,
+      "text_ratio": 0.943348,
+      "vision_ratio": 0.056652
+    },
+    "middle": {
+      "mdi": 8.19305,
+      "aei_text": 2.583792,
+      "aei_vision": 0.315364,
+      "text_ratio": 0.891222,
+      "vision_ratio": 0.108778
+    },
+    "late": {
+      "mdi": 18.596181,
+      "aei_text": 2.946761,
+      "aei_vision": 0.158461,
+      "text_ratio": 0.94897,
+      "vision_ratio": 0.05103
+    },
+    "all": {
+      "mdi": 18.596181,
+      "aei_text": 2.813244,
+      "aei_vision": 0.216177,
+      "text_ratio": 0.94897,
+      "vision_ratio": 0.05103
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94897,
+      0.05103
+    ],
+    "text_vision_ratio": "0.948970:0.051030"
+  }
+}
+```
+
+
+## === Rollout Step 255 ===
+Step: 254/29790 | 2025-10-22 12:21:00
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.633 | 8.599 | 24.539 | 24.539 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.632523,
+      "aei_text": 3.164772,
+      "aei_vision": 0.190276,
+      "text_ratio": 0.943287,
+      "vision_ratio": 0.056713
+    },
+    "middle": {
+      "mdi": 8.598536,
+      "aei_text": 2.802204,
+      "aei_vision": 0.325893,
+      "text_ratio": 0.895817,
+      "vision_ratio": 0.104183
+    },
+    "late": {
+      "mdi": 24.538711,
+      "aei_text": 3.312568,
+      "aei_vision": 0.134994,
+      "text_ratio": 0.960844,
+      "vision_ratio": 0.039156
+    },
+    "all": {
+      "mdi": 24.538711,
+      "aei_text": 3.093181,
+      "aei_vision": 0.217054,
+      "text_ratio": 0.960844,
+      "vision_ratio": 0.039156
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960844,
+      0.039156
+    ],
+    "text_vision_ratio": "0.960844:0.039156"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.632523,
+      "aei_text": 3.164772,
+      "aei_vision": 0.190276,
+      "text_ratio": 0.943287,
+      "vision_ratio": 0.056713
+    },
+    "middle": {
+      "mdi": 8.598536,
+      "aei_text": 2.802204,
+      "aei_vision": 0.325893,
+      "text_ratio": 0.895817,
+      "vision_ratio": 0.104183
+    },
+    "late": {
+      "mdi": 24.538711,
+      "aei_text": 3.312568,
+      "aei_vision": 0.134994,
+      "text_ratio": 0.960844,
+      "vision_ratio": 0.039156
+    },
+    "all": {
+      "mdi": 24.538711,
+      "aei_text": 3.093181,
+      "aei_vision": 0.217054,
+      "text_ratio": 0.960844,
+      "vision_ratio": 0.039156
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960844,
+      0.039156
+    ],
+    "text_vision_ratio": "0.960844:0.039156"
+  }
+}
+```
+
+
+## === Rollout Step 256 ===
+Step: 255/29790 | 2025-10-22 12:21:03
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.742 | 7.927 | 15.415 | 15.415 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.742277,
+      "aei_text": 2.298219,
+      "aei_vision": 0.180362,
+      "text_ratio": 0.927232,
+      "vision_ratio": 0.072768
+    },
+    "middle": {
+      "mdi": 7.926775,
+      "aei_text": 2.153575,
+      "aei_vision": 0.271684,
+      "text_ratio": 0.887977,
+      "vision_ratio": 0.112023
+    },
+    "late": {
+      "mdi": 15.415034,
+      "aei_text": 2.343136,
+      "aei_vision": 0.152003,
+      "text_ratio": 0.93908,
+      "vision_ratio": 0.06092
+    },
+    "all": {
+      "mdi": 15.415034,
+      "aei_text": 2.264977,
+      "aei_vision": 0.20135,
+      "text_ratio": 0.93908,
+      "vision_ratio": 0.06092
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93908,
+      0.06092
+    ],
+    "text_vision_ratio": "0.939080:0.060920"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.742277,
+      "aei_text": 2.298219,
+      "aei_vision": 0.180362,
+      "text_ratio": 0.927232,
+      "vision_ratio": 0.072768
+    },
+    "middle": {
+      "mdi": 7.926775,
+      "aei_text": 2.153575,
+      "aei_vision": 0.271684,
+      "text_ratio": 0.887977,
+      "vision_ratio": 0.112023
+    },
+    "late": {
+      "mdi": 15.415034,
+      "aei_text": 2.343136,
+      "aei_vision": 0.152003,
+      "text_ratio": 0.93908,
+      "vision_ratio": 0.06092
+    },
+    "all": {
+      "mdi": 15.415034,
+      "aei_text": 2.264977,
+      "aei_vision": 0.20135,
+      "text_ratio": 0.93908,
+      "vision_ratio": 0.06092
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93908,
+      0.06092
+    ],
+    "text_vision_ratio": "0.939080:0.060920"
+  }
+}
+```
+
+
+## === Rollout Step 257 ===
+Step: 256/29790 | 2025-10-22 12:21:06
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.084 | 10.522 | 8.618 | 8.618 |
+| MDI Std | 2.750 | 2.457 | 0.119 | 0.119 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.834362,
+      "aei_text": 2.278717,
+      "aei_vision": 0.14391,
+      "text_ratio": 0.940598,
+      "vision_ratio": 0.059402
+    },
+    "middle": {
+      "mdi": 12.978761,
+      "aei_text": 2.236304,
+      "aei_vision": 0.172305,
+      "text_ratio": 0.928463,
+      "vision_ratio": 0.071537
+    },
+    "late": {
+      "mdi": 8.737319,
+      "aei_text": 2.129608,
+      "aei_vision": 0.243737,
+      "text_ratio": 0.897302,
+      "vision_ratio": 0.102698
+    },
+    "all": {
+      "mdi": 8.737319,
+      "aei_text": 2.214876,
+      "aei_vision": 0.186651,
+      "text_ratio": 0.897302,
+      "vision_ratio": 0.102698
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.897302,
+      0.102698
+    ],
+    "text_vision_ratio": "0.897302:0.102698"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.333389,
+      "aei_text": 2.178739,
+      "aei_vision": 0.210845,
+      "text_ratio": 0.911765,
+      "vision_ratio": 0.088235
+    },
+    "middle": {
+      "mdi": 8.064433,
+      "aei_text": 2.103978,
+      "aei_vision": 0.260896,
+      "text_ratio": 0.889679,
+      "vision_ratio": 0.110321
+    },
+    "late": {
+      "mdi": 8.498742,
+      "aei_text": 2.120916,
+      "aei_vision": 0.249556,
+      "text_ratio": 0.894723,
+      "vision_ratio": 0.105277
+    },
+    "all": {
+      "mdi": 8.498742,
+      "aei_text": 2.134544,
+      "aei_vision": 0.240432,
+      "text_ratio": 0.894723,
+      "vision_ratio": 0.105277
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.894723,
+      0.105277
+    ],
+    "text_vision_ratio": "0.894723:0.105277"
+  }
+}
+```
+
+
+## === Rollout Step 258 ===
+Step: 257/29790 | 2025-10-22 12:21:09
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.358 | 12.330 | 17.843 | 17.843 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.357631,
+      "aei_text": 2.901311,
+      "aei_vision": 0.167149,
+      "text_ratio": 0.945527,
+      "vision_ratio": 0.054473
+    },
+    "middle": {
+      "mdi": 12.330382,
+      "aei_text": 2.770039,
+      "aei_vision": 0.224652,
+      "text_ratio": 0.924983,
+      "vision_ratio": 0.075017
+    },
+    "late": {
+      "mdi": 17.842979,
+      "aei_text": 2.910513,
+      "aei_vision": 0.163118,
+      "text_ratio": 0.94693,
+      "vision_ratio": 0.05307
+    },
+    "all": {
+      "mdi": 17.842979,
+      "aei_text": 2.860621,
+      "aei_vision": 0.184973,
+      "text_ratio": 0.94693,
+      "vision_ratio": 0.05307
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94693,
+      0.05307
+    ],
+    "text_vision_ratio": "0.946930:0.053070"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.357631,
+      "aei_text": 2.901311,
+      "aei_vision": 0.167149,
+      "text_ratio": 0.945527,
+      "vision_ratio": 0.054473
+    },
+    "middle": {
+      "mdi": 12.330382,
+      "aei_text": 2.770039,
+      "aei_vision": 0.224652,
+      "text_ratio": 0.924983,
+      "vision_ratio": 0.075017
+    },
+    "late": {
+      "mdi": 17.842979,
+      "aei_text": 2.910513,
+      "aei_vision": 0.163118,
+      "text_ratio": 0.94693,
+      "vision_ratio": 0.05307
+    },
+    "all": {
+      "mdi": 17.842979,
+      "aei_text": 2.860621,
+      "aei_vision": 0.184973,
+      "text_ratio": 0.94693,
+      "vision_ratio": 0.05307
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94693,
+      0.05307
+    ],
+    "text_vision_ratio": "0.946930:0.053070"
+  }
+}
+```
+
+
+## === Rollout Step 259 ===
+Step: 258/29790 | 2025-10-22 12:21:13
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.886 | 12.322 | 21.451 | 21.451 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 486.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 486.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.885625,
+      "aei_text": 3.60429,
+      "aei_vision": 0.190848,
+      "text_ratio": 0.949712,
+      "vision_ratio": 0.050288
+    },
+    "middle": {
+      "mdi": 12.321948,
+      "aei_text": 3.344854,
+      "aei_vision": 0.271455,
+      "text_ratio": 0.924936,
+      "vision_ratio": 0.075064
+    },
+    "late": {
+      "mdi": 21.450619,
+      "aei_text": 3.668157,
+      "aei_vision": 0.171005,
+      "text_ratio": 0.955458,
+      "vision_ratio": 0.044542
+    },
+    "all": {
+      "mdi": 21.450619,
+      "aei_text": 3.5391,
+      "aei_vision": 0.211103,
+      "text_ratio": 0.955458,
+      "vision_ratio": 0.044542
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955458,
+      0.044542
+    ],
+    "text_vision_ratio": "0.955458:0.044542"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.885625,
+      "aei_text": 3.60429,
+      "aei_vision": 0.190848,
+      "text_ratio": 0.949712,
+      "vision_ratio": 0.050288
+    },
+    "middle": {
+      "mdi": 12.321948,
+      "aei_text": 3.344854,
+      "aei_vision": 0.271455,
+      "text_ratio": 0.924936,
+      "vision_ratio": 0.075064
+    },
+    "late": {
+      "mdi": 21.450619,
+      "aei_text": 3.668157,
+      "aei_vision": 0.171005,
+      "text_ratio": 0.955458,
+      "vision_ratio": 0.044542
+    },
+    "all": {
+      "mdi": 21.450619,
+      "aei_text": 3.5391,
+      "aei_vision": 0.211103,
+      "text_ratio": 0.955458,
+      "vision_ratio": 0.044542
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955458,
+      0.044542
+    ],
+    "text_vision_ratio": "0.955458:0.044542"
+  }
+}
+```
+
+
+## === Rollout Step 260 ===
+Step: 259/29790 | 2025-10-22 12:21:17
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.352 | 13.467 | 20.767 | 20.767 |
+| MDI Std | 5.197 | 5.806 | 1.171 | 1.171 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.549068,
+      "aei_text": 3.015715,
+      "aei_vision": 0.122844,
+      "text_ratio": 0.96086,
+      "vision_ratio": 0.03914
+    },
+    "middle": {
+      "mdi": 19.272851,
+      "aei_text": 2.946665,
+      "aei_vision": 0.152892,
+      "text_ratio": 0.950673,
+      "vision_ratio": 0.049327
+    },
+    "late": {
+      "mdi": 19.595765,
+      "aei_text": 2.951847,
+      "aei_vision": 0.150637,
+      "text_ratio": 0.951446,
+      "vision_ratio": 0.048554
+    },
+    "all": {
+      "mdi": 19.595765,
+      "aei_text": 2.971409,
+      "aei_vision": 0.142124,
+      "text_ratio": 0.951446,
+      "vision_ratio": 0.048554
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951446,
+      0.048554
+    ],
+    "text_vision_ratio": "0.951446:0.048554"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.154265,
+      "aei_text": 2.837355,
+      "aei_vision": 0.200459,
+      "text_ratio": 0.934012,
+      "vision_ratio": 0.065988
+    },
+    "middle": {
+      "mdi": 7.66148,
+      "aei_text": 2.537043,
+      "aei_vision": 0.331143,
+      "text_ratio": 0.884546,
+      "vision_ratio": 0.115454
+    },
+    "late": {
+      "mdi": 21.938762,
+      "aei_text": 2.985312,
+      "aei_vision": 0.136075,
+      "text_ratio": 0.956406,
+      "vision_ratio": 0.043594
+    },
+    "all": {
+      "mdi": 21.938762,
+      "aei_text": 2.78657,
+      "aei_vision": 0.222559,
+      "text_ratio": 0.956406,
+      "vision_ratio": 0.043594
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956406,
+      0.043594
+    ],
+    "text_vision_ratio": "0.956406:0.043594"
+  }
+}
+```
+
+
+## === Rollout Step 261 ===
+Step: 260/29790 | 2025-10-22 12:21:20
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.394 | 11.916 | 19.565 | 19.565 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.394324,
+      "aei_text": 2.892559,
+      "aei_vision": 0.176437,
+      "text_ratio": 0.94251,
+      "vision_ratio": 0.05749
+    },
+    "middle": {
+      "mdi": 11.916087,
+      "aei_text": 2.764819,
+      "aei_vision": 0.232024,
+      "text_ratio": 0.922577,
+      "vision_ratio": 0.077423
+    },
+    "late": {
+      "mdi": 19.565473,
+      "aei_text": 2.951368,
+      "aei_vision": 0.150846,
+      "text_ratio": 0.951375,
+      "vision_ratio": 0.048625
+    },
+    "all": {
+      "mdi": 19.565473,
+      "aei_text": 2.869582,
+      "aei_vision": 0.186435,
+      "text_ratio": 0.951375,
+      "vision_ratio": 0.048625
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951375,
+      0.048625
+    ],
+    "text_vision_ratio": "0.951375:0.048625"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.394324,
+      "aei_text": 2.892559,
+      "aei_vision": 0.176437,
+      "text_ratio": 0.94251,
+      "vision_ratio": 0.05749
+    },
+    "middle": {
+      "mdi": 11.916087,
+      "aei_text": 2.764819,
+      "aei_vision": 0.232024,
+      "text_ratio": 0.922577,
+      "vision_ratio": 0.077423
+    },
+    "late": {
+      "mdi": 19.565473,
+      "aei_text": 2.951368,
+      "aei_vision": 0.150846,
+      "text_ratio": 0.951375,
+      "vision_ratio": 0.048625
+    },
+    "all": {
+      "mdi": 19.565473,
+      "aei_text": 2.869582,
+      "aei_vision": 0.186435,
+      "text_ratio": 0.951375,
+      "vision_ratio": 0.048625
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951375,
+      0.048625
+    ],
+    "text_vision_ratio": "0.951375:0.048625"
+  }
+}
+```
+
+
+## === Rollout Step 262 ===
+Step: 261/29790 | 2025-10-22 12:21:23
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.180 | 5.386 | 13.462 | 13.462 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 255.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 255.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 255,
+    "text_tokens": 0,
+    "total_tokens": 255
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.179996,
+      "aei_text": 2.284289,
+      "aei_vision": 0.22439,
+      "text_ratio": 0.910555,
+      "vision_ratio": 0.089445
+    },
+    "middle": {
+      "mdi": 5.385524,
+      "aei_text": 2.031297,
+      "aei_vision": 0.377177,
+      "text_ratio": 0.843396,
+      "vision_ratio": 0.156604
+    },
+    "late": {
+      "mdi": 13.462096,
+      "aei_text": 2.364954,
+      "aei_vision": 0.175675,
+      "text_ratio": 0.930854,
+      "vision_ratio": 0.069146
+    },
+    "all": {
+      "mdi": 13.462096,
+      "aei_text": 2.226847,
+      "aei_vision": 0.259081,
+      "text_ratio": 0.930854,
+      "vision_ratio": 0.069146
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930854,
+      0.069146
+    ],
+    "text_vision_ratio": "0.930854:0.069146"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 255,
+    "text_tokens": 0,
+    "total_tokens": 255
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.179996,
+      "aei_text": 2.284289,
+      "aei_vision": 0.22439,
+      "text_ratio": 0.910555,
+      "vision_ratio": 0.089445
+    },
+    "middle": {
+      "mdi": 5.385524,
+      "aei_text": 2.031297,
+      "aei_vision": 0.377177,
+      "text_ratio": 0.843396,
+      "vision_ratio": 0.156604
+    },
+    "late": {
+      "mdi": 13.462096,
+      "aei_text": 2.364954,
+      "aei_vision": 0.175675,
+      "text_ratio": 0.930854,
+      "vision_ratio": 0.069146
+    },
+    "all": {
+      "mdi": 13.462096,
+      "aei_text": 2.226847,
+      "aei_vision": 0.259081,
+      "text_ratio": 0.930854,
+      "vision_ratio": 0.069146
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930854,
+      0.069146
+    ],
+    "text_vision_ratio": "0.930854:0.069146"
+  }
+}
+```
+
+
+## === Rollout Step 263 ===
+Step: 262/29790 | 2025-10-22 12:21:26
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 7.511 | 2.770 | 8.943 | 8.943 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 164.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 164.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 164,
+    "text_tokens": 0,
+    "total_tokens": 164
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 7.511426,
+      "aei_text": 1.84707,
+      "aei_vision": 0.245901,
+      "text_ratio": 0.882511,
+      "vision_ratio": 0.117489
+    },
+    "middle": {
+      "mdi": 2.770091,
+      "aei_text": 1.510693,
+      "aei_vision": 0.545359,
+      "text_ratio": 0.734754,
+      "vision_ratio": 0.265246
+    },
+    "late": {
+      "mdi": 8.942972,
+      "aei_text": 1.886351,
+      "aei_vision": 0.210931,
+      "text_ratio": 0.899426,
+      "vision_ratio": 0.100574
+    },
+    "all": {
+      "mdi": 8.942972,
+      "aei_text": 1.748038,
+      "aei_vision": 0.334064,
+      "text_ratio": 0.899426,
+      "vision_ratio": 0.100574
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.899426,
+      0.100574
+    ],
+    "text_vision_ratio": "0.899426:0.100574"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 164,
+    "text_tokens": 0,
+    "total_tokens": 164
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 7.511426,
+      "aei_text": 1.84707,
+      "aei_vision": 0.245901,
+      "text_ratio": 0.882511,
+      "vision_ratio": 0.117489
+    },
+    "middle": {
+      "mdi": 2.770091,
+      "aei_text": 1.510693,
+      "aei_vision": 0.545359,
+      "text_ratio": 0.734754,
+      "vision_ratio": 0.265246
+    },
+    "late": {
+      "mdi": 8.942972,
+      "aei_text": 1.886351,
+      "aei_vision": 0.210931,
+      "text_ratio": 0.899426,
+      "vision_ratio": 0.100574
+    },
+    "all": {
+      "mdi": 8.942972,
+      "aei_text": 1.748038,
+      "aei_vision": 0.334064,
+      "text_ratio": 0.899426,
+      "vision_ratio": 0.100574
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.899426,
+      0.100574
+    ],
+    "text_vision_ratio": "0.899426:0.100574"
+  }
+}
+```
+
+
+## === Rollout Step 264 ===
+Step: 263/29790 | 2025-10-22 12:21:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.629 | 7.161 | 20.699 | 20.699 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.629109,
+      "aei_text": 3.100281,
+      "aei_vision": 0.198366,
+      "text_ratio": 0.939864,
+      "vision_ratio": 0.060136
+    },
+    "middle": {
+      "mdi": 7.161383,
+      "aei_text": 2.650362,
+      "aei_vision": 0.370091,
+      "text_ratio": 0.877472,
+      "vision_ratio": 0.122528
+    },
+    "late": {
+      "mdi": 20.699252,
+      "aei_text": 3.21328,
+      "aei_vision": 0.155237,
+      "text_ratio": 0.953915,
+      "vision_ratio": 0.046085
+    },
+    "all": {
+      "mdi": 20.699252,
+      "aei_text": 2.987975,
+      "aei_vision": 0.241231,
+      "text_ratio": 0.953915,
+      "vision_ratio": 0.046085
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953915,
+      0.046085
+    ],
+    "text_vision_ratio": "0.953915:0.046085"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.629109,
+      "aei_text": 3.100281,
+      "aei_vision": 0.198366,
+      "text_ratio": 0.939864,
+      "vision_ratio": 0.060136
+    },
+    "middle": {
+      "mdi": 7.161383,
+      "aei_text": 2.650362,
+      "aei_vision": 0.370091,
+      "text_ratio": 0.877472,
+      "vision_ratio": 0.122528
+    },
+    "late": {
+      "mdi": 20.699252,
+      "aei_text": 3.21328,
+      "aei_vision": 0.155237,
+      "text_ratio": 0.953915,
+      "vision_ratio": 0.046085
+    },
+    "all": {
+      "mdi": 20.699252,
+      "aei_text": 2.987975,
+      "aei_vision": 0.241231,
+      "text_ratio": 0.953915,
+      "vision_ratio": 0.046085
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953915,
+      0.046085
+    ],
+    "text_vision_ratio": "0.953915:0.046085"
+  }
+}
+```
+
+
+## === Rollout Step 265 ===
+Step: 264/29790 | 2025-10-22 12:21:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 26.989 | 24.954 | 18.989 | 18.989 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.989258,
+      "aei_text": 3.002572,
+      "aei_vision": 0.111251,
+      "text_ratio": 0.964272,
+      "vision_ratio": 0.035728
+    },
+    "middle": {
+      "mdi": 24.953513,
+      "aei_text": 2.983815,
+      "aei_vision": 0.119575,
+      "text_ratio": 0.96147,
+      "vision_ratio": 0.03853
+    },
+    "late": {
+      "mdi": 18.98948,
+      "aei_text": 2.90817,
+      "aei_vision": 0.153146,
+      "text_ratio": 0.949974,
+      "vision_ratio": 0.050026
+    },
+    "all": {
+      "mdi": 18.98948,
+      "aei_text": 2.964852,
+      "aei_vision": 0.127991,
+      "text_ratio": 0.949974,
+      "vision_ratio": 0.050026
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949974,
+      0.050026
+    ],
+    "text_vision_ratio": "0.949974:0.050026"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.989258,
+      "aei_text": 3.002572,
+      "aei_vision": 0.111251,
+      "text_ratio": 0.964272,
+      "vision_ratio": 0.035728
+    },
+    "middle": {
+      "mdi": 24.953513,
+      "aei_text": 2.983815,
+      "aei_vision": 0.119575,
+      "text_ratio": 0.96147,
+      "vision_ratio": 0.03853
+    },
+    "late": {
+      "mdi": 18.98948,
+      "aei_text": 2.90817,
+      "aei_vision": 0.153146,
+      "text_ratio": 0.949974,
+      "vision_ratio": 0.050026
+    },
+    "all": {
+      "mdi": 18.98948,
+      "aei_text": 2.964852,
+      "aei_vision": 0.127991,
+      "text_ratio": 0.949974,
+      "vision_ratio": 0.050026
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949974,
+      0.050026
+    ],
+    "text_vision_ratio": "0.949974:0.050026"
+  }
+}
+```
+
+
+## === Rollout Step 266 ===
+Step: 265/29790 | 2025-10-22 12:21:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.649 | 13.957 | 16.889 | 16.889 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.649143,
+      "aei_text": 2.883147,
+      "aei_vision": 0.196813,
+      "text_ratio": 0.936099,
+      "vision_ratio": 0.063901
+    },
+    "middle": {
+      "mdi": 13.956503,
+      "aei_text": 2.86354,
+      "aei_vision": 0.205176,
+      "text_ratio": 0.933139,
+      "vision_ratio": 0.066861
+    },
+    "late": {
+      "mdi": 16.889256,
+      "aei_text": 2.936891,
+      "aei_vision": 0.173891,
+      "text_ratio": 0.944101,
+      "vision_ratio": 0.055899
+    },
+    "all": {
+      "mdi": 16.889256,
+      "aei_text": 2.894526,
+      "aei_vision": 0.19196,
+      "text_ratio": 0.944101,
+      "vision_ratio": 0.055899
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944101,
+      0.055899
+    ],
+    "text_vision_ratio": "0.944101:0.055899"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.649143,
+      "aei_text": 2.883147,
+      "aei_vision": 0.196813,
+      "text_ratio": 0.936099,
+      "vision_ratio": 0.063901
+    },
+    "middle": {
+      "mdi": 13.956503,
+      "aei_text": 2.86354,
+      "aei_vision": 0.205176,
+      "text_ratio": 0.933139,
+      "vision_ratio": 0.066861
+    },
+    "late": {
+      "mdi": 16.889256,
+      "aei_text": 2.936891,
+      "aei_vision": 0.173891,
+      "text_ratio": 0.944101,
+      "vision_ratio": 0.055899
+    },
+    "all": {
+      "mdi": 16.889256,
+      "aei_text": 2.894526,
+      "aei_vision": 0.19196,
+      "text_ratio": 0.944101,
+      "vision_ratio": 0.055899
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944101,
+      0.055899
+    ],
+    "text_vision_ratio": "0.944101:0.055899"
+  }
+}
+```
+
+
+## === Rollout Step 267 ===
+Step: 266/29790 | 2025-10-22 12:21:39
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.375 | 11.038 | 19.894 | 19.894 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.37476,
+      "aei_text": 2.773014,
+      "aei_vision": 0.243787,
+      "text_ratio": 0.91919,
+      "vision_ratio": 0.08081
+    },
+    "middle": {
+      "mdi": 11.038456,
+      "aei_text": 2.758651,
+      "aei_vision": 0.249913,
+      "text_ratio": 0.916933,
+      "vision_ratio": 0.083067
+    },
+    "late": {
+      "mdi": 19.893542,
+      "aei_text": 2.99197,
+      "aei_vision": 0.150399,
+      "text_ratio": 0.952138,
+      "vision_ratio": 0.047862
+    },
+    "all": {
+      "mdi": 19.893542,
+      "aei_text": 2.841211,
+      "aei_vision": 0.214699,
+      "text_ratio": 0.952138,
+      "vision_ratio": 0.047862
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952138,
+      0.047862
+    ],
+    "text_vision_ratio": "0.952138:0.047862"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.37476,
+      "aei_text": 2.773014,
+      "aei_vision": 0.243787,
+      "text_ratio": 0.91919,
+      "vision_ratio": 0.08081
+    },
+    "middle": {
+      "mdi": 11.038456,
+      "aei_text": 2.758651,
+      "aei_vision": 0.249913,
+      "text_ratio": 0.916933,
+      "vision_ratio": 0.083067
+    },
+    "late": {
+      "mdi": 19.893542,
+      "aei_text": 2.99197,
+      "aei_vision": 0.150399,
+      "text_ratio": 0.952138,
+      "vision_ratio": 0.047862
+    },
+    "all": {
+      "mdi": 19.893542,
+      "aei_text": 2.841211,
+      "aei_vision": 0.214699,
+      "text_ratio": 0.952138,
+      "vision_ratio": 0.047862
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952138,
+      0.047862
+    ],
+    "text_vision_ratio": "0.952138:0.047862"
+  }
+}
+```
+
+
+## === Rollout Step 268 ===
+Step: 267/29790 | 2025-10-22 12:21:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.806 | 11.329 | 18.777 | 18.777 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.806207,
+      "aei_text": 3.154766,
+      "aei_vision": 0.144673,
+      "text_ratio": 0.956152,
+      "vision_ratio": 0.043848
+    },
+    "middle": {
+      "mdi": 11.328989,
+      "aei_text": 2.879022,
+      "aei_vision": 0.254129,
+      "text_ratio": 0.91889,
+      "vision_ratio": 0.08111
+    },
+    "late": {
+      "mdi": 18.777173,
+      "aei_text": 3.102928,
+      "aei_vision": 0.16525,
+      "text_ratio": 0.949437,
+      "vision_ratio": 0.050563
+    },
+    "all": {
+      "mdi": 18.777173,
+      "aei_text": 3.045572,
+      "aei_vision": 0.188017,
+      "text_ratio": 0.949437,
+      "vision_ratio": 0.050563
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949437,
+      0.050563
+    ],
+    "text_vision_ratio": "0.949437:0.050563"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.806207,
+      "aei_text": 3.154766,
+      "aei_vision": 0.144673,
+      "text_ratio": 0.956152,
+      "vision_ratio": 0.043848
+    },
+    "middle": {
+      "mdi": 11.328989,
+      "aei_text": 2.879022,
+      "aei_vision": 0.254129,
+      "text_ratio": 0.91889,
+      "vision_ratio": 0.08111
+    },
+    "late": {
+      "mdi": 18.777173,
+      "aei_text": 3.102928,
+      "aei_vision": 0.16525,
+      "text_ratio": 0.949437,
+      "vision_ratio": 0.050563
+    },
+    "all": {
+      "mdi": 18.777173,
+      "aei_text": 3.045572,
+      "aei_vision": 0.188017,
+      "text_ratio": 0.949437,
+      "vision_ratio": 0.050563
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949437,
+      0.050563
+    ],
+    "text_vision_ratio": "0.949437:0.050563"
+  }
+}
+```
+
+
+## === Rollout Step 269 ===
+Step: 268/29790 | 2025-10-22 12:21:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.688 | 8.278 | 15.511 | 15.511 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.688112,
+      "aei_text": 3.261474,
+      "aei_vision": 0.195437,
+      "text_ratio": 0.943465,
+      "vision_ratio": 0.056535
+    },
+    "middle": {
+      "mdi": 8.277782,
+      "aei_text": 2.844821,
+      "aei_vision": 0.343669,
+      "text_ratio": 0.892216,
+      "vision_ratio": 0.107784
+    },
+    "late": {
+      "mdi": 15.510562,
+      "aei_text": 3.226167,
+      "aei_vision": 0.207998,
+      "text_ratio": 0.939433,
+      "vision_ratio": 0.060567
+    },
+    "all": {
+      "mdi": 15.510562,
+      "aei_text": 3.110821,
+      "aei_vision": 0.249035,
+      "text_ratio": 0.939433,
+      "vision_ratio": 0.060567
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.939433,
+      0.060567
+    ],
+    "text_vision_ratio": "0.939433:0.060567"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.688112,
+      "aei_text": 3.261474,
+      "aei_vision": 0.195437,
+      "text_ratio": 0.943465,
+      "vision_ratio": 0.056535
+    },
+    "middle": {
+      "mdi": 8.277782,
+      "aei_text": 2.844821,
+      "aei_vision": 0.343669,
+      "text_ratio": 0.892216,
+      "vision_ratio": 0.107784
+    },
+    "late": {
+      "mdi": 15.510562,
+      "aei_text": 3.226167,
+      "aei_vision": 0.207998,
+      "text_ratio": 0.939433,
+      "vision_ratio": 0.060567
+    },
+    "all": {
+      "mdi": 15.510562,
+      "aei_text": 3.110821,
+      "aei_vision": 0.249035,
+      "text_ratio": 0.939433,
+      "vision_ratio": 0.060567
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.939433,
+      0.060567
+    ],
+    "text_vision_ratio": "0.939433:0.060567"
+  }
+}
+```
+
+
+## === Rollout Step 270 ===
+Step: 269/29790 | 2025-10-22 12:21:50
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.676 | 8.165 | 15.842 | 15.842 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.676295,
+      "aei_text": 2.982543,
+      "aei_vision": 0.218081,
+      "text_ratio": 0.931863,
+      "vision_ratio": 0.068137
+    },
+    "middle": {
+      "mdi": 8.165277,
+      "aei_text": 2.697771,
+      "aei_vision": 0.330396,
+      "text_ratio": 0.890893,
+      "vision_ratio": 0.109107
+    },
+    "late": {
+      "mdi": 15.841747,
+      "aei_text": 3.047698,
+      "aei_vision": 0.192384,
+      "text_ratio": 0.940624,
+      "vision_ratio": 0.059376
+    },
+    "all": {
+      "mdi": 15.841747,
+      "aei_text": 2.909337,
+      "aei_vision": 0.246954,
+      "text_ratio": 0.940624,
+      "vision_ratio": 0.059376
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940624,
+      0.059376
+    ],
+    "text_vision_ratio": "0.940624:0.059376"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.676295,
+      "aei_text": 2.982543,
+      "aei_vision": 0.218081,
+      "text_ratio": 0.931863,
+      "vision_ratio": 0.068137
+    },
+    "middle": {
+      "mdi": 8.165277,
+      "aei_text": 2.697771,
+      "aei_vision": 0.330396,
+      "text_ratio": 0.890893,
+      "vision_ratio": 0.109107
+    },
+    "late": {
+      "mdi": 15.841747,
+      "aei_text": 3.047698,
+      "aei_vision": 0.192384,
+      "text_ratio": 0.940624,
+      "vision_ratio": 0.059376
+    },
+    "all": {
+      "mdi": 15.841747,
+      "aei_text": 2.909337,
+      "aei_vision": 0.246954,
+      "text_ratio": 0.940624,
+      "vision_ratio": 0.059376
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940624,
+      0.059376
+    ],
+    "text_vision_ratio": "0.940624:0.059376"
+  }
+}
+```
+
+
+## === Rollout Step 271 ===
+Step: 270/29790 | 2025-10-22 12:21:54
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.612 | 10.779 | 24.054 | 24.054 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.612073,
+      "aei_text": 3.21914,
+      "aei_vision": 0.136335,
+      "text_ratio": 0.95937,
+      "vision_ratio": 0.04063
+    },
+    "middle": {
+      "mdi": 10.779453,
+      "aei_text": 2.882385,
+      "aei_vision": 0.267396,
+      "text_ratio": 0.915106,
+      "vision_ratio": 0.084894
+    },
+    "late": {
+      "mdi": 24.0536,
+      "aei_text": 3.22495,
+      "aei_vision": 0.134073,
+      "text_ratio": 0.960086,
+      "vision_ratio": 0.039914
+    },
+    "all": {
+      "mdi": 24.0536,
+      "aei_text": 3.108825,
+      "aei_vision": 0.179268,
+      "text_ratio": 0.960086,
+      "vision_ratio": 0.039914
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960086,
+      0.039914
+    ],
+    "text_vision_ratio": "0.960086:0.039914"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.612073,
+      "aei_text": 3.21914,
+      "aei_vision": 0.136335,
+      "text_ratio": 0.95937,
+      "vision_ratio": 0.04063
+    },
+    "middle": {
+      "mdi": 10.779453,
+      "aei_text": 2.882385,
+      "aei_vision": 0.267396,
+      "text_ratio": 0.915106,
+      "vision_ratio": 0.084894
+    },
+    "late": {
+      "mdi": 24.0536,
+      "aei_text": 3.22495,
+      "aei_vision": 0.134073,
+      "text_ratio": 0.960086,
+      "vision_ratio": 0.039914
+    },
+    "all": {
+      "mdi": 24.0536,
+      "aei_text": 3.108825,
+      "aei_vision": 0.179268,
+      "text_ratio": 0.960086,
+      "vision_ratio": 0.039914
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960086,
+      0.039914
+    ],
+    "text_vision_ratio": "0.960086:0.039914"
+  }
+}
+```
+
+
+## === Rollout Step 272 ===
+Step: 271/29790 | 2025-10-22 12:21:57
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.932 | 7.696 | 21.657 | 21.657 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.931645,
+      "aei_text": 2.879716,
+      "aei_vision": 0.19286,
+      "text_ratio": 0.937232,
+      "vision_ratio": 0.062768
+    },
+    "middle": {
+      "mdi": 7.695733,
+      "aei_text": 2.555517,
+      "aei_vision": 0.332069,
+      "text_ratio": 0.885001,
+      "vision_ratio": 0.114999
+    },
+    "late": {
+      "mdi": 21.656802,
+      "aei_text": 3.005647,
+      "aei_vision": 0.138785,
+      "text_ratio": 0.955863,
+      "vision_ratio": 0.044137
+    },
+    "all": {
+      "mdi": 21.656802,
+      "aei_text": 2.813627,
+      "aei_vision": 0.221238,
+      "text_ratio": 0.955863,
+      "vision_ratio": 0.044137
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955863,
+      0.044137
+    ],
+    "text_vision_ratio": "0.955863:0.044137"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.931645,
+      "aei_text": 2.879716,
+      "aei_vision": 0.19286,
+      "text_ratio": 0.937232,
+      "vision_ratio": 0.062768
+    },
+    "middle": {
+      "mdi": 7.695733,
+      "aei_text": 2.555517,
+      "aei_vision": 0.332069,
+      "text_ratio": 0.885001,
+      "vision_ratio": 0.114999
+    },
+    "late": {
+      "mdi": 21.656802,
+      "aei_text": 3.005647,
+      "aei_vision": 0.138785,
+      "text_ratio": 0.955863,
+      "vision_ratio": 0.044137
+    },
+    "all": {
+      "mdi": 21.656802,
+      "aei_text": 2.813627,
+      "aei_vision": 0.221238,
+      "text_ratio": 0.955863,
+      "vision_ratio": 0.044137
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955863,
+      0.044137
+    ],
+    "text_vision_ratio": "0.955863:0.044137"
+  }
+}
+```
+
+
+## === Rollout Step 273 ===
+Step: 272/29790 | 2025-10-22 12:22:00
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.794 | 11.468 | 18.395 | 18.395 |
+| MDI Std | 2.367 | 1.732 | 0.858 | 0.858 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.161564,
+      "aei_text": 3.095494,
+      "aei_vision": 0.118322,
+      "text_ratio": 0.963183,
+      "vision_ratio": 0.036817
+    },
+    "middle": {
+      "mdi": 13.200435,
+      "aei_text": 2.861504,
+      "aei_vision": 0.216773,
+      "text_ratio": 0.92958,
+      "vision_ratio": 0.07042
+    },
+    "late": {
+      "mdi": 17.537137,
+      "aei_text": 2.973703,
+      "aei_vision": 0.169566,
+      "text_ratio": 0.946054,
+      "vision_ratio": 0.053946
+    },
+    "all": {
+      "mdi": 17.537137,
+      "aei_text": 2.9769,
+      "aei_vision": 0.168221,
+      "text_ratio": 0.946054,
+      "vision_ratio": 0.053946
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946054,
+      0.053946
+    ],
+    "text_vision_ratio": "0.946054:0.053946"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.427093,
+      "aei_text": 3.039561,
+      "aei_vision": 0.141856,
+      "text_ratio": 0.955411,
+      "vision_ratio": 0.044589
+    },
+    "middle": {
+      "mdi": 9.736294,
+      "aei_text": 2.714162,
+      "aei_vision": 0.278767,
+      "text_ratio": 0.906858,
+      "vision_ratio": 0.093142
+    },
+    "late": {
+      "mdi": 19.253227,
+      "aei_text": 3.005677,
+      "aei_vision": 0.156113,
+      "text_ratio": 0.950625,
+      "vision_ratio": 0.049375
+    },
+    "all": {
+      "mdi": 19.253227,
+      "aei_text": 2.9198,
+      "aei_vision": 0.192245,
+      "text_ratio": 0.950625,
+      "vision_ratio": 0.049375
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950625,
+      0.049375
+    ],
+    "text_vision_ratio": "0.950625:0.049375"
+  }
+}
+```
+
+
+## === Rollout Step 274 ===
+Step: 273/29790 | 2025-10-22 12:22:04
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.328 | 12.616 | 21.939 | 21.939 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.328469,
+      "aei_text": 3.192832,
+      "aei_vision": 0.174201,
+      "text_ratio": 0.948263,
+      "vision_ratio": 0.051737
+    },
+    "middle": {
+      "mdi": 12.615592,
+      "aei_text": 3.019783,
+      "aei_vision": 0.239369,
+      "text_ratio": 0.926555,
+      "vision_ratio": 0.073445
+    },
+    "late": {
+      "mdi": 21.939458,
+      "aei_text": 3.260746,
+      "aei_vision": 0.148625,
+      "text_ratio": 0.956407,
+      "vision_ratio": 0.043593
+    },
+    "all": {
+      "mdi": 21.939458,
+      "aei_text": 3.157787,
+      "aei_vision": 0.187398,
+      "text_ratio": 0.956407,
+      "vision_ratio": 0.043593
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956407,
+      0.043593
+    ],
+    "text_vision_ratio": "0.956407:0.043593"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.328469,
+      "aei_text": 3.192832,
+      "aei_vision": 0.174201,
+      "text_ratio": 0.948263,
+      "vision_ratio": 0.051737
+    },
+    "middle": {
+      "mdi": 12.615592,
+      "aei_text": 3.019783,
+      "aei_vision": 0.239369,
+      "text_ratio": 0.926555,
+      "vision_ratio": 0.073445
+    },
+    "late": {
+      "mdi": 21.939458,
+      "aei_text": 3.260746,
+      "aei_vision": 0.148625,
+      "text_ratio": 0.956407,
+      "vision_ratio": 0.043593
+    },
+    "all": {
+      "mdi": 21.939458,
+      "aei_text": 3.157787,
+      "aei_vision": 0.187398,
+      "text_ratio": 0.956407,
+      "vision_ratio": 0.043593
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956407,
+      0.043593
+    ],
+    "text_vision_ratio": "0.956407:0.043593"
+  }
+}
+```
+
+
+## === Rollout Step 275 ===
+Step: 274/29790 | 2025-10-22 12:22:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.381 | 16.497 | 22.298 | 22.298 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.380646,
+      "aei_text": 3.121217,
+      "aei_vision": 0.17958,
+      "text_ratio": 0.945595,
+      "vision_ratio": 0.054405
+    },
+    "middle": {
+      "mdi": 16.496628,
+      "aei_text": 3.099707,
+      "aei_vision": 0.187899,
+      "text_ratio": 0.942846,
+      "vision_ratio": 0.057154
+    },
+    "late": {
+      "mdi": 22.297516,
+      "aei_text": 3.212964,
+      "aei_vision": 0.144095,
+      "text_ratio": 0.957077,
+      "vision_ratio": 0.042923
+    },
+    "all": {
+      "mdi": 22.297516,
+      "aei_text": 3.14463,
+      "aei_vision": 0.170525,
+      "text_ratio": 0.957077,
+      "vision_ratio": 0.042923
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957077,
+      0.042923
+    ],
+    "text_vision_ratio": "0.957077:0.042923"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.380646,
+      "aei_text": 3.121217,
+      "aei_vision": 0.17958,
+      "text_ratio": 0.945595,
+      "vision_ratio": 0.054405
+    },
+    "middle": {
+      "mdi": 16.496628,
+      "aei_text": 3.099707,
+      "aei_vision": 0.187899,
+      "text_ratio": 0.942846,
+      "vision_ratio": 0.057154
+    },
+    "late": {
+      "mdi": 22.297516,
+      "aei_text": 3.212964,
+      "aei_vision": 0.144095,
+      "text_ratio": 0.957077,
+      "vision_ratio": 0.042923
+    },
+    "all": {
+      "mdi": 22.297516,
+      "aei_text": 3.14463,
+      "aei_vision": 0.170525,
+      "text_ratio": 0.957077,
+      "vision_ratio": 0.042923
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957077,
+      0.042923
+    ],
+    "text_vision_ratio": "0.957077:0.042923"
+  }
+}
+```
+
+
+## === Rollout Step 276 ===
+Step: 275/29790 | 2025-10-22 12:22:11
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.931 | 17.930 | 17.685 | 17.685 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.930586,
+      "aei_text": 3.033976,
+      "aei_vision": 0.138344,
+      "text_ratio": 0.95639,
+      "vision_ratio": 0.04361
+    },
+    "middle": {
+      "mdi": 17.929966,
+      "aei_text": 2.969587,
+      "aei_vision": 0.165621,
+      "text_ratio": 0.947174,
+      "vision_ratio": 0.052826
+    },
+    "late": {
+      "mdi": 17.685278,
+      "aei_text": 2.964815,
+      "aei_vision": 0.167643,
+      "text_ratio": 0.946482,
+      "vision_ratio": 0.053518
+    },
+    "all": {
+      "mdi": 17.685278,
+      "aei_text": 2.98946,
+      "aei_vision": 0.157203,
+      "text_ratio": 0.946482,
+      "vision_ratio": 0.053518
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946482,
+      0.053518
+    ],
+    "text_vision_ratio": "0.946482:0.053518"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.930586,
+      "aei_text": 3.033976,
+      "aei_vision": 0.138344,
+      "text_ratio": 0.95639,
+      "vision_ratio": 0.04361
+    },
+    "middle": {
+      "mdi": 17.929966,
+      "aei_text": 2.969587,
+      "aei_vision": 0.165621,
+      "text_ratio": 0.947174,
+      "vision_ratio": 0.052826
+    },
+    "late": {
+      "mdi": 17.685278,
+      "aei_text": 2.964815,
+      "aei_vision": 0.167643,
+      "text_ratio": 0.946482,
+      "vision_ratio": 0.053518
+    },
+    "all": {
+      "mdi": 17.685278,
+      "aei_text": 2.98946,
+      "aei_vision": 0.157203,
+      "text_ratio": 0.946482,
+      "vision_ratio": 0.053518
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946482,
+      0.053518
+    ],
+    "text_vision_ratio": "0.946482:0.053518"
+  }
+}
+```
+
+
+## === Rollout Step 277 ===
+Step: 276/29790 | 2025-10-22 12:22:14
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.955 | 6.770 | 21.523 | 21.523 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.954843,
+      "aei_text": 3.002106,
+      "aei_vision": 0.251121,
+      "text_ratio": 0.922809,
+      "vision_ratio": 0.077191
+    },
+    "middle": {
+      "mdi": 6.769599,
+      "aei_text": 2.633457,
+      "aei_vision": 0.389012,
+      "text_ratio": 0.871293,
+      "vision_ratio": 0.128707
+    },
+    "late": {
+      "mdi": 21.523108,
+      "aei_text": 3.267589,
+      "aei_vision": 0.151818,
+      "text_ratio": 0.955601,
+      "vision_ratio": 0.044399
+    },
+    "all": {
+      "mdi": 21.523108,
+      "aei_text": 2.967718,
+      "aei_vision": 0.263984,
+      "text_ratio": 0.955601,
+      "vision_ratio": 0.044399
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955601,
+      0.044399
+    ],
+    "text_vision_ratio": "0.955601:0.044399"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.954843,
+      "aei_text": 3.002106,
+      "aei_vision": 0.251121,
+      "text_ratio": 0.922809,
+      "vision_ratio": 0.077191
+    },
+    "middle": {
+      "mdi": 6.769599,
+      "aei_text": 2.633457,
+      "aei_vision": 0.389012,
+      "text_ratio": 0.871293,
+      "vision_ratio": 0.128707
+    },
+    "late": {
+      "mdi": 21.523108,
+      "aei_text": 3.267589,
+      "aei_vision": 0.151818,
+      "text_ratio": 0.955601,
+      "vision_ratio": 0.044399
+    },
+    "all": {
+      "mdi": 21.523108,
+      "aei_text": 2.967718,
+      "aei_vision": 0.263984,
+      "text_ratio": 0.955601,
+      "vision_ratio": 0.044399
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955601,
+      0.044399
+    ],
+    "text_vision_ratio": "0.955601:0.044399"
+  }
+}
+```
+
+
+## === Rollout Step 278 ===
+Step: 277/29790 | 2025-10-22 12:22:19
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.720 | 16.399 | 20.300 | 20.300 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 486.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 486.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.720206,
+      "aei_text": 3.599149,
+      "aei_vision": 0.165705,
+      "text_ratio": 0.955986,
+      "vision_ratio": 0.044014
+    },
+    "middle": {
+      "mdi": 16.398689,
+      "aei_text": 3.458371,
+      "aei_vision": 0.210893,
+      "text_ratio": 0.942524,
+      "vision_ratio": 0.057476
+    },
+    "late": {
+      "mdi": 20.299888,
+      "aei_text": 3.567836,
+      "aei_vision": 0.175756,
+      "text_ratio": 0.953051,
+      "vision_ratio": 0.046949
+    },
+    "all": {
+      "mdi": 20.299888,
+      "aei_text": 3.541785,
+      "aei_vision": 0.184118,
+      "text_ratio": 0.953051,
+      "vision_ratio": 0.046949
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953051,
+      0.046949
+    ],
+    "text_vision_ratio": "0.953051:0.046949"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.720206,
+      "aei_text": 3.599149,
+      "aei_vision": 0.165705,
+      "text_ratio": 0.955986,
+      "vision_ratio": 0.044014
+    },
+    "middle": {
+      "mdi": 16.398689,
+      "aei_text": 3.458371,
+      "aei_vision": 0.210893,
+      "text_ratio": 0.942524,
+      "vision_ratio": 0.057476
+    },
+    "late": {
+      "mdi": 20.299888,
+      "aei_text": 3.567836,
+      "aei_vision": 0.175756,
+      "text_ratio": 0.953051,
+      "vision_ratio": 0.046949
+    },
+    "all": {
+      "mdi": 20.299888,
+      "aei_text": 3.541785,
+      "aei_vision": 0.184118,
+      "text_ratio": 0.953051,
+      "vision_ratio": 0.046949
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953051,
+      0.046949
+    ],
+    "text_vision_ratio": "0.953051:0.046949"
+  }
+}
+```
+
+
+## === Rollout Step 279 ===
+Step: 278/29790 | 2025-10-22 12:22:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.317 | 17.214 | 22.200 | 22.200 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.317069,
+      "aei_text": 3.15119,
+      "aei_vision": 0.135145,
+      "text_ratio": 0.958877,
+      "vision_ratio": 0.041123
+    },
+    "middle": {
+      "mdi": 17.213686,
+      "aei_text": 3.047049,
+      "aei_vision": 0.177013,
+      "text_ratio": 0.945096,
+      "vision_ratio": 0.054904
+    },
+    "late": {
+      "mdi": 22.200202,
+      "aei_text": 3.135982,
+      "aei_vision": 0.141259,
+      "text_ratio": 0.956897,
+      "vision_ratio": 0.043103
+    },
+    "all": {
+      "mdi": 22.200202,
+      "aei_text": 3.111407,
+      "aei_vision": 0.151139,
+      "text_ratio": 0.956897,
+      "vision_ratio": 0.043103
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956897,
+      0.043103
+    ],
+    "text_vision_ratio": "0.956897:0.043103"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.317069,
+      "aei_text": 3.15119,
+      "aei_vision": 0.135145,
+      "text_ratio": 0.958877,
+      "vision_ratio": 0.041123
+    },
+    "middle": {
+      "mdi": 17.213686,
+      "aei_text": 3.047049,
+      "aei_vision": 0.177013,
+      "text_ratio": 0.945096,
+      "vision_ratio": 0.054904
+    },
+    "late": {
+      "mdi": 22.200202,
+      "aei_text": 3.135982,
+      "aei_vision": 0.141259,
+      "text_ratio": 0.956897,
+      "vision_ratio": 0.043103
+    },
+    "all": {
+      "mdi": 22.200202,
+      "aei_text": 3.111407,
+      "aei_vision": 0.151139,
+      "text_ratio": 0.956897,
+      "vision_ratio": 0.043103
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956897,
+      0.043103
+    ],
+    "text_vision_ratio": "0.956897:0.043103"
+  }
+}
+```
+
+
+## === Rollout Step 280 ===
+Step: 279/29790 | 2025-10-22 12:22:26
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.359 | 8.377 | 17.316 | 17.316 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.359344,
+      "aei_text": 2.834702,
+      "aei_vision": 0.212189,
+      "text_ratio": 0.930359,
+      "vision_ratio": 0.069641
+    },
+    "middle": {
+      "mdi": 8.376911,
+      "aei_text": 2.604722,
+      "aei_vision": 0.310941,
+      "text_ratio": 0.893355,
+      "vision_ratio": 0.106645
+    },
+    "late": {
+      "mdi": 17.316049,
+      "aei_text": 2.93423,
+      "aei_vision": 0.169451,
+      "text_ratio": 0.945403,
+      "vision_ratio": 0.054597
+    },
+    "all": {
+      "mdi": 17.316049,
+      "aei_text": 2.791218,
+      "aei_vision": 0.23086,
+      "text_ratio": 0.945403,
+      "vision_ratio": 0.054597
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945403,
+      0.054597
+    ],
+    "text_vision_ratio": "0.945403:0.054597"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.359344,
+      "aei_text": 2.834702,
+      "aei_vision": 0.212189,
+      "text_ratio": 0.930359,
+      "vision_ratio": 0.069641
+    },
+    "middle": {
+      "mdi": 8.376911,
+      "aei_text": 2.604722,
+      "aei_vision": 0.310941,
+      "text_ratio": 0.893355,
+      "vision_ratio": 0.106645
+    },
+    "late": {
+      "mdi": 17.316049,
+      "aei_text": 2.93423,
+      "aei_vision": 0.169451,
+      "text_ratio": 0.945403,
+      "vision_ratio": 0.054597
+    },
+    "all": {
+      "mdi": 17.316049,
+      "aei_text": 2.791218,
+      "aei_vision": 0.23086,
+      "text_ratio": 0.945403,
+      "vision_ratio": 0.054597
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945403,
+      0.054597
+    ],
+    "text_vision_ratio": "0.945403:0.054597"
+  }
+}
+```
+
+
+## === Rollout Step 281 ===
+Step: 280/29790 | 2025-10-22 12:22:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.841 | 7.002 | 15.228 | 15.228 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 278.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 278.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 278,
+    "text_tokens": 0,
+    "total_tokens": 278
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.841051,
+      "aei_text": 2.412629,
+      "aei_vision": 0.222546,
+      "text_ratio": 0.915548,
+      "vision_ratio": 0.084452
+    },
+    "middle": {
+      "mdi": 7.001637,
+      "aei_text": 2.236579,
+      "aei_vision": 0.319437,
+      "text_ratio": 0.875026,
+      "vision_ratio": 0.124974
+    },
+    "late": {
+      "mdi": 15.227659,
+      "aei_text": 2.516696,
+      "aei_vision": 0.165271,
+      "text_ratio": 0.938377,
+      "vision_ratio": 0.061623
+    },
+    "all": {
+      "mdi": 15.227659,
+      "aei_text": 2.388635,
+      "aei_vision": 0.235751,
+      "text_ratio": 0.938377,
+      "vision_ratio": 0.061623
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938377,
+      0.061623
+    ],
+    "text_vision_ratio": "0.938377:0.061623"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 278,
+    "text_tokens": 0,
+    "total_tokens": 278
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.841051,
+      "aei_text": 2.412629,
+      "aei_vision": 0.222546,
+      "text_ratio": 0.915548,
+      "vision_ratio": 0.084452
+    },
+    "middle": {
+      "mdi": 7.001637,
+      "aei_text": 2.236579,
+      "aei_vision": 0.319437,
+      "text_ratio": 0.875026,
+      "vision_ratio": 0.124974
+    },
+    "late": {
+      "mdi": 15.227659,
+      "aei_text": 2.516696,
+      "aei_vision": 0.165271,
+      "text_ratio": 0.938377,
+      "vision_ratio": 0.061623
+    },
+    "all": {
+      "mdi": 15.227659,
+      "aei_text": 2.388635,
+      "aei_vision": 0.235751,
+      "text_ratio": 0.938377,
+      "vision_ratio": 0.061623
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938377,
+      0.061623
+    ],
+    "text_vision_ratio": "0.938377:0.061623"
+  }
+}
+```
+
+
+## === Rollout Step 282 ===
+Step: 281/29790 | 2025-10-22 12:22:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.519 | 9.689 | 16.153 | 16.153 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.518753,
+      "aei_text": 3.114375,
+      "aei_vision": 0.214507,
+      "text_ratio": 0.935562,
+      "vision_ratio": 0.064438
+    },
+    "middle": {
+      "mdi": 9.688872,
+      "aei_text": 2.88912,
+      "aei_vision": 0.29819,
+      "text_ratio": 0.906445,
+      "vision_ratio": 0.093555
+    },
+    "late": {
+      "mdi": 16.153293,
+      "aei_text": 3.164457,
+      "aei_vision": 0.195902,
+      "text_ratio": 0.941702,
+      "vision_ratio": 0.058298
+    },
+    "all": {
+      "mdi": 16.153293,
+      "aei_text": 3.055984,
+      "aei_vision": 0.236199,
+      "text_ratio": 0.941702,
+      "vision_ratio": 0.058298
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941702,
+      0.058298
+    ],
+    "text_vision_ratio": "0.941702:0.058298"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.518753,
+      "aei_text": 3.114375,
+      "aei_vision": 0.214507,
+      "text_ratio": 0.935562,
+      "vision_ratio": 0.064438
+    },
+    "middle": {
+      "mdi": 9.688872,
+      "aei_text": 2.88912,
+      "aei_vision": 0.29819,
+      "text_ratio": 0.906445,
+      "vision_ratio": 0.093555
+    },
+    "late": {
+      "mdi": 16.153293,
+      "aei_text": 3.164457,
+      "aei_vision": 0.195902,
+      "text_ratio": 0.941702,
+      "vision_ratio": 0.058298
+    },
+    "all": {
+      "mdi": 16.153293,
+      "aei_text": 3.055984,
+      "aei_vision": 0.236199,
+      "text_ratio": 0.941702,
+      "vision_ratio": 0.058298
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941702,
+      0.058298
+    ],
+    "text_vision_ratio": "0.941702:0.058298"
+  }
+}
+```
+
+
+## === Rollout Step 283 ===
+Step: 282/29790 | 2025-10-22 12:22:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.545 | 11.298 | 19.039 | 19.039 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 296.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 296.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 296,
+    "text_tokens": 0,
+    "total_tokens": 296
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.544656,
+      "aei_text": 2.666411,
+      "aei_vision": 0.161165,
+      "text_ratio": 0.943003,
+      "vision_ratio": 0.056997
+    },
+    "middle": {
+      "mdi": 11.298049,
+      "aei_text": 2.539966,
+      "aei_vision": 0.224815,
+      "text_ratio": 0.918686,
+      "vision_ratio": 0.081314
+    },
+    "late": {
+      "mdi": 19.039358,
+      "aei_text": 2.704399,
+      "aei_vision": 0.142043,
+      "text_ratio": 0.950098,
+      "vision_ratio": 0.049902
+    },
+    "all": {
+      "mdi": 19.039358,
+      "aei_text": 2.636925,
+      "aei_vision": 0.176007,
+      "text_ratio": 0.950098,
+      "vision_ratio": 0.049902
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950098,
+      0.049902
+    ],
+    "text_vision_ratio": "0.950098:0.049902"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 296,
+    "text_tokens": 0,
+    "total_tokens": 296
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.544656,
+      "aei_text": 2.666411,
+      "aei_vision": 0.161165,
+      "text_ratio": 0.943003,
+      "vision_ratio": 0.056997
+    },
+    "middle": {
+      "mdi": 11.298049,
+      "aei_text": 2.539966,
+      "aei_vision": 0.224815,
+      "text_ratio": 0.918686,
+      "vision_ratio": 0.081314
+    },
+    "late": {
+      "mdi": 19.039358,
+      "aei_text": 2.704399,
+      "aei_vision": 0.142043,
+      "text_ratio": 0.950098,
+      "vision_ratio": 0.049902
+    },
+    "all": {
+      "mdi": 19.039358,
+      "aei_text": 2.636925,
+      "aei_vision": 0.176007,
+      "text_ratio": 0.950098,
+      "vision_ratio": 0.049902
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950098,
+      0.049902
+    ],
+    "text_vision_ratio": "0.950098:0.049902"
+  }
+}
+```
+
+
+## === Rollout Step 284 ===
+Step: 283/29790 | 2025-10-22 12:22:39
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.415 | 7.078 | 19.323 | 19.323 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.414585,
+      "aei_text": 2.805461,
+      "aei_vision": 0.209135,
+      "text_ratio": 0.930626,
+      "vision_ratio": 0.069374
+    },
+    "middle": {
+      "mdi": 7.078386,
+      "aei_text": 2.482309,
+      "aei_vision": 0.350689,
+      "text_ratio": 0.876213,
+      "vision_ratio": 0.123787
+    },
+    "late": {
+      "mdi": 19.323302,
+      "aei_text": 2.936027,
+      "aei_vision": 0.151942,
+      "text_ratio": 0.950795,
+      "vision_ratio": 0.049205
+    },
+    "all": {
+      "mdi": 19.323302,
+      "aei_text": 2.741266,
+      "aei_vision": 0.237255,
+      "text_ratio": 0.950795,
+      "vision_ratio": 0.049205
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950795,
+      0.049205
+    ],
+    "text_vision_ratio": "0.950795:0.049205"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.414585,
+      "aei_text": 2.805461,
+      "aei_vision": 0.209135,
+      "text_ratio": 0.930626,
+      "vision_ratio": 0.069374
+    },
+    "middle": {
+      "mdi": 7.078386,
+      "aei_text": 2.482309,
+      "aei_vision": 0.350689,
+      "text_ratio": 0.876213,
+      "vision_ratio": 0.123787
+    },
+    "late": {
+      "mdi": 19.323302,
+      "aei_text": 2.936027,
+      "aei_vision": 0.151942,
+      "text_ratio": 0.950795,
+      "vision_ratio": 0.049205
+    },
+    "all": {
+      "mdi": 19.323302,
+      "aei_text": 2.741266,
+      "aei_vision": 0.237255,
+      "text_ratio": 0.950795,
+      "vision_ratio": 0.049205
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950795,
+      0.049205
+    ],
+    "text_vision_ratio": "0.950795:0.049205"
+  }
+}
+```
+
+
+## === Rollout Step 285 ===
+Step: 284/29790 | 2025-10-22 12:22:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.099 | 10.743 | 15.174 | 15.174 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.098858,
+      "aei_text": 2.915188,
+      "aei_vision": 0.16107,
+      "text_ratio": 0.947641,
+      "vision_ratio": 0.052359
+    },
+    "middle": {
+      "mdi": 10.743114,
+      "aei_text": 2.707546,
+      "aei_vision": 0.252026,
+      "text_ratio": 0.914844,
+      "vision_ratio": 0.085156
+    },
+    "late": {
+      "mdi": 15.173541,
+      "aei_text": 2.853569,
+      "aei_vision": 0.188062,
+      "text_ratio": 0.938171,
+      "vision_ratio": 0.061829
+    },
+    "all": {
+      "mdi": 15.173541,
+      "aei_text": 2.825434,
+      "aei_vision": 0.200386,
+      "text_ratio": 0.938171,
+      "vision_ratio": 0.061829
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938171,
+      0.061829
+    ],
+    "text_vision_ratio": "0.938171:0.061829"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.098858,
+      "aei_text": 2.915188,
+      "aei_vision": 0.16107,
+      "text_ratio": 0.947641,
+      "vision_ratio": 0.052359
+    },
+    "middle": {
+      "mdi": 10.743114,
+      "aei_text": 2.707546,
+      "aei_vision": 0.252026,
+      "text_ratio": 0.914844,
+      "vision_ratio": 0.085156
+    },
+    "late": {
+      "mdi": 15.173541,
+      "aei_text": 2.853569,
+      "aei_vision": 0.188062,
+      "text_ratio": 0.938171,
+      "vision_ratio": 0.061829
+    },
+    "all": {
+      "mdi": 15.173541,
+      "aei_text": 2.825434,
+      "aei_vision": 0.200386,
+      "text_ratio": 0.938171,
+      "vision_ratio": 0.061829
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938171,
+      0.061829
+    ],
+    "text_vision_ratio": "0.938171:0.061829"
+  }
+}
+```
+
+
+## === Rollout Step 286 ===
+Step: 285/29790 | 2025-10-22 12:22:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.918 | 9.709 | 17.264 | 17.264 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.917603,
+      "aei_text": 2.968551,
+      "aei_vision": 0.149042,
+      "text_ratio": 0.952193,
+      "vision_ratio": 0.047807
+    },
+    "middle": {
+      "mdi": 9.708687,
+      "aei_text": 2.675766,
+      "aei_vision": 0.275605,
+      "text_ratio": 0.906618,
+      "vision_ratio": 0.093382
+    },
+    "late": {
+      "mdi": 17.26448,
+      "aei_text": 2.921827,
+      "aei_vision": 0.169239,
+      "text_ratio": 0.945249,
+      "vision_ratio": 0.054751
+    },
+    "all": {
+      "mdi": 17.26448,
+      "aei_text": 2.855381,
+      "aei_vision": 0.197962,
+      "text_ratio": 0.945249,
+      "vision_ratio": 0.054751
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945249,
+      0.054751
+    ],
+    "text_vision_ratio": "0.945249:0.054751"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.917603,
+      "aei_text": 2.968551,
+      "aei_vision": 0.149042,
+      "text_ratio": 0.952193,
+      "vision_ratio": 0.047807
+    },
+    "middle": {
+      "mdi": 9.708687,
+      "aei_text": 2.675766,
+      "aei_vision": 0.275605,
+      "text_ratio": 0.906618,
+      "vision_ratio": 0.093382
+    },
+    "late": {
+      "mdi": 17.26448,
+      "aei_text": 2.921827,
+      "aei_vision": 0.169239,
+      "text_ratio": 0.945249,
+      "vision_ratio": 0.054751
+    },
+    "all": {
+      "mdi": 17.26448,
+      "aei_text": 2.855381,
+      "aei_vision": 0.197962,
+      "text_ratio": 0.945249,
+      "vision_ratio": 0.054751
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945249,
+      0.054751
+    ],
+    "text_vision_ratio": "0.945249:0.054751"
+  }
+}
+```
+
+
+## === Rollout Step 287 ===
+Step: 286/29790 | 2025-10-22 12:22:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.516 | 8.720 | 22.124 | 22.124 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.516415,
+      "aei_text": 3.161528,
+      "aei_vision": 0.180489,
+      "text_ratio": 0.945994,
+      "vision_ratio": 0.054006
+    },
+    "middle": {
+      "mdi": 8.719638,
+      "aei_text": 2.792797,
+      "aei_vision": 0.320288,
+      "text_ratio": 0.897116,
+      "vision_ratio": 0.102884
+    },
+    "late": {
+      "mdi": 22.124064,
+      "aei_text": 3.250112,
+      "aei_vision": 0.146904,
+      "text_ratio": 0.956755,
+      "vision_ratio": 0.043245
+    },
+    "all": {
+      "mdi": 22.124064,
+      "aei_text": 3.068146,
+      "aei_vision": 0.215894,
+      "text_ratio": 0.956755,
+      "vision_ratio": 0.043245
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956755,
+      0.043245
+    ],
+    "text_vision_ratio": "0.956755:0.043245"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.516415,
+      "aei_text": 3.161528,
+      "aei_vision": 0.180489,
+      "text_ratio": 0.945994,
+      "vision_ratio": 0.054006
+    },
+    "middle": {
+      "mdi": 8.719638,
+      "aei_text": 2.792797,
+      "aei_vision": 0.320288,
+      "text_ratio": 0.897116,
+      "vision_ratio": 0.102884
+    },
+    "late": {
+      "mdi": 22.124064,
+      "aei_text": 3.250112,
+      "aei_vision": 0.146904,
+      "text_ratio": 0.956755,
+      "vision_ratio": 0.043245
+    },
+    "all": {
+      "mdi": 22.124064,
+      "aei_text": 3.068146,
+      "aei_vision": 0.215894,
+      "text_ratio": 0.956755,
+      "vision_ratio": 0.043245
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956755,
+      0.043245
+    ],
+    "text_vision_ratio": "0.956755:0.043245"
+  }
+}
+```
+
+
+## === Rollout Step 288 ===
+Step: 287/29790 | 2025-10-22 12:22:52
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.963 | 7.037 | 12.434 | 12.434 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.963487,
+      "aei_text": 2.200316,
+      "aei_vision": 0.157576,
+      "text_ratio": 0.933171,
+      "vision_ratio": 0.066829
+    },
+    "middle": {
+      "mdi": 7.037435,
+      "aei_text": 2.016554,
+      "aei_vision": 0.286547,
+      "text_ratio": 0.875582,
+      "vision_ratio": 0.124418
+    },
+    "late": {
+      "mdi": 12.434138,
+      "aei_text": 2.17554,
+      "aei_vision": 0.174965,
+      "text_ratio": 0.925563,
+      "vision_ratio": 0.074437
+    },
+    "all": {
+      "mdi": 12.434138,
+      "aei_text": 2.130803,
+      "aei_vision": 0.206363,
+      "text_ratio": 0.925563,
+      "vision_ratio": 0.074437
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.925563,
+      0.074437
+    ],
+    "text_vision_ratio": "0.925563:0.074437"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.963487,
+      "aei_text": 2.200316,
+      "aei_vision": 0.157576,
+      "text_ratio": 0.933171,
+      "vision_ratio": 0.066829
+    },
+    "middle": {
+      "mdi": 7.037435,
+      "aei_text": 2.016554,
+      "aei_vision": 0.286547,
+      "text_ratio": 0.875582,
+      "vision_ratio": 0.124418
+    },
+    "late": {
+      "mdi": 12.434138,
+      "aei_text": 2.17554,
+      "aei_vision": 0.174965,
+      "text_ratio": 0.925563,
+      "vision_ratio": 0.074437
+    },
+    "all": {
+      "mdi": 12.434138,
+      "aei_text": 2.130803,
+      "aei_vision": 0.206363,
+      "text_ratio": 0.925563,
+      "vision_ratio": 0.074437
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.925563,
+      0.074437
+    ],
+    "text_vision_ratio": "0.925563:0.074437"
+  }
+}
+```
+
+
+## === Rollout Step 289 ===
+Step: 288/29790 | 2025-10-22 12:22:56
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 29.705 | 20.447 | 22.233 | 22.233 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 486.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 486.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 29.705299,
+      "aei_text": 3.709029,
+      "aei_vision": 0.124861,
+      "text_ratio": 0.967432,
+      "vision_ratio": 0.032568
+    },
+    "middle": {
+      "mdi": 20.447148,
+      "aei_text": 3.557034,
+      "aei_vision": 0.173962,
+      "text_ratio": 0.953374,
+      "vision_ratio": 0.046626
+    },
+    "late": {
+      "mdi": 22.232644,
+      "aei_text": 3.594996,
+      "aei_vision": 0.161699,
+      "text_ratio": 0.956957,
+      "vision_ratio": 0.043043
+    },
+    "all": {
+      "mdi": 22.232644,
+      "aei_text": 3.620353,
+      "aei_vision": 0.153507,
+      "text_ratio": 0.956957,
+      "vision_ratio": 0.043043
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956957,
+      0.043043
+    ],
+    "text_vision_ratio": "0.956957:0.043043"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 29.705299,
+      "aei_text": 3.709029,
+      "aei_vision": 0.124861,
+      "text_ratio": 0.967432,
+      "vision_ratio": 0.032568
+    },
+    "middle": {
+      "mdi": 20.447148,
+      "aei_text": 3.557034,
+      "aei_vision": 0.173962,
+      "text_ratio": 0.953374,
+      "vision_ratio": 0.046626
+    },
+    "late": {
+      "mdi": 22.232644,
+      "aei_text": 3.594996,
+      "aei_vision": 0.161699,
+      "text_ratio": 0.956957,
+      "vision_ratio": 0.043043
+    },
+    "all": {
+      "mdi": 22.232644,
+      "aei_text": 3.620353,
+      "aei_vision": 0.153507,
+      "text_ratio": 0.956957,
+      "vision_ratio": 0.043043
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956957,
+      0.043043
+    ],
+    "text_vision_ratio": "0.956957:0.043043"
+  }
+}
+```
+
+
+## === Rollout Step 290 ===
+Step: 289/29790 | 2025-10-22 12:23:00
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.371 | 16.789 | 16.404 | 16.404 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.371131,
+      "aei_text": 2.792185,
+      "aei_vision": 0.194291,
+      "text_ratio": 0.934943,
+      "vision_ratio": 0.065057
+    },
+    "middle": {
+      "mdi": 16.788681,
+      "aei_text": 2.847137,
+      "aei_vision": 0.169587,
+      "text_ratio": 0.943784,
+      "vision_ratio": 0.056216
+    },
+    "late": {
+      "mdi": 16.403734,
+      "aei_text": 2.839342,
+      "aei_vision": 0.173091,
+      "text_ratio": 0.942541,
+      "vision_ratio": 0.057459
+    },
+    "all": {
+      "mdi": 16.403734,
+      "aei_text": 2.826222,
+      "aei_vision": 0.17899,
+      "text_ratio": 0.942541,
+      "vision_ratio": 0.057459
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942541,
+      0.057459
+    ],
+    "text_vision_ratio": "0.942541:0.057459"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.371131,
+      "aei_text": 2.792185,
+      "aei_vision": 0.194291,
+      "text_ratio": 0.934943,
+      "vision_ratio": 0.065057
+    },
+    "middle": {
+      "mdi": 16.788681,
+      "aei_text": 2.847137,
+      "aei_vision": 0.169587,
+      "text_ratio": 0.943784,
+      "vision_ratio": 0.056216
+    },
+    "late": {
+      "mdi": 16.403734,
+      "aei_text": 2.839342,
+      "aei_vision": 0.173091,
+      "text_ratio": 0.942541,
+      "vision_ratio": 0.057459
+    },
+    "all": {
+      "mdi": 16.403734,
+      "aei_text": 2.826222,
+      "aei_vision": 0.17899,
+      "text_ratio": 0.942541,
+      "vision_ratio": 0.057459
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942541,
+      0.057459
+    ],
+    "text_vision_ratio": "0.942541:0.057459"
+  }
+}
+```
+
+
+## === Rollout Step 291 ===
+Step: 290/29790 | 2025-10-22 12:23:03
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.865 | 8.655 | 11.521 | 11.521 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.8647,
+      "aei_text": 2.163879,
+      "aei_vision": 0.199166,
+      "text_ratio": 0.915716,
+      "vision_ratio": 0.084284
+    },
+    "middle": {
+      "mdi": 8.655495,
+      "aei_text": 2.100621,
+      "aei_vision": 0.242692,
+      "text_ratio": 0.896432,
+      "vision_ratio": 0.103568
+    },
+    "late": {
+      "mdi": 11.521462,
+      "aei_text": 2.17853,
+      "aei_vision": 0.189085,
+      "text_ratio": 0.920137,
+      "vision_ratio": 0.079863
+    },
+    "all": {
+      "mdi": 11.521462,
+      "aei_text": 2.147677,
+      "aei_vision": 0.210314,
+      "text_ratio": 0.920137,
+      "vision_ratio": 0.079863
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.920137,
+      0.079863
+    ],
+    "text_vision_ratio": "0.920137:0.079863"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.8647,
+      "aei_text": 2.163879,
+      "aei_vision": 0.199166,
+      "text_ratio": 0.915716,
+      "vision_ratio": 0.084284
+    },
+    "middle": {
+      "mdi": 8.655495,
+      "aei_text": 2.100621,
+      "aei_vision": 0.242692,
+      "text_ratio": 0.896432,
+      "vision_ratio": 0.103568
+    },
+    "late": {
+      "mdi": 11.521462,
+      "aei_text": 2.17853,
+      "aei_vision": 0.189085,
+      "text_ratio": 0.920137,
+      "vision_ratio": 0.079863
+    },
+    "all": {
+      "mdi": 11.521462,
+      "aei_text": 2.147677,
+      "aei_vision": 0.210314,
+      "text_ratio": 0.920137,
+      "vision_ratio": 0.079863
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.920137,
+      0.079863
+    ],
+    "text_vision_ratio": "0.920137:0.079863"
+  }
+}
+```
+
+
+## === Rollout Step 292 ===
+Step: 291/29790 | 2025-10-22 12:23:06
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.182 | 12.415 | 18.221 | 18.221 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.181866,
+      "aei_text": 2.850153,
+      "aei_vision": 0.216218,
+      "text_ratio": 0.929487,
+      "vision_ratio": 0.070513
+    },
+    "middle": {
+      "mdi": 12.414531,
+      "aei_text": 2.823646,
+      "aei_vision": 0.227447,
+      "text_ratio": 0.925454,
+      "vision_ratio": 0.074546
+    },
+    "late": {
+      "mdi": 18.221087,
+      "aei_text": 2.975117,
+      "aei_vision": 0.163279,
+      "text_ratio": 0.947974,
+      "vision_ratio": 0.052026
+    },
+    "all": {
+      "mdi": 18.221087,
+      "aei_text": 2.882972,
+      "aei_vision": 0.202314,
+      "text_ratio": 0.947974,
+      "vision_ratio": 0.052026
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947974,
+      0.052026
+    ],
+    "text_vision_ratio": "0.947974:0.052026"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.181866,
+      "aei_text": 2.850153,
+      "aei_vision": 0.216218,
+      "text_ratio": 0.929487,
+      "vision_ratio": 0.070513
+    },
+    "middle": {
+      "mdi": 12.414531,
+      "aei_text": 2.823646,
+      "aei_vision": 0.227447,
+      "text_ratio": 0.925454,
+      "vision_ratio": 0.074546
+    },
+    "late": {
+      "mdi": 18.221087,
+      "aei_text": 2.975117,
+      "aei_vision": 0.163279,
+      "text_ratio": 0.947974,
+      "vision_ratio": 0.052026
+    },
+    "all": {
+      "mdi": 18.221087,
+      "aei_text": 2.882972,
+      "aei_vision": 0.202314,
+      "text_ratio": 0.947974,
+      "vision_ratio": 0.052026
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947974,
+      0.052026
+    ],
+    "text_vision_ratio": "0.947974:0.052026"
+  }
+}
+```
+
+
+## === Rollout Step 293 ===
+Step: 292/29790 | 2025-10-22 12:23:09
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.528 | 13.070 | 17.299 | 17.299 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.527677,
+      "aei_text": 2.587596,
+      "aei_vision": 0.166644,
+      "text_ratio": 0.939495,
+      "vision_ratio": 0.060505
+    },
+    "middle": {
+      "mdi": 13.069546,
+      "aei_text": 2.535482,
+      "aei_vision": 0.193999,
+      "text_ratio": 0.928925,
+      "vision_ratio": 0.071075
+    },
+    "late": {
+      "mdi": 17.298544,
+      "aei_text": 2.616871,
+      "aei_vision": 0.151277,
+      "text_ratio": 0.945351,
+      "vision_ratio": 0.054649
+    },
+    "all": {
+      "mdi": 17.298544,
+      "aei_text": 2.579983,
+      "aei_vision": 0.17064,
+      "text_ratio": 0.945351,
+      "vision_ratio": 0.054649
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945351,
+      0.054649
+    ],
+    "text_vision_ratio": "0.945351:0.054649"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.527677,
+      "aei_text": 2.587596,
+      "aei_vision": 0.166644,
+      "text_ratio": 0.939495,
+      "vision_ratio": 0.060505
+    },
+    "middle": {
+      "mdi": 13.069546,
+      "aei_text": 2.535482,
+      "aei_vision": 0.193999,
+      "text_ratio": 0.928925,
+      "vision_ratio": 0.071075
+    },
+    "late": {
+      "mdi": 17.298544,
+      "aei_text": 2.616871,
+      "aei_vision": 0.151277,
+      "text_ratio": 0.945351,
+      "vision_ratio": 0.054649
+    },
+    "all": {
+      "mdi": 17.298544,
+      "aei_text": 2.579983,
+      "aei_vision": 0.17064,
+      "text_ratio": 0.945351,
+      "vision_ratio": 0.054649
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945351,
+      0.054649
+    ],
+    "text_vision_ratio": "0.945351:0.054649"
+  }
+}
+```
+
+
+## === Rollout Step 294 ===
+Step: 293/29790 | 2025-10-22 12:23:13
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.458 | 7.360 | 18.333 | 18.333 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.458113,
+      "aei_text": 3.076365,
+      "aei_vision": 0.212778,
+      "text_ratio": 0.935309,
+      "vision_ratio": 0.064691
+    },
+    "middle": {
+      "mdi": 7.360488,
+      "aei_text": 2.677956,
+      "aei_vision": 0.363829,
+      "text_ratio": 0.88039,
+      "vision_ratio": 0.11961
+    },
+    "late": {
+      "mdi": 18.332832,
+      "aei_text": 3.180062,
+      "aei_vision": 0.173463,
+      "text_ratio": 0.948275,
+      "vision_ratio": 0.051725
+    },
+    "all": {
+      "mdi": 18.332832,
+      "aei_text": 2.978127,
+      "aei_vision": 0.250023,
+      "text_ratio": 0.948275,
+      "vision_ratio": 0.051725
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948275,
+      0.051725
+    ],
+    "text_vision_ratio": "0.948275:0.051725"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.458113,
+      "aei_text": 3.076365,
+      "aei_vision": 0.212778,
+      "text_ratio": 0.935309,
+      "vision_ratio": 0.064691
+    },
+    "middle": {
+      "mdi": 7.360488,
+      "aei_text": 2.677956,
+      "aei_vision": 0.363829,
+      "text_ratio": 0.88039,
+      "vision_ratio": 0.11961
+    },
+    "late": {
+      "mdi": 18.332832,
+      "aei_text": 3.180062,
+      "aei_vision": 0.173463,
+      "text_ratio": 0.948275,
+      "vision_ratio": 0.051725
+    },
+    "all": {
+      "mdi": 18.332832,
+      "aei_text": 2.978127,
+      "aei_vision": 0.250023,
+      "text_ratio": 0.948275,
+      "vision_ratio": 0.051725
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948275,
+      0.051725
+    ],
+    "text_vision_ratio": "0.948275:0.051725"
+  }
+}
+```
+
+
+## === Rollout Step 295 ===
+Step: 294/29790 | 2025-10-22 12:23:16
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 22.356 | 10.586 | 19.816 | 19.816 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.356014,
+      "aei_text": 2.955376,
+      "aei_vision": 0.132196,
+      "text_ratio": 0.957184,
+      "vision_ratio": 0.042816
+    },
+    "middle": {
+      "mdi": 10.585638,
+      "aei_text": 2.682296,
+      "aei_vision": 0.25339,
+      "text_ratio": 0.913686,
+      "vision_ratio": 0.086314
+    },
+    "late": {
+      "mdi": 19.815559,
+      "aei_text": 2.921087,
+      "aei_vision": 0.147414,
+      "text_ratio": 0.951959,
+      "vision_ratio": 0.048041
+    },
+    "all": {
+      "mdi": 19.815559,
+      "aei_text": 2.85292,
+      "aei_vision": 0.177667,
+      "text_ratio": 0.951959,
+      "vision_ratio": 0.048041
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951959,
+      0.048041
+    ],
+    "text_vision_ratio": "0.951959:0.048041"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.356014,
+      "aei_text": 2.955376,
+      "aei_vision": 0.132196,
+      "text_ratio": 0.957184,
+      "vision_ratio": 0.042816
+    },
+    "middle": {
+      "mdi": 10.585638,
+      "aei_text": 2.682296,
+      "aei_vision": 0.25339,
+      "text_ratio": 0.913686,
+      "vision_ratio": 0.086314
+    },
+    "late": {
+      "mdi": 19.815559,
+      "aei_text": 2.921087,
+      "aei_vision": 0.147414,
+      "text_ratio": 0.951959,
+      "vision_ratio": 0.048041
+    },
+    "all": {
+      "mdi": 19.815559,
+      "aei_text": 2.85292,
+      "aei_vision": 0.177667,
+      "text_ratio": 0.951959,
+      "vision_ratio": 0.048041
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951959,
+      0.048041
+    ],
+    "text_vision_ratio": "0.951959:0.048041"
+  }
+}
+```
+
+
+## === Rollout Step 296 ===
+Step: 295/29790 | 2025-10-22 12:23:20
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.364 | 12.984 | 22.125 | 22.125 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.364435,
+      "aei_text": 3.143021,
+      "aei_vision": 0.171147,
+      "text_ratio": 0.948359,
+      "vision_ratio": 0.051641
+    },
+    "middle": {
+      "mdi": 12.984198,
+      "aei_text": 2.99011,
+      "aei_vision": 0.230288,
+      "text_ratio": 0.928491,
+      "vision_ratio": 0.071509
+    },
+    "late": {
+      "mdi": 22.125406,
+      "aei_text": 3.21037,
+      "aei_vision": 0.145099,
+      "text_ratio": 0.956758,
+      "vision_ratio": 0.043242
+    },
+    "all": {
+      "mdi": 22.125406,
+      "aei_text": 3.1145,
+      "aei_vision": 0.182178,
+      "text_ratio": 0.956758,
+      "vision_ratio": 0.043242
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956758,
+      0.043242
+    ],
+    "text_vision_ratio": "0.956758:0.043242"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.364435,
+      "aei_text": 3.143021,
+      "aei_vision": 0.171147,
+      "text_ratio": 0.948359,
+      "vision_ratio": 0.051641
+    },
+    "middle": {
+      "mdi": 12.984198,
+      "aei_text": 2.99011,
+      "aei_vision": 0.230288,
+      "text_ratio": 0.928491,
+      "vision_ratio": 0.071509
+    },
+    "late": {
+      "mdi": 22.125406,
+      "aei_text": 3.21037,
+      "aei_vision": 0.145099,
+      "text_ratio": 0.956758,
+      "vision_ratio": 0.043242
+    },
+    "all": {
+      "mdi": 22.125406,
+      "aei_text": 3.1145,
+      "aei_vision": 0.182178,
+      "text_ratio": 0.956758,
+      "vision_ratio": 0.043242
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956758,
+      0.043242
+    ],
+    "text_vision_ratio": "0.956758:0.043242"
+  }
+}
+```
+
+
+## === Rollout Step 297 ===
+Step: 296/29790 | 2025-10-22 12:23:24
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.296 | 10.153 | 21.144 | 21.144 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.296301,
+      "aei_text": 3.093311,
+      "aei_vision": 0.169068,
+      "text_ratio": 0.948177,
+      "vision_ratio": 0.051823
+    },
+    "middle": {
+      "mdi": 10.152605,
+      "aei_text": 2.819588,
+      "aei_vision": 0.277721,
+      "text_ratio": 0.910335,
+      "vision_ratio": 0.089665
+    },
+    "late": {
+      "mdi": 21.144156,
+      "aei_text": 3.144569,
+      "aei_vision": 0.148721,
+      "text_ratio": 0.954841,
+      "vision_ratio": 0.045159
+    },
+    "all": {
+      "mdi": 21.144156,
+      "aei_text": 3.019156,
+      "aei_vision": 0.198503,
+      "text_ratio": 0.954841,
+      "vision_ratio": 0.045159
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954841,
+      0.045159
+    ],
+    "text_vision_ratio": "0.954841:0.045159"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.296301,
+      "aei_text": 3.093311,
+      "aei_vision": 0.169068,
+      "text_ratio": 0.948177,
+      "vision_ratio": 0.051823
+    },
+    "middle": {
+      "mdi": 10.152605,
+      "aei_text": 2.819588,
+      "aei_vision": 0.277721,
+      "text_ratio": 0.910335,
+      "vision_ratio": 0.089665
+    },
+    "late": {
+      "mdi": 21.144156,
+      "aei_text": 3.144569,
+      "aei_vision": 0.148721,
+      "text_ratio": 0.954841,
+      "vision_ratio": 0.045159
+    },
+    "all": {
+      "mdi": 21.144156,
+      "aei_text": 3.019156,
+      "aei_vision": 0.198503,
+      "text_ratio": 0.954841,
+      "vision_ratio": 0.045159
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954841,
+      0.045159
+    ],
+    "text_vision_ratio": "0.954841:0.045159"
+  }
+}
+```
+
+
+## === Rollout Step 298 ===
+Step: 297/29790 | 2025-10-22 12:23:27
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.126 | 8.598 | 15.926 | 15.926 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.125528,
+      "aei_text": 2.874979,
+      "aei_vision": 0.167877,
+      "text_ratio": 0.944829,
+      "vision_ratio": 0.055171
+    },
+    "middle": {
+      "mdi": 8.597962,
+      "aei_text": 2.577712,
+      "aei_vision": 0.299805,
+      "text_ratio": 0.895811,
+      "vision_ratio": 0.104189
+    },
+    "late": {
+      "mdi": 15.925578,
+      "aei_text": 2.85001,
+      "aei_vision": 0.178958,
+      "text_ratio": 0.940918,
+      "vision_ratio": 0.059082
+    },
+    "all": {
+      "mdi": 15.925578,
+      "aei_text": 2.767567,
+      "aei_vision": 0.215547,
+      "text_ratio": 0.940918,
+      "vision_ratio": 0.059082
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940918,
+      0.059082
+    ],
+    "text_vision_ratio": "0.940918:0.059082"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.125528,
+      "aei_text": 2.874979,
+      "aei_vision": 0.167877,
+      "text_ratio": 0.944829,
+      "vision_ratio": 0.055171
+    },
+    "middle": {
+      "mdi": 8.597962,
+      "aei_text": 2.577712,
+      "aei_vision": 0.299805,
+      "text_ratio": 0.895811,
+      "vision_ratio": 0.104189
+    },
+    "late": {
+      "mdi": 15.925578,
+      "aei_text": 2.85001,
+      "aei_vision": 0.178958,
+      "text_ratio": 0.940918,
+      "vision_ratio": 0.059082
+    },
+    "all": {
+      "mdi": 15.925578,
+      "aei_text": 2.767567,
+      "aei_vision": 0.215547,
+      "text_ratio": 0.940918,
+      "vision_ratio": 0.059082
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940918,
+      0.059082
+    ],
+    "text_vision_ratio": "0.940918:0.059082"
+  }
+}
+```
+
+
+## === Rollout Step 299 ===
+Step: 298/29790 | 2025-10-22 12:23:30
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.444 | 11.401 | 18.441 | 18.441 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.443821,
+      "aei_text": 2.921308,
+      "aei_vision": 0.15839,
+      "text_ratio": 0.94857,
+      "vision_ratio": 0.05143
+    },
+    "middle": {
+      "mdi": 11.40123,
+      "aei_text": 2.735216,
+      "aei_vision": 0.239905,
+      "text_ratio": 0.919363,
+      "vision_ratio": 0.080637
+    },
+    "late": {
+      "mdi": 18.440926,
+      "aei_text": 2.921258,
+      "aei_vision": 0.158412,
+      "text_ratio": 0.948562,
+      "vision_ratio": 0.051438
+    },
+    "all": {
+      "mdi": 18.440926,
+      "aei_text": 2.859261,
+      "aei_vision": 0.185569,
+      "text_ratio": 0.948562,
+      "vision_ratio": 0.051438
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948562,
+      0.051438
+    ],
+    "text_vision_ratio": "0.948562:0.051438"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.443821,
+      "aei_text": 2.921308,
+      "aei_vision": 0.15839,
+      "text_ratio": 0.94857,
+      "vision_ratio": 0.05143
+    },
+    "middle": {
+      "mdi": 11.40123,
+      "aei_text": 2.735216,
+      "aei_vision": 0.239905,
+      "text_ratio": 0.919363,
+      "vision_ratio": 0.080637
+    },
+    "late": {
+      "mdi": 18.440926,
+      "aei_text": 2.921258,
+      "aei_vision": 0.158412,
+      "text_ratio": 0.948562,
+      "vision_ratio": 0.051438
+    },
+    "all": {
+      "mdi": 18.440926,
+      "aei_text": 2.859261,
+      "aei_vision": 0.185569,
+      "text_ratio": 0.948562,
+      "vision_ratio": 0.051438
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948562,
+      0.051438
+    ],
+    "text_vision_ratio": "0.948562:0.051438"
+  }
+}
+```
+
+
+## === Rollout Step 300 ===
+Step: 299/29790 | 2025-10-22 12:23:34
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.152 | 7.512 | 17.013 | 17.013 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.151509,
+      "aei_text": 3.020398,
+      "aei_vision": 0.213433,
+      "text_ratio": 0.934,
+      "vision_ratio": 0.066
+    },
+    "middle": {
+      "mdi": 7.512078,
+      "aei_text": 2.659319,
+      "aei_vision": 0.354006,
+      "text_ratio": 0.88252,
+      "vision_ratio": 0.11748
+    },
+    "late": {
+      "mdi": 17.012648,
+      "aei_text": 3.100503,
+      "aei_vision": 0.182247,
+      "text_ratio": 0.944483,
+      "vision_ratio": 0.055517
+    },
+    "all": {
+      "mdi": 17.012648,
+      "aei_text": 2.92674,
+      "aei_vision": 0.249895,
+      "text_ratio": 0.944483,
+      "vision_ratio": 0.055517
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944483,
+      0.055517
+    ],
+    "text_vision_ratio": "0.944483:0.055517"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.151509,
+      "aei_text": 3.020398,
+      "aei_vision": 0.213433,
+      "text_ratio": 0.934,
+      "vision_ratio": 0.066
+    },
+    "middle": {
+      "mdi": 7.512078,
+      "aei_text": 2.659319,
+      "aei_vision": 0.354006,
+      "text_ratio": 0.88252,
+      "vision_ratio": 0.11748
+    },
+    "late": {
+      "mdi": 17.012648,
+      "aei_text": 3.100503,
+      "aei_vision": 0.182247,
+      "text_ratio": 0.944483,
+      "vision_ratio": 0.055517
+    },
+    "all": {
+      "mdi": 17.012648,
+      "aei_text": 2.92674,
+      "aei_vision": 0.249895,
+      "text_ratio": 0.944483,
+      "vision_ratio": 0.055517
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944483,
+      0.055517
+    ],
+    "text_vision_ratio": "0.944483:0.055517"
+  }
+}
+```
+
+
+## === Rollout Step 301 ===
+Step: 300/29790 | 2025-10-22 12:23:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.503 | 9.706 | 15.296 | 15.296 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.502757,
+      "aei_text": 3.133153,
+      "aei_vision": 0.202103,
+      "text_ratio": 0.939404,
+      "vision_ratio": 0.060596
+    },
+    "middle": {
+      "mdi": 9.706399,
+      "aei_text": 2.880173,
+      "aei_vision": 0.296729,
+      "text_ratio": 0.906598,
+      "vision_ratio": 0.093402
+    },
+    "late": {
+      "mdi": 15.295986,
+      "aei_text": 3.126936,
+      "aei_vision": 0.204429,
+      "text_ratio": 0.938635,
+      "vision_ratio": 0.061365
+    },
+    "all": {
+      "mdi": 15.295986,
+      "aei_text": 3.046754,
+      "aei_vision": 0.23442,
+      "text_ratio": 0.938635,
+      "vision_ratio": 0.061365
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938635,
+      0.061365
+    ],
+    "text_vision_ratio": "0.938635:0.061365"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.502757,
+      "aei_text": 3.133153,
+      "aei_vision": 0.202103,
+      "text_ratio": 0.939404,
+      "vision_ratio": 0.060596
+    },
+    "middle": {
+      "mdi": 9.706399,
+      "aei_text": 2.880173,
+      "aei_vision": 0.296729,
+      "text_ratio": 0.906598,
+      "vision_ratio": 0.093402
+    },
+    "late": {
+      "mdi": 15.295986,
+      "aei_text": 3.126936,
+      "aei_vision": 0.204429,
+      "text_ratio": 0.938635,
+      "vision_ratio": 0.061365
+    },
+    "all": {
+      "mdi": 15.295986,
+      "aei_text": 3.046754,
+      "aei_vision": 0.23442,
+      "text_ratio": 0.938635,
+      "vision_ratio": 0.061365
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938635,
+      0.061365
+    ],
+    "text_vision_ratio": "0.938635:0.061365"
+  }
+}
+```
+
+
+## === Rollout Step 302 ===
+Step: 301/29790 | 2025-10-22 12:23:41
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.837 | 7.648 | 22.348 | 22.348 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.836915,
+      "aei_text": 3.094154,
+      "aei_vision": 0.195376,
+      "text_ratio": 0.940607,
+      "vision_ratio": 0.059393
+    },
+    "middle": {
+      "mdi": 7.648106,
+      "aei_text": 2.687943,
+      "aei_vision": 0.351452,
+      "text_ratio": 0.884368,
+      "vision_ratio": 0.115632
+    },
+    "late": {
+      "mdi": 22.348455,
+      "aei_text": 3.226857,
+      "aei_vision": 0.144388,
+      "text_ratio": 0.957171,
+      "vision_ratio": 0.042829
+    },
+    "all": {
+      "mdi": 22.348455,
+      "aei_text": 3.002984,
+      "aei_vision": 0.230405,
+      "text_ratio": 0.957171,
+      "vision_ratio": 0.042829
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957171,
+      0.042829
+    ],
+    "text_vision_ratio": "0.957171:0.042829"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.836915,
+      "aei_text": 3.094154,
+      "aei_vision": 0.195376,
+      "text_ratio": 0.940607,
+      "vision_ratio": 0.059393
+    },
+    "middle": {
+      "mdi": 7.648106,
+      "aei_text": 2.687943,
+      "aei_vision": 0.351452,
+      "text_ratio": 0.884368,
+      "vision_ratio": 0.115632
+    },
+    "late": {
+      "mdi": 22.348455,
+      "aei_text": 3.226857,
+      "aei_vision": 0.144388,
+      "text_ratio": 0.957171,
+      "vision_ratio": 0.042829
+    },
+    "all": {
+      "mdi": 22.348455,
+      "aei_text": 3.002984,
+      "aei_vision": 0.230405,
+      "text_ratio": 0.957171,
+      "vision_ratio": 0.042829
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957171,
+      0.042829
+    ],
+    "text_vision_ratio": "0.957171:0.042829"
+  }
+}
+```
+
+
+## === Rollout Step 303 ===
+Step: 302/29790 | 2025-10-22 12:23:45
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.014 | 15.044 | 51.634 | 51.634 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.014088,
+      "aei_text": 3.119505,
+      "aei_vision": 0.164063,
+      "text_ratio": 0.950035,
+      "vision_ratio": 0.049965
+    },
+    "middle": {
+      "mdi": 15.044248,
+      "aei_text": 3.025569,
+      "aei_vision": 0.201111,
+      "text_ratio": 0.937672,
+      "vision_ratio": 0.062328
+    },
+    "late": {
+      "mdi": 51.633994,
+      "aei_text": 3.37,
+      "aei_vision": 0.065267,
+      "text_ratio": 0.981001,
+      "vision_ratio": 0.018999
+    },
+    "all": {
+      "mdi": 51.633994,
+      "aei_text": 3.171692,
+      "aei_vision": 0.14348,
+      "text_ratio": 0.981001,
+      "vision_ratio": 0.018999
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.981001,
+      0.018999
+    ],
+    "text_vision_ratio": "0.981001:0.018999"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.014088,
+      "aei_text": 3.119505,
+      "aei_vision": 0.164063,
+      "text_ratio": 0.950035,
+      "vision_ratio": 0.049965
+    },
+    "middle": {
+      "mdi": 15.044248,
+      "aei_text": 3.025569,
+      "aei_vision": 0.201111,
+      "text_ratio": 0.937672,
+      "vision_ratio": 0.062328
+    },
+    "late": {
+      "mdi": 51.633994,
+      "aei_text": 3.37,
+      "aei_vision": 0.065267,
+      "text_ratio": 0.981001,
+      "vision_ratio": 0.018999
+    },
+    "all": {
+      "mdi": 51.633994,
+      "aei_text": 3.171692,
+      "aei_vision": 0.14348,
+      "text_ratio": 0.981001,
+      "vision_ratio": 0.018999
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.981001,
+      0.018999
+    ],
+    "text_vision_ratio": "0.981001:0.018999"
+  }
+}
+```
+
+
+## === Rollout Step 304 ===
+Step: 303/29790 | 2025-10-22 12:23:48
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.659 | 8.159 | 25.839 | 25.839 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.658908,
+      "aei_text": 2.961013,
+      "aei_vision": 0.189094,
+      "text_ratio": 0.939972,
+      "vision_ratio": 0.060028
+    },
+    "middle": {
+      "mdi": 8.158974,
+      "aei_text": 2.636769,
+      "aei_vision": 0.323174,
+      "text_ratio": 0.890817,
+      "vision_ratio": 0.109183
+    },
+    "late": {
+      "mdi": 25.838813,
+      "aei_text": 3.125756,
+      "aei_vision": 0.120971,
+      "text_ratio": 0.962741,
+      "vision_ratio": 0.037259
+    },
+    "all": {
+      "mdi": 25.838813,
+      "aei_text": 2.907846,
+      "aei_vision": 0.21108,
+      "text_ratio": 0.962741,
+      "vision_ratio": 0.037259
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962741,
+      0.037259
+    ],
+    "text_vision_ratio": "0.962741:0.037259"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.658908,
+      "aei_text": 2.961013,
+      "aei_vision": 0.189094,
+      "text_ratio": 0.939972,
+      "vision_ratio": 0.060028
+    },
+    "middle": {
+      "mdi": 8.158974,
+      "aei_text": 2.636769,
+      "aei_vision": 0.323174,
+      "text_ratio": 0.890817,
+      "vision_ratio": 0.109183
+    },
+    "late": {
+      "mdi": 25.838813,
+      "aei_text": 3.125756,
+      "aei_vision": 0.120971,
+      "text_ratio": 0.962741,
+      "vision_ratio": 0.037259
+    },
+    "all": {
+      "mdi": 25.838813,
+      "aei_text": 2.907846,
+      "aei_vision": 0.21108,
+      "text_ratio": 0.962741,
+      "vision_ratio": 0.037259
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962741,
+      0.037259
+    ],
+    "text_vision_ratio": "0.962741:0.037259"
+  }
+}
+```
+
+
+## === Rollout Step 305 ===
+Step: 304/29790 | 2025-10-22 12:23:52
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.110 | 8.963 | 21.000 | 21.000 |
+| MDI Std | 1.407 | 0.555 | 0.322 | 0.322 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.517639,
+      "aei_text": 3.171574,
+      "aei_vision": 0.154578,
+      "text_ratio": 0.953527,
+      "vision_ratio": 0.046473
+    },
+    "middle": {
+      "mdi": 9.518135,
+      "aei_text": 2.810238,
+      "aei_vision": 0.295251,
+      "text_ratio": 0.904926,
+      "vision_ratio": 0.095074
+    },
+    "late": {
+      "mdi": 21.321222,
+      "aei_text": 3.18493,
+      "aei_vision": 0.149378,
+      "text_ratio": 0.9552,
+      "vision_ratio": 0.0448
+    },
+    "all": {
+      "mdi": 21.321222,
+      "aei_text": 3.055581,
+      "aei_vision": 0.199736,
+      "text_ratio": 0.9552,
+      "vision_ratio": 0.0448
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.9552,
+      0.0448
+    ],
+    "text_vision_ratio": "0.955200:0.044800"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.703169,
+      "aei_text": 3.116449,
+      "aei_vision": 0.176039,
+      "text_ratio": 0.946533,
+      "vision_ratio": 0.053467
+    },
+    "middle": {
+      "mdi": 8.408393,
+      "aei_text": 2.733567,
+      "aei_vision": 0.3251,
+      "text_ratio": 0.893712,
+      "vision_ratio": 0.106288
+    },
+    "late": {
+      "mdi": 20.678137,
+      "aei_text": 3.174316,
+      "aei_vision": 0.153511,
+      "text_ratio": 0.953871,
+      "vision_ratio": 0.046129
+    },
+    "all": {
+      "mdi": 20.678137,
+      "aei_text": 3.00811,
+      "aei_vision": 0.218217,
+      "text_ratio": 0.953871,
+      "vision_ratio": 0.046129
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953871,
+      0.046129
+    ],
+    "text_vision_ratio": "0.953871:0.046129"
+  }
+}
+```
+
+
+## === Rollout Step 306 ===
+Step: 305/29790 | 2025-10-22 12:23:56
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.653 | 10.388 | 15.521 | 15.521 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.652667,
+      "aei_text": 2.954971,
+      "aei_vision": 0.177447,
+      "text_ratio": 0.943351,
+      "vision_ratio": 0.056649
+    },
+    "middle": {
+      "mdi": 10.388493,
+      "aei_text": 2.748013,
+      "aei_vision": 0.264525,
+      "text_ratio": 0.912192,
+      "vision_ratio": 0.087808
+    },
+    "late": {
+      "mdi": 15.520807,
+      "aei_text": 2.9283,
+      "aei_vision": 0.188669,
+      "text_ratio": 0.93947,
+      "vision_ratio": 0.06053
+    },
+    "all": {
+      "mdi": 15.520807,
+      "aei_text": 2.877095,
+      "aei_vision": 0.210214,
+      "text_ratio": 0.93947,
+      "vision_ratio": 0.06053
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93947,
+      0.06053
+    ],
+    "text_vision_ratio": "0.939470:0.060530"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.652667,
+      "aei_text": 2.954971,
+      "aei_vision": 0.177447,
+      "text_ratio": 0.943351,
+      "vision_ratio": 0.056649
+    },
+    "middle": {
+      "mdi": 10.388493,
+      "aei_text": 2.748013,
+      "aei_vision": 0.264525,
+      "text_ratio": 0.912192,
+      "vision_ratio": 0.087808
+    },
+    "late": {
+      "mdi": 15.520807,
+      "aei_text": 2.9283,
+      "aei_vision": 0.188669,
+      "text_ratio": 0.93947,
+      "vision_ratio": 0.06053
+    },
+    "all": {
+      "mdi": 15.520807,
+      "aei_text": 2.877095,
+      "aei_vision": 0.210214,
+      "text_ratio": 0.93947,
+      "vision_ratio": 0.06053
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93947,
+      0.06053
+    ],
+    "text_vision_ratio": "0.939470:0.060530"
+  }
+}
+```
+
+
+## === Rollout Step 307 ===
+Step: 306/29790 | 2025-10-22 12:23:59
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.145 | 8.467 | 21.048 | 21.048 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.14507,
+      "aei_text": 2.885201,
+      "aei_vision": 0.190504,
+      "text_ratio": 0.938062,
+      "vision_ratio": 0.061938
+    },
+    "middle": {
+      "mdi": 8.466534,
+      "aei_text": 2.610734,
+      "aei_vision": 0.308359,
+      "text_ratio": 0.894365,
+      "vision_ratio": 0.105635
+    },
+    "late": {
+      "mdi": 21.04771,
+      "aei_text": 2.997226,
+      "aei_vision": 0.142402,
+      "text_ratio": 0.954644,
+      "vision_ratio": 0.045356
+    },
+    "all": {
+      "mdi": 21.04771,
+      "aei_text": 2.831054,
+      "aei_vision": 0.213755,
+      "text_ratio": 0.954644,
+      "vision_ratio": 0.045356
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954644,
+      0.045356
+    ],
+    "text_vision_ratio": "0.954644:0.045356"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.14507,
+      "aei_text": 2.885201,
+      "aei_vision": 0.190504,
+      "text_ratio": 0.938062,
+      "vision_ratio": 0.061938
+    },
+    "middle": {
+      "mdi": 8.466534,
+      "aei_text": 2.610734,
+      "aei_vision": 0.308359,
+      "text_ratio": 0.894365,
+      "vision_ratio": 0.105635
+    },
+    "late": {
+      "mdi": 21.04771,
+      "aei_text": 2.997226,
+      "aei_vision": 0.142402,
+      "text_ratio": 0.954644,
+      "vision_ratio": 0.045356
+    },
+    "all": {
+      "mdi": 21.04771,
+      "aei_text": 2.831054,
+      "aei_vision": 0.213755,
+      "text_ratio": 0.954644,
+      "vision_ratio": 0.045356
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954644,
+      0.045356
+    ],
+    "text_vision_ratio": "0.954644:0.045356"
+  }
+}
+```
+
+
+## === Rollout Step 308 ===
+Step: 307/29790 | 2025-10-22 12:24:02
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.661 | 10.323 | 18.803 | 18.803 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.660849,
+      "aei_text": 2.78138,
+      "aei_vision": 0.219684,
+      "text_ratio": 0.926798,
+      "vision_ratio": 0.073202
+    },
+    "middle": {
+      "mdi": 10.322543,
+      "aei_text": 2.688349,
+      "aei_vision": 0.260435,
+      "text_ratio": 0.911681,
+      "vision_ratio": 0.088319
+    },
+    "late": {
+      "mdi": 18.803048,
+      "aei_text": 2.927468,
+      "aei_vision": 0.155691,
+      "text_ratio": 0.949503,
+      "vision_ratio": 0.050497
+    },
+    "all": {
+      "mdi": 18.803048,
+      "aei_text": 2.799066,
+      "aei_vision": 0.211937,
+      "text_ratio": 0.949503,
+      "vision_ratio": 0.050497
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949503,
+      0.050497
+    ],
+    "text_vision_ratio": "0.949503:0.050497"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.660849,
+      "aei_text": 2.78138,
+      "aei_vision": 0.219684,
+      "text_ratio": 0.926798,
+      "vision_ratio": 0.073202
+    },
+    "middle": {
+      "mdi": 10.322543,
+      "aei_text": 2.688349,
+      "aei_vision": 0.260435,
+      "text_ratio": 0.911681,
+      "vision_ratio": 0.088319
+    },
+    "late": {
+      "mdi": 18.803048,
+      "aei_text": 2.927468,
+      "aei_vision": 0.155691,
+      "text_ratio": 0.949503,
+      "vision_ratio": 0.050497
+    },
+    "all": {
+      "mdi": 18.803048,
+      "aei_text": 2.799066,
+      "aei_vision": 0.211937,
+      "text_ratio": 0.949503,
+      "vision_ratio": 0.050497
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949503,
+      0.050497
+    ],
+    "text_vision_ratio": "0.949503:0.050497"
+  }
+}
+```
+
+
+## === Rollout Step 309 ===
+Step: 308/29790 | 2025-10-22 12:24:06
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.961 | 10.295 | 15.275 | 15.275 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.960613,
+      "aei_text": 2.885811,
+      "aei_vision": 0.1522,
+      "text_ratio": 0.949901,
+      "vision_ratio": 0.050099
+    },
+    "middle": {
+      "mdi": 10.294811,
+      "aei_text": 2.651467,
+      "aei_vision": 0.257554,
+      "text_ratio": 0.911464,
+      "vision_ratio": 0.088536
+    },
+    "late": {
+      "mdi": 15.275056,
+      "aei_text": 2.814509,
+      "aei_vision": 0.184255,
+      "text_ratio": 0.938556,
+      "vision_ratio": 0.061444
+    },
+    "all": {
+      "mdi": 15.275056,
+      "aei_text": 2.783929,
+      "aei_vision": 0.198003,
+      "text_ratio": 0.938556,
+      "vision_ratio": 0.061444
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938556,
+      0.061444
+    ],
+    "text_vision_ratio": "0.938556:0.061444"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.960613,
+      "aei_text": 2.885811,
+      "aei_vision": 0.1522,
+      "text_ratio": 0.949901,
+      "vision_ratio": 0.050099
+    },
+    "middle": {
+      "mdi": 10.294811,
+      "aei_text": 2.651467,
+      "aei_vision": 0.257554,
+      "text_ratio": 0.911464,
+      "vision_ratio": 0.088536
+    },
+    "late": {
+      "mdi": 15.275056,
+      "aei_text": 2.814509,
+      "aei_vision": 0.184255,
+      "text_ratio": 0.938556,
+      "vision_ratio": 0.061444
+    },
+    "all": {
+      "mdi": 15.275056,
+      "aei_text": 2.783929,
+      "aei_vision": 0.198003,
+      "text_ratio": 0.938556,
+      "vision_ratio": 0.061444
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938556,
+      0.061444
+    ],
+    "text_vision_ratio": "0.938556:0.061444"
+  }
+}
+```
+
+
+## === Rollout Step 310 ===
+Step: 309/29790 | 2025-10-22 12:24:09
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.828 | 8.835 | 14.954 | 14.954 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.827679,
+      "aei_text": 2.935859,
+      "aei_vision": 0.185489,
+      "text_ratio": 0.940574,
+      "vision_ratio": 0.059426
+    },
+    "middle": {
+      "mdi": 8.835131,
+      "aei_text": 2.660909,
+      "aei_vision": 0.301174,
+      "text_ratio": 0.898324,
+      "vision_ratio": 0.101676
+    },
+    "late": {
+      "mdi": 14.954304,
+      "aei_text": 2.913642,
+      "aei_vision": 0.194836,
+      "text_ratio": 0.937321,
+      "vision_ratio": 0.062679
+    },
+    "all": {
+      "mdi": 14.954304,
+      "aei_text": 2.836803,
+      "aei_vision": 0.227166,
+      "text_ratio": 0.937321,
+      "vision_ratio": 0.062679
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.937321,
+      0.062679
+    ],
+    "text_vision_ratio": "0.937321:0.062679"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.827679,
+      "aei_text": 2.935859,
+      "aei_vision": 0.185489,
+      "text_ratio": 0.940574,
+      "vision_ratio": 0.059426
+    },
+    "middle": {
+      "mdi": 8.835131,
+      "aei_text": 2.660909,
+      "aei_vision": 0.301174,
+      "text_ratio": 0.898324,
+      "vision_ratio": 0.101676
+    },
+    "late": {
+      "mdi": 14.954304,
+      "aei_text": 2.913642,
+      "aei_vision": 0.194836,
+      "text_ratio": 0.937321,
+      "vision_ratio": 0.062679
+    },
+    "all": {
+      "mdi": 14.954304,
+      "aei_text": 2.836803,
+      "aei_vision": 0.227166,
+      "text_ratio": 0.937321,
+      "vision_ratio": 0.062679
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.937321,
+      0.062679
+    ],
+    "text_vision_ratio": "0.937321:0.062679"
+  }
+}
+```
+
+
+## === Rollout Step 311 ===
+Step: 310/29790 | 2025-10-22 12:24:13
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.999 | 16.554 | 25.821 | 25.821 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.999111,
+      "aei_text": 3.16859,
+      "aei_vision": 0.166776,
+      "text_ratio": 0.949998,
+      "vision_ratio": 0.050002
+    },
+    "middle": {
+      "mdi": 16.554306,
+      "aei_text": 3.113196,
+      "aei_vision": 0.18806,
+      "text_ratio": 0.943034,
+      "vision_ratio": 0.056966
+    },
+    "late": {
+      "mdi": 25.820905,
+      "aei_text": 3.272767,
+      "aei_vision": 0.126749,
+      "text_ratio": 0.962716,
+      "vision_ratio": 0.037284
+    },
+    "all": {
+      "mdi": 25.820905,
+      "aei_text": 3.184851,
+      "aei_vision": 0.160528,
+      "text_ratio": 0.962716,
+      "vision_ratio": 0.037284
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962716,
+      0.037284
+    ],
+    "text_vision_ratio": "0.962716:0.037284"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.999111,
+      "aei_text": 3.16859,
+      "aei_vision": 0.166776,
+      "text_ratio": 0.949998,
+      "vision_ratio": 0.050002
+    },
+    "middle": {
+      "mdi": 16.554306,
+      "aei_text": 3.113196,
+      "aei_vision": 0.18806,
+      "text_ratio": 0.943034,
+      "vision_ratio": 0.056966
+    },
+    "late": {
+      "mdi": 25.820905,
+      "aei_text": 3.272767,
+      "aei_vision": 0.126749,
+      "text_ratio": 0.962716,
+      "vision_ratio": 0.037284
+    },
+    "all": {
+      "mdi": 25.820905,
+      "aei_text": 3.184851,
+      "aei_vision": 0.160528,
+      "text_ratio": 0.962716,
+      "vision_ratio": 0.037284
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962716,
+      0.037284
+    ],
+    "text_vision_ratio": "0.962716:0.037284"
+  }
+}
+```
+
+
+## === Rollout Step 312 ===
+Step: 311/29790 | 2025-10-22 12:24:16
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.544 | 11.411 | 24.479 | 24.479 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.543694,
+      "aei_text": 2.869388,
+      "aei_vision": 0.197294,
+      "text_ratio": 0.935665,
+      "vision_ratio": 0.064335
+    },
+    "middle": {
+      "mdi": 11.410562,
+      "aei_text": 2.764611,
+      "aei_vision": 0.242285,
+      "text_ratio": 0.919423,
+      "vision_ratio": 0.080577
+    },
+    "late": {
+      "mdi": 24.479442,
+      "aei_text": 3.039678,
+      "aei_vision": 0.124173,
+      "text_ratio": 0.960753,
+      "vision_ratio": 0.039247
+    },
+    "all": {
+      "mdi": 24.479442,
+      "aei_text": 2.891226,
+      "aei_vision": 0.187917,
+      "text_ratio": 0.960753,
+      "vision_ratio": 0.039247
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960753,
+      0.039247
+    ],
+    "text_vision_ratio": "0.960753:0.039247"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.543694,
+      "aei_text": 2.869388,
+      "aei_vision": 0.197294,
+      "text_ratio": 0.935665,
+      "vision_ratio": 0.064335
+    },
+    "middle": {
+      "mdi": 11.410562,
+      "aei_text": 2.764611,
+      "aei_vision": 0.242285,
+      "text_ratio": 0.919423,
+      "vision_ratio": 0.080577
+    },
+    "late": {
+      "mdi": 24.479442,
+      "aei_text": 3.039678,
+      "aei_vision": 0.124173,
+      "text_ratio": 0.960753,
+      "vision_ratio": 0.039247
+    },
+    "all": {
+      "mdi": 24.479442,
+      "aei_text": 2.891226,
+      "aei_vision": 0.187917,
+      "text_ratio": 0.960753,
+      "vision_ratio": 0.039247
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960753,
+      0.039247
+    ],
+    "text_vision_ratio": "0.960753:0.039247"
+  }
+}
+```
+
+
+## === Rollout Step 313 ===
+Step: 312/29790 | 2025-10-22 12:24:20
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.264 | 6.983 | 14.263 | 14.263 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.26419,
+      "aei_text": 3.022244,
+      "aei_vision": 0.149142,
+      "text_ratio": 0.952973,
+      "vision_ratio": 0.047027
+    },
+    "middle": {
+      "mdi": 6.982923,
+      "aei_text": 2.519257,
+      "aei_vision": 0.360774,
+      "text_ratio": 0.874733,
+      "vision_ratio": 0.125267
+    },
+    "late": {
+      "mdi": 14.262655,
+      "aei_text": 2.894394,
+      "aei_vision": 0.202935,
+      "text_ratio": 0.934481,
+      "vision_ratio": 0.065519
+    },
+    "all": {
+      "mdi": 14.262655,
+      "aei_text": 2.811965,
+      "aei_vision": 0.237617,
+      "text_ratio": 0.934481,
+      "vision_ratio": 0.065519
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934481,
+      0.065519
+    ],
+    "text_vision_ratio": "0.934481:0.065519"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.26419,
+      "aei_text": 3.022244,
+      "aei_vision": 0.149142,
+      "text_ratio": 0.952973,
+      "vision_ratio": 0.047027
+    },
+    "middle": {
+      "mdi": 6.982923,
+      "aei_text": 2.519257,
+      "aei_vision": 0.360774,
+      "text_ratio": 0.874733,
+      "vision_ratio": 0.125267
+    },
+    "late": {
+      "mdi": 14.262655,
+      "aei_text": 2.894394,
+      "aei_vision": 0.202935,
+      "text_ratio": 0.934481,
+      "vision_ratio": 0.065519
+    },
+    "all": {
+      "mdi": 14.262655,
+      "aei_text": 2.811965,
+      "aei_vision": 0.237617,
+      "text_ratio": 0.934481,
+      "vision_ratio": 0.065519
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934481,
+      0.065519
+    ],
+    "text_vision_ratio": "0.934481:0.065519"
+  }
+}
+```
+
+
+## === Rollout Step 314 ===
+Step: 313/29790 | 2025-10-22 12:24:24
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 22.692 | 20.686 | 22.349 | 22.349 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.6924,
+      "aei_text": 3.046331,
+      "aei_vision": 0.134245,
+      "text_ratio": 0.957792,
+      "vision_ratio": 0.042208
+    },
+    "middle": {
+      "mdi": 20.686298,
+      "aei_text": 3.018715,
+      "aei_vision": 0.145928,
+      "text_ratio": 0.953888,
+      "vision_ratio": 0.046112
+    },
+    "late": {
+      "mdi": 22.349143,
+      "aei_text": 3.041924,
+      "aei_vision": 0.136109,
+      "text_ratio": 0.957172,
+      "vision_ratio": 0.042828
+    },
+    "all": {
+      "mdi": 22.349143,
+      "aei_text": 3.035657,
+      "aei_vision": 0.138761,
+      "text_ratio": 0.957172,
+      "vision_ratio": 0.042828
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957172,
+      0.042828
+    ],
+    "text_vision_ratio": "0.957172:0.042828"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.6924,
+      "aei_text": 3.046331,
+      "aei_vision": 0.134245,
+      "text_ratio": 0.957792,
+      "vision_ratio": 0.042208
+    },
+    "middle": {
+      "mdi": 20.686298,
+      "aei_text": 3.018715,
+      "aei_vision": 0.145928,
+      "text_ratio": 0.953888,
+      "vision_ratio": 0.046112
+    },
+    "late": {
+      "mdi": 22.349143,
+      "aei_text": 3.041924,
+      "aei_vision": 0.136109,
+      "text_ratio": 0.957172,
+      "vision_ratio": 0.042828
+    },
+    "all": {
+      "mdi": 22.349143,
+      "aei_text": 3.035657,
+      "aei_vision": 0.138761,
+      "text_ratio": 0.957172,
+      "vision_ratio": 0.042828
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957172,
+      0.042828
+    ],
+    "text_vision_ratio": "0.957172:0.042828"
+  }
+}
+```
+
+
+## === Rollout Step 315 ===
+Step: 314/29790 | 2025-10-22 12:24:28
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.487 | 8.851 | 14.378 | 14.378 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.486876,
+      "aei_text": 2.752822,
+      "aei_vision": 0.262502,
+      "text_ratio": 0.912944,
+      "vision_ratio": 0.087056
+    },
+    "middle": {
+      "mdi": 8.850588,
+      "aei_text": 2.661895,
+      "aei_vision": 0.300759,
+      "text_ratio": 0.898483,
+      "vision_ratio": 0.101517
+    },
+    "late": {
+      "mdi": 14.377875,
+      "aei_text": 2.897711,
+      "aei_vision": 0.20154,
+      "text_ratio": 0.934972,
+      "vision_ratio": 0.065028
+    },
+    "all": {
+      "mdi": 14.377875,
+      "aei_text": 2.770809,
+      "aei_vision": 0.254933,
+      "text_ratio": 0.934972,
+      "vision_ratio": 0.065028
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934972,
+      0.065028
+    ],
+    "text_vision_ratio": "0.934972:0.065028"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.486876,
+      "aei_text": 2.752822,
+      "aei_vision": 0.262502,
+      "text_ratio": 0.912944,
+      "vision_ratio": 0.087056
+    },
+    "middle": {
+      "mdi": 8.850588,
+      "aei_text": 2.661895,
+      "aei_vision": 0.300759,
+      "text_ratio": 0.898483,
+      "vision_ratio": 0.101517
+    },
+    "late": {
+      "mdi": 14.377875,
+      "aei_text": 2.897711,
+      "aei_vision": 0.20154,
+      "text_ratio": 0.934972,
+      "vision_ratio": 0.065028
+    },
+    "all": {
+      "mdi": 14.377875,
+      "aei_text": 2.770809,
+      "aei_vision": 0.254933,
+      "text_ratio": 0.934972,
+      "vision_ratio": 0.065028
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934972,
+      0.065028
+    ],
+    "text_vision_ratio": "0.934972:0.065028"
+  }
+}
+```
+
+
+## === Rollout Step 316 ===
+Step: 315/29790 | 2025-10-22 12:24:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 28.714 | 20.331 | 20.247 | 20.247 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.713851,
+      "aei_text": 3.13473,
+      "aei_vision": 0.109171,
+      "text_ratio": 0.966346,
+      "vision_ratio": 0.033654
+    },
+    "middle": {
+      "mdi": 20.331091,
+      "aei_text": 3.038237,
+      "aei_vision": 0.149438,
+      "text_ratio": 0.95312,
+      "vision_ratio": 0.04688
+    },
+    "late": {
+      "mdi": 20.246766,
+      "aei_text": 3.036903,
+      "aei_vision": 0.149994,
+      "text_ratio": 0.952934,
+      "vision_ratio": 0.047066
+    },
+    "all": {
+      "mdi": 20.246766,
+      "aei_text": 3.069957,
+      "aei_vision": 0.136201,
+      "text_ratio": 0.952934,
+      "vision_ratio": 0.047066
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952934,
+      0.047066
+    ],
+    "text_vision_ratio": "0.952934:0.047066"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.713851,
+      "aei_text": 3.13473,
+      "aei_vision": 0.109171,
+      "text_ratio": 0.966346,
+      "vision_ratio": 0.033654
+    },
+    "middle": {
+      "mdi": 20.331091,
+      "aei_text": 3.038237,
+      "aei_vision": 0.149438,
+      "text_ratio": 0.95312,
+      "vision_ratio": 0.04688
+    },
+    "late": {
+      "mdi": 20.246766,
+      "aei_text": 3.036903,
+      "aei_vision": 0.149994,
+      "text_ratio": 0.952934,
+      "vision_ratio": 0.047066
+    },
+    "all": {
+      "mdi": 20.246766,
+      "aei_text": 3.069957,
+      "aei_vision": 0.136201,
+      "text_ratio": 0.952934,
+      "vision_ratio": 0.047066
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952934,
+      0.047066
+    ],
+    "text_vision_ratio": "0.952934:0.047066"
+  }
+}
+```
+
+
+## === Rollout Step 317 ===
+Step: 316/29790 | 2025-10-22 12:24:35
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.185 | 14.964 | 18.198 | 18.198 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.185467,
+      "aei_text": 2.905606,
+      "aei_vision": 0.159776,
+      "text_ratio": 0.947877,
+      "vision_ratio": 0.052123
+    },
+    "middle": {
+      "mdi": 14.9636,
+      "aei_text": 2.837852,
+      "aei_vision": 0.18965,
+      "text_ratio": 0.937357,
+      "vision_ratio": 0.062643
+    },
+    "late": {
+      "mdi": 18.197518,
+      "aei_text": 2.905819,
+      "aei_vision": 0.159682,
+      "text_ratio": 0.94791,
+      "vision_ratio": 0.05209
+    },
+    "all": {
+      "mdi": 18.197518,
+      "aei_text": 2.883092,
+      "aei_vision": 0.169703,
+      "text_ratio": 0.94791,
+      "vision_ratio": 0.05209
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94791,
+      0.05209
+    ],
+    "text_vision_ratio": "0.947910:0.052090"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.185467,
+      "aei_text": 2.905606,
+      "aei_vision": 0.159776,
+      "text_ratio": 0.947877,
+      "vision_ratio": 0.052123
+    },
+    "middle": {
+      "mdi": 14.9636,
+      "aei_text": 2.837852,
+      "aei_vision": 0.18965,
+      "text_ratio": 0.937357,
+      "vision_ratio": 0.062643
+    },
+    "late": {
+      "mdi": 18.197518,
+      "aei_text": 2.905819,
+      "aei_vision": 0.159682,
+      "text_ratio": 0.94791,
+      "vision_ratio": 0.05209
+    },
+    "all": {
+      "mdi": 18.197518,
+      "aei_text": 2.883092,
+      "aei_vision": 0.169703,
+      "text_ratio": 0.94791,
+      "vision_ratio": 0.05209
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94791,
+      0.05209
+    ],
+    "text_vision_ratio": "0.947910:0.052090"
+  }
+}
+```
+
+
+## === Rollout Step 318 ===
+Step: 317/29790 | 2025-10-22 12:24:39
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.223 | 6.691 | 13.381 | 13.381 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.222942,
+      "aei_text": 2.981016,
+      "aei_vision": 0.243887,
+      "text_ratio": 0.924374,
+      "vision_ratio": 0.075626
+    },
+    "middle": {
+      "mdi": 6.690506,
+      "aei_text": 2.601323,
+      "aei_vision": 0.388808,
+      "text_ratio": 0.86997,
+      "vision_ratio": 0.13003
+    },
+    "late": {
+      "mdi": 13.381351,
+      "aei_text": 3.027275,
+      "aei_vision": 0.226231,
+      "text_ratio": 0.930466,
+      "vision_ratio": 0.069534
+    },
+    "all": {
+      "mdi": 13.381351,
+      "aei_text": 2.869871,
+      "aei_vision": 0.286309,
+      "text_ratio": 0.930466,
+      "vision_ratio": 0.069534
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930466,
+      0.069534
+    ],
+    "text_vision_ratio": "0.930466:0.069534"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.222942,
+      "aei_text": 2.981016,
+      "aei_vision": 0.243887,
+      "text_ratio": 0.924374,
+      "vision_ratio": 0.075626
+    },
+    "middle": {
+      "mdi": 6.690506,
+      "aei_text": 2.601323,
+      "aei_vision": 0.388808,
+      "text_ratio": 0.86997,
+      "vision_ratio": 0.13003
+    },
+    "late": {
+      "mdi": 13.381351,
+      "aei_text": 3.027275,
+      "aei_vision": 0.226231,
+      "text_ratio": 0.930466,
+      "vision_ratio": 0.069534
+    },
+    "all": {
+      "mdi": 13.381351,
+      "aei_text": 2.869871,
+      "aei_vision": 0.286309,
+      "text_ratio": 0.930466,
+      "vision_ratio": 0.069534
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930466,
+      0.069534
+    ],
+    "text_vision_ratio": "0.930466:0.069534"
+  }
+}
+```
+
+
+## === Rollout Step 319 ===
+Step: 318/29790 | 2025-10-22 12:24:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.574 | 5.545 | 18.565 | 18.565 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.574042,
+      "aei_text": 2.903254,
+      "aei_vision": 0.199207,
+      "text_ratio": 0.935791,
+      "vision_ratio": 0.064209
+    },
+    "middle": {
+      "mdi": 5.544754,
+      "aei_text": 2.363582,
+      "aei_vision": 0.426274,
+      "text_ratio": 0.847206,
+      "vision_ratio": 0.152794
+    },
+    "late": {
+      "mdi": 18.565207,
+      "aei_text": 2.993487,
+      "aei_vision": 0.161242,
+      "text_ratio": 0.948889,
+      "vision_ratio": 0.051111
+    },
+    "all": {
+      "mdi": 18.565207,
+      "aei_text": 2.753441,
+      "aei_vision": 0.262241,
+      "text_ratio": 0.948889,
+      "vision_ratio": 0.051111
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948889,
+      0.051111
+    ],
+    "text_vision_ratio": "0.948889:0.051111"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.574042,
+      "aei_text": 2.903254,
+      "aei_vision": 0.199207,
+      "text_ratio": 0.935791,
+      "vision_ratio": 0.064209
+    },
+    "middle": {
+      "mdi": 5.544754,
+      "aei_text": 2.363582,
+      "aei_vision": 0.426274,
+      "text_ratio": 0.847206,
+      "vision_ratio": 0.152794
+    },
+    "late": {
+      "mdi": 18.565207,
+      "aei_text": 2.993487,
+      "aei_vision": 0.161242,
+      "text_ratio": 0.948889,
+      "vision_ratio": 0.051111
+    },
+    "all": {
+      "mdi": 18.565207,
+      "aei_text": 2.753441,
+      "aei_vision": 0.262241,
+      "text_ratio": 0.948889,
+      "vision_ratio": 0.051111
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948889,
+      0.051111
+    ],
+    "text_vision_ratio": "0.948889:0.051111"
+  }
+}
+```
+
+
+## === Rollout Step 320 ===
+Step: 319/29790 | 2025-10-22 12:24:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.792 | 4.883 | 16.085 | 16.085 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.792195,
+      "aei_text": 2.858373,
+      "aei_vision": 0.223447,
+      "text_ratio": 0.927495,
+      "vision_ratio": 0.072505
+    },
+    "middle": {
+      "mdi": 4.88314,
+      "aei_text": 2.277136,
+      "aei_vision": 0.466326,
+      "text_ratio": 0.830023,
+      "vision_ratio": 0.169977
+    },
+    "late": {
+      "mdi": 16.085366,
+      "aei_text": 2.953671,
+      "aei_vision": 0.183625,
+      "text_ratio": 0.94147,
+      "vision_ratio": 0.05853
+    },
+    "all": {
+      "mdi": 16.085366,
+      "aei_text": 2.696393,
+      "aei_vision": 0.291133,
+      "text_ratio": 0.94147,
+      "vision_ratio": 0.05853
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94147,
+      0.05853
+    ],
+    "text_vision_ratio": "0.941470:0.058530"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.792195,
+      "aei_text": 2.858373,
+      "aei_vision": 0.223447,
+      "text_ratio": 0.927495,
+      "vision_ratio": 0.072505
+    },
+    "middle": {
+      "mdi": 4.88314,
+      "aei_text": 2.277136,
+      "aei_vision": 0.466326,
+      "text_ratio": 0.830023,
+      "vision_ratio": 0.169977
+    },
+    "late": {
+      "mdi": 16.085366,
+      "aei_text": 2.953671,
+      "aei_vision": 0.183625,
+      "text_ratio": 0.94147,
+      "vision_ratio": 0.05853
+    },
+    "all": {
+      "mdi": 16.085366,
+      "aei_text": 2.696393,
+      "aei_vision": 0.291133,
+      "text_ratio": 0.94147,
+      "vision_ratio": 0.05853
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94147,
+      0.05853
+    ],
+    "text_vision_ratio": "0.941470:0.058530"
+  }
+}
+```
+
+
+## === Rollout Step 321 ===
+Step: 320/29790 | 2025-10-22 12:24:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.155 | 8.031 | 11.052 | 11.052 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 232.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 232.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 232,
+    "text_tokens": 0,
+    "total_tokens": 232
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.15546,
+      "aei_text": 2.279868,
+      "aei_vision": 0.150432,
+      "text_ratio": 0.938101,
+      "vision_ratio": 0.061899
+    },
+    "middle": {
+      "mdi": 8.03135,
+      "aei_text": 2.110595,
+      "aei_vision": 0.262795,
+      "text_ratio": 0.889275,
+      "vision_ratio": 0.110725
+    },
+    "late": {
+      "mdi": 11.051971,
+      "aei_text": 2.205819,
+      "aei_vision": 0.199586,
+      "text_ratio": 0.917026,
+      "vision_ratio": 0.082974
+    },
+    "all": {
+      "mdi": 11.051971,
+      "aei_text": 2.198761,
+      "aei_vision": 0.204271,
+      "text_ratio": 0.917026,
+      "vision_ratio": 0.082974
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.917026,
+      0.082974
+    ],
+    "text_vision_ratio": "0.917026:0.082974"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 232,
+    "text_tokens": 0,
+    "total_tokens": 232
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.15546,
+      "aei_text": 2.279868,
+      "aei_vision": 0.150432,
+      "text_ratio": 0.938101,
+      "vision_ratio": 0.061899
+    },
+    "middle": {
+      "mdi": 8.03135,
+      "aei_text": 2.110595,
+      "aei_vision": 0.262795,
+      "text_ratio": 0.889275,
+      "vision_ratio": 0.110725
+    },
+    "late": {
+      "mdi": 11.051971,
+      "aei_text": 2.205819,
+      "aei_vision": 0.199586,
+      "text_ratio": 0.917026,
+      "vision_ratio": 0.082974
+    },
+    "all": {
+      "mdi": 11.051971,
+      "aei_text": 2.198761,
+      "aei_vision": 0.204271,
+      "text_ratio": 0.917026,
+      "vision_ratio": 0.082974
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.917026,
+      0.082974
+    ],
+    "text_vision_ratio": "0.917026:0.082974"
+  }
+}
+```
+
+
+## === Rollout Step 322 ===
+Step: 321/29790 | 2025-10-22 12:24:52
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.595 | 14.580 | 19.694 | 19.694 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.595148,
+      "aei_text": 3.099339,
+      "aei_vision": 0.166675,
+      "text_ratio": 0.948967,
+      "vision_ratio": 0.051033
+    },
+    "middle": {
+      "mdi": 14.58019,
+      "aei_text": 3.000748,
+      "aei_vision": 0.20581,
+      "text_ratio": 0.935816,
+      "vision_ratio": 0.064184
+    },
+    "late": {
+      "mdi": 19.693522,
+      "aei_text": 3.120102,
+      "aei_vision": 0.158433,
+      "text_ratio": 0.951676,
+      "vision_ratio": 0.048324
+    },
+    "all": {
+      "mdi": 19.693522,
+      "aei_text": 3.073396,
+      "aei_vision": 0.176972,
+      "text_ratio": 0.951676,
+      "vision_ratio": 0.048324
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951676,
+      0.048324
+    ],
+    "text_vision_ratio": "0.951676:0.048324"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.595148,
+      "aei_text": 3.099339,
+      "aei_vision": 0.166675,
+      "text_ratio": 0.948967,
+      "vision_ratio": 0.051033
+    },
+    "middle": {
+      "mdi": 14.58019,
+      "aei_text": 3.000748,
+      "aei_vision": 0.20581,
+      "text_ratio": 0.935816,
+      "vision_ratio": 0.064184
+    },
+    "late": {
+      "mdi": 19.693522,
+      "aei_text": 3.120102,
+      "aei_vision": 0.158433,
+      "text_ratio": 0.951676,
+      "vision_ratio": 0.048324
+    },
+    "all": {
+      "mdi": 19.693522,
+      "aei_text": 3.073396,
+      "aei_vision": 0.176972,
+      "text_ratio": 0.951676,
+      "vision_ratio": 0.048324
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951676,
+      0.048324
+    ],
+    "text_vision_ratio": "0.951676:0.048324"
+  }
+}
+```
+
+
+## === Rollout Step 323 ===
+Step: 322/29790 | 2025-10-22 12:24:55
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 8.719 | 4.810 | 12.945 | 12.945 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.719458,
+      "aei_text": 2.459998,
+      "aei_vision": 0.282127,
+      "text_ratio": 0.897114,
+      "vision_ratio": 0.102886
+    },
+    "middle": {
+      "mdi": 4.810038,
+      "aei_text": 2.132232,
+      "aei_vision": 0.443288,
+      "text_ratio": 0.827884,
+      "vision_ratio": 0.172116
+    },
+    "late": {
+      "mdi": 12.944579,
+      "aei_text": 2.621852,
+      "aei_vision": 0.202544,
+      "text_ratio": 0.928288,
+      "vision_ratio": 0.071712
+    },
+    "all": {
+      "mdi": 12.944579,
+      "aei_text": 2.404694,
+      "aei_vision": 0.30932,
+      "text_ratio": 0.928288,
+      "vision_ratio": 0.071712
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.928288,
+      0.071712
+    ],
+    "text_vision_ratio": "0.928288:0.071712"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.719458,
+      "aei_text": 2.459998,
+      "aei_vision": 0.282127,
+      "text_ratio": 0.897114,
+      "vision_ratio": 0.102886
+    },
+    "middle": {
+      "mdi": 4.810038,
+      "aei_text": 2.132232,
+      "aei_vision": 0.443288,
+      "text_ratio": 0.827884,
+      "vision_ratio": 0.172116
+    },
+    "late": {
+      "mdi": 12.944579,
+      "aei_text": 2.621852,
+      "aei_vision": 0.202544,
+      "text_ratio": 0.928288,
+      "vision_ratio": 0.071712
+    },
+    "all": {
+      "mdi": 12.944579,
+      "aei_text": 2.404694,
+      "aei_vision": 0.30932,
+      "text_ratio": 0.928288,
+      "vision_ratio": 0.071712
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.928288,
+      0.071712
+    ],
+    "text_vision_ratio": "0.928288:0.071712"
+  }
+}
+```
+
+
+## === Rollout Step 324 ===
+Step: 323/29790 | 2025-10-22 12:25:00
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 24.032 | 14.847 | 29.078 | 29.078 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 531.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 531.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.031598,
+      "aei_text": 4.045581,
+      "aei_vision": 0.168344,
+      "text_ratio": 0.96005,
+      "vision_ratio": 0.03995
+    },
+    "middle": {
+      "mdi": 14.846672,
+      "aei_text": 3.73965,
+      "aei_vision": 0.251885,
+      "text_ratio": 0.936895,
+      "vision_ratio": 0.063105
+    },
+    "late": {
+      "mdi": 29.078382,
+      "aei_text": 4.140609,
+      "aei_vision": 0.142395,
+      "text_ratio": 0.966754,
+      "vision_ratio": 0.033246
+    },
+    "all": {
+      "mdi": 29.078382,
+      "aei_text": 3.97528,
+      "aei_vision": 0.187541,
+      "text_ratio": 0.966754,
+      "vision_ratio": 0.033246
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.966754,
+      0.033246
+    ],
+    "text_vision_ratio": "0.966754:0.033246"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.031598,
+      "aei_text": 4.045581,
+      "aei_vision": 0.168344,
+      "text_ratio": 0.96005,
+      "vision_ratio": 0.03995
+    },
+    "middle": {
+      "mdi": 14.846672,
+      "aei_text": 3.73965,
+      "aei_vision": 0.251885,
+      "text_ratio": 0.936895,
+      "vision_ratio": 0.063105
+    },
+    "late": {
+      "mdi": 29.078382,
+      "aei_text": 4.140609,
+      "aei_vision": 0.142395,
+      "text_ratio": 0.966754,
+      "vision_ratio": 0.033246
+    },
+    "all": {
+      "mdi": 29.078382,
+      "aei_text": 3.97528,
+      "aei_vision": 0.187541,
+      "text_ratio": 0.966754,
+      "vision_ratio": 0.033246
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.966754,
+      0.033246
+    ],
+    "text_vision_ratio": "0.966754:0.033246"
+  }
+}
+```
+
+
+## === Rollout Step 325 ===
+Step: 324/29790 | 2025-10-22 12:25:03
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.719 | 6.633 | 18.217 | 18.217 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.718914,
+      "aei_text": 2.8781,
+      "aei_vision": 0.209791,
+      "text_ratio": 0.93206,
+      "vision_ratio": 0.06794
+    },
+    "middle": {
+      "mdi": 6.632839,
+      "aei_text": 2.485938,
+      "aei_vision": 0.374793,
+      "text_ratio": 0.868987,
+      "vision_ratio": 0.131013
+    },
+    "late": {
+      "mdi": 18.217267,
+      "aei_text": 2.987012,
+      "aei_vision": 0.163966,
+      "text_ratio": 0.947963,
+      "vision_ratio": 0.052037
+    },
+    "all": {
+      "mdi": 18.217267,
+      "aei_text": 2.783684,
+      "aei_vision": 0.249516,
+      "text_ratio": 0.947963,
+      "vision_ratio": 0.052037
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947963,
+      0.052037
+    ],
+    "text_vision_ratio": "0.947963:0.052037"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.718914,
+      "aei_text": 2.8781,
+      "aei_vision": 0.209791,
+      "text_ratio": 0.93206,
+      "vision_ratio": 0.06794
+    },
+    "middle": {
+      "mdi": 6.632839,
+      "aei_text": 2.485938,
+      "aei_vision": 0.374793,
+      "text_ratio": 0.868987,
+      "vision_ratio": 0.131013
+    },
+    "late": {
+      "mdi": 18.217267,
+      "aei_text": 2.987012,
+      "aei_vision": 0.163966,
+      "text_ratio": 0.947963,
+      "vision_ratio": 0.052037
+    },
+    "all": {
+      "mdi": 18.217267,
+      "aei_text": 2.783684,
+      "aei_vision": 0.249516,
+      "text_ratio": 0.947963,
+      "vision_ratio": 0.052037
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947963,
+      0.052037
+    ],
+    "text_vision_ratio": "0.947963:0.052037"
+  }
+}
+```
+
+
+## === Rollout Step 326 ===
+Step: 325/29790 | 2025-10-22 12:25:07
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.806 | 9.462 | 19.511 | 19.511 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.805873,
+      "aei_text": 3.069758,
+      "aei_vision": 0.194216,
+      "text_ratio": 0.940497,
+      "vision_ratio": 0.059503
+    },
+    "middle": {
+      "mdi": 9.46241,
+      "aei_text": 2.806725,
+      "aei_vision": 0.296618,
+      "text_ratio": 0.90442,
+      "vision_ratio": 0.09558
+    },
+    "late": {
+      "mdi": 19.510697,
+      "aei_text": 3.153466,
+      "aei_vision": 0.161628,
+      "text_ratio": 0.951245,
+      "vision_ratio": 0.048755
+    },
+    "all": {
+      "mdi": 19.510697,
+      "aei_text": 3.009983,
+      "aei_vision": 0.217487,
+      "text_ratio": 0.951245,
+      "vision_ratio": 0.048755
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951245,
+      0.048755
+    ],
+    "text_vision_ratio": "0.951245:0.048755"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.805873,
+      "aei_text": 3.069758,
+      "aei_vision": 0.194216,
+      "text_ratio": 0.940497,
+      "vision_ratio": 0.059503
+    },
+    "middle": {
+      "mdi": 9.46241,
+      "aei_text": 2.806725,
+      "aei_vision": 0.296618,
+      "text_ratio": 0.90442,
+      "vision_ratio": 0.09558
+    },
+    "late": {
+      "mdi": 19.510697,
+      "aei_text": 3.153466,
+      "aei_vision": 0.161628,
+      "text_ratio": 0.951245,
+      "vision_ratio": 0.048755
+    },
+    "all": {
+      "mdi": 19.510697,
+      "aei_text": 3.009983,
+      "aei_vision": 0.217487,
+      "text_ratio": 0.951245,
+      "vision_ratio": 0.048755
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951245,
+      0.048755
+    ],
+    "text_vision_ratio": "0.951245:0.048755"
+  }
+}
+```
+
+
+## === Rollout Step 327 ===
+Step: 326/29790 | 2025-10-22 12:25:10
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.902 | 5.107 | 15.185 | 15.185 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.901767,
+      "aei_text": 2.659413,
+      "aei_vision": 0.206128,
+      "text_ratio": 0.928067,
+      "vision_ratio": 0.071933
+    },
+    "middle": {
+      "mdi": 5.107337,
+      "aei_text": 2.192822,
+      "aei_vision": 0.429347,
+      "text_ratio": 0.836263,
+      "vision_ratio": 0.163737
+    },
+    "late": {
+      "mdi": 15.184768,
+      "aei_text": 2.716355,
+      "aei_vision": 0.178887,
+      "text_ratio": 0.938214,
+      "vision_ratio": 0.061786
+    },
+    "all": {
+      "mdi": 15.184768,
+      "aei_text": 2.522863,
+      "aei_vision": 0.271454,
+      "text_ratio": 0.938214,
+      "vision_ratio": 0.061786
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938214,
+      0.061786
+    ],
+    "text_vision_ratio": "0.938214:0.061786"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.901767,
+      "aei_text": 2.659413,
+      "aei_vision": 0.206128,
+      "text_ratio": 0.928067,
+      "vision_ratio": 0.071933
+    },
+    "middle": {
+      "mdi": 5.107337,
+      "aei_text": 2.192822,
+      "aei_vision": 0.429347,
+      "text_ratio": 0.836263,
+      "vision_ratio": 0.163737
+    },
+    "late": {
+      "mdi": 15.184768,
+      "aei_text": 2.716355,
+      "aei_vision": 0.178887,
+      "text_ratio": 0.938214,
+      "vision_ratio": 0.061786
+    },
+    "all": {
+      "mdi": 15.184768,
+      "aei_text": 2.522863,
+      "aei_vision": 0.271454,
+      "text_ratio": 0.938214,
+      "vision_ratio": 0.061786
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938214,
+      0.061786
+    ],
+    "text_vision_ratio": "0.938214:0.061786"
+  }
+}
+```
+
+
+## === Rollout Step 328 ===
+Step: 327/29790 | 2025-10-22 12:25:14
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 22.357 | 14.118 | 18.456 | 18.456 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.357068,
+      "aei_text": 3.078996,
+      "aei_vision": 0.137719,
+      "text_ratio": 0.957186,
+      "vision_ratio": 0.042814
+    },
+    "middle": {
+      "mdi": 14.118102,
+      "aei_text": 2.913487,
+      "aei_vision": 0.206365,
+      "text_ratio": 0.933854,
+      "vision_ratio": 0.066146
+    },
+    "late": {
+      "mdi": 18.456236,
+      "aei_text": 3.016925,
+      "aei_vision": 0.163464,
+      "text_ratio": 0.948603,
+      "vision_ratio": 0.051397
+    },
+    "all": {
+      "mdi": 18.456236,
+      "aei_text": 3.003136,
+      "aei_vision": 0.169183,
+      "text_ratio": 0.948603,
+      "vision_ratio": 0.051397
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948603,
+      0.051397
+    ],
+    "text_vision_ratio": "0.948603:0.051397"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.357068,
+      "aei_text": 3.078996,
+      "aei_vision": 0.137719,
+      "text_ratio": 0.957186,
+      "vision_ratio": 0.042814
+    },
+    "middle": {
+      "mdi": 14.118102,
+      "aei_text": 2.913487,
+      "aei_vision": 0.206365,
+      "text_ratio": 0.933854,
+      "vision_ratio": 0.066146
+    },
+    "late": {
+      "mdi": 18.456236,
+      "aei_text": 3.016925,
+      "aei_vision": 0.163464,
+      "text_ratio": 0.948603,
+      "vision_ratio": 0.051397
+    },
+    "all": {
+      "mdi": 18.456236,
+      "aei_text": 3.003136,
+      "aei_vision": 0.169183,
+      "text_ratio": 0.948603,
+      "vision_ratio": 0.051397
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948603,
+      0.051397
+    ],
+    "text_vision_ratio": "0.948603:0.051397"
+  }
+}
+```
+
+
+## === Rollout Step 329 ===
+Step: 328/29790 | 2025-10-22 12:25:17
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.452 | 8.364 | 18.776 | 18.776 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.45227,
+      "aei_text": 3.088024,
+      "aei_vision": 0.21367,
+      "text_ratio": 0.935285,
+      "vision_ratio": 0.064715
+    },
+    "middle": {
+      "mdi": 8.364346,
+      "aei_text": 2.77457,
+      "aei_vision": 0.331714,
+      "text_ratio": 0.893212,
+      "vision_ratio": 0.106788
+    },
+    "late": {
+      "mdi": 18.775574,
+      "aei_text": 3.202482,
+      "aei_vision": 0.170566,
+      "text_ratio": 0.949433,
+      "vision_ratio": 0.050567
+    },
+    "all": {
+      "mdi": 18.775574,
+      "aei_text": 3.021692,
+      "aei_vision": 0.23865,
+      "text_ratio": 0.949433,
+      "vision_ratio": 0.050567
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949433,
+      0.050567
+    ],
+    "text_vision_ratio": "0.949433:0.050567"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.45227,
+      "aei_text": 3.088024,
+      "aei_vision": 0.21367,
+      "text_ratio": 0.935285,
+      "vision_ratio": 0.064715
+    },
+    "middle": {
+      "mdi": 8.364346,
+      "aei_text": 2.77457,
+      "aei_vision": 0.331714,
+      "text_ratio": 0.893212,
+      "vision_ratio": 0.106788
+    },
+    "late": {
+      "mdi": 18.775574,
+      "aei_text": 3.202482,
+      "aei_vision": 0.170566,
+      "text_ratio": 0.949433,
+      "vision_ratio": 0.050567
+    },
+    "all": {
+      "mdi": 18.775574,
+      "aei_text": 3.021692,
+      "aei_vision": 0.23865,
+      "text_ratio": 0.949433,
+      "vision_ratio": 0.050567
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949433,
+      0.050567
+    ],
+    "text_vision_ratio": "0.949433:0.050567"
+  }
+}
+```
+
+
+## === Rollout Step 330 ===
+Step: 329/29790 | 2025-10-22 12:25:21
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.777 | 14.972 | 18.101 | 18.101 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.776562,
+      "aei_text": 2.93176,
+      "aei_vision": 0.148244,
+      "text_ratio": 0.951869,
+      "vision_ratio": 0.048131
+    },
+    "middle": {
+      "mdi": 14.972396,
+      "aei_text": 2.838071,
+      "aei_vision": 0.189554,
+      "text_ratio": 0.937392,
+      "vision_ratio": 0.062608
+    },
+    "late": {
+      "mdi": 18.101265,
+      "aei_text": 2.904108,
+      "aei_vision": 0.160437,
+      "text_ratio": 0.947647,
+      "vision_ratio": 0.052353
+    },
+    "all": {
+      "mdi": 18.101265,
+      "aei_text": 2.891313,
+      "aei_vision": 0.166078,
+      "text_ratio": 0.947647,
+      "vision_ratio": 0.052353
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947647,
+      0.052353
+    ],
+    "text_vision_ratio": "0.947647:0.052353"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.776562,
+      "aei_text": 2.93176,
+      "aei_vision": 0.148244,
+      "text_ratio": 0.951869,
+      "vision_ratio": 0.048131
+    },
+    "middle": {
+      "mdi": 14.972396,
+      "aei_text": 2.838071,
+      "aei_vision": 0.189554,
+      "text_ratio": 0.937392,
+      "vision_ratio": 0.062608
+    },
+    "late": {
+      "mdi": 18.101265,
+      "aei_text": 2.904108,
+      "aei_vision": 0.160437,
+      "text_ratio": 0.947647,
+      "vision_ratio": 0.052353
+    },
+    "all": {
+      "mdi": 18.101265,
+      "aei_text": 2.891313,
+      "aei_vision": 0.166078,
+      "text_ratio": 0.947647,
+      "vision_ratio": 0.052353
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947647,
+      0.052353
+    ],
+    "text_vision_ratio": "0.947647:0.052353"
+  }
+}
+```
+
+
+## === Rollout Step 331 ===
+Step: 330/29790 | 2025-10-22 12:25:25
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.069 | 10.981 | 15.177 | 15.177 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.069159,
+      "aei_text": 2.952932,
+      "aei_vision": 0.244668,
+      "text_ratio": 0.923484,
+      "vision_ratio": 0.076516
+    },
+    "middle": {
+      "mdi": 10.981282,
+      "aei_text": 2.902206,
+      "aei_vision": 0.264287,
+      "text_ratio": 0.916536,
+      "vision_ratio": 0.083464
+    },
+    "late": {
+      "mdi": 15.176548,
+      "aei_text": 3.063601,
+      "aei_vision": 0.201864,
+      "text_ratio": 0.938182,
+      "vision_ratio": 0.061818
+    },
+    "all": {
+      "mdi": 15.176548,
+      "aei_text": 2.972913,
+      "aei_vision": 0.236939,
+      "text_ratio": 0.938182,
+      "vision_ratio": 0.061818
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938182,
+      0.061818
+    ],
+    "text_vision_ratio": "0.938182:0.061818"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.069159,
+      "aei_text": 2.952932,
+      "aei_vision": 0.244668,
+      "text_ratio": 0.923484,
+      "vision_ratio": 0.076516
+    },
+    "middle": {
+      "mdi": 10.981282,
+      "aei_text": 2.902206,
+      "aei_vision": 0.264287,
+      "text_ratio": 0.916536,
+      "vision_ratio": 0.083464
+    },
+    "late": {
+      "mdi": 15.176548,
+      "aei_text": 3.063601,
+      "aei_vision": 0.201864,
+      "text_ratio": 0.938182,
+      "vision_ratio": 0.061818
+    },
+    "all": {
+      "mdi": 15.176548,
+      "aei_text": 2.972913,
+      "aei_vision": 0.236939,
+      "text_ratio": 0.938182,
+      "vision_ratio": 0.061818
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938182,
+      0.061818
+    ],
+    "text_vision_ratio": "0.938182:0.061818"
+  }
+}
+```
+
+
+## === Rollout Step 332 ===
+Step: 331/29790 | 2025-10-22 12:25:28
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.429 | 30.725 | 25.245 | 25.245 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.42878,
+      "aei_text": 3.177557,
+      "aei_vision": 0.135626,
+      "text_ratio": 0.959065,
+      "vision_ratio": 0.040935
+    },
+    "middle": {
+      "mdi": 30.72498,
+      "aei_text": 3.252545,
+      "aei_vision": 0.10586,
+      "text_ratio": 0.968479,
+      "vision_ratio": 0.031521
+    },
+    "late": {
+      "mdi": 25.245208,
+      "aei_text": 3.19991,
+      "aei_vision": 0.126753,
+      "text_ratio": 0.961898,
+      "vision_ratio": 0.038102
+    },
+    "all": {
+      "mdi": 25.245208,
+      "aei_text": 3.210004,
+      "aei_vision": 0.122746,
+      "text_ratio": 0.961898,
+      "vision_ratio": 0.038102
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961898,
+      0.038102
+    ],
+    "text_vision_ratio": "0.961898:0.038102"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.42878,
+      "aei_text": 3.177557,
+      "aei_vision": 0.135626,
+      "text_ratio": 0.959065,
+      "vision_ratio": 0.040935
+    },
+    "middle": {
+      "mdi": 30.72498,
+      "aei_text": 3.252545,
+      "aei_vision": 0.10586,
+      "text_ratio": 0.968479,
+      "vision_ratio": 0.031521
+    },
+    "late": {
+      "mdi": 25.245208,
+      "aei_text": 3.19991,
+      "aei_vision": 0.126753,
+      "text_ratio": 0.961898,
+      "vision_ratio": 0.038102
+    },
+    "all": {
+      "mdi": 25.245208,
+      "aei_text": 3.210004,
+      "aei_vision": 0.122746,
+      "text_ratio": 0.961898,
+      "vision_ratio": 0.038102
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961898,
+      0.038102
+    ],
+    "text_vision_ratio": "0.961898:0.038102"
+  }
+}
+```
+
+
+## === Rollout Step 333 ===
+Step: 332/29790 | 2025-10-22 12:25:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.276 | 9.407 | 19.924 | 19.924 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.275962,
+      "aei_text": 3.333001,
+      "aei_vision": 0.164382,
+      "text_ratio": 0.952999,
+      "vision_ratio": 0.047001
+    },
+    "middle": {
+      "mdi": 9.407378,
+      "aei_text": 2.924119,
+      "aei_vision": 0.310832,
+      "text_ratio": 0.903914,
+      "vision_ratio": 0.096086
+    },
+    "late": {
+      "mdi": 19.924093,
+      "aei_text": 3.325892,
+      "aei_vision": 0.166928,
+      "text_ratio": 0.952208,
+      "vision_ratio": 0.047792
+    },
+    "all": {
+      "mdi": 19.924093,
+      "aei_text": 3.194337,
+      "aei_vision": 0.214048,
+      "text_ratio": 0.952208,
+      "vision_ratio": 0.047792
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952208,
+      0.047792
+    ],
+    "text_vision_ratio": "0.952208:0.047792"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.275962,
+      "aei_text": 3.333001,
+      "aei_vision": 0.164382,
+      "text_ratio": 0.952999,
+      "vision_ratio": 0.047001
+    },
+    "middle": {
+      "mdi": 9.407378,
+      "aei_text": 2.924119,
+      "aei_vision": 0.310832,
+      "text_ratio": 0.903914,
+      "vision_ratio": 0.096086
+    },
+    "late": {
+      "mdi": 19.924093,
+      "aei_text": 3.325892,
+      "aei_vision": 0.166928,
+      "text_ratio": 0.952208,
+      "vision_ratio": 0.047792
+    },
+    "all": {
+      "mdi": 19.924093,
+      "aei_text": 3.194337,
+      "aei_vision": 0.214048,
+      "text_ratio": 0.952208,
+      "vision_ratio": 0.047792
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952208,
+      0.047792
+    ],
+    "text_vision_ratio": "0.952208:0.047792"
+  }
+}
+```
+
+
+## === Rollout Step 334 ===
+Step: 333/29790 | 2025-10-22 12:25:35
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 9.298 | 5.179 | 10.158 | 10.158 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.297975,
+      "aei_text": 2.115268,
+      "aei_vision": 0.227498,
+      "text_ratio": 0.902894,
+      "vision_ratio": 0.097106
+    },
+    "middle": {
+      "mdi": 5.17917,
+      "aei_text": 1.911009,
+      "aei_vision": 0.36898,
+      "text_ratio": 0.838166,
+      "vision_ratio": 0.161834
+    },
+    "late": {
+      "mdi": 10.157803,
+      "aei_text": 2.13961,
+      "aei_vision": 0.210637,
+      "text_ratio": 0.910377,
+      "vision_ratio": 0.089623
+    },
+    "all": {
+      "mdi": 10.157803,
+      "aei_text": 2.055296,
+      "aei_vision": 0.269038,
+      "text_ratio": 0.910377,
+      "vision_ratio": 0.089623
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.910377,
+      0.089623
+    ],
+    "text_vision_ratio": "0.910377:0.089623"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.297975,
+      "aei_text": 2.115268,
+      "aei_vision": 0.227498,
+      "text_ratio": 0.902894,
+      "vision_ratio": 0.097106
+    },
+    "middle": {
+      "mdi": 5.17917,
+      "aei_text": 1.911009,
+      "aei_vision": 0.36898,
+      "text_ratio": 0.838166,
+      "vision_ratio": 0.161834
+    },
+    "late": {
+      "mdi": 10.157803,
+      "aei_text": 2.13961,
+      "aei_vision": 0.210637,
+      "text_ratio": 0.910377,
+      "vision_ratio": 0.089623
+    },
+    "all": {
+      "mdi": 10.157803,
+      "aei_text": 2.055296,
+      "aei_vision": 0.269038,
+      "text_ratio": 0.910377,
+      "vision_ratio": 0.089623
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.910377,
+      0.089623
+    ],
+    "text_vision_ratio": "0.910377:0.089623"
+  }
+}
+```
+
+
+## === Rollout Step 335 ===
+Step: 334/29790 | 2025-10-22 12:25:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.336 | 7.078 | 15.448 | 15.448 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.336215,
+      "aei_text": 3.019165,
+      "aei_vision": 0.24474,
+      "text_ratio": 0.925016,
+      "vision_ratio": 0.074984
+    },
+    "middle": {
+      "mdi": 7.078396,
+      "aei_text": 2.66639,
+      "aei_vision": 0.376694,
+      "text_ratio": 0.876213,
+      "vision_ratio": 0.123787
+    },
+    "late": {
+      "mdi": 15.448413,
+      "aei_text": 3.131533,
+      "aei_vision": 0.202709,
+      "text_ratio": 0.939204,
+      "vision_ratio": 0.060796
+    },
+    "all": {
+      "mdi": 15.448413,
+      "aei_text": 2.939029,
+      "aei_vision": 0.274714,
+      "text_ratio": 0.939204,
+      "vision_ratio": 0.060796
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.939204,
+      0.060796
+    ],
+    "text_vision_ratio": "0.939204:0.060796"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.336215,
+      "aei_text": 3.019165,
+      "aei_vision": 0.24474,
+      "text_ratio": 0.925016,
+      "vision_ratio": 0.074984
+    },
+    "middle": {
+      "mdi": 7.078396,
+      "aei_text": 2.66639,
+      "aei_vision": 0.376694,
+      "text_ratio": 0.876213,
+      "vision_ratio": 0.123787
+    },
+    "late": {
+      "mdi": 15.448413,
+      "aei_text": 3.131533,
+      "aei_vision": 0.202709,
+      "text_ratio": 0.939204,
+      "vision_ratio": 0.060796
+    },
+    "all": {
+      "mdi": 15.448413,
+      "aei_text": 2.939029,
+      "aei_vision": 0.274714,
+      "text_ratio": 0.939204,
+      "vision_ratio": 0.060796
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.939204,
+      0.060796
+    ],
+    "text_vision_ratio": "0.939204:0.060796"
+  }
+}
+```
+
+
+## === Rollout Step 336 ===
+Step: 335/29790 | 2025-10-22 12:25:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.885 | 10.186 | 21.928 | 21.928 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.884567,
+      "aei_text": 2.689441,
+      "aei_vision": 0.169312,
+      "text_ratio": 0.940774,
+      "vision_ratio": 0.059226
+    },
+    "middle": {
+      "mdi": 10.185746,
+      "aei_text": 2.528849,
+      "aei_vision": 0.248273,
+      "text_ratio": 0.910601,
+      "vision_ratio": 0.089399
+    },
+    "late": {
+      "mdi": 21.928372,
+      "aei_text": 2.776292,
+      "aei_vision": 0.126607,
+      "text_ratio": 0.956386,
+      "vision_ratio": 0.043614
+    },
+    "all": {
+      "mdi": 21.928372,
+      "aei_text": 2.664861,
+      "aei_vision": 0.181397,
+      "text_ratio": 0.956386,
+      "vision_ratio": 0.043614
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956386,
+      0.043614
+    ],
+    "text_vision_ratio": "0.956386:0.043614"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.884567,
+      "aei_text": 2.689441,
+      "aei_vision": 0.169312,
+      "text_ratio": 0.940774,
+      "vision_ratio": 0.059226
+    },
+    "middle": {
+      "mdi": 10.185746,
+      "aei_text": 2.528849,
+      "aei_vision": 0.248273,
+      "text_ratio": 0.910601,
+      "vision_ratio": 0.089399
+    },
+    "late": {
+      "mdi": 21.928372,
+      "aei_text": 2.776292,
+      "aei_vision": 0.126607,
+      "text_ratio": 0.956386,
+      "vision_ratio": 0.043614
+    },
+    "all": {
+      "mdi": 21.928372,
+      "aei_text": 2.664861,
+      "aei_vision": 0.181397,
+      "text_ratio": 0.956386,
+      "vision_ratio": 0.043614
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956386,
+      0.043614
+    ],
+    "text_vision_ratio": "0.956386:0.043614"
+  }
+}
+```
+
+
+## === Rollout Step 337 ===
+Step: 336/29790 | 2025-10-22 12:25:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.191 | 10.244 | 18.168 | 18.168 |
+| MDI Std | 1.624 | 1.307 | 1.529 | 1.529 |
+| Vision Tokens | 508.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 508.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 508,
+    "text_tokens": 0,
+    "total_tokens": 508
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.567059,
+      "aei_text": 3.483886,
+      "aei_vision": 0.25679,
+      "text_ratio": 0.931352,
+      "vision_ratio": 0.068648
+    },
+    "middle": {
+      "mdi": 8.937388,
+      "aei_text": 3.160316,
+      "aei_vision": 0.353606,
+      "text_ratio": 0.89937,
+      "vision_ratio": 0.10063
+    },
+    "late": {
+      "mdi": 16.639143,
+      "aei_text": 3.615836,
+      "aei_vision": 0.217309,
+      "text_ratio": 0.943308,
+      "vision_ratio": 0.056692
+    },
+    "all": {
+      "mdi": 16.639143,
+      "aei_text": 3.420013,
+      "aei_vision": 0.275902,
+      "text_ratio": 0.943308,
+      "vision_ratio": 0.056692
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943308,
+      0.056692
+    ],
+    "text_vision_ratio": "0.943308:0.056692"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 508,
+    "text_tokens": 0,
+    "total_tokens": 508
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.814909,
+      "aei_text": 3.622169,
+      "aei_vision": 0.215414,
+      "text_ratio": 0.943867,
+      "vision_ratio": 0.056133
+    },
+    "middle": {
+      "mdi": 11.551297,
+      "aei_text": 3.367729,
+      "aei_vision": 0.291546,
+      "text_ratio": 0.920327,
+      "vision_ratio": 0.079673
+    },
+    "late": {
+      "mdi": 19.696785,
+      "aei_text": 3.712224,
+      "aei_vision": 0.188469,
+      "text_ratio": 0.951683,
+      "vision_ratio": 0.048317
+    },
+    "all": {
+      "mdi": 19.696785,
+      "aei_text": 3.567374,
+      "aei_vision": 0.231809,
+      "text_ratio": 0.951683,
+      "vision_ratio": 0.048317
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951683,
+      0.048317
+    ],
+    "text_vision_ratio": "0.951683:0.048317"
+  }
+}
+```
+
+
+## === Rollout Step 338 ===
+Step: 337/29790 | 2025-10-22 12:25:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.551 | 9.816 | 21.092 | 21.092 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.550643,
+      "aei_text": 3.017018,
+      "aei_vision": 0.18229,
+      "text_ratio": 0.943022,
+      "vision_ratio": 0.056978
+    },
+    "middle": {
+      "mdi": 9.815818,
+      "aei_text": 2.770463,
+      "aei_vision": 0.282245,
+      "text_ratio": 0.907543,
+      "vision_ratio": 0.092457
+    },
+    "late": {
+      "mdi": 21.092345,
+      "aei_text": 3.103701,
+      "aei_vision": 0.147148,
+      "text_ratio": 0.954735,
+      "vision_ratio": 0.045265
+    },
+    "all": {
+      "mdi": 21.092345,
+      "aei_text": 2.963727,
+      "aei_vision": 0.203894,
+      "text_ratio": 0.954735,
+      "vision_ratio": 0.045265
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954735,
+      0.045265
+    ],
+    "text_vision_ratio": "0.954735:0.045265"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.550643,
+      "aei_text": 3.017018,
+      "aei_vision": 0.18229,
+      "text_ratio": 0.943022,
+      "vision_ratio": 0.056978
+    },
+    "middle": {
+      "mdi": 9.815818,
+      "aei_text": 2.770463,
+      "aei_vision": 0.282245,
+      "text_ratio": 0.907543,
+      "vision_ratio": 0.092457
+    },
+    "late": {
+      "mdi": 21.092345,
+      "aei_text": 3.103701,
+      "aei_vision": 0.147148,
+      "text_ratio": 0.954735,
+      "vision_ratio": 0.045265
+    },
+    "all": {
+      "mdi": 21.092345,
+      "aei_text": 2.963727,
+      "aei_vision": 0.203894,
+      "text_ratio": 0.954735,
+      "vision_ratio": 0.045265
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954735,
+      0.045265
+    ],
+    "text_vision_ratio": "0.954735:0.045265"
+  }
+}
+```
+
+
+## === Rollout Step 339 ===
+Step: 338/29790 | 2025-10-22 12:25:53
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.417 | 10.200 | 16.564 | 16.564 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.417219,
+      "aei_text": 2.904117,
+      "aei_vision": 0.176895,
+      "text_ratio": 0.942586,
+      "vision_ratio": 0.057414
+    },
+    "middle": {
+      "mdi": 10.200499,
+      "aei_text": 2.700824,
+      "aei_vision": 0.264774,
+      "text_ratio": 0.910718,
+      "vision_ratio": 0.089282
+    },
+    "late": {
+      "mdi": 16.564051,
+      "aei_text": 2.9073,
+      "aei_vision": 0.175519,
+      "text_ratio": 0.943066,
+      "vision_ratio": 0.056934
+    },
+    "all": {
+      "mdi": 16.564051,
+      "aei_text": 2.837414,
+      "aei_vision": 0.205729,
+      "text_ratio": 0.943066,
+      "vision_ratio": 0.056934
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943066,
+      0.056934
+    ],
+    "text_vision_ratio": "0.943066:0.056934"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.417219,
+      "aei_text": 2.904117,
+      "aei_vision": 0.176895,
+      "text_ratio": 0.942586,
+      "vision_ratio": 0.057414
+    },
+    "middle": {
+      "mdi": 10.200499,
+      "aei_text": 2.700824,
+      "aei_vision": 0.264774,
+      "text_ratio": 0.910718,
+      "vision_ratio": 0.089282
+    },
+    "late": {
+      "mdi": 16.564051,
+      "aei_text": 2.9073,
+      "aei_vision": 0.175519,
+      "text_ratio": 0.943066,
+      "vision_ratio": 0.056934
+    },
+    "all": {
+      "mdi": 16.564051,
+      "aei_text": 2.837414,
+      "aei_vision": 0.205729,
+      "text_ratio": 0.943066,
+      "vision_ratio": 0.056934
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943066,
+      0.056934
+    ],
+    "text_vision_ratio": "0.943066:0.056934"
+  }
+}
+```
+
+
+## === Rollout Step 340 ===
+Step: 339/29790 | 2025-10-22 12:25:56
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.389 | 12.813 | 16.362 | 16.362 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.389123,
+      "aei_text": 2.990237,
+      "aei_vision": 0.162609,
+      "text_ratio": 0.948425,
+      "vision_ratio": 0.051575
+    },
+    "middle": {
+      "mdi": 12.812829,
+      "aei_text": 2.848357,
+      "aei_vision": 0.222305,
+      "text_ratio": 0.927604,
+      "vision_ratio": 0.072396
+    },
+    "late": {
+      "mdi": 16.361682,
+      "aei_text": 2.948422,
+      "aei_vision": 0.180203,
+      "text_ratio": 0.942402,
+      "vision_ratio": 0.057598
+    },
+    "all": {
+      "mdi": 16.361682,
+      "aei_text": 2.929005,
+      "aei_vision": 0.188372,
+      "text_ratio": 0.942402,
+      "vision_ratio": 0.057598
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942402,
+      0.057598
+    ],
+    "text_vision_ratio": "0.942402:0.057598"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.389123,
+      "aei_text": 2.990237,
+      "aei_vision": 0.162609,
+      "text_ratio": 0.948425,
+      "vision_ratio": 0.051575
+    },
+    "middle": {
+      "mdi": 12.812829,
+      "aei_text": 2.848357,
+      "aei_vision": 0.222305,
+      "text_ratio": 0.927604,
+      "vision_ratio": 0.072396
+    },
+    "late": {
+      "mdi": 16.361682,
+      "aei_text": 2.948422,
+      "aei_vision": 0.180203,
+      "text_ratio": 0.942402,
+      "vision_ratio": 0.057598
+    },
+    "all": {
+      "mdi": 16.361682,
+      "aei_text": 2.929005,
+      "aei_vision": 0.188372,
+      "text_ratio": 0.942402,
+      "vision_ratio": 0.057598
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942402,
+      0.057598
+    ],
+    "text_vision_ratio": "0.942402:0.057598"
+  }
+}
+```
+
+
+## === Rollout Step 341 ===
+Step: 340/29790 | 2025-10-22 12:26:00
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 25.998 | 16.099 | 16.549 | 16.549 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.998406,
+      "aei_text": 3.288591,
+      "aei_vision": 0.126492,
+      "text_ratio": 0.962961,
+      "vision_ratio": 0.037039
+    },
+    "middle": {
+      "mdi": 16.099287,
+      "aei_text": 3.113335,
+      "aei_vision": 0.193383,
+      "text_ratio": 0.941518,
+      "vision_ratio": 0.058482
+    },
+    "late": {
+      "mdi": 16.549292,
+      "aei_text": 3.125229,
+      "aei_vision": 0.188844,
+      "text_ratio": 0.943018,
+      "vision_ratio": 0.056982
+    },
+    "all": {
+      "mdi": 16.549292,
+      "aei_text": 3.175719,
+      "aei_vision": 0.169573,
+      "text_ratio": 0.943018,
+      "vision_ratio": 0.056982
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943018,
+      0.056982
+    ],
+    "text_vision_ratio": "0.943018:0.056982"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.998406,
+      "aei_text": 3.288591,
+      "aei_vision": 0.126492,
+      "text_ratio": 0.962961,
+      "vision_ratio": 0.037039
+    },
+    "middle": {
+      "mdi": 16.099287,
+      "aei_text": 3.113335,
+      "aei_vision": 0.193383,
+      "text_ratio": 0.941518,
+      "vision_ratio": 0.058482
+    },
+    "late": {
+      "mdi": 16.549292,
+      "aei_text": 3.125229,
+      "aei_vision": 0.188844,
+      "text_ratio": 0.943018,
+      "vision_ratio": 0.056982
+    },
+    "all": {
+      "mdi": 16.549292,
+      "aei_text": 3.175719,
+      "aei_vision": 0.169573,
+      "text_ratio": 0.943018,
+      "vision_ratio": 0.056982
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943018,
+      0.056982
+    ],
+    "text_vision_ratio": "0.943018:0.056982"
+  }
+}
+```
+
+
+## === Rollout Step 342 ===
+Step: 341/29790 | 2025-10-22 12:26:03
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.807 | 9.959 | 11.411 | 11.411 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.80697,
+      "aei_text": 2.349764,
+      "aei_vision": 0.124941,
+      "text_ratio": 0.949513,
+      "vision_ratio": 0.050487
+    },
+    "middle": {
+      "mdi": 9.959104,
+      "aei_text": 2.20151,
+      "aei_vision": 0.221055,
+      "text_ratio": 0.908752,
+      "vision_ratio": 0.091248
+    },
+    "late": {
+      "mdi": 11.411098,
+      "aei_text": 2.23973,
+      "aei_vision": 0.196276,
+      "text_ratio": 0.919427,
+      "vision_ratio": 0.080573
+    },
+    "all": {
+      "mdi": 11.411098,
+      "aei_text": 2.263668,
+      "aei_vision": 0.180758,
+      "text_ratio": 0.919427,
+      "vision_ratio": 0.080573
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.919427,
+      0.080573
+    ],
+    "text_vision_ratio": "0.919427:0.080573"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.80697,
+      "aei_text": 2.349764,
+      "aei_vision": 0.124941,
+      "text_ratio": 0.949513,
+      "vision_ratio": 0.050487
+    },
+    "middle": {
+      "mdi": 9.959104,
+      "aei_text": 2.20151,
+      "aei_vision": 0.221055,
+      "text_ratio": 0.908752,
+      "vision_ratio": 0.091248
+    },
+    "late": {
+      "mdi": 11.411098,
+      "aei_text": 2.23973,
+      "aei_vision": 0.196276,
+      "text_ratio": 0.919427,
+      "vision_ratio": 0.080573
+    },
+    "all": {
+      "mdi": 11.411098,
+      "aei_text": 2.263668,
+      "aei_vision": 0.180758,
+      "text_ratio": 0.919427,
+      "vision_ratio": 0.080573
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.919427,
+      0.080573
+    ],
+    "text_vision_ratio": "0.919427:0.080573"
+  }
+}
+```
+
+
+## === Rollout Step 343 ===
+Step: 342/29790 | 2025-10-22 12:26:06
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.901 | 8.775 | 22.921 | 22.921 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.901436,
+      "aei_text": 3.139346,
+      "aei_vision": 0.210674,
+      "text_ratio": 0.937113,
+      "vision_ratio": 0.062887
+    },
+    "middle": {
+      "mdi": 8.774868,
+      "aei_text": 2.834757,
+      "aei_vision": 0.323054,
+      "text_ratio": 0.897697,
+      "vision_ratio": 0.102303
+    },
+    "late": {
+      "mdi": 22.92111,
+      "aei_text": 3.318002,
+      "aei_vision": 0.144757,
+      "text_ratio": 0.958196,
+      "vision_ratio": 0.041804
+    },
+    "all": {
+      "mdi": 22.92111,
+      "aei_text": 3.097368,
+      "aei_vision": 0.226162,
+      "text_ratio": 0.958196,
+      "vision_ratio": 0.041804
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958196,
+      0.041804
+    ],
+    "text_vision_ratio": "0.958196:0.041804"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.901436,
+      "aei_text": 3.139346,
+      "aei_vision": 0.210674,
+      "text_ratio": 0.937113,
+      "vision_ratio": 0.062887
+    },
+    "middle": {
+      "mdi": 8.774868,
+      "aei_text": 2.834757,
+      "aei_vision": 0.323054,
+      "text_ratio": 0.897697,
+      "vision_ratio": 0.102303
+    },
+    "late": {
+      "mdi": 22.92111,
+      "aei_text": 3.318002,
+      "aei_vision": 0.144757,
+      "text_ratio": 0.958196,
+      "vision_ratio": 0.041804
+    },
+    "all": {
+      "mdi": 22.92111,
+      "aei_text": 3.097368,
+      "aei_vision": 0.226162,
+      "text_ratio": 0.958196,
+      "vision_ratio": 0.041804
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958196,
+      0.041804
+    ],
+    "text_vision_ratio": "0.958196:0.041804"
+  }
+}
+```
+
+
+## === Rollout Step 344 ===
+Step: 343/29790 | 2025-10-22 12:26:10
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 9.281 | 6.420 | 19.253 | 19.253 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.280788,
+      "aei_text": 2.160626,
+      "aei_vision": 0.232806,
+      "text_ratio": 0.902731,
+      "vision_ratio": 0.097269
+    },
+    "middle": {
+      "mdi": 6.419796,
+      "aei_text": 2.033603,
+      "aei_vision": 0.316771,
+      "text_ratio": 0.865225,
+      "vision_ratio": 0.134775
+    },
+    "late": {
+      "mdi": 19.253367,
+      "aei_text": 2.329761,
+      "aei_vision": 0.121005,
+      "text_ratio": 0.950625,
+      "vision_ratio": 0.049375
+    },
+    "all": {
+      "mdi": 19.253367,
+      "aei_text": 2.174664,
+      "aei_vision": 0.223527,
+      "text_ratio": 0.950625,
+      "vision_ratio": 0.049375
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950625,
+      0.049375
+    ],
+    "text_vision_ratio": "0.950625:0.049375"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.280788,
+      "aei_text": 2.160626,
+      "aei_vision": 0.232806,
+      "text_ratio": 0.902731,
+      "vision_ratio": 0.097269
+    },
+    "middle": {
+      "mdi": 6.419796,
+      "aei_text": 2.033603,
+      "aei_vision": 0.316771,
+      "text_ratio": 0.865225,
+      "vision_ratio": 0.134775
+    },
+    "late": {
+      "mdi": 19.253367,
+      "aei_text": 2.329761,
+      "aei_vision": 0.121005,
+      "text_ratio": 0.950625,
+      "vision_ratio": 0.049375
+    },
+    "all": {
+      "mdi": 19.253367,
+      "aei_text": 2.174664,
+      "aei_vision": 0.223527,
+      "text_ratio": 0.950625,
+      "vision_ratio": 0.049375
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950625,
+      0.049375
+    ],
+    "text_vision_ratio": "0.950625:0.049375"
+  }
+}
+```
+
+
+## === Rollout Step 345 ===
+Step: 344/29790 | 2025-10-22 12:26:13
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.000 | 10.702 | 16.641 | 16.641 |
+| MDI Std | 2.586 | 0.466 | 0.716 | 0.716 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.414494,
+      "aei_text": 2.82599,
+      "aei_vision": 0.210667,
+      "text_ratio": 0.930625,
+      "vision_ratio": 0.069375
+    },
+    "middle": {
+      "mdi": 10.235743,
+      "aei_text": 2.702544,
+      "aei_vision": 0.26403,
+      "text_ratio": 0.910998,
+      "vision_ratio": 0.089002
+    },
+    "late": {
+      "mdi": 15.92552,
+      "aei_text": 2.893085,
+      "aei_vision": 0.181663,
+      "text_ratio": 0.940918,
+      "vision_ratio": 0.059082
+    },
+    "all": {
+      "mdi": 15.92552,
+      "aei_text": 2.807206,
+      "aei_vision": 0.218787,
+      "text_ratio": 0.940918,
+      "vision_ratio": 0.059082
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940918,
+      0.059082
+    ],
+    "text_vision_ratio": "0.940918:0.059082"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.585619,
+      "aei_text": 2.946576,
+      "aei_vision": 0.158541,
+      "text_ratio": 0.948942,
+      "vision_ratio": 0.051058
+    },
+    "middle": {
+      "mdi": 11.168703,
+      "aei_text": 2.744811,
+      "aei_vision": 0.245759,
+      "text_ratio": 0.917822,
+      "vision_ratio": 0.082178
+    },
+    "late": {
+      "mdi": 17.35729,
+      "aei_text": 2.923674,
+      "aei_vision": 0.168441,
+      "text_ratio": 0.945526,
+      "vision_ratio": 0.054474
+    },
+    "all": {
+      "mdi": 17.35729,
+      "aei_text": 2.871687,
+      "aei_vision": 0.190913,
+      "text_ratio": 0.945526,
+      "vision_ratio": 0.054474
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945526,
+      0.054474
+    ],
+    "text_vision_ratio": "0.945526:0.054474"
+  }
+}
+```
+
+
+## === Rollout Step 346 ===
+Step: 345/29790 | 2025-10-22 12:26:16
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.232 | 7.623 | 18.511 | 18.511 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.231856,
+      "aei_text": 2.944026,
+      "aei_vision": 0.170848,
+      "text_ratio": 0.945151,
+      "vision_ratio": 0.054849
+    },
+    "middle": {
+      "mdi": 7.623111,
+      "aei_text": 2.557882,
+      "aei_vision": 0.335543,
+      "text_ratio": 0.884033,
+      "vision_ratio": 0.115967
+    },
+    "late": {
+      "mdi": 18.511333,
+      "aei_text": 2.9686,
+      "aei_vision": 0.160367,
+      "text_ratio": 0.948748,
+      "vision_ratio": 0.051252
+    },
+    "all": {
+      "mdi": 18.511333,
+      "aei_text": 2.823503,
+      "aei_vision": 0.222253,
+      "text_ratio": 0.948748,
+      "vision_ratio": 0.051252
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948748,
+      0.051252
+    ],
+    "text_vision_ratio": "0.948748:0.051252"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.231856,
+      "aei_text": 2.944026,
+      "aei_vision": 0.170848,
+      "text_ratio": 0.945151,
+      "vision_ratio": 0.054849
+    },
+    "middle": {
+      "mdi": 7.623111,
+      "aei_text": 2.557882,
+      "aei_vision": 0.335543,
+      "text_ratio": 0.884033,
+      "vision_ratio": 0.115967
+    },
+    "late": {
+      "mdi": 18.511333,
+      "aei_text": 2.9686,
+      "aei_vision": 0.160367,
+      "text_ratio": 0.948748,
+      "vision_ratio": 0.051252
+    },
+    "all": {
+      "mdi": 18.511333,
+      "aei_text": 2.823503,
+      "aei_vision": 0.222253,
+      "text_ratio": 0.948748,
+      "vision_ratio": 0.051252
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948748,
+      0.051252
+    ],
+    "text_vision_ratio": "0.948748:0.051252"
+  }
+}
+```
+
+
+## === Rollout Step 347 ===
+Step: 346/29790 | 2025-10-22 12:26:20
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.399 | 9.819 | 20.429 | 20.429 |
+| MDI Std | 0.265 | 0.582 | 1.330 | 1.330 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.663231,
+      "aei_text": 2.939164,
+      "aei_vision": 0.187647,
+      "text_ratio": 0.939988,
+      "vision_ratio": 0.060012
+    },
+    "middle": {
+      "mdi": 10.401484,
+      "aei_text": 2.754866,
+      "aei_vision": 0.264853,
+      "text_ratio": 0.912292,
+      "vision_ratio": 0.087708
+    },
+    "late": {
+      "mdi": 19.099193,
+      "aei_text": 3.010795,
+      "aei_vision": 0.15764,
+      "text_ratio": 0.950247,
+      "vision_ratio": 0.049753
+    },
+    "all": {
+      "mdi": 19.099193,
+      "aei_text": 2.901609,
+      "aei_vision": 0.20338,
+      "text_ratio": 0.950247,
+      "vision_ratio": 0.049753
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950247,
+      0.049753
+    ],
+    "text_vision_ratio": "0.950247:0.049753"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.133848,
+      "aei_text": 2.92563,
+      "aei_vision": 0.193317,
+      "text_ratio": 0.938019,
+      "vision_ratio": 0.061981
+    },
+    "middle": {
+      "mdi": 9.237182,
+      "aei_text": 2.691542,
+      "aei_vision": 0.291381,
+      "text_ratio": 0.902317,
+      "vision_ratio": 0.097683
+    },
+    "late": {
+      "mdi": 21.758383,
+      "aei_text": 3.052238,
+      "aei_vision": 0.140279,
+      "text_ratio": 0.95606,
+      "vision_ratio": 0.04394
+    },
+    "all": {
+      "mdi": 21.758383,
+      "aei_text": 2.889803,
+      "aei_vision": 0.208326,
+      "text_ratio": 0.95606,
+      "vision_ratio": 0.04394
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95606,
+      0.04394
+    ],
+    "text_vision_ratio": "0.956060:0.043940"
+  }
+}
+```
+
+
+## === Rollout Step 348 ===
+Step: 347/29790 | 2025-10-22 12:26:23
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.427 | 16.307 | 18.066 | 18.066 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.426906,
+      "aei_text": 2.868197,
+      "aei_vision": 0.122432,
+      "text_ratio": 0.959062,
+      "vision_ratio": 0.040938
+    },
+    "middle": {
+      "mdi": 16.307359,
+      "aei_text": 2.767547,
+      "aei_vision": 0.169712,
+      "text_ratio": 0.942221,
+      "vision_ratio": 0.057779
+    },
+    "late": {
+      "mdi": 18.066063,
+      "aei_text": 2.79901,
+      "aei_vision": 0.154932,
+      "text_ratio": 0.947551,
+      "vision_ratio": 0.052449
+    },
+    "all": {
+      "mdi": 18.066063,
+      "aei_text": 2.811585,
+      "aei_vision": 0.149025,
+      "text_ratio": 0.947551,
+      "vision_ratio": 0.052449
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947551,
+      0.052449
+    ],
+    "text_vision_ratio": "0.947551:0.052449"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.426906,
+      "aei_text": 2.868197,
+      "aei_vision": 0.122432,
+      "text_ratio": 0.959062,
+      "vision_ratio": 0.040938
+    },
+    "middle": {
+      "mdi": 16.307359,
+      "aei_text": 2.767547,
+      "aei_vision": 0.169712,
+      "text_ratio": 0.942221,
+      "vision_ratio": 0.057779
+    },
+    "late": {
+      "mdi": 18.066063,
+      "aei_text": 2.79901,
+      "aei_vision": 0.154932,
+      "text_ratio": 0.947551,
+      "vision_ratio": 0.052449
+    },
+    "all": {
+      "mdi": 18.066063,
+      "aei_text": 2.811585,
+      "aei_vision": 0.149025,
+      "text_ratio": 0.947551,
+      "vision_ratio": 0.052449
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947551,
+      0.052449
+    ],
+    "text_vision_ratio": "0.947551:0.052449"
+  }
+}
+```
+
+
+## === Rollout Step 349 ===
+Step: 348/29790 | 2025-10-22 12:26:27
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.643 | 10.956 | 18.806 | 18.806 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.642514,
+      "aei_text": 3.199653,
+      "aei_vision": 0.171632,
+      "text_ratio": 0.94909,
+      "vision_ratio": 0.05091
+    },
+    "middle": {
+      "mdi": 10.955663,
+      "aei_text": 2.942266,
+      "aei_vision": 0.268561,
+      "text_ratio": 0.916358,
+      "vision_ratio": 0.083642
+    },
+    "late": {
+      "mdi": 18.80647,
+      "aei_text": 3.203134,
+      "aei_vision": 0.170321,
+      "text_ratio": 0.949511,
+      "vision_ratio": 0.050489
+    },
+    "all": {
+      "mdi": 18.80647,
+      "aei_text": 3.115018,
+      "aei_vision": 0.203505,
+      "text_ratio": 0.949511,
+      "vision_ratio": 0.050489
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949511,
+      0.050489
+    ],
+    "text_vision_ratio": "0.949511:0.050489"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.642514,
+      "aei_text": 3.199653,
+      "aei_vision": 0.171632,
+      "text_ratio": 0.94909,
+      "vision_ratio": 0.05091
+    },
+    "middle": {
+      "mdi": 10.955663,
+      "aei_text": 2.942266,
+      "aei_vision": 0.268561,
+      "text_ratio": 0.916358,
+      "vision_ratio": 0.083642
+    },
+    "late": {
+      "mdi": 18.80647,
+      "aei_text": 3.203134,
+      "aei_vision": 0.170321,
+      "text_ratio": 0.949511,
+      "vision_ratio": 0.050489
+    },
+    "all": {
+      "mdi": 18.80647,
+      "aei_text": 3.115018,
+      "aei_vision": 0.203505,
+      "text_ratio": 0.949511,
+      "vision_ratio": 0.050489
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949511,
+      0.050489
+    ],
+    "text_vision_ratio": "0.949511:0.050489"
+  }
+}
+```
+
+
+## === Rollout Step 350 ===
+Step: 349/29790 | 2025-10-22 12:26:31
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.505 | 8.759 | 14.158 | 14.158 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.505254,
+      "aei_text": 3.015157,
+      "aei_vision": 0.241111,
+      "text_ratio": 0.925955,
+      "vision_ratio": 0.074045
+    },
+    "middle": {
+      "mdi": 8.759407,
+      "aei_text": 2.805056,
+      "aei_vision": 0.320234,
+      "text_ratio": 0.897535,
+      "vision_ratio": 0.102465
+    },
+    "late": {
+      "mdi": 14.157743,
+      "aei_text": 3.078084,
+      "aei_vision": 0.217413,
+      "text_ratio": 0.934027,
+      "vision_ratio": 0.065973
+    },
+    "all": {
+      "mdi": 14.157743,
+      "aei_text": 2.966099,
+      "aei_vision": 0.259586,
+      "text_ratio": 0.934027,
+      "vision_ratio": 0.065973
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934027,
+      0.065973
+    ],
+    "text_vision_ratio": "0.934027:0.065973"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.505254,
+      "aei_text": 3.015157,
+      "aei_vision": 0.241111,
+      "text_ratio": 0.925955,
+      "vision_ratio": 0.074045
+    },
+    "middle": {
+      "mdi": 8.759407,
+      "aei_text": 2.805056,
+      "aei_vision": 0.320234,
+      "text_ratio": 0.897535,
+      "vision_ratio": 0.102465
+    },
+    "late": {
+      "mdi": 14.157743,
+      "aei_text": 3.078084,
+      "aei_vision": 0.217413,
+      "text_ratio": 0.934027,
+      "vision_ratio": 0.065973
+    },
+    "all": {
+      "mdi": 14.157743,
+      "aei_text": 2.966099,
+      "aei_vision": 0.259586,
+      "text_ratio": 0.934027,
+      "vision_ratio": 0.065973
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934027,
+      0.065973
+    ],
+    "text_vision_ratio": "0.934027:0.065973"
+  }
+}
+```
+
+
+## === Rollout Step 351 ===
+Step: 350/29790 | 2025-10-22 12:26:35
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.121 | 14.084 | 22.261 | 22.261 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.120825,
+      "aei_text": 3.183752,
+      "aei_vision": 0.166507,
+      "text_ratio": 0.9503,
+      "vision_ratio": 0.0497
+    },
+    "middle": {
+      "mdi": 14.084117,
+      "aei_text": 3.052212,
+      "aei_vision": 0.216713,
+      "text_ratio": 0.933705,
+      "vision_ratio": 0.066295
+    },
+    "late": {
+      "mdi": 22.261374,
+      "aei_text": 3.238815,
+      "aei_vision": 0.14549,
+      "text_ratio": 0.95701,
+      "vision_ratio": 0.04299
+    },
+    "all": {
+      "mdi": 22.261374,
+      "aei_text": 3.15826,
+      "aei_vision": 0.176237,
+      "text_ratio": 0.95701,
+      "vision_ratio": 0.04299
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95701,
+      0.04299
+    ],
+    "text_vision_ratio": "0.957010:0.042990"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.120825,
+      "aei_text": 3.183752,
+      "aei_vision": 0.166507,
+      "text_ratio": 0.9503,
+      "vision_ratio": 0.0497
+    },
+    "middle": {
+      "mdi": 14.084117,
+      "aei_text": 3.052212,
+      "aei_vision": 0.216713,
+      "text_ratio": 0.933705,
+      "vision_ratio": 0.066295
+    },
+    "late": {
+      "mdi": 22.261374,
+      "aei_text": 3.238815,
+      "aei_vision": 0.14549,
+      "text_ratio": 0.95701,
+      "vision_ratio": 0.04299
+    },
+    "all": {
+      "mdi": 22.261374,
+      "aei_text": 3.15826,
+      "aei_vision": 0.176237,
+      "text_ratio": 0.95701,
+      "vision_ratio": 0.04299
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95701,
+      0.04299
+    ],
+    "text_vision_ratio": "0.957010:0.042990"
+  }
+}
+```
+
+
+## === Rollout Step 352 ===
+Step: 351/29790 | 2025-10-22 12:26:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.021 | 10.640 | 16.486 | 16.486 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.02053,
+      "aei_text": 3.070598,
+      "aei_vision": 0.204427,
+      "text_ratio": 0.93758,
+      "vision_ratio": 0.06242
+    },
+    "middle": {
+      "mdi": 10.639861,
+      "aei_text": 2.894594,
+      "aei_vision": 0.272052,
+      "text_ratio": 0.914088,
+      "vision_ratio": 0.085912
+    },
+    "late": {
+      "mdi": 16.486379,
+      "aei_text": 3.111454,
+      "aei_vision": 0.188729,
+      "text_ratio": 0.942813,
+      "vision_ratio": 0.057187
+    },
+    "all": {
+      "mdi": 16.486379,
+      "aei_text": 3.025549,
+      "aei_vision": 0.221736,
+      "text_ratio": 0.942813,
+      "vision_ratio": 0.057187
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942813,
+      0.057187
+    ],
+    "text_vision_ratio": "0.942813:0.057187"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.02053,
+      "aei_text": 3.070598,
+      "aei_vision": 0.204427,
+      "text_ratio": 0.93758,
+      "vision_ratio": 0.06242
+    },
+    "middle": {
+      "mdi": 10.639861,
+      "aei_text": 2.894594,
+      "aei_vision": 0.272052,
+      "text_ratio": 0.914088,
+      "vision_ratio": 0.085912
+    },
+    "late": {
+      "mdi": 16.486379,
+      "aei_text": 3.111454,
+      "aei_vision": 0.188729,
+      "text_ratio": 0.942813,
+      "vision_ratio": 0.057187
+    },
+    "all": {
+      "mdi": 16.486379,
+      "aei_text": 3.025549,
+      "aei_vision": 0.221736,
+      "text_ratio": 0.942813,
+      "vision_ratio": 0.057187
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942813,
+      0.057187
+    ],
+    "text_vision_ratio": "0.942813:0.057187"
+  }
+}
+```
+
+
+## === Rollout Step 353 ===
+Step: 352/29790 | 2025-10-22 12:26:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.809 | 16.702 | 23.480 | 23.480 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.809128,
+      "aei_text": 3.184278,
+      "aei_vision": 0.160748,
+      "text_ratio": 0.951944,
+      "vision_ratio": 0.048056
+    },
+    "middle": {
+      "mdi": 16.701516,
+      "aei_text": 3.116928,
+      "aei_vision": 0.186625,
+      "text_ratio": 0.943508,
+      "vision_ratio": 0.056492
+    },
+    "late": {
+      "mdi": 23.479944,
+      "aei_text": 3.243159,
+      "aei_vision": 0.138125,
+      "text_ratio": 0.95915,
+      "vision_ratio": 0.04085
+    },
+    "all": {
+      "mdi": 23.479944,
+      "aei_text": 3.181455,
+      "aei_vision": 0.161833,
+      "text_ratio": 0.95915,
+      "vision_ratio": 0.04085
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95915,
+      0.04085
+    ],
+    "text_vision_ratio": "0.959150:0.040850"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.809128,
+      "aei_text": 3.184278,
+      "aei_vision": 0.160748,
+      "text_ratio": 0.951944,
+      "vision_ratio": 0.048056
+    },
+    "middle": {
+      "mdi": 16.701516,
+      "aei_text": 3.116928,
+      "aei_vision": 0.186625,
+      "text_ratio": 0.943508,
+      "vision_ratio": 0.056492
+    },
+    "late": {
+      "mdi": 23.479944,
+      "aei_text": 3.243159,
+      "aei_vision": 0.138125,
+      "text_ratio": 0.95915,
+      "vision_ratio": 0.04085
+    },
+    "all": {
+      "mdi": 23.479944,
+      "aei_text": 3.181455,
+      "aei_vision": 0.161833,
+      "text_ratio": 0.95915,
+      "vision_ratio": 0.04085
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95915,
+      0.04085
+    ],
+    "text_vision_ratio": "0.959150:0.040850"
+  }
+}
+```
+
+
+## === Rollout Step 354 ===
+Step: 353/29790 | 2025-10-22 12:26:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.973 | 13.758 | 24.204 | 24.204 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.97324,
+      "aei_text": 3.143108,
+      "aei_vision": 0.16566,
+      "text_ratio": 0.949933,
+      "vision_ratio": 0.050067
+    },
+    "middle": {
+      "mdi": 13.758324,
+      "aei_text": 3.007195,
+      "aei_vision": 0.218573,
+      "text_ratio": 0.932242,
+      "vision_ratio": 0.067758
+    },
+    "late": {
+      "mdi": 24.203552,
+      "aei_text": 3.226239,
+      "aei_vision": 0.133296,
+      "text_ratio": 0.960323,
+      "vision_ratio": 0.039677
+    },
+    "all": {
+      "mdi": 24.203552,
+      "aei_text": 3.125514,
+      "aei_vision": 0.17251,
+      "text_ratio": 0.960323,
+      "vision_ratio": 0.039677
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960323,
+      0.039677
+    ],
+    "text_vision_ratio": "0.960323:0.039677"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.97324,
+      "aei_text": 3.143108,
+      "aei_vision": 0.16566,
+      "text_ratio": 0.949933,
+      "vision_ratio": 0.050067
+    },
+    "middle": {
+      "mdi": 13.758324,
+      "aei_text": 3.007195,
+      "aei_vision": 0.218573,
+      "text_ratio": 0.932242,
+      "vision_ratio": 0.067758
+    },
+    "late": {
+      "mdi": 24.203552,
+      "aei_text": 3.226239,
+      "aei_vision": 0.133296,
+      "text_ratio": 0.960323,
+      "vision_ratio": 0.039677
+    },
+    "all": {
+      "mdi": 24.203552,
+      "aei_text": 3.125514,
+      "aei_vision": 0.17251,
+      "text_ratio": 0.960323,
+      "vision_ratio": 0.039677
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960323,
+      0.039677
+    ],
+    "text_vision_ratio": "0.960323:0.039677"
+  }
+}
+```
+
+
+## === Rollout Step 355 ===
+Step: 354/29790 | 2025-10-22 12:26:50
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 28.535 | 11.036 | 22.537 | 22.537 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 531.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 531.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.535334,
+      "aei_text": 4.093993,
+      "aei_vision": 0.143471,
+      "text_ratio": 0.966142,
+      "vision_ratio": 0.033858
+    },
+    "middle": {
+      "mdi": 11.036017,
+      "aei_text": 3.474871,
+      "aei_vision": 0.314866,
+      "text_ratio": 0.916916,
+      "vision_ratio": 0.083084
+    },
+    "late": {
+      "mdi": 22.537458,
+      "aei_text": 3.975123,
+      "aei_vision": 0.176378,
+      "text_ratio": 0.957515,
+      "vision_ratio": 0.042485
+    },
+    "all": {
+      "mdi": 22.537458,
+      "aei_text": 3.847995,
+      "aei_vision": 0.211572,
+      "text_ratio": 0.957515,
+      "vision_ratio": 0.042485
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957515,
+      0.042485
+    ],
+    "text_vision_ratio": "0.957515:0.042485"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.535334,
+      "aei_text": 4.093993,
+      "aei_vision": 0.143471,
+      "text_ratio": 0.966142,
+      "vision_ratio": 0.033858
+    },
+    "middle": {
+      "mdi": 11.036017,
+      "aei_text": 3.474871,
+      "aei_vision": 0.314866,
+      "text_ratio": 0.916916,
+      "vision_ratio": 0.083084
+    },
+    "late": {
+      "mdi": 22.537458,
+      "aei_text": 3.975123,
+      "aei_vision": 0.176378,
+      "text_ratio": 0.957515,
+      "vision_ratio": 0.042485
+    },
+    "all": {
+      "mdi": 22.537458,
+      "aei_text": 3.847995,
+      "aei_vision": 0.211572,
+      "text_ratio": 0.957515,
+      "vision_ratio": 0.042485
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957515,
+      0.042485
+    ],
+    "text_vision_ratio": "0.957515:0.042485"
+  }
+}
+```
+
+
+## === Rollout Step 356 ===
+Step: 355/29790 | 2025-10-22 12:26:54
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 27.355 | 13.563 | 18.530 | 18.530 |
+| MDI Std | 0.087 | 0.480 | 0.504 | 0.504 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.441363,
+      "aei_text": 2.779672,
+      "aei_vision": 0.101295,
+      "text_ratio": 0.96484,
+      "vision_ratio": 0.03516
+    },
+    "middle": {
+      "mdi": 13.082526,
+      "aei_text": 2.588456,
+      "aei_vision": 0.197856,
+      "text_ratio": 0.92899,
+      "vision_ratio": 0.07101
+    },
+    "late": {
+      "mdi": 18.026172,
+      "aei_text": 2.685273,
+      "aei_vision": 0.148965,
+      "text_ratio": 0.947441,
+      "vision_ratio": 0.052559
+    },
+    "all": {
+      "mdi": 18.026172,
+      "aei_text": 2.684467,
+      "aei_vision": 0.149372,
+      "text_ratio": 0.947441,
+      "vision_ratio": 0.052559
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947441,
+      0.052559
+    ],
+    "text_vision_ratio": "0.947441:0.052559"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.268312,
+      "aei_text": 2.778486,
+      "aei_vision": 0.101894,
+      "text_ratio": 0.964625,
+      "vision_ratio": 0.035375
+    },
+    "middle": {
+      "mdi": 14.043498,
+      "aei_text": 2.611954,
+      "aei_vision": 0.18599,
+      "text_ratio": 0.933526,
+      "vision_ratio": 0.066474
+    },
+    "late": {
+      "mdi": 19.033921,
+      "aei_text": 2.699419,
+      "aei_vision": 0.141822,
+      "text_ratio": 0.950085,
+      "vision_ratio": 0.049915
+    },
+    "all": {
+      "mdi": 19.033921,
+      "aei_text": 2.696619,
+      "aei_vision": 0.143235,
+      "text_ratio": 0.950085,
+      "vision_ratio": 0.049915
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950085,
+      0.049915
+    ],
+    "text_vision_ratio": "0.950085:0.049915"
+  }
+}
+```
+
+
+## === Rollout Step 357 ===
+Step: 356/29790 | 2025-10-22 12:26:57
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.945 | 7.990 | 19.808 | 19.808 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.944752,
+      "aei_text": 2.852906,
+      "aei_vision": 0.220391,
+      "text_ratio": 0.928288,
+      "vision_ratio": 0.071712
+    },
+    "middle": {
+      "mdi": 7.990498,
+      "aei_text": 2.602591,
+      "aei_vision": 0.325711,
+      "text_ratio": 0.888771,
+      "vision_ratio": 0.111229
+    },
+    "late": {
+      "mdi": 19.808348,
+      "aei_text": 3.014961,
+      "aei_vision": 0.152207,
+      "text_ratio": 0.951942,
+      "vision_ratio": 0.048058
+    },
+    "all": {
+      "mdi": 19.808348,
+      "aei_text": 2.823486,
+      "aei_vision": 0.232769,
+      "text_ratio": 0.951942,
+      "vision_ratio": 0.048058
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951942,
+      0.048058
+    ],
+    "text_vision_ratio": "0.951942:0.048058"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.944752,
+      "aei_text": 2.852906,
+      "aei_vision": 0.220391,
+      "text_ratio": 0.928288,
+      "vision_ratio": 0.071712
+    },
+    "middle": {
+      "mdi": 7.990498,
+      "aei_text": 2.602591,
+      "aei_vision": 0.325711,
+      "text_ratio": 0.888771,
+      "vision_ratio": 0.111229
+    },
+    "late": {
+      "mdi": 19.808348,
+      "aei_text": 3.014961,
+      "aei_vision": 0.152207,
+      "text_ratio": 0.951942,
+      "vision_ratio": 0.048058
+    },
+    "all": {
+      "mdi": 19.808348,
+      "aei_text": 2.823486,
+      "aei_vision": 0.232769,
+      "text_ratio": 0.951942,
+      "vision_ratio": 0.048058
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951942,
+      0.048058
+    ],
+    "text_vision_ratio": "0.951942:0.048058"
+  }
+}
+```
+
+
+## === Rollout Step 358 ===
+Step: 357/29790 | 2025-10-22 12:27:01
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.630 | 12.811 | 22.200 | 22.200 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.62951,
+      "aei_text": 3.2665,
+      "aei_vision": 0.166408,
+      "text_ratio": 0.951526,
+      "vision_ratio": 0.048474
+    },
+    "middle": {
+      "mdi": 12.810716,
+      "aei_text": 3.067835,
+      "aei_vision": 0.239474,
+      "text_ratio": 0.927592,
+      "vision_ratio": 0.072408
+    },
+    "late": {
+      "mdi": 22.199799,
+      "aei_text": 3.313169,
+      "aei_vision": 0.149243,
+      "text_ratio": 0.956896,
+      "vision_ratio": 0.043104
+    },
+    "all": {
+      "mdi": 22.199799,
+      "aei_text": 3.215834,
+      "aei_vision": 0.185042,
+      "text_ratio": 0.956896,
+      "vision_ratio": 0.043104
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956896,
+      0.043104
+    ],
+    "text_vision_ratio": "0.956896:0.043104"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.62951,
+      "aei_text": 3.2665,
+      "aei_vision": 0.166408,
+      "text_ratio": 0.951526,
+      "vision_ratio": 0.048474
+    },
+    "middle": {
+      "mdi": 12.810716,
+      "aei_text": 3.067835,
+      "aei_vision": 0.239474,
+      "text_ratio": 0.927592,
+      "vision_ratio": 0.072408
+    },
+    "late": {
+      "mdi": 22.199799,
+      "aei_text": 3.313169,
+      "aei_vision": 0.149243,
+      "text_ratio": 0.956896,
+      "vision_ratio": 0.043104
+    },
+    "all": {
+      "mdi": 22.199799,
+      "aei_text": 3.215834,
+      "aei_vision": 0.185042,
+      "text_ratio": 0.956896,
+      "vision_ratio": 0.043104
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956896,
+      0.043104
+    ],
+    "text_vision_ratio": "0.956896:0.043104"
+  }
+}
+```
+
+
+## === Rollout Step 359 ===
+Step: 358/29790 | 2025-10-22 12:27:05
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 27.925 | 19.474 | 22.050 | 22.050 |
+| MDI Std | 0.234 | 0.109 | 1.714 | 1.714 |
+| Vision Tokens | 486.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 486.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.69171,
+      "aei_text": 3.81266,
+      "aei_vision": 0.137682,
+      "text_ratio": 0.965147,
+      "vision_ratio": 0.034853
+    },
+    "middle": {
+      "mdi": 19.365298,
+      "aei_text": 3.647404,
+      "aei_vision": 0.188347,
+      "text_ratio": 0.950897,
+      "vision_ratio": 0.049103
+    },
+    "late": {
+      "mdi": 20.335296,
+      "aei_text": 3.672657,
+      "aei_vision": 0.180605,
+      "text_ratio": 0.953129,
+      "vision_ratio": 0.046871
+    },
+    "all": {
+      "mdi": 20.335296,
+      "aei_text": 3.710907,
+      "aei_vision": 0.168878,
+      "text_ratio": 0.953129,
+      "vision_ratio": 0.046871
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953129,
+      0.046871
+    ],
+    "text_vision_ratio": "0.953129:0.046871"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.159041,
+      "aei_text": 3.81934,
+      "aei_vision": 0.135635,
+      "text_ratio": 0.965705,
+      "vision_ratio": 0.034295
+    },
+    "middle": {
+      "mdi": 19.582717,
+      "aei_text": 3.653251,
+      "aei_vision": 0.186555,
+      "text_ratio": 0.951416,
+      "vision_ratio": 0.048584
+    },
+    "late": {
+      "mdi": 23.764221,
+      "aei_text": 3.747398,
+      "aei_vision": 0.157691,
+      "text_ratio": 0.959619,
+      "vision_ratio": 0.040381
+    },
+    "all": {
+      "mdi": 23.764221,
+      "aei_text": 3.739996,
+      "aei_vision": 0.15996,
+      "text_ratio": 0.959619,
+      "vision_ratio": 0.040381
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.959619,
+      0.040381
+    ],
+    "text_vision_ratio": "0.959619:0.040381"
+  }
+}
+```
+
+
+## === Rollout Step 360 ===
+Step: 359/29790 | 2025-10-22 12:27:09
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.137 | 7.215 | 10.133 | 10.133 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.137036,
+      "aei_text": 2.493215,
+      "aei_vision": 0.245951,
+      "text_ratio": 0.91021,
+      "vision_ratio": 0.08979
+    },
+    "middle": {
+      "mdi": 7.215032,
+      "aei_text": 2.338445,
+      "aei_vision": 0.324107,
+      "text_ratio": 0.878272,
+      "vision_ratio": 0.121728
+    },
+    "late": {
+      "mdi": 10.13262,
+      "aei_text": 2.493038,
+      "aei_vision": 0.246041,
+      "text_ratio": 0.910174,
+      "vision_ratio": 0.089826
+    },
+    "all": {
+      "mdi": 10.13262,
+      "aei_text": 2.441566,
+      "aei_vision": 0.272033,
+      "text_ratio": 0.910174,
+      "vision_ratio": 0.089826
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.910174,
+      0.089826
+    ],
+    "text_vision_ratio": "0.910174:0.089826"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.137036,
+      "aei_text": 2.493215,
+      "aei_vision": 0.245951,
+      "text_ratio": 0.91021,
+      "vision_ratio": 0.08979
+    },
+    "middle": {
+      "mdi": 7.215032,
+      "aei_text": 2.338445,
+      "aei_vision": 0.324107,
+      "text_ratio": 0.878272,
+      "vision_ratio": 0.121728
+    },
+    "late": {
+      "mdi": 10.13262,
+      "aei_text": 2.493038,
+      "aei_vision": 0.246041,
+      "text_ratio": 0.910174,
+      "vision_ratio": 0.089826
+    },
+    "all": {
+      "mdi": 10.13262,
+      "aei_text": 2.441566,
+      "aei_vision": 0.272033,
+      "text_ratio": 0.910174,
+      "vision_ratio": 0.089826
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.910174,
+      0.089826
+    ],
+    "text_vision_ratio": "0.910174:0.089826"
+  }
+}
+```
+
+
+## === Rollout Step 361 ===
+Step: 360/29790 | 2025-10-22 12:27:12
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.766 | 18.504 | 19.509 | 19.509 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.766357,
+      "aei_text": 2.954672,
+      "aei_vision": 0.166307,
+      "text_ratio": 0.946713,
+      "vision_ratio": 0.053287
+    },
+    "middle": {
+      "mdi": 18.504382,
+      "aei_text": 2.968475,
+      "aei_vision": 0.16042,
+      "text_ratio": 0.948729,
+      "vision_ratio": 0.051271
+    },
+    "late": {
+      "mdi": 19.509461,
+      "aei_text": 2.985772,
+      "aei_vision": 0.153042,
+      "text_ratio": 0.951242,
+      "vision_ratio": 0.048758
+    },
+    "all": {
+      "mdi": 19.509461,
+      "aei_text": 2.96964,
+      "aei_vision": 0.159923,
+      "text_ratio": 0.951242,
+      "vision_ratio": 0.048758
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951242,
+      0.048758
+    ],
+    "text_vision_ratio": "0.951242:0.048758"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.766357,
+      "aei_text": 2.954672,
+      "aei_vision": 0.166307,
+      "text_ratio": 0.946713,
+      "vision_ratio": 0.053287
+    },
+    "middle": {
+      "mdi": 18.504382,
+      "aei_text": 2.968475,
+      "aei_vision": 0.16042,
+      "text_ratio": 0.948729,
+      "vision_ratio": 0.051271
+    },
+    "late": {
+      "mdi": 19.509461,
+      "aei_text": 2.985772,
+      "aei_vision": 0.153042,
+      "text_ratio": 0.951242,
+      "vision_ratio": 0.048758
+    },
+    "all": {
+      "mdi": 19.509461,
+      "aei_text": 2.96964,
+      "aei_vision": 0.159923,
+      "text_ratio": 0.951242,
+      "vision_ratio": 0.048758
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951242,
+      0.048758
+    ],
+    "text_vision_ratio": "0.951242:0.048758"
+  }
+}
+```
+
+
+## === Rollout Step 362 ===
+Step: 361/29790 | 2025-10-22 12:27:16
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.671 | 7.480 | 11.129 | 11.129 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.670682,
+      "aei_text": 2.842222,
+      "aei_vision": 0.193735,
+      "text_ratio": 0.936187,
+      "vision_ratio": 0.063813
+    },
+    "middle": {
+      "mdi": 7.479783,
+      "aei_text": 2.516237,
+      "aei_vision": 0.336405,
+      "text_ratio": 0.882072,
+      "vision_ratio": 0.117928
+    },
+    "late": {
+      "mdi": 11.129334,
+      "aei_text": 2.72536,
+      "aei_vision": 0.244881,
+      "text_ratio": 0.917555,
+      "vision_ratio": 0.082445
+    },
+    "all": {
+      "mdi": 11.129334,
+      "aei_text": 2.694606,
+      "aei_vision": 0.25834,
+      "text_ratio": 0.917555,
+      "vision_ratio": 0.082445
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.917555,
+      0.082445
+    ],
+    "text_vision_ratio": "0.917555:0.082445"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.670682,
+      "aei_text": 2.842222,
+      "aei_vision": 0.193735,
+      "text_ratio": 0.936187,
+      "vision_ratio": 0.063813
+    },
+    "middle": {
+      "mdi": 7.479783,
+      "aei_text": 2.516237,
+      "aei_vision": 0.336405,
+      "text_ratio": 0.882072,
+      "vision_ratio": 0.117928
+    },
+    "late": {
+      "mdi": 11.129334,
+      "aei_text": 2.72536,
+      "aei_vision": 0.244881,
+      "text_ratio": 0.917555,
+      "vision_ratio": 0.082445
+    },
+    "all": {
+      "mdi": 11.129334,
+      "aei_text": 2.694606,
+      "aei_vision": 0.25834,
+      "text_ratio": 0.917555,
+      "vision_ratio": 0.082445
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.917555,
+      0.082445
+    ],
+    "text_vision_ratio": "0.917555:0.082445"
+  }
+}
+```
+
+
+## === Rollout Step 363 ===
+Step: 362/29790 | 2025-10-22 12:27:20
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.406 | 9.041 | 20.025 | 20.025 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.406117,
+      "aei_text": 3.010943,
+      "aei_vision": 0.242698,
+      "text_ratio": 0.925407,
+      "vision_ratio": 0.074593
+    },
+    "middle": {
+      "mdi": 9.041454,
+      "aei_text": 2.82556,
+      "aei_vision": 0.312512,
+      "text_ratio": 0.900413,
+      "vision_ratio": 0.099587
+    },
+    "late": {
+      "mdi": 20.024844,
+      "aei_text": 3.22743,
+      "aei_vision": 0.161171,
+      "text_ratio": 0.952437,
+      "vision_ratio": 0.047563
+    },
+    "all": {
+      "mdi": 20.024844,
+      "aei_text": 3.021311,
+      "aei_vision": 0.238794,
+      "text_ratio": 0.952437,
+      "vision_ratio": 0.047563
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952437,
+      0.047563
+    ],
+    "text_vision_ratio": "0.952437:0.047563"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.406117,
+      "aei_text": 3.010943,
+      "aei_vision": 0.242698,
+      "text_ratio": 0.925407,
+      "vision_ratio": 0.074593
+    },
+    "middle": {
+      "mdi": 9.041454,
+      "aei_text": 2.82556,
+      "aei_vision": 0.312512,
+      "text_ratio": 0.900413,
+      "vision_ratio": 0.099587
+    },
+    "late": {
+      "mdi": 20.024844,
+      "aei_text": 3.22743,
+      "aei_vision": 0.161171,
+      "text_ratio": 0.952437,
+      "vision_ratio": 0.047563
+    },
+    "all": {
+      "mdi": 20.024844,
+      "aei_text": 3.021311,
+      "aei_vision": 0.238794,
+      "text_ratio": 0.952437,
+      "vision_ratio": 0.047563
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952437,
+      0.047563
+    ],
+    "text_vision_ratio": "0.952437:0.047563"
+  }
+}
+```
+
+
+## === Rollout Step 364 ===
+Step: 363/29790 | 2025-10-22 12:27:24
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.102 | 10.278 | 19.585 | 19.585 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.102446,
+      "aei_text": 3.196258,
+      "aei_vision": 0.167322,
+      "text_ratio": 0.950255,
+      "vision_ratio": 0.049745
+    },
+    "middle": {
+      "mdi": 10.277668,
+      "aei_text": 2.894708,
+      "aei_vision": 0.28165,
+      "text_ratio": 0.911329,
+      "vision_ratio": 0.088671
+    },
+    "late": {
+      "mdi": 19.58522,
+      "aei_text": 3.205846,
+      "aei_vision": 0.163687,
+      "text_ratio": 0.951421,
+      "vision_ratio": 0.048579
+    },
+    "all": {
+      "mdi": 19.58522,
+      "aei_text": 3.098937,
+      "aei_vision": 0.20422,
+      "text_ratio": 0.951421,
+      "vision_ratio": 0.048579
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951421,
+      0.048579
+    ],
+    "text_vision_ratio": "0.951421:0.048579"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.102446,
+      "aei_text": 3.196258,
+      "aei_vision": 0.167322,
+      "text_ratio": 0.950255,
+      "vision_ratio": 0.049745
+    },
+    "middle": {
+      "mdi": 10.277668,
+      "aei_text": 2.894708,
+      "aei_vision": 0.28165,
+      "text_ratio": 0.911329,
+      "vision_ratio": 0.088671
+    },
+    "late": {
+      "mdi": 19.58522,
+      "aei_text": 3.205846,
+      "aei_vision": 0.163687,
+      "text_ratio": 0.951421,
+      "vision_ratio": 0.048579
+    },
+    "all": {
+      "mdi": 19.58522,
+      "aei_text": 3.098937,
+      "aei_vision": 0.20422,
+      "text_ratio": 0.951421,
+      "vision_ratio": 0.048579
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951421,
+      0.048579
+    ],
+    "text_vision_ratio": "0.951421:0.048579"
+  }
+}
+```
+
+
+## === Rollout Step 365 ===
+Step: 364/29790 | 2025-10-22 12:27:28
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.257 | 10.909 | 22.608 | 22.608 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.2569,
+      "aei_text": 3.193629,
+      "aei_vision": 0.185064,
+      "text_ratio": 0.945226,
+      "vision_ratio": 0.054774
+    },
+    "middle": {
+      "mdi": 10.908622,
+      "aei_text": 2.961107,
+      "aei_vision": 0.271446,
+      "text_ratio": 0.916027,
+      "vision_ratio": 0.083973
+    },
+    "late": {
+      "mdi": 22.607957,
+      "aei_text": 3.298992,
+      "aei_vision": 0.145922,
+      "text_ratio": 0.957641,
+      "vision_ratio": 0.042359
+    },
+    "all": {
+      "mdi": 22.607957,
+      "aei_text": 3.151242,
+      "aei_vision": 0.200811,
+      "text_ratio": 0.957641,
+      "vision_ratio": 0.042359
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957641,
+      0.042359
+    ],
+    "text_vision_ratio": "0.957641:0.042359"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.2569,
+      "aei_text": 3.193629,
+      "aei_vision": 0.185064,
+      "text_ratio": 0.945226,
+      "vision_ratio": 0.054774
+    },
+    "middle": {
+      "mdi": 10.908622,
+      "aei_text": 2.961107,
+      "aei_vision": 0.271446,
+      "text_ratio": 0.916027,
+      "vision_ratio": 0.083973
+    },
+    "late": {
+      "mdi": 22.607957,
+      "aei_text": 3.298992,
+      "aei_vision": 0.145922,
+      "text_ratio": 0.957641,
+      "vision_ratio": 0.042359
+    },
+    "all": {
+      "mdi": 22.607957,
+      "aei_text": 3.151242,
+      "aei_vision": 0.200811,
+      "text_ratio": 0.957641,
+      "vision_ratio": 0.042359
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957641,
+      0.042359
+    ],
+    "text_vision_ratio": "0.957641:0.042359"
+  }
+}
+```
+
+
+## === Rollout Step 366 ===
+Step: 365/29790 | 2025-10-22 12:27:31
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.307 | 7.982 | 19.436 | 19.436 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.306589,
+      "aei_text": 2.867508,
+      "aei_vision": 0.187338,
+      "text_ratio": 0.938675,
+      "vision_ratio": 0.061325
+    },
+    "middle": {
+      "mdi": 7.982388,
+      "aei_text": 2.560797,
+      "aei_vision": 0.320806,
+      "text_ratio": 0.888671,
+      "vision_ratio": 0.111329
+    },
+    "late": {
+      "mdi": 19.436184,
+      "aei_text": 2.949306,
+      "aei_vision": 0.151743,
+      "text_ratio": 0.951067,
+      "vision_ratio": 0.048933
+    },
+    "all": {
+      "mdi": 19.436184,
+      "aei_text": 2.792537,
+      "aei_vision": 0.219962,
+      "text_ratio": 0.951067,
+      "vision_ratio": 0.048933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951067,
+      0.048933
+    ],
+    "text_vision_ratio": "0.951067:0.048933"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.306589,
+      "aei_text": 2.867508,
+      "aei_vision": 0.187338,
+      "text_ratio": 0.938675,
+      "vision_ratio": 0.061325
+    },
+    "middle": {
+      "mdi": 7.982388,
+      "aei_text": 2.560797,
+      "aei_vision": 0.320806,
+      "text_ratio": 0.888671,
+      "vision_ratio": 0.111329
+    },
+    "late": {
+      "mdi": 19.436184,
+      "aei_text": 2.949306,
+      "aei_vision": 0.151743,
+      "text_ratio": 0.951067,
+      "vision_ratio": 0.048933
+    },
+    "all": {
+      "mdi": 19.436184,
+      "aei_text": 2.792537,
+      "aei_vision": 0.219962,
+      "text_ratio": 0.951067,
+      "vision_ratio": 0.048933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951067,
+      0.048933
+    ],
+    "text_vision_ratio": "0.951067:0.048933"
+  }
+}
+```
+
+
+## === Rollout Step 367 ===
+Step: 366/29790 | 2025-10-22 12:27:34
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.688 | 8.039 | 19.942 | 19.942 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.687823,
+      "aei_text": 2.810357,
+      "aei_vision": 0.191339,
+      "text_ratio": 0.936256,
+      "vision_ratio": 0.063744
+    },
+    "middle": {
+      "mdi": 8.039052,
+      "aei_text": 2.533252,
+      "aei_vision": 0.315118,
+      "text_ratio": 0.889369,
+      "vision_ratio": 0.110631
+    },
+    "late": {
+      "mdi": 19.942313,
+      "aei_text": 2.91183,
+      "aei_vision": 0.146013,
+      "text_ratio": 0.95225,
+      "vision_ratio": 0.04775
+    },
+    "all": {
+      "mdi": 19.942313,
+      "aei_text": 2.751813,
+      "aei_vision": 0.21749,
+      "text_ratio": 0.95225,
+      "vision_ratio": 0.04775
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95225,
+      0.04775
+    ],
+    "text_vision_ratio": "0.952250:0.047750"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.687823,
+      "aei_text": 2.810357,
+      "aei_vision": 0.191339,
+      "text_ratio": 0.936256,
+      "vision_ratio": 0.063744
+    },
+    "middle": {
+      "mdi": 8.039052,
+      "aei_text": 2.533252,
+      "aei_vision": 0.315118,
+      "text_ratio": 0.889369,
+      "vision_ratio": 0.110631
+    },
+    "late": {
+      "mdi": 19.942313,
+      "aei_text": 2.91183,
+      "aei_vision": 0.146013,
+      "text_ratio": 0.95225,
+      "vision_ratio": 0.04775
+    },
+    "all": {
+      "mdi": 19.942313,
+      "aei_text": 2.751813,
+      "aei_vision": 0.21749,
+      "text_ratio": 0.95225,
+      "vision_ratio": 0.04775
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95225,
+      0.04775
+    ],
+    "text_vision_ratio": "0.952250:0.047750"
+  }
+}
+```
+
+
+## === Rollout Step 368 ===
+Step: 367/29790 | 2025-10-22 12:27:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.037 | 5.626 | 20.307 | 20.307 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.036536,
+      "aei_text": 3.169041,
+      "aei_vision": 0.210756,
+      "text_ratio": 0.937642,
+      "vision_ratio": 0.062358
+    },
+    "middle": {
+      "mdi": 5.625602,
+      "aei_text": 2.518097,
+      "aei_vision": 0.447614,
+      "text_ratio": 0.84907,
+      "vision_ratio": 0.15093
+    },
+    "late": {
+      "mdi": 20.307037,
+      "aei_text": 3.30145,
+      "aei_vision": 0.162577,
+      "text_ratio": 0.953067,
+      "vision_ratio": 0.046933
+    },
+    "all": {
+      "mdi": 20.307037,
+      "aei_text": 2.996196,
+      "aei_vision": 0.273649,
+      "text_ratio": 0.953067,
+      "vision_ratio": 0.046933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953067,
+      0.046933
+    ],
+    "text_vision_ratio": "0.953067:0.046933"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.036536,
+      "aei_text": 3.169041,
+      "aei_vision": 0.210756,
+      "text_ratio": 0.937642,
+      "vision_ratio": 0.062358
+    },
+    "middle": {
+      "mdi": 5.625602,
+      "aei_text": 2.518097,
+      "aei_vision": 0.447614,
+      "text_ratio": 0.84907,
+      "vision_ratio": 0.15093
+    },
+    "late": {
+      "mdi": 20.307037,
+      "aei_text": 3.30145,
+      "aei_vision": 0.162577,
+      "text_ratio": 0.953067,
+      "vision_ratio": 0.046933
+    },
+    "all": {
+      "mdi": 20.307037,
+      "aei_text": 2.996196,
+      "aei_vision": 0.273649,
+      "text_ratio": 0.953067,
+      "vision_ratio": 0.046933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953067,
+      0.046933
+    ],
+    "text_vision_ratio": "0.953067:0.046933"
+  }
+}
+```
+
+
+## === Rollout Step 369 ===
+Step: 368/29790 | 2025-10-22 12:27:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.073 | 11.734 | 25.496 | 25.496 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.073006,
+      "aei_text": 3.300011,
+      "aei_vision": 0.143025,
+      "text_ratio": 0.95846,
+      "vision_ratio": 0.04154
+    },
+    "middle": {
+      "mdi": 11.734002,
+      "aei_text": 2.998122,
+      "aei_vision": 0.255507,
+      "text_ratio": 0.92147,
+      "vision_ratio": 0.07853
+    },
+    "late": {
+      "mdi": 25.496241,
+      "aei_text": 3.333019,
+      "aei_vision": 0.130726,
+      "text_ratio": 0.962259,
+      "vision_ratio": 0.037741
+    },
+    "all": {
+      "mdi": 25.496241,
+      "aei_text": 3.210384,
+      "aei_vision": 0.176419,
+      "text_ratio": 0.962259,
+      "vision_ratio": 0.037741
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962259,
+      0.037741
+    ],
+    "text_vision_ratio": "0.962259:0.037741"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.073006,
+      "aei_text": 3.300011,
+      "aei_vision": 0.143025,
+      "text_ratio": 0.95846,
+      "vision_ratio": 0.04154
+    },
+    "middle": {
+      "mdi": 11.734002,
+      "aei_text": 2.998122,
+      "aei_vision": 0.255507,
+      "text_ratio": 0.92147,
+      "vision_ratio": 0.07853
+    },
+    "late": {
+      "mdi": 25.496241,
+      "aei_text": 3.333019,
+      "aei_vision": 0.130726,
+      "text_ratio": 0.962259,
+      "vision_ratio": 0.037741
+    },
+    "all": {
+      "mdi": 25.496241,
+      "aei_text": 3.210384,
+      "aei_vision": 0.176419,
+      "text_ratio": 0.962259,
+      "vision_ratio": 0.037741
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962259,
+      0.037741
+    ],
+    "text_vision_ratio": "0.962259:0.037741"
+  }
+}
+```
+
+
+## === Rollout Step 370 ===
+Step: 369/29790 | 2025-10-22 12:27:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.552 | 6.650 | 16.037 | 16.037 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.551578,
+      "aei_text": 3.017108,
+      "aei_vision": 0.240377,
+      "text_ratio": 0.926208,
+      "vision_ratio": 0.073792
+    },
+    "middle": {
+      "mdi": 6.64998,
+      "aei_text": 2.612291,
+      "aei_vision": 0.392827,
+      "text_ratio": 0.869281,
+      "vision_ratio": 0.130719
+    },
+    "late": {
+      "mdi": 16.036731,
+      "aei_text": 3.136118,
+      "aei_vision": 0.195558,
+      "text_ratio": 0.941303,
+      "vision_ratio": 0.058697
+    },
+    "all": {
+      "mdi": 16.036731,
+      "aei_text": 2.921839,
+      "aei_vision": 0.276254,
+      "text_ratio": 0.941303,
+      "vision_ratio": 0.058697
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941303,
+      0.058697
+    ],
+    "text_vision_ratio": "0.941303:0.058697"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.551578,
+      "aei_text": 3.017108,
+      "aei_vision": 0.240377,
+      "text_ratio": 0.926208,
+      "vision_ratio": 0.073792
+    },
+    "middle": {
+      "mdi": 6.64998,
+      "aei_text": 2.612291,
+      "aei_vision": 0.392827,
+      "text_ratio": 0.869281,
+      "vision_ratio": 0.130719
+    },
+    "late": {
+      "mdi": 16.036731,
+      "aei_text": 3.136118,
+      "aei_vision": 0.195558,
+      "text_ratio": 0.941303,
+      "vision_ratio": 0.058697
+    },
+    "all": {
+      "mdi": 16.036731,
+      "aei_text": 2.921839,
+      "aei_vision": 0.276254,
+      "text_ratio": 0.941303,
+      "vision_ratio": 0.058697
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941303,
+      0.058697
+    ],
+    "text_vision_ratio": "0.941303:0.058697"
+  }
+}
+```
+
+
+## === Rollout Step 371 ===
+Step: 370/29790 | 2025-10-22 12:27:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.855 | 8.528 | 14.492 | 14.492 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.854955,
+      "aei_text": 2.271827,
+      "aei_vision": 0.191635,
+      "text_ratio": 0.922209,
+      "vision_ratio": 0.077791
+    },
+    "middle": {
+      "mdi": 8.527831,
+      "aei_text": 2.172517,
+      "aei_vision": 0.254756,
+      "text_ratio": 0.895044,
+      "vision_ratio": 0.104956
+    },
+    "late": {
+      "mdi": 14.491861,
+      "aei_text": 2.321316,
+      "aei_vision": 0.160181,
+      "text_ratio": 0.93545,
+      "vision_ratio": 0.06455
+    },
+    "all": {
+      "mdi": 14.491861,
+      "aei_text": 2.25522,
+      "aei_vision": 0.202191,
+      "text_ratio": 0.93545,
+      "vision_ratio": 0.06455
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93545,
+      0.06455
+    ],
+    "text_vision_ratio": "0.935450:0.064550"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.854955,
+      "aei_text": 2.271827,
+      "aei_vision": 0.191635,
+      "text_ratio": 0.922209,
+      "vision_ratio": 0.077791
+    },
+    "middle": {
+      "mdi": 8.527831,
+      "aei_text": 2.172517,
+      "aei_vision": 0.254756,
+      "text_ratio": 0.895044,
+      "vision_ratio": 0.104956
+    },
+    "late": {
+      "mdi": 14.491861,
+      "aei_text": 2.321316,
+      "aei_vision": 0.160181,
+      "text_ratio": 0.93545,
+      "vision_ratio": 0.06455
+    },
+    "all": {
+      "mdi": 14.491861,
+      "aei_text": 2.25522,
+      "aei_vision": 0.202191,
+      "text_ratio": 0.93545,
+      "vision_ratio": 0.06455
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.93545,
+      0.06455
+    ],
+    "text_vision_ratio": "0.935450:0.064550"
+  }
+}
+```
+
+
+## === Rollout Step 372 ===
+Step: 371/29790 | 2025-10-22 12:27:52
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.599 | 10.652 | 19.621 | 19.621 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.598694,
+      "aei_text": 2.906686,
+      "aei_vision": 0.14831,
+      "text_ratio": 0.951453,
+      "vision_ratio": 0.048547
+    },
+    "middle": {
+      "mdi": 10.652498,
+      "aei_text": 2.67627,
+      "aei_vision": 0.251234,
+      "text_ratio": 0.914181,
+      "vision_ratio": 0.085819
+    },
+    "late": {
+      "mdi": 19.621001,
+      "aei_text": 2.907025,
+      "aei_vision": 0.148159,
+      "text_ratio": 0.951506,
+      "vision_ratio": 0.048494
+    },
+    "all": {
+      "mdi": 19.621001,
+      "aei_text": 2.829994,
+      "aei_vision": 0.182568,
+      "text_ratio": 0.951506,
+      "vision_ratio": 0.048494
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951506,
+      0.048494
+    ],
+    "text_vision_ratio": "0.951506:0.048494"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.598694,
+      "aei_text": 2.906686,
+      "aei_vision": 0.14831,
+      "text_ratio": 0.951453,
+      "vision_ratio": 0.048547
+    },
+    "middle": {
+      "mdi": 10.652498,
+      "aei_text": 2.67627,
+      "aei_vision": 0.251234,
+      "text_ratio": 0.914181,
+      "vision_ratio": 0.085819
+    },
+    "late": {
+      "mdi": 19.621001,
+      "aei_text": 2.907025,
+      "aei_vision": 0.148159,
+      "text_ratio": 0.951506,
+      "vision_ratio": 0.048494
+    },
+    "all": {
+      "mdi": 19.621001,
+      "aei_text": 2.829994,
+      "aei_vision": 0.182568,
+      "text_ratio": 0.951506,
+      "vision_ratio": 0.048494
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951506,
+      0.048494
+    ],
+    "text_vision_ratio": "0.951506:0.048494"
+  }
+}
+```
+
+
+## === Rollout Step 373 ===
+Step: 372/29790 | 2025-10-22 12:27:55
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 22.751 | 21.198 | 20.103 | 20.103 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.750837,
+      "aei_text": 2.96008,
+      "aei_vision": 0.130109,
+      "text_ratio": 0.957896,
+      "vision_ratio": 0.042104
+    },
+    "middle": {
+      "mdi": 21.197728,
+      "aei_text": 2.940664,
+      "aei_vision": 0.138725,
+      "text_ratio": 0.95495,
+      "vision_ratio": 0.04505
+    },
+    "late": {
+      "mdi": 20.103228,
+      "aei_text": 2.925361,
+      "aei_vision": 0.145517,
+      "text_ratio": 0.952614,
+      "vision_ratio": 0.047386
+    },
+    "all": {
+      "mdi": 20.103228,
+      "aei_text": 2.942035,
+      "aei_vision": 0.138117,
+      "text_ratio": 0.952614,
+      "vision_ratio": 0.047386
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952614,
+      0.047386
+    ],
+    "text_vision_ratio": "0.952614:0.047386"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.750837,
+      "aei_text": 2.96008,
+      "aei_vision": 0.130109,
+      "text_ratio": 0.957896,
+      "vision_ratio": 0.042104
+    },
+    "middle": {
+      "mdi": 21.197728,
+      "aei_text": 2.940664,
+      "aei_vision": 0.138725,
+      "text_ratio": 0.95495,
+      "vision_ratio": 0.04505
+    },
+    "late": {
+      "mdi": 20.103228,
+      "aei_text": 2.925361,
+      "aei_vision": 0.145517,
+      "text_ratio": 0.952614,
+      "vision_ratio": 0.047386
+    },
+    "all": {
+      "mdi": 20.103228,
+      "aei_text": 2.942035,
+      "aei_vision": 0.138117,
+      "text_ratio": 0.952614,
+      "vision_ratio": 0.047386
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952614,
+      0.047386
+    ],
+    "text_vision_ratio": "0.952614:0.047386"
+  }
+}
+```
+
+
+## === Rollout Step 374 ===
+Step: 373/29790 | 2025-10-22 12:27:59
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 25.429 | 13.788 | 21.912 | 21.912 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.429282,
+      "aei_text": 3.024677,
+      "aei_vision": 0.118945,
+      "text_ratio": 0.962163,
+      "vision_ratio": 0.037837
+    },
+    "middle": {
+      "mdi": 13.788177,
+      "aei_text": 2.826871,
+      "aei_vision": 0.205021,
+      "text_ratio": 0.932378,
+      "vision_ratio": 0.067622
+    },
+    "late": {
+      "mdi": 21.912095,
+      "aei_text": 2.984967,
+      "aei_vision": 0.136225,
+      "text_ratio": 0.956355,
+      "vision_ratio": 0.043645
+    },
+    "all": {
+      "mdi": 21.912095,
+      "aei_text": 2.945505,
+      "aei_vision": 0.153397,
+      "text_ratio": 0.956355,
+      "vision_ratio": 0.043645
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956355,
+      0.043645
+    ],
+    "text_vision_ratio": "0.956355:0.043645"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.429282,
+      "aei_text": 3.024677,
+      "aei_vision": 0.118945,
+      "text_ratio": 0.962163,
+      "vision_ratio": 0.037837
+    },
+    "middle": {
+      "mdi": 13.788177,
+      "aei_text": 2.826871,
+      "aei_vision": 0.205021,
+      "text_ratio": 0.932378,
+      "vision_ratio": 0.067622
+    },
+    "late": {
+      "mdi": 21.912095,
+      "aei_text": 2.984967,
+      "aei_vision": 0.136225,
+      "text_ratio": 0.956355,
+      "vision_ratio": 0.043645
+    },
+    "all": {
+      "mdi": 21.912095,
+      "aei_text": 2.945505,
+      "aei_vision": 0.153397,
+      "text_ratio": 0.956355,
+      "vision_ratio": 0.043645
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956355,
+      0.043645
+    ],
+    "text_vision_ratio": "0.956355:0.043645"
+  }
+}
+```
+
+
+## === Rollout Step 375 ===
+Step: 374/29790 | 2025-10-22 12:28:02
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.336 | 9.093 | 22.364 | 22.364 |
+| MDI Std | 0.682 | 0.091 | 0.569 | 0.569 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.018282,
+      "aei_text": 3.181684,
+      "aei_vision": 0.167296,
+      "text_ratio": 0.950046,
+      "vision_ratio": 0.049954
+    },
+    "middle": {
+      "mdi": 9.001789,
+      "aei_text": 2.803912,
+      "aei_vision": 0.311484,
+      "text_ratio": 0.900018,
+      "vision_ratio": 0.099982
+    },
+    "late": {
+      "mdi": 22.933197,
+      "aei_text": 3.248837,
+      "aei_vision": 0.141665,
+      "text_ratio": 0.958217,
+      "vision_ratio": 0.041783
+    },
+    "all": {
+      "mdi": 22.933197,
+      "aei_text": 3.078145,
+      "aei_vision": 0.206815,
+      "text_ratio": 0.958217,
+      "vision_ratio": 0.041783
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958217,
+      0.041783
+    ],
+    "text_vision_ratio": "0.958217:0.041783"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.654639,
+      "aei_text": 3.152204,
+      "aei_vision": 0.178548,
+      "text_ratio": 0.946394,
+      "vision_ratio": 0.053606
+    },
+    "middle": {
+      "mdi": 9.184078,
+      "aei_text": 2.816515,
+      "aei_vision": 0.306674,
+      "text_ratio": 0.901808,
+      "vision_ratio": 0.098192
+    },
+    "late": {
+      "mdi": 21.794715,
+      "aei_text": 3.231529,
+      "aei_vision": 0.148271,
+      "text_ratio": 0.95613,
+      "vision_ratio": 0.04387
+    },
+    "all": {
+      "mdi": 21.794715,
+      "aei_text": 3.066749,
+      "aei_vision": 0.211164,
+      "text_ratio": 0.95613,
+      "vision_ratio": 0.04387
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95613,
+      0.04387
+    ],
+    "text_vision_ratio": "0.956130:0.043870"
+  }
+}
+```
+
+
+## === Rollout Step 376 ===
+Step: 375/29790 | 2025-10-22 12:28:06
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.013 | 5.989 | 21.315 | 21.315 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.013337,
+      "aei_text": 3.059028,
+      "aei_vision": 0.235069,
+      "text_ratio": 0.928639,
+      "vision_ratio": 0.071361
+    },
+    "middle": {
+      "mdi": 5.988988,
+      "aei_text": 2.547013,
+      "aei_vision": 0.425283,
+      "text_ratio": 0.856918,
+      "vision_ratio": 0.143082
+    },
+    "late": {
+      "mdi": 21.315304,
+      "aei_text": 3.277842,
+      "aei_vision": 0.153779,
+      "text_ratio": 0.955188,
+      "vision_ratio": 0.044812
+    },
+    "all": {
+      "mdi": 21.315304,
+      "aei_text": 2.961294,
+      "aei_vision": 0.271377,
+      "text_ratio": 0.955188,
+      "vision_ratio": 0.044812
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955188,
+      0.044812
+    ],
+    "text_vision_ratio": "0.955188:0.044812"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.013337,
+      "aei_text": 3.059028,
+      "aei_vision": 0.235069,
+      "text_ratio": 0.928639,
+      "vision_ratio": 0.071361
+    },
+    "middle": {
+      "mdi": 5.988988,
+      "aei_text": 2.547013,
+      "aei_vision": 0.425283,
+      "text_ratio": 0.856918,
+      "vision_ratio": 0.143082
+    },
+    "late": {
+      "mdi": 21.315304,
+      "aei_text": 3.277842,
+      "aei_vision": 0.153779,
+      "text_ratio": 0.955188,
+      "vision_ratio": 0.044812
+    },
+    "all": {
+      "mdi": 21.315304,
+      "aei_text": 2.961294,
+      "aei_vision": 0.271377,
+      "text_ratio": 0.955188,
+      "vision_ratio": 0.044812
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955188,
+      0.044812
+    ],
+    "text_vision_ratio": "0.955188:0.044812"
+  }
+}
+```
+
+
+## === Rollout Step 377 ===
+Step: 376/29790 | 2025-10-22 12:28:10
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.177 | 13.288 | 20.232 | 20.232 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 531.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 531.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.176879,
+      "aei_text": 3.857133,
+      "aei_vision": 0.182139,
+      "text_ratio": 0.954908,
+      "vision_ratio": 0.045092
+    },
+    "middle": {
+      "mdi": 13.288066,
+      "aei_text": 3.558021,
+      "aei_vision": 0.267761,
+      "text_ratio": 0.930012,
+      "vision_ratio": 0.069988
+    },
+    "late": {
+      "mdi": 20.232492,
+      "aei_text": 3.831806,
+      "aei_vision": 0.189389,
+      "text_ratio": 0.952902,
+      "vision_ratio": 0.047098
+    },
+    "all": {
+      "mdi": 20.232492,
+      "aei_text": 3.748987,
+      "aei_vision": 0.213096,
+      "text_ratio": 0.952902,
+      "vision_ratio": 0.047098
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952902,
+      0.047098
+    ],
+    "text_vision_ratio": "0.952902:0.047098"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.176879,
+      "aei_text": 3.857133,
+      "aei_vision": 0.182139,
+      "text_ratio": 0.954908,
+      "vision_ratio": 0.045092
+    },
+    "middle": {
+      "mdi": 13.288066,
+      "aei_text": 3.558021,
+      "aei_vision": 0.267761,
+      "text_ratio": 0.930012,
+      "vision_ratio": 0.069988
+    },
+    "late": {
+      "mdi": 20.232492,
+      "aei_text": 3.831806,
+      "aei_vision": 0.189389,
+      "text_ratio": 0.952902,
+      "vision_ratio": 0.047098
+    },
+    "all": {
+      "mdi": 20.232492,
+      "aei_text": 3.748987,
+      "aei_vision": 0.213096,
+      "text_ratio": 0.952902,
+      "vision_ratio": 0.047098
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952902,
+      0.047098
+    ],
+    "text_vision_ratio": "0.952902:0.047098"
+  }
+}
+```
+
+
+## === Rollout Step 378 ===
+Step: 377/29790 | 2025-10-22 12:28:14
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.289 | 9.034 | 16.138 | 16.138 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.288505,
+      "aei_text": 3.139094,
+      "aei_vision": 0.205324,
+      "text_ratio": 0.938607,
+      "vision_ratio": 0.061393
+    },
+    "middle": {
+      "mdi": 9.034461,
+      "aei_text": 2.844326,
+      "aei_vision": 0.314831,
+      "text_ratio": 0.900343,
+      "vision_ratio": 0.099657
+    },
+    "late": {
+      "mdi": 16.137726,
+      "aei_text": 3.164021,
+      "aei_vision": 0.196064,
+      "text_ratio": 0.941649,
+      "vision_ratio": 0.058351
+    },
+    "all": {
+      "mdi": 16.137726,
+      "aei_text": 3.049147,
+      "aei_vision": 0.238739,
+      "text_ratio": 0.941649,
+      "vision_ratio": 0.058351
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941649,
+      0.058351
+    ],
+    "text_vision_ratio": "0.941649:0.058351"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.288505,
+      "aei_text": 3.139094,
+      "aei_vision": 0.205324,
+      "text_ratio": 0.938607,
+      "vision_ratio": 0.061393
+    },
+    "middle": {
+      "mdi": 9.034461,
+      "aei_text": 2.844326,
+      "aei_vision": 0.314831,
+      "text_ratio": 0.900343,
+      "vision_ratio": 0.099657
+    },
+    "late": {
+      "mdi": 16.137726,
+      "aei_text": 3.164021,
+      "aei_vision": 0.196064,
+      "text_ratio": 0.941649,
+      "vision_ratio": 0.058351
+    },
+    "all": {
+      "mdi": 16.137726,
+      "aei_text": 3.049147,
+      "aei_vision": 0.238739,
+      "text_ratio": 0.941649,
+      "vision_ratio": 0.058351
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941649,
+      0.058351
+    ],
+    "text_vision_ratio": "0.941649:0.058351"
+  }
+}
+```
+
+
+## === Rollout Step 379 ===
+Step: 378/29790 | 2025-10-22 12:28:18
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.986 | 7.270 | 31.888 | 31.888 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.985609,
+      "aei_text": 3.172458,
+      "aei_vision": 0.198457,
+      "text_ratio": 0.941127,
+      "vision_ratio": 0.058873
+    },
+    "middle": {
+      "mdi": 7.270329,
+      "aei_text": 2.702766,
+      "aei_vision": 0.371753,
+      "text_ratio": 0.879086,
+      "vision_ratio": 0.120914
+    },
+    "late": {
+      "mdi": 31.887731,
+      "aei_text": 3.419684,
+      "aei_vision": 0.107241,
+      "text_ratio": 0.969594,
+      "vision_ratio": 0.030406
+    },
+    "all": {
+      "mdi": 31.887731,
+      "aei_text": 3.098303,
+      "aei_vision": 0.225817,
+      "text_ratio": 0.969594,
+      "vision_ratio": 0.030406
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.969594,
+      0.030406
+    ],
+    "text_vision_ratio": "0.969594:0.030406"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.985609,
+      "aei_text": 3.172458,
+      "aei_vision": 0.198457,
+      "text_ratio": 0.941127,
+      "vision_ratio": 0.058873
+    },
+    "middle": {
+      "mdi": 7.270329,
+      "aei_text": 2.702766,
+      "aei_vision": 0.371753,
+      "text_ratio": 0.879086,
+      "vision_ratio": 0.120914
+    },
+    "late": {
+      "mdi": 31.887731,
+      "aei_text": 3.419684,
+      "aei_vision": 0.107241,
+      "text_ratio": 0.969594,
+      "vision_ratio": 0.030406
+    },
+    "all": {
+      "mdi": 31.887731,
+      "aei_text": 3.098303,
+      "aei_vision": 0.225817,
+      "text_ratio": 0.969594,
+      "vision_ratio": 0.030406
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.969594,
+      0.030406
+    ],
+    "text_vision_ratio": "0.969594:0.030406"
+  }
+}
+```
+
+
+## === Rollout Step 380 ===
+Step: 379/29790 | 2025-10-22 12:28:21
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.045 | 7.877 | 26.777 | 26.777 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.044765,
+      "aei_text": 2.177583,
+      "aei_vision": 0.135719,
+      "text_ratio": 0.941331,
+      "vision_ratio": 0.058669
+    },
+    "middle": {
+      "mdi": 7.877298,
+      "aei_text": 2.014126,
+      "aei_vision": 0.255687,
+      "text_ratio": 0.887353,
+      "vision_ratio": 0.112647
+    },
+    "late": {
+      "mdi": 26.777486,
+      "aei_text": 2.248111,
+      "aei_vision": 0.083955,
+      "text_ratio": 0.964,
+      "vision_ratio": 0.036
+    },
+    "all": {
+      "mdi": 26.777486,
+      "aei_text": 2.146606,
+      "aei_vision": 0.158454,
+      "text_ratio": 0.964,
+      "vision_ratio": 0.036
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964,
+      0.036
+    ],
+    "text_vision_ratio": "0.964000:0.036000"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.044765,
+      "aei_text": 2.177583,
+      "aei_vision": 0.135719,
+      "text_ratio": 0.941331,
+      "vision_ratio": 0.058669
+    },
+    "middle": {
+      "mdi": 7.877298,
+      "aei_text": 2.014126,
+      "aei_vision": 0.255687,
+      "text_ratio": 0.887353,
+      "vision_ratio": 0.112647
+    },
+    "late": {
+      "mdi": 26.777486,
+      "aei_text": 2.248111,
+      "aei_vision": 0.083955,
+      "text_ratio": 0.964,
+      "vision_ratio": 0.036
+    },
+    "all": {
+      "mdi": 26.777486,
+      "aei_text": 2.146606,
+      "aei_vision": 0.158454,
+      "text_ratio": 0.964,
+      "vision_ratio": 0.036
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964,
+      0.036
+    ],
+    "text_vision_ratio": "0.964000:0.036000"
+  }
+}
+```
+
+
+## === Rollout Step 381 ===
+Step: 380/29790 | 2025-10-22 12:28:24
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.188 | 5.213 | 17.102 | 17.102 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.188285,
+      "aei_text": 3.020036,
+      "aei_vision": 0.228994,
+      "text_ratio": 0.929519,
+      "vision_ratio": 0.070481
+    },
+    "middle": {
+      "mdi": 5.213394,
+      "aei_text": 2.409235,
+      "aei_vision": 0.462124,
+      "text_ratio": 0.839057,
+      "vision_ratio": 0.160943
+    },
+    "late": {
+      "mdi": 17.101754,
+      "aei_text": 3.139089,
+      "aei_vision": 0.183554,
+      "text_ratio": 0.944757,
+      "vision_ratio": 0.055243
+    },
+    "all": {
+      "mdi": 17.101754,
+      "aei_text": 2.85612,
+      "aei_vision": 0.291557,
+      "text_ratio": 0.944757,
+      "vision_ratio": 0.055243
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944757,
+      0.055243
+    ],
+    "text_vision_ratio": "0.944757:0.055243"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.188285,
+      "aei_text": 3.020036,
+      "aei_vision": 0.228994,
+      "text_ratio": 0.929519,
+      "vision_ratio": 0.070481
+    },
+    "middle": {
+      "mdi": 5.213394,
+      "aei_text": 2.409235,
+      "aei_vision": 0.462124,
+      "text_ratio": 0.839057,
+      "vision_ratio": 0.160943
+    },
+    "late": {
+      "mdi": 17.101754,
+      "aei_text": 3.139089,
+      "aei_vision": 0.183554,
+      "text_ratio": 0.944757,
+      "vision_ratio": 0.055243
+    },
+    "all": {
+      "mdi": 17.101754,
+      "aei_text": 2.85612,
+      "aei_vision": 0.291557,
+      "text_ratio": 0.944757,
+      "vision_ratio": 0.055243
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944757,
+      0.055243
+    ],
+    "text_vision_ratio": "0.944757:0.055243"
+  }
+}
+```
+
+
+## === Rollout Step 382 ===
+Step: 381/29790 | 2025-10-22 12:28:28
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.217 | 7.598 | 18.348 | 18.348 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.217334,
+      "aei_text": 2.932237,
+      "aei_vision": 0.170307,
+      "text_ratio": 0.945107,
+      "vision_ratio": 0.054893
+    },
+    "middle": {
+      "mdi": 7.598165,
+      "aei_text": 2.547916,
+      "aei_vision": 0.335333,
+      "text_ratio": 0.883696,
+      "vision_ratio": 0.116304
+    },
+    "late": {
+      "mdi": 18.347986,
+      "aei_text": 2.953925,
+      "aei_vision": 0.160995,
+      "text_ratio": 0.948315,
+      "vision_ratio": 0.051685
+    },
+    "all": {
+      "mdi": 18.347986,
+      "aei_text": 2.81136,
+      "aei_vision": 0.222212,
+      "text_ratio": 0.948315,
+      "vision_ratio": 0.051685
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948315,
+      0.051685
+    ],
+    "text_vision_ratio": "0.948315:0.051685"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.217334,
+      "aei_text": 2.932237,
+      "aei_vision": 0.170307,
+      "text_ratio": 0.945107,
+      "vision_ratio": 0.054893
+    },
+    "middle": {
+      "mdi": 7.598165,
+      "aei_text": 2.547916,
+      "aei_vision": 0.335333,
+      "text_ratio": 0.883696,
+      "vision_ratio": 0.116304
+    },
+    "late": {
+      "mdi": 18.347986,
+      "aei_text": 2.953925,
+      "aei_vision": 0.160995,
+      "text_ratio": 0.948315,
+      "vision_ratio": 0.051685
+    },
+    "all": {
+      "mdi": 18.347986,
+      "aei_text": 2.81136,
+      "aei_vision": 0.222212,
+      "text_ratio": 0.948315,
+      "vision_ratio": 0.051685
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948315,
+      0.051685
+    ],
+    "text_vision_ratio": "0.948315:0.051685"
+  }
+}
+```
+
+
+## === Rollout Step 383 ===
+Step: 382/29790 | 2025-10-22 12:28:31
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.509 | 8.921 | 15.518 | 15.518 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.508888,
+      "aei_text": 2.837569,
+      "aei_vision": 0.226844,
+      "text_ratio": 0.925975,
+      "vision_ratio": 0.074025
+    },
+    "middle": {
+      "mdi": 8.920613,
+      "aei_text": 2.666325,
+      "aei_vision": 0.298895,
+      "text_ratio": 0.8992,
+      "vision_ratio": 0.1008
+    },
+    "late": {
+      "mdi": 15.518295,
+      "aei_text": 2.928237,
+      "aei_vision": 0.188696,
+      "text_ratio": 0.939461,
+      "vision_ratio": 0.060539
+    },
+    "all": {
+      "mdi": 15.518295,
+      "aei_text": 2.81071,
+      "aei_vision": 0.238145,
+      "text_ratio": 0.939461,
+      "vision_ratio": 0.060539
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.939461,
+      0.060539
+    ],
+    "text_vision_ratio": "0.939461:0.060539"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.508888,
+      "aei_text": 2.837569,
+      "aei_vision": 0.226844,
+      "text_ratio": 0.925975,
+      "vision_ratio": 0.074025
+    },
+    "middle": {
+      "mdi": 8.920613,
+      "aei_text": 2.666325,
+      "aei_vision": 0.298895,
+      "text_ratio": 0.8992,
+      "vision_ratio": 0.1008
+    },
+    "late": {
+      "mdi": 15.518295,
+      "aei_text": 2.928237,
+      "aei_vision": 0.188696,
+      "text_ratio": 0.939461,
+      "vision_ratio": 0.060539
+    },
+    "all": {
+      "mdi": 15.518295,
+      "aei_text": 2.81071,
+      "aei_vision": 0.238145,
+      "text_ratio": 0.939461,
+      "vision_ratio": 0.060539
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.939461,
+      0.060539
+    ],
+    "text_vision_ratio": "0.939461:0.060539"
+  }
+}
+```
+
+
+## === Rollout Step 384 ===
+Step: 383/29790 | 2025-10-22 12:28:35
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.336 | 11.764 | 16.743 | 16.743 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 326.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 326.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 326,
+    "text_tokens": 0,
+    "total_tokens": 326
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.336447,
+      "aei_text": 2.688448,
+      "aei_vision": 0.217927,
+      "text_ratio": 0.925018,
+      "vision_ratio": 0.074982
+    },
+    "middle": {
+      "mdi": 11.764095,
+      "aei_text": 2.669107,
+      "aei_vision": 0.226886,
+      "text_ratio": 0.921655,
+      "vision_ratio": 0.078345
+    },
+    "late": {
+      "mdi": 16.742684,
+      "aei_text": 2.798127,
+      "aei_vision": 0.167125,
+      "text_ratio": 0.943639,
+      "vision_ratio": 0.056361
+    },
+    "all": {
+      "mdi": 16.742684,
+      "aei_text": 2.718561,
+      "aei_vision": 0.20398,
+      "text_ratio": 0.943639,
+      "vision_ratio": 0.056361
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943639,
+      0.056361
+    ],
+    "text_vision_ratio": "0.943639:0.056361"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 326,
+    "text_tokens": 0,
+    "total_tokens": 326
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.336447,
+      "aei_text": 2.688448,
+      "aei_vision": 0.217927,
+      "text_ratio": 0.925018,
+      "vision_ratio": 0.074982
+    },
+    "middle": {
+      "mdi": 11.764095,
+      "aei_text": 2.669107,
+      "aei_vision": 0.226886,
+      "text_ratio": 0.921655,
+      "vision_ratio": 0.078345
+    },
+    "late": {
+      "mdi": 16.742684,
+      "aei_text": 2.798127,
+      "aei_vision": 0.167125,
+      "text_ratio": 0.943639,
+      "vision_ratio": 0.056361
+    },
+    "all": {
+      "mdi": 16.742684,
+      "aei_text": 2.718561,
+      "aei_vision": 0.20398,
+      "text_ratio": 0.943639,
+      "vision_ratio": 0.056361
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943639,
+      0.056361
+    ],
+    "text_vision_ratio": "0.943639:0.056361"
+  }
+}
+```
+
+
+## === Rollout Step 385 ===
+Step: 384/29790 | 2025-10-22 12:28:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.269 | 8.558 | 10.244 | 10.244 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.268728,
+      "aei_text": 2.194227,
+      "aei_vision": 0.194718,
+      "text_ratio": 0.918492,
+      "vision_ratio": 0.081508
+    },
+    "middle": {
+      "mdi": 8.558333,
+      "aei_text": 2.116282,
+      "aei_vision": 0.247277,
+      "text_ratio": 0.895379,
+      "vision_ratio": 0.104621
+    },
+    "late": {
+      "mdi": 10.243801,
+      "aei_text": 2.168989,
+      "aei_vision": 0.211737,
+      "text_ratio": 0.911062,
+      "vision_ratio": 0.088938
+    },
+    "all": {
+      "mdi": 10.243801,
+      "aei_text": 2.159833,
+      "aei_vision": 0.217911,
+      "text_ratio": 0.911062,
+      "vision_ratio": 0.088938
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.911062,
+      0.088938
+    ],
+    "text_vision_ratio": "0.911062:0.088938"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.268728,
+      "aei_text": 2.194227,
+      "aei_vision": 0.194718,
+      "text_ratio": 0.918492,
+      "vision_ratio": 0.081508
+    },
+    "middle": {
+      "mdi": 8.558333,
+      "aei_text": 2.116282,
+      "aei_vision": 0.247277,
+      "text_ratio": 0.895379,
+      "vision_ratio": 0.104621
+    },
+    "late": {
+      "mdi": 10.243801,
+      "aei_text": 2.168989,
+      "aei_vision": 0.211737,
+      "text_ratio": 0.911062,
+      "vision_ratio": 0.088938
+    },
+    "all": {
+      "mdi": 10.243801,
+      "aei_text": 2.159833,
+      "aei_vision": 0.217911,
+      "text_ratio": 0.911062,
+      "vision_ratio": 0.088938
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.911062,
+      0.088938
+    ],
+    "text_vision_ratio": "0.911062:0.088938"
+  }
+}
+```
+
+
+## === Rollout Step 386 ===
+Step: 385/29790 | 2025-10-22 12:28:41
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.511 | 8.862 | 15.356 | 15.356 |
+| MDI Std | 0.041 | 0.141 | 0.868 | 0.868 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.469873,
+      "aei_text": 3.076751,
+      "aei_vision": 0.212631,
+      "text_ratio": 0.935358,
+      "vision_ratio": 0.064642
+    },
+    "middle": {
+      "mdi": 9.002247,
+      "aei_text": 2.813308,
+      "aei_vision": 0.312512,
+      "text_ratio": 0.900022,
+      "vision_ratio": 0.099978
+    },
+    "late": {
+      "mdi": 16.224785,
+      "aei_text": 3.128929,
+      "aei_vision": 0.192849,
+      "text_ratio": 0.941944,
+      "vision_ratio": 0.058056
+    },
+    "all": {
+      "mdi": 16.224785,
+      "aei_text": 3.006329,
+      "aei_vision": 0.239331,
+      "text_ratio": 0.941944,
+      "vision_ratio": 0.058056
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941944,
+      0.058056
+    ],
+    "text_vision_ratio": "0.941944:0.058056"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.551142,
+      "aei_text": 3.079402,
+      "aei_vision": 0.211626,
+      "text_ratio": 0.935696,
+      "vision_ratio": 0.064304
+    },
+    "middle": {
+      "mdi": 8.720927,
+      "aei_text": 2.792893,
+      "aei_vision": 0.320252,
+      "text_ratio": 0.897129,
+      "vision_ratio": 0.102871
+    },
+    "late": {
+      "mdi": 14.488009,
+      "aei_text": 3.077344,
+      "aei_vision": 0.212406,
+      "text_ratio": 0.935434,
+      "vision_ratio": 0.064566
+    },
+    "all": {
+      "mdi": 14.488009,
+      "aei_text": 2.983213,
+      "aei_vision": 0.248095,
+      "text_ratio": 0.935434,
+      "vision_ratio": 0.064566
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.935434,
+      0.064566
+    ],
+    "text_vision_ratio": "0.935434:0.064566"
+  }
+}
+```
+
+
+## === Rollout Step 387 ===
+Step: 386/29790 | 2025-10-22 12:28:45
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.481 | 9.227 | 34.839 | 34.839 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.480758,
+      "aei_text": 2.990213,
+      "aei_vision": 0.193157,
+      "text_ratio": 0.939323,
+      "vision_ratio": 0.060677
+    },
+    "middle": {
+      "mdi": 9.227127,
+      "aei_text": 2.735415,
+      "aei_vision": 0.296454,
+      "text_ratio": 0.902221,
+      "vision_ratio": 0.097779
+    },
+    "late": {
+      "mdi": 34.839314,
+      "aei_text": 3.237451,
+      "aei_vision": 0.092925,
+      "text_ratio": 0.972098,
+      "vision_ratio": 0.027902
+    },
+    "all": {
+      "mdi": 34.839314,
+      "aei_text": 2.987693,
+      "aei_vision": 0.194179,
+      "text_ratio": 0.972098,
+      "vision_ratio": 0.027902
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.972098,
+      0.027902
+    ],
+    "text_vision_ratio": "0.972098:0.027902"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.480758,
+      "aei_text": 2.990213,
+      "aei_vision": 0.193157,
+      "text_ratio": 0.939323,
+      "vision_ratio": 0.060677
+    },
+    "middle": {
+      "mdi": 9.227127,
+      "aei_text": 2.735415,
+      "aei_vision": 0.296454,
+      "text_ratio": 0.902221,
+      "vision_ratio": 0.097779
+    },
+    "late": {
+      "mdi": 34.839314,
+      "aei_text": 3.237451,
+      "aei_vision": 0.092925,
+      "text_ratio": 0.972098,
+      "vision_ratio": 0.027902
+    },
+    "all": {
+      "mdi": 34.839314,
+      "aei_text": 2.987693,
+      "aei_vision": 0.194179,
+      "text_ratio": 0.972098,
+      "vision_ratio": 0.027902
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.972098,
+      0.027902
+    ],
+    "text_vision_ratio": "0.972098:0.027902"
+  }
+}
+```
+
+
+## === Rollout Step 388 ===
+Step: 387/29790 | 2025-10-22 12:28:48
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.912 | 9.888 | 16.530 | 16.530 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.912078,
+      "aei_text": 3.279654,
+      "aei_vision": 0.164707,
+      "text_ratio": 0.952181,
+      "vision_ratio": 0.047819
+    },
+    "middle": {
+      "mdi": 9.887833,
+      "aei_text": 2.922515,
+      "aei_vision": 0.295567,
+      "text_ratio": 0.908154,
+      "vision_ratio": 0.091846
+    },
+    "late": {
+      "mdi": 16.530392,
+      "aei_text": 3.200727,
+      "aei_vision": 0.193627,
+      "text_ratio": 0.942956,
+      "vision_ratio": 0.057044
+    },
+    "all": {
+      "mdi": 16.530392,
+      "aei_text": 3.134299,
+      "aei_vision": 0.217967,
+      "text_ratio": 0.942956,
+      "vision_ratio": 0.057044
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942956,
+      0.057044
+    ],
+    "text_vision_ratio": "0.942956:0.057044"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.912078,
+      "aei_text": 3.279654,
+      "aei_vision": 0.164707,
+      "text_ratio": 0.952181,
+      "vision_ratio": 0.047819
+    },
+    "middle": {
+      "mdi": 9.887833,
+      "aei_text": 2.922515,
+      "aei_vision": 0.295567,
+      "text_ratio": 0.908154,
+      "vision_ratio": 0.091846
+    },
+    "late": {
+      "mdi": 16.530392,
+      "aei_text": 3.200727,
+      "aei_vision": 0.193627,
+      "text_ratio": 0.942956,
+      "vision_ratio": 0.057044
+    },
+    "all": {
+      "mdi": 16.530392,
+      "aei_text": 3.134299,
+      "aei_vision": 0.217967,
+      "text_ratio": 0.942956,
+      "vision_ratio": 0.057044
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942956,
+      0.057044
+    ],
+    "text_vision_ratio": "0.942956:0.057044"
+  }
+}
+```
+
+
+## === Rollout Step 389 ===
+Step: 388/29790 | 2025-10-22 12:28:52
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.855 | 11.480 | 15.926 | 15.926 |
+| MDI Std | 1.450 | 0.618 | 1.077 | 1.077 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.405065,
+      "aei_text": 2.972161,
+      "aei_vision": 0.153164,
+      "text_ratio": 0.950993,
+      "vision_ratio": 0.049007
+    },
+    "middle": {
+      "mdi": 12.097407,
+      "aei_text": 2.791475,
+      "aei_vision": 0.23075,
+      "text_ratio": 0.923649,
+      "vision_ratio": 0.076351
+    },
+    "late": {
+      "mdi": 14.849107,
+      "aei_text": 2.877557,
+      "aei_vision": 0.193787,
+      "text_ratio": 0.936905,
+      "vision_ratio": 0.063095
+    },
+    "all": {
+      "mdi": 14.849107,
+      "aei_text": 2.880398,
+      "aei_vision": 0.192567,
+      "text_ratio": 0.936905,
+      "vision_ratio": 0.063095
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.936905,
+      0.063095
+    ],
+    "text_vision_ratio": "0.936905:0.063095"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.304152,
+      "aei_text": 3.014141,
+      "aei_vision": 0.135138,
+      "text_ratio": 0.957089,
+      "vision_ratio": 0.042911
+    },
+    "middle": {
+      "mdi": 10.862163,
+      "aei_text": 2.741153,
+      "aei_vision": 0.252358,
+      "text_ratio": 0.915698,
+      "vision_ratio": 0.084302
+    },
+    "late": {
+      "mdi": 17.003491,
+      "aei_text": 2.92785,
+      "aei_vision": 0.172191,
+      "text_ratio": 0.944455,
+      "vision_ratio": 0.055545
+    },
+    "all": {
+      "mdi": 17.003491,
+      "aei_text": 2.894382,
+      "aei_vision": 0.186562,
+      "text_ratio": 0.944455,
+      "vision_ratio": 0.055545
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944455,
+      0.055545
+    ],
+    "text_vision_ratio": "0.944455:0.055545"
+  }
+}
+```
+
+
+## === Rollout Step 390 ===
+Step: 389/29790 | 2025-10-22 12:28:55
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.876 | 9.506 | 22.613 | 22.613 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.876483,
+      "aei_text": 2.709767,
+      "aei_vision": 0.170678,
+      "text_ratio": 0.940746,
+      "vision_ratio": 0.059254
+    },
+    "middle": {
+      "mdi": 9.50603,
+      "aei_text": 2.515984,
+      "aei_vision": 0.264672,
+      "text_ratio": 0.904817,
+      "vision_ratio": 0.095183
+    },
+    "late": {
+      "mdi": 22.613414,
+      "aei_text": 2.805838,
+      "aei_vision": 0.124078,
+      "text_ratio": 0.957651,
+      "vision_ratio": 0.042349
+    },
+    "all": {
+      "mdi": 22.613414,
+      "aei_text": 2.677196,
+      "aei_vision": 0.186476,
+      "text_ratio": 0.957651,
+      "vision_ratio": 0.042349
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957651,
+      0.042349
+    ],
+    "text_vision_ratio": "0.957651:0.042349"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.876483,
+      "aei_text": 2.709767,
+      "aei_vision": 0.170678,
+      "text_ratio": 0.940746,
+      "vision_ratio": 0.059254
+    },
+    "middle": {
+      "mdi": 9.50603,
+      "aei_text": 2.515984,
+      "aei_vision": 0.264672,
+      "text_ratio": 0.904817,
+      "vision_ratio": 0.095183
+    },
+    "late": {
+      "mdi": 22.613414,
+      "aei_text": 2.805838,
+      "aei_vision": 0.124078,
+      "text_ratio": 0.957651,
+      "vision_ratio": 0.042349
+    },
+    "all": {
+      "mdi": 22.613414,
+      "aei_text": 2.677196,
+      "aei_vision": 0.186476,
+      "text_ratio": 0.957651,
+      "vision_ratio": 0.042349
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957651,
+      0.042349
+    ],
+    "text_vision_ratio": "0.957651:0.042349"
+  }
+}
+```
+
+
+## === Rollout Step 391 ===
+Step: 390/29790 | 2025-10-22 12:28:59
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.459 | 21.093 | 18.126 | 18.126 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.458966,
+      "aei_text": 3.18713,
+      "aei_vision": 0.148522,
+      "text_ratio": 0.955474,
+      "vision_ratio": 0.044526
+    },
+    "middle": {
+      "mdi": 21.092656,
+      "aei_text": 3.181224,
+      "aei_vision": 0.150821,
+      "text_ratio": 0.954736,
+      "vision_ratio": 0.045264
+    },
+    "late": {
+      "mdi": 18.126458,
+      "aei_text": 3.125697,
+      "aei_vision": 0.172438,
+      "text_ratio": 0.947716,
+      "vision_ratio": 0.052284
+    },
+    "all": {
+      "mdi": 18.126458,
+      "aei_text": 3.164684,
+      "aei_vision": 0.157261,
+      "text_ratio": 0.947716,
+      "vision_ratio": 0.052284
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947716,
+      0.052284
+    ],
+    "text_vision_ratio": "0.947716:0.052284"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.458966,
+      "aei_text": 3.18713,
+      "aei_vision": 0.148522,
+      "text_ratio": 0.955474,
+      "vision_ratio": 0.044526
+    },
+    "middle": {
+      "mdi": 21.092656,
+      "aei_text": 3.181224,
+      "aei_vision": 0.150821,
+      "text_ratio": 0.954736,
+      "vision_ratio": 0.045264
+    },
+    "late": {
+      "mdi": 18.126458,
+      "aei_text": 3.125697,
+      "aei_vision": 0.172438,
+      "text_ratio": 0.947716,
+      "vision_ratio": 0.052284
+    },
+    "all": {
+      "mdi": 18.126458,
+      "aei_text": 3.164684,
+      "aei_vision": 0.157261,
+      "text_ratio": 0.947716,
+      "vision_ratio": 0.052284
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947716,
+      0.052284
+    ],
+    "text_vision_ratio": "0.947716:0.052284"
+  }
+}
+```
+
+
+## === Rollout Step 392 ===
+Step: 391/29790 | 2025-10-22 12:29:02
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.864 | 9.132 | 18.712 | 18.712 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.864201,
+      "aei_text": 2.778178,
+      "aei_vision": 0.215962,
+      "text_ratio": 0.927872,
+      "vision_ratio": 0.072128
+    },
+    "middle": {
+      "mdi": 9.132196,
+      "aei_text": 2.617836,
+      "aei_vision": 0.28666,
+      "text_ratio": 0.901305,
+      "vision_ratio": 0.098695
+    },
+    "late": {
+      "mdi": 18.712325,
+      "aei_text": 2.914705,
+      "aei_vision": 0.155764,
+      "text_ratio": 0.94927,
+      "vision_ratio": 0.05073
+    },
+    "all": {
+      "mdi": 18.712325,
+      "aei_text": 2.77024,
+      "aei_vision": 0.219462,
+      "text_ratio": 0.94927,
+      "vision_ratio": 0.05073
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94927,
+      0.05073
+    ],
+    "text_vision_ratio": "0.949270:0.050730"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.864201,
+      "aei_text": 2.778178,
+      "aei_vision": 0.215962,
+      "text_ratio": 0.927872,
+      "vision_ratio": 0.072128
+    },
+    "middle": {
+      "mdi": 9.132196,
+      "aei_text": 2.617836,
+      "aei_vision": 0.28666,
+      "text_ratio": 0.901305,
+      "vision_ratio": 0.098695
+    },
+    "late": {
+      "mdi": 18.712325,
+      "aei_text": 2.914705,
+      "aei_vision": 0.155764,
+      "text_ratio": 0.94927,
+      "vision_ratio": 0.05073
+    },
+    "all": {
+      "mdi": 18.712325,
+      "aei_text": 2.77024,
+      "aei_vision": 0.219462,
+      "text_ratio": 0.94927,
+      "vision_ratio": 0.05073
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94927,
+      0.05073
+    ],
+    "text_vision_ratio": "0.949270:0.050730"
+  }
+}
+```
+
+
+## === Rollout Step 393 ===
+Step: 392/29790 | 2025-10-22 12:29:06
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.328 | 9.621 | 13.651 | 13.651 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.327797,
+      "aei_text": 2.864727,
+      "aei_vision": 0.156305,
+      "text_ratio": 0.948261,
+      "vision_ratio": 0.051739
+    },
+    "middle": {
+      "mdi": 9.620891,
+      "aei_text": 2.610488,
+      "aei_vision": 0.271335,
+      "text_ratio": 0.905846,
+      "vision_ratio": 0.094154
+    },
+    "late": {
+      "mdi": 13.651447,
+      "aei_text": 2.762877,
+      "aei_vision": 0.202387,
+      "text_ratio": 0.931747,
+      "vision_ratio": 0.068253
+    },
+    "all": {
+      "mdi": 13.651447,
+      "aei_text": 2.746031,
+      "aei_vision": 0.210009,
+      "text_ratio": 0.931747,
+      "vision_ratio": 0.068253
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.931747,
+      0.068253
+    ],
+    "text_vision_ratio": "0.931747:0.068253"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.327797,
+      "aei_text": 2.864727,
+      "aei_vision": 0.156305,
+      "text_ratio": 0.948261,
+      "vision_ratio": 0.051739
+    },
+    "middle": {
+      "mdi": 9.620891,
+      "aei_text": 2.610488,
+      "aei_vision": 0.271335,
+      "text_ratio": 0.905846,
+      "vision_ratio": 0.094154
+    },
+    "late": {
+      "mdi": 13.651447,
+      "aei_text": 2.762877,
+      "aei_vision": 0.202387,
+      "text_ratio": 0.931747,
+      "vision_ratio": 0.068253
+    },
+    "all": {
+      "mdi": 13.651447,
+      "aei_text": 2.746031,
+      "aei_vision": 0.210009,
+      "text_ratio": 0.931747,
+      "vision_ratio": 0.068253
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.931747,
+      0.068253
+    ],
+    "text_vision_ratio": "0.931747:0.068253"
+  }
+}
+```
+
+
+## === Rollout Step 394 ===
+Step: 393/29790 | 2025-10-22 12:29:09
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 27.859 | 20.048 | 23.734 | 23.734 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.858647,
+      "aei_text": 3.374128,
+      "aei_vision": 0.121116,
+      "text_ratio": 0.965348,
+      "vision_ratio": 0.034652
+    },
+    "middle": {
+      "mdi": 20.048413,
+      "aei_text": 3.261807,
+      "aei_vision": 0.162697,
+      "text_ratio": 0.95249,
+      "vision_ratio": 0.04751
+    },
+    "late": {
+      "mdi": 23.733991,
+      "aei_text": 3.32308,
+      "aei_vision": 0.140014,
+      "text_ratio": 0.95957,
+      "vision_ratio": 0.04043
+    },
+    "all": {
+      "mdi": 23.733991,
+      "aei_text": 3.319672,
+      "aei_vision": 0.141275,
+      "text_ratio": 0.95957,
+      "vision_ratio": 0.04043
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95957,
+      0.04043
+    ],
+    "text_vision_ratio": "0.959570:0.040430"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.858647,
+      "aei_text": 3.374128,
+      "aei_vision": 0.121116,
+      "text_ratio": 0.965348,
+      "vision_ratio": 0.034652
+    },
+    "middle": {
+      "mdi": 20.048413,
+      "aei_text": 3.261807,
+      "aei_vision": 0.162697,
+      "text_ratio": 0.95249,
+      "vision_ratio": 0.04751
+    },
+    "late": {
+      "mdi": 23.733991,
+      "aei_text": 3.32308,
+      "aei_vision": 0.140014,
+      "text_ratio": 0.95957,
+      "vision_ratio": 0.04043
+    },
+    "all": {
+      "mdi": 23.733991,
+      "aei_text": 3.319672,
+      "aei_vision": 0.141275,
+      "text_ratio": 0.95957,
+      "vision_ratio": 0.04043
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95957,
+      0.04043
+    ],
+    "text_vision_ratio": "0.959570:0.040430"
+  }
+}
+```
+
+
+## === Rollout Step 395 ===
+Step: 394/29790 | 2025-10-22 12:29:13
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.510 | 19.472 | 23.202 | 23.202 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.510141,
+      "aei_text": 2.944774,
+      "aei_vision": 0.136902,
+      "text_ratio": 0.955576,
+      "vision_ratio": 0.044424
+    },
+    "middle": {
+      "mdi": 19.471513,
+      "aei_text": 2.915827,
+      "aei_vision": 0.149748,
+      "text_ratio": 0.951152,
+      "vision_ratio": 0.048848
+    },
+    "late": {
+      "mdi": 23.201707,
+      "aei_text": 2.965273,
+      "aei_vision": 0.127804,
+      "text_ratio": 0.958681,
+      "vision_ratio": 0.041319
+    },
+    "all": {
+      "mdi": 23.201707,
+      "aei_text": 2.941958,
+      "aei_vision": 0.138151,
+      "text_ratio": 0.958681,
+      "vision_ratio": 0.041319
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958681,
+      0.041319
+    ],
+    "text_vision_ratio": "0.958681:0.041319"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.510141,
+      "aei_text": 2.944774,
+      "aei_vision": 0.136902,
+      "text_ratio": 0.955576,
+      "vision_ratio": 0.044424
+    },
+    "middle": {
+      "mdi": 19.471513,
+      "aei_text": 2.915827,
+      "aei_vision": 0.149748,
+      "text_ratio": 0.951152,
+      "vision_ratio": 0.048848
+    },
+    "late": {
+      "mdi": 23.201707,
+      "aei_text": 2.965273,
+      "aei_vision": 0.127804,
+      "text_ratio": 0.958681,
+      "vision_ratio": 0.041319
+    },
+    "all": {
+      "mdi": 23.201707,
+      "aei_text": 2.941958,
+      "aei_vision": 0.138151,
+      "text_ratio": 0.958681,
+      "vision_ratio": 0.041319
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958681,
+      0.041319
+    ],
+    "text_vision_ratio": "0.958681:0.041319"
+  }
+}
+```
+
+
+## === Rollout Step 396 ===
+Step: 395/29790 | 2025-10-22 12:29:16
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.058 | 9.577 | 16.494 | 16.494 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 254.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 254.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 254,
+    "text_tokens": 0,
+    "total_tokens": 254
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.058168,
+      "aei_text": 2.387809,
+      "aei_vision": 0.158572,
+      "text_ratio": 0.937726,
+      "vision_ratio": 0.062274
+    },
+    "middle": {
+      "mdi": 9.577482,
+      "aei_text": 2.260131,
+      "aei_vision": 0.235984,
+      "text_ratio": 0.90546,
+      "vision_ratio": 0.09454
+    },
+    "late": {
+      "mdi": 16.494016,
+      "aei_text": 2.408507,
+      "aei_vision": 0.146023,
+      "text_ratio": 0.942838,
+      "vision_ratio": 0.057162
+    },
+    "all": {
+      "mdi": 16.494016,
+      "aei_text": 2.352149,
+      "aei_vision": 0.180193,
+      "text_ratio": 0.942838,
+      "vision_ratio": 0.057162
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942838,
+      0.057162
+    ],
+    "text_vision_ratio": "0.942838:0.057162"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 254,
+    "text_tokens": 0,
+    "total_tokens": 254
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.058168,
+      "aei_text": 2.387809,
+      "aei_vision": 0.158572,
+      "text_ratio": 0.937726,
+      "vision_ratio": 0.062274
+    },
+    "middle": {
+      "mdi": 9.577482,
+      "aei_text": 2.260131,
+      "aei_vision": 0.235984,
+      "text_ratio": 0.90546,
+      "vision_ratio": 0.09454
+    },
+    "late": {
+      "mdi": 16.494016,
+      "aei_text": 2.408507,
+      "aei_vision": 0.146023,
+      "text_ratio": 0.942838,
+      "vision_ratio": 0.057162
+    },
+    "all": {
+      "mdi": 16.494016,
+      "aei_text": 2.352149,
+      "aei_vision": 0.180193,
+      "text_ratio": 0.942838,
+      "vision_ratio": 0.057162
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942838,
+      0.057162
+    ],
+    "text_vision_ratio": "0.942838:0.057162"
+  }
+}
+```
+
+
+## === Rollout Step 397 ===
+Step: 396/29790 | 2025-10-22 12:29:20
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.465 | 9.361 | 26.700 | 26.700 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 531.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 531.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.465259,
+      "aei_text": 3.84594,
+      "aei_vision": 0.233579,
+      "text_ratio": 0.942743,
+      "vision_ratio": 0.057257
+    },
+    "middle": {
+      "mdi": 9.361335,
+      "aei_text": 3.374679,
+      "aei_vision": 0.360491,
+      "text_ratio": 0.903487,
+      "vision_ratio": 0.096513
+    },
+    "late": {
+      "mdi": 26.699823,
+      "aei_text": 4.137818,
+      "aei_vision": 0.154975,
+      "text_ratio": 0.963899,
+      "vision_ratio": 0.036101
+    },
+    "all": {
+      "mdi": 26.699823,
+      "aei_text": 3.786146,
+      "aei_vision": 0.249682,
+      "text_ratio": 0.963899,
+      "vision_ratio": 0.036101
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.963899,
+      0.036101
+    ],
+    "text_vision_ratio": "0.963899:0.036101"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.465259,
+      "aei_text": 3.84594,
+      "aei_vision": 0.233579,
+      "text_ratio": 0.942743,
+      "vision_ratio": 0.057257
+    },
+    "middle": {
+      "mdi": 9.361335,
+      "aei_text": 3.374679,
+      "aei_vision": 0.360491,
+      "text_ratio": 0.903487,
+      "vision_ratio": 0.096513
+    },
+    "late": {
+      "mdi": 26.699823,
+      "aei_text": 4.137818,
+      "aei_vision": 0.154975,
+      "text_ratio": 0.963899,
+      "vision_ratio": 0.036101
+    },
+    "all": {
+      "mdi": 26.699823,
+      "aei_text": 3.786146,
+      "aei_vision": 0.249682,
+      "text_ratio": 0.963899,
+      "vision_ratio": 0.036101
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.963899,
+      0.036101
+    ],
+    "text_vision_ratio": "0.963899:0.036101"
+  }
+}
+```
+
+
+## === Rollout Step 398 ===
+Step: 397/29790 | 2025-10-22 12:29:24
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.910 | 25.288 | 27.492 | 27.492 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 508.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 508.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 508,
+    "text_tokens": 0,
+    "total_tokens": 508
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.910397,
+      "aei_text": 3.733408,
+      "aei_vision": 0.18751,
+      "text_ratio": 0.952177,
+      "vision_ratio": 0.047823
+    },
+    "middle": {
+      "mdi": 25.28844,
+      "aei_text": 3.851814,
+      "aei_vision": 0.152315,
+      "text_ratio": 0.96196,
+      "vision_ratio": 0.03804
+    },
+    "late": {
+      "mdi": 27.492303,
+      "aei_text": 3.888413,
+      "aei_vision": 0.141436,
+      "text_ratio": 0.964903,
+      "vision_ratio": 0.035097
+    },
+    "all": {
+      "mdi": 27.492303,
+      "aei_text": 3.824545,
+      "aei_vision": 0.160421,
+      "text_ratio": 0.964903,
+      "vision_ratio": 0.035097
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964903,
+      0.035097
+    ],
+    "text_vision_ratio": "0.964903:0.035097"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 508,
+    "text_tokens": 0,
+    "total_tokens": 508
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.910397,
+      "aei_text": 3.733408,
+      "aei_vision": 0.18751,
+      "text_ratio": 0.952177,
+      "vision_ratio": 0.047823
+    },
+    "middle": {
+      "mdi": 25.28844,
+      "aei_text": 3.851814,
+      "aei_vision": 0.152315,
+      "text_ratio": 0.96196,
+      "vision_ratio": 0.03804
+    },
+    "late": {
+      "mdi": 27.492303,
+      "aei_text": 3.888413,
+      "aei_vision": 0.141436,
+      "text_ratio": 0.964903,
+      "vision_ratio": 0.035097
+    },
+    "all": {
+      "mdi": 27.492303,
+      "aei_text": 3.824545,
+      "aei_vision": 0.160421,
+      "text_ratio": 0.964903,
+      "vision_ratio": 0.035097
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964903,
+      0.035097
+    ],
+    "text_vision_ratio": "0.964903:0.035097"
+  }
+}
+```
+
+
+## === Rollout Step 399 ===
+Step: 398/29790 | 2025-10-22 12:29:28
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 22.772 | 10.213 | 22.073 | 22.073 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.77197,
+      "aei_text": 3.24648,
+      "aei_vision": 0.142565,
+      "text_ratio": 0.957934,
+      "vision_ratio": 0.042066
+    },
+    "middle": {
+      "mdi": 10.212872,
+      "aei_text": 2.880929,
+      "aei_vision": 0.282088,
+      "text_ratio": 0.910817,
+      "vision_ratio": 0.089183
+    },
+    "late": {
+      "mdi": 22.072651,
+      "aei_text": 3.235902,
+      "aei_vision": 0.146602,
+      "text_ratio": 0.956659,
+      "vision_ratio": 0.043341
+    },
+    "all": {
+      "mdi": 22.072651,
+      "aei_text": 3.121104,
+      "aei_vision": 0.190418,
+      "text_ratio": 0.956659,
+      "vision_ratio": 0.043341
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956659,
+      0.043341
+    ],
+    "text_vision_ratio": "0.956659:0.043341"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.77197,
+      "aei_text": 3.24648,
+      "aei_vision": 0.142565,
+      "text_ratio": 0.957934,
+      "vision_ratio": 0.042066
+    },
+    "middle": {
+      "mdi": 10.212872,
+      "aei_text": 2.880929,
+      "aei_vision": 0.282088,
+      "text_ratio": 0.910817,
+      "vision_ratio": 0.089183
+    },
+    "late": {
+      "mdi": 22.072651,
+      "aei_text": 3.235902,
+      "aei_vision": 0.146602,
+      "text_ratio": 0.956659,
+      "vision_ratio": 0.043341
+    },
+    "all": {
+      "mdi": 22.072651,
+      "aei_text": 3.121104,
+      "aei_vision": 0.190418,
+      "text_ratio": 0.956659,
+      "vision_ratio": 0.043341
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956659,
+      0.043341
+    ],
+    "text_vision_ratio": "0.956659:0.043341"
+  }
+}
+```
+
+
+## === Rollout Step 400 ===
+Step: 399/29790 | 2025-10-22 12:29:31
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.714 | 7.117 | 18.284 | 18.284 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.714119,
+      "aei_text": 2.786811,
+      "aei_vision": 0.237902,
+      "text_ratio": 0.921347,
+      "vision_ratio": 0.078653
+    },
+    "middle": {
+      "mdi": 7.11705,
+      "aei_text": 2.515804,
+      "aei_vision": 0.35349,
+      "text_ratio": 0.876803,
+      "vision_ratio": 0.123197
+    },
+    "late": {
+      "mdi": 18.283783,
+      "aei_text": 2.964452,
+      "aei_vision": 0.162136,
+      "text_ratio": 0.948143,
+      "vision_ratio": 0.051857
+    },
+    "all": {
+      "mdi": 18.283783,
+      "aei_text": 2.755689,
+      "aei_vision": 0.251176,
+      "text_ratio": 0.948143,
+      "vision_ratio": 0.051857
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948143,
+      0.051857
+    ],
+    "text_vision_ratio": "0.948143:0.051857"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.714119,
+      "aei_text": 2.786811,
+      "aei_vision": 0.237902,
+      "text_ratio": 0.921347,
+      "vision_ratio": 0.078653
+    },
+    "middle": {
+      "mdi": 7.11705,
+      "aei_text": 2.515804,
+      "aei_vision": 0.35349,
+      "text_ratio": 0.876803,
+      "vision_ratio": 0.123197
+    },
+    "late": {
+      "mdi": 18.283783,
+      "aei_text": 2.964452,
+      "aei_vision": 0.162136,
+      "text_ratio": 0.948143,
+      "vision_ratio": 0.051857
+    },
+    "all": {
+      "mdi": 18.283783,
+      "aei_text": 2.755689,
+      "aei_vision": 0.251176,
+      "text_ratio": 0.948143,
+      "vision_ratio": 0.051857
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948143,
+      0.051857
+    ],
+    "text_vision_ratio": "0.948143:0.051857"
+  }
+}
+```
+
+
+## === Rollout Step 401 ===
+Step: 400/29790 | 2025-10-22 12:29:35
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.275 | 7.829 | 28.132 | 28.132 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 531.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 531.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.27523,
+      "aei_text": 3.710264,
+      "aei_vision": 0.259909,
+      "text_ratio": 0.934535,
+      "vision_ratio": 0.065465
+    },
+    "middle": {
+      "mdi": 7.829356,
+      "aei_text": 3.176368,
+      "aei_vision": 0.4057,
+      "text_ratio": 0.886741,
+      "vision_ratio": 0.113259
+    },
+    "late": {
+      "mdi": 28.131949,
+      "aei_text": 4.125087,
+      "aei_vision": 0.146634,
+      "text_ratio": 0.965673,
+      "vision_ratio": 0.034327
+    },
+    "all": {
+      "mdi": 28.131949,
+      "aei_text": 3.670573,
+      "aei_vision": 0.270748,
+      "text_ratio": 0.965673,
+      "vision_ratio": 0.034327
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.965673,
+      0.034327
+    ],
+    "text_vision_ratio": "0.965673:0.034327"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.27523,
+      "aei_text": 3.710264,
+      "aei_vision": 0.259909,
+      "text_ratio": 0.934535,
+      "vision_ratio": 0.065465
+    },
+    "middle": {
+      "mdi": 7.829356,
+      "aei_text": 3.176368,
+      "aei_vision": 0.4057,
+      "text_ratio": 0.886741,
+      "vision_ratio": 0.113259
+    },
+    "late": {
+      "mdi": 28.131949,
+      "aei_text": 4.125087,
+      "aei_vision": 0.146634,
+      "text_ratio": 0.965673,
+      "vision_ratio": 0.034327
+    },
+    "all": {
+      "mdi": 28.131949,
+      "aei_text": 3.670573,
+      "aei_vision": 0.270748,
+      "text_ratio": 0.965673,
+      "vision_ratio": 0.034327
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.965673,
+      0.034327
+    ],
+    "text_vision_ratio": "0.965673:0.034327"
+  }
+}
+```
+
+
+## === Rollout Step 402 ===
+Step: 401/29790 | 2025-10-22 12:29:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 9.698 | 9.479 | 11.707 | 11.707 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.697858,
+      "aei_text": 2.228215,
+      "aei_vision": 0.229764,
+      "text_ratio": 0.906523,
+      "vision_ratio": 0.093477
+    },
+    "middle": {
+      "mdi": 9.478695,
+      "aei_text": 2.220963,
+      "aei_vision": 0.234311,
+      "text_ratio": 0.904568,
+      "vision_ratio": 0.095432
+    },
+    "late": {
+      "mdi": 11.707381,
+      "aei_text": 2.283564,
+      "aei_vision": 0.195053,
+      "text_ratio": 0.921306,
+      "vision_ratio": 0.078694
+    },
+    "all": {
+      "mdi": 11.707381,
+      "aei_text": 2.244247,
+      "aei_vision": 0.219709,
+      "text_ratio": 0.921306,
+      "vision_ratio": 0.078694
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.921306,
+      0.078694
+    ],
+    "text_vision_ratio": "0.921306:0.078694"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.697858,
+      "aei_text": 2.228215,
+      "aei_vision": 0.229764,
+      "text_ratio": 0.906523,
+      "vision_ratio": 0.093477
+    },
+    "middle": {
+      "mdi": 9.478695,
+      "aei_text": 2.220963,
+      "aei_vision": 0.234311,
+      "text_ratio": 0.904568,
+      "vision_ratio": 0.095432
+    },
+    "late": {
+      "mdi": 11.707381,
+      "aei_text": 2.283564,
+      "aei_vision": 0.195053,
+      "text_ratio": 0.921306,
+      "vision_ratio": 0.078694
+    },
+    "all": {
+      "mdi": 11.707381,
+      "aei_text": 2.244247,
+      "aei_vision": 0.219709,
+      "text_ratio": 0.921306,
+      "vision_ratio": 0.078694
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.921306,
+      0.078694
+    ],
+    "text_vision_ratio": "0.921306:0.078694"
+  }
+}
+```
+
+
+## === Rollout Step 403 ===
+Step: 402/29790 | 2025-10-22 12:29:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.523 | 13.605 | 21.949 | 21.949 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.523053,
+      "aei_text": 3.110218,
+      "aei_vision": 0.144506,
+      "text_ratio": 0.955601,
+      "vision_ratio": 0.044399
+    },
+    "middle": {
+      "mdi": 13.605353,
+      "aei_text": 2.934617,
+      "aei_vision": 0.215696,
+      "text_ratio": 0.931532,
+      "vision_ratio": 0.068468
+    },
+    "late": {
+      "mdi": 21.948772,
+      "aei_text": 3.116433,
+      "aei_vision": 0.141987,
+      "text_ratio": 0.956425,
+      "vision_ratio": 0.043575
+    },
+    "all": {
+      "mdi": 21.948772,
+      "aei_text": 3.053756,
+      "aei_vision": 0.167396,
+      "text_ratio": 0.956425,
+      "vision_ratio": 0.043575
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956425,
+      0.043575
+    ],
+    "text_vision_ratio": "0.956425:0.043575"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.523053,
+      "aei_text": 3.110218,
+      "aei_vision": 0.144506,
+      "text_ratio": 0.955601,
+      "vision_ratio": 0.044399
+    },
+    "middle": {
+      "mdi": 13.605353,
+      "aei_text": 2.934617,
+      "aei_vision": 0.215696,
+      "text_ratio": 0.931532,
+      "vision_ratio": 0.068468
+    },
+    "late": {
+      "mdi": 21.948772,
+      "aei_text": 3.116433,
+      "aei_vision": 0.141987,
+      "text_ratio": 0.956425,
+      "vision_ratio": 0.043575
+    },
+    "all": {
+      "mdi": 21.948772,
+      "aei_text": 3.053756,
+      "aei_vision": 0.167396,
+      "text_ratio": 0.956425,
+      "vision_ratio": 0.043575
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956425,
+      0.043575
+    ],
+    "text_vision_ratio": "0.956425:0.043575"
+  }
+}
+```
+
+
+## === Rollout Step 404 ===
+Step: 403/29790 | 2025-10-22 12:29:45
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.347 | 9.467 | 15.183 | 15.183 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.347303,
+      "aei_text": 3.084521,
+      "aei_vision": 0.21499,
+      "text_ratio": 0.934842,
+      "vision_ratio": 0.065158
+    },
+    "middle": {
+      "mdi": 9.467082,
+      "aei_text": 2.854697,
+      "aei_vision": 0.301539,
+      "text_ratio": 0.904462,
+      "vision_ratio": 0.095538
+    },
+    "late": {
+      "mdi": 15.182778,
+      "aei_text": 3.111259,
+      "aei_vision": 0.20492,
+      "text_ratio": 0.938206,
+      "vision_ratio": 0.061794
+    },
+    "all": {
+      "mdi": 15.182778,
+      "aei_text": 3.016825,
+      "aei_vision": 0.240483,
+      "text_ratio": 0.938206,
+      "vision_ratio": 0.061794
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938206,
+      0.061794
+    ],
+    "text_vision_ratio": "0.938206:0.061794"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.347303,
+      "aei_text": 3.084521,
+      "aei_vision": 0.21499,
+      "text_ratio": 0.934842,
+      "vision_ratio": 0.065158
+    },
+    "middle": {
+      "mdi": 9.467082,
+      "aei_text": 2.854697,
+      "aei_vision": 0.301539,
+      "text_ratio": 0.904462,
+      "vision_ratio": 0.095538
+    },
+    "late": {
+      "mdi": 15.182778,
+      "aei_text": 3.111259,
+      "aei_vision": 0.20492,
+      "text_ratio": 0.938206,
+      "vision_ratio": 0.061794
+    },
+    "all": {
+      "mdi": 15.182778,
+      "aei_text": 3.016825,
+      "aei_vision": 0.240483,
+      "text_ratio": 0.938206,
+      "vision_ratio": 0.061794
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938206,
+      0.061794
+    ],
+    "text_vision_ratio": "0.938206:0.061794"
+  }
+}
+```
+
+
+## === Rollout Step 405 ===
+Step: 404/29790 | 2025-10-22 12:29:48
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.735 | 13.944 | 14.603 | 14.603 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.734807,
+      "aei_text": 2.242061,
+      "aei_vision": 0.133976,
+      "text_ratio": 0.943614,
+      "vision_ratio": 0.056386
+    },
+    "middle": {
+      "mdi": 13.944344,
+      "aei_text": 2.207195,
+      "aei_vision": 0.158286,
+      "text_ratio": 0.933085,
+      "vision_ratio": 0.066915
+    },
+    "late": {
+      "mdi": 14.603351,
+      "aei_text": 2.216523,
+      "aei_vision": 0.151782,
+      "text_ratio": 0.935911,
+      "vision_ratio": 0.064089
+    },
+    "all": {
+      "mdi": 14.603351,
+      "aei_text": 2.221926,
+      "aei_vision": 0.148015,
+      "text_ratio": 0.935911,
+      "vision_ratio": 0.064089
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.935911,
+      0.064089
+    ],
+    "text_vision_ratio": "0.935911:0.064089"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.734807,
+      "aei_text": 2.242061,
+      "aei_vision": 0.133976,
+      "text_ratio": 0.943614,
+      "vision_ratio": 0.056386
+    },
+    "middle": {
+      "mdi": 13.944344,
+      "aei_text": 2.207195,
+      "aei_vision": 0.158286,
+      "text_ratio": 0.933085,
+      "vision_ratio": 0.066915
+    },
+    "late": {
+      "mdi": 14.603351,
+      "aei_text": 2.216523,
+      "aei_vision": 0.151782,
+      "text_ratio": 0.935911,
+      "vision_ratio": 0.064089
+    },
+    "all": {
+      "mdi": 14.603351,
+      "aei_text": 2.221926,
+      "aei_vision": 0.148015,
+      "text_ratio": 0.935911,
+      "vision_ratio": 0.064089
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.935911,
+      0.064089
+    ],
+    "text_vision_ratio": "0.935911:0.064089"
+  }
+}
+```
+
+
+## === Rollout Step 406 ===
+Step: 405/29790 | 2025-10-22 12:29:51
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.291 | 10.249 | 19.523 | 19.523 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.290772,
+      "aei_text": 2.801666,
+      "aei_vision": 0.210798,
+      "text_ratio": 0.930025,
+      "vision_ratio": 0.069975
+    },
+    "middle": {
+      "mdi": 10.249469,
+      "aei_text": 2.684883,
+      "aei_vision": 0.261953,
+      "text_ratio": 0.911107,
+      "vision_ratio": 0.088893
+    },
+    "late": {
+      "mdi": 19.522554,
+      "aei_text": 2.939196,
+      "aei_vision": 0.150554,
+      "text_ratio": 0.951273,
+      "vision_ratio": 0.048727
+    },
+    "all": {
+      "mdi": 19.522554,
+      "aei_text": 2.808581,
+      "aei_vision": 0.207768,
+      "text_ratio": 0.951273,
+      "vision_ratio": 0.048727
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951273,
+      0.048727
+    ],
+    "text_vision_ratio": "0.951273:0.048727"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.290772,
+      "aei_text": 2.801666,
+      "aei_vision": 0.210798,
+      "text_ratio": 0.930025,
+      "vision_ratio": 0.069975
+    },
+    "middle": {
+      "mdi": 10.249469,
+      "aei_text": 2.684883,
+      "aei_vision": 0.261953,
+      "text_ratio": 0.911107,
+      "vision_ratio": 0.088893
+    },
+    "late": {
+      "mdi": 19.522554,
+      "aei_text": 2.939196,
+      "aei_vision": 0.150554,
+      "text_ratio": 0.951273,
+      "vision_ratio": 0.048727
+    },
+    "all": {
+      "mdi": 19.522554,
+      "aei_text": 2.808581,
+      "aei_vision": 0.207768,
+      "text_ratio": 0.951273,
+      "vision_ratio": 0.048727
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951273,
+      0.048727
+    ],
+    "text_vision_ratio": "0.951273:0.048727"
+  }
+}
+```
+
+
+## === Rollout Step 407 ===
+Step: 406/29790 | 2025-10-22 12:29:55
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.688 | 12.691 | 16.231 | 16.231 |
+| MDI Std | 4.169 | 2.681 | 0.825 | 0.825 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.856715,
+      "aei_text": 3.219302,
+      "aei_vision": 0.147291,
+      "text_ratio": 0.956249,
+      "vision_ratio": 0.043751
+    },
+    "middle": {
+      "mdi": 15.371695,
+      "aei_text": 3.080993,
+      "aei_vision": 0.200433,
+      "text_ratio": 0.938919,
+      "vision_ratio": 0.061081
+    },
+    "late": {
+      "mdi": 17.056247,
+      "aei_text": 3.125693,
+      "aei_vision": 0.183258,
+      "text_ratio": 0.944618,
+      "vision_ratio": 0.055382
+    },
+    "all": {
+      "mdi": 17.056247,
+      "aei_text": 3.141996,
+      "aei_vision": 0.176994,
+      "text_ratio": 0.944618,
+      "vision_ratio": 0.055382
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944618,
+      0.055382
+    ],
+    "text_vision_ratio": "0.944618:0.055382"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.519577,
+      "aei_text": 3.021065,
+      "aei_vision": 0.223459,
+      "text_ratio": 0.931127,
+      "vision_ratio": 0.068873
+    },
+    "middle": {
+      "mdi": 10.009388,
+      "aei_text": 2.859198,
+      "aei_vision": 0.285652,
+      "text_ratio": 0.909168,
+      "vision_ratio": 0.090832
+    },
+    "late": {
+      "mdi": 15.405847,
+      "aei_text": 3.081982,
+      "aei_vision": 0.200053,
+      "text_ratio": 0.939046,
+      "vision_ratio": 0.060954
+    },
+    "all": {
+      "mdi": 15.405847,
+      "aei_text": 2.987415,
+      "aei_vision": 0.236388,
+      "text_ratio": 0.939046,
+      "vision_ratio": 0.060954
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.939046,
+      0.060954
+    ],
+    "text_vision_ratio": "0.939046:0.060954"
+  }
+}
+```
+
+
+## === Rollout Step 408 ===
+Step: 407/29790 | 2025-10-22 12:29:58
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.017 | 13.341 | 16.795 | 16.795 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.01719,
+      "aei_text": 2.917527,
+      "aei_vision": 0.18215,
+      "text_ratio": 0.941236,
+      "vision_ratio": 0.058764
+    },
+    "middle": {
+      "mdi": 13.341395,
+      "aei_text": 2.844676,
+      "aei_vision": 0.213222,
+      "text_ratio": 0.930272,
+      "vision_ratio": 0.069728
+    },
+    "late": {
+      "mdi": 16.794734,
+      "aei_text": 2.934877,
+      "aei_vision": 0.17475,
+      "text_ratio": 0.943804,
+      "vision_ratio": 0.056196
+    },
+    "all": {
+      "mdi": 16.794734,
+      "aei_text": 2.899027,
+      "aei_vision": 0.19004,
+      "text_ratio": 0.943804,
+      "vision_ratio": 0.056196
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943804,
+      0.056196
+    ],
+    "text_vision_ratio": "0.943804:0.056196"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.01719,
+      "aei_text": 2.917527,
+      "aei_vision": 0.18215,
+      "text_ratio": 0.941236,
+      "vision_ratio": 0.058764
+    },
+    "middle": {
+      "mdi": 13.341395,
+      "aei_text": 2.844676,
+      "aei_vision": 0.213222,
+      "text_ratio": 0.930272,
+      "vision_ratio": 0.069728
+    },
+    "late": {
+      "mdi": 16.794734,
+      "aei_text": 2.934877,
+      "aei_vision": 0.17475,
+      "text_ratio": 0.943804,
+      "vision_ratio": 0.056196
+    },
+    "all": {
+      "mdi": 16.794734,
+      "aei_text": 2.899027,
+      "aei_vision": 0.19004,
+      "text_ratio": 0.943804,
+      "vision_ratio": 0.056196
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943804,
+      0.056196
+    ],
+    "text_vision_ratio": "0.943804:0.056196"
+  }
+}
+```
+
+
+## === Rollout Step 409 ===
+Step: 408/29790 | 2025-10-22 12:30:01
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 3.980 | 2.266 | 8.134 | 8.134 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 101.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 101.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 101,
+    "text_tokens": 0,
+    "total_tokens": 101
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 3.980036,
+      "aei_text": 1.44127,
+      "aei_vision": 0.362125,
+      "text_ratio": 0.799198,
+      "vision_ratio": 0.200802
+    },
+    "middle": {
+      "mdi": 2.265626,
+      "aei_text": 1.296049,
+      "aei_vision": 0.572049,
+      "text_ratio": 0.69378,
+      "vision_ratio": 0.30622
+    },
+    "late": {
+      "mdi": 8.133625,
+      "aei_text": 1.55917,
+      "aei_vision": 0.191694,
+      "text_ratio": 0.890514,
+      "vision_ratio": 0.109486
+    },
+    "all": {
+      "mdi": 8.133625,
+      "aei_text": 1.432163,
+      "aei_vision": 0.375289,
+      "text_ratio": 0.890514,
+      "vision_ratio": 0.109486
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.890514,
+      0.109486
+    ],
+    "text_vision_ratio": "0.890514:0.109486"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 101,
+    "text_tokens": 0,
+    "total_tokens": 101
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 3.980036,
+      "aei_text": 1.44127,
+      "aei_vision": 0.362125,
+      "text_ratio": 0.799198,
+      "vision_ratio": 0.200802
+    },
+    "middle": {
+      "mdi": 2.265626,
+      "aei_text": 1.296049,
+      "aei_vision": 0.572049,
+      "text_ratio": 0.69378,
+      "vision_ratio": 0.30622
+    },
+    "late": {
+      "mdi": 8.133625,
+      "aei_text": 1.55917,
+      "aei_vision": 0.191694,
+      "text_ratio": 0.890514,
+      "vision_ratio": 0.109486
+    },
+    "all": {
+      "mdi": 8.133625,
+      "aei_text": 1.432163,
+      "aei_vision": 0.375289,
+      "text_ratio": 0.890514,
+      "vision_ratio": 0.109486
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.890514,
+      0.109486
+    ],
+    "text_vision_ratio": "0.890514:0.109486"
+  }
+}
+```
+
+
+## === Rollout Step 410 ===
+Step: 409/29790 | 2025-10-22 12:30:04
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.784 | 11.582 | 27.395 | 27.395 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 486.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 486.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.783515,
+      "aei_text": 3.57483,
+      "aei_vision": 0.226491,
+      "text_ratio": 0.940418,
+      "vision_ratio": 0.059582
+    },
+    "middle": {
+      "mdi": 11.581976,
+      "aei_text": 3.362386,
+      "aei_vision": 0.290312,
+      "text_ratio": 0.920521,
+      "vision_ratio": 0.079479
+    },
+    "late": {
+      "mdi": 27.395325,
+      "aei_text": 3.859772,
+      "aei_vision": 0.140892,
+      "text_ratio": 0.964783,
+      "vision_ratio": 0.035217
+    },
+    "all": {
+      "mdi": 27.395325,
+      "aei_text": 3.598996,
+      "aei_vision": 0.219232,
+      "text_ratio": 0.964783,
+      "vision_ratio": 0.035217
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964783,
+      0.035217
+    ],
+    "text_vision_ratio": "0.964783:0.035217"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.783515,
+      "aei_text": 3.57483,
+      "aei_vision": 0.226491,
+      "text_ratio": 0.940418,
+      "vision_ratio": 0.059582
+    },
+    "middle": {
+      "mdi": 11.581976,
+      "aei_text": 3.362386,
+      "aei_vision": 0.290312,
+      "text_ratio": 0.920521,
+      "vision_ratio": 0.079479
+    },
+    "late": {
+      "mdi": 27.395325,
+      "aei_text": 3.859772,
+      "aei_vision": 0.140892,
+      "text_ratio": 0.964783,
+      "vision_ratio": 0.035217
+    },
+    "all": {
+      "mdi": 27.395325,
+      "aei_text": 3.598996,
+      "aei_vision": 0.219232,
+      "text_ratio": 0.964783,
+      "vision_ratio": 0.035217
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964783,
+      0.035217
+    ],
+    "text_vision_ratio": "0.964783:0.035217"
+  }
+}
+```
+
+
+## === Rollout Step 411 ===
+Step: 410/29790 | 2025-10-22 12:30:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.780 | 21.512 | 15.763 | 15.763 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.780104,
+      "aei_text": 2.876524,
+      "aei_vision": 0.161783,
+      "text_ratio": 0.946752,
+      "vision_ratio": 0.053248
+    },
+    "middle": {
+      "mdi": 21.512315,
+      "aei_text": 2.933437,
+      "aei_vision": 0.136361,
+      "text_ratio": 0.95558,
+      "vision_ratio": 0.04442
+    },
+    "late": {
+      "mdi": 15.763418,
+      "aei_text": 2.83595,
+      "aei_vision": 0.179907,
+      "text_ratio": 0.940346,
+      "vision_ratio": 0.059654
+    },
+    "all": {
+      "mdi": 15.763418,
+      "aei_text": 2.88197,
+      "aei_vision": 0.15935,
+      "text_ratio": 0.940346,
+      "vision_ratio": 0.059654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940346,
+      0.059654
+    ],
+    "text_vision_ratio": "0.940346:0.059654"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.780104,
+      "aei_text": 2.876524,
+      "aei_vision": 0.161783,
+      "text_ratio": 0.946752,
+      "vision_ratio": 0.053248
+    },
+    "middle": {
+      "mdi": 21.512315,
+      "aei_text": 2.933437,
+      "aei_vision": 0.136361,
+      "text_ratio": 0.95558,
+      "vision_ratio": 0.04442
+    },
+    "late": {
+      "mdi": 15.763418,
+      "aei_text": 2.83595,
+      "aei_vision": 0.179907,
+      "text_ratio": 0.940346,
+      "vision_ratio": 0.059654
+    },
+    "all": {
+      "mdi": 15.763418,
+      "aei_text": 2.88197,
+      "aei_vision": 0.15935,
+      "text_ratio": 0.940346,
+      "vision_ratio": 0.059654
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940346,
+      0.059654
+    ],
+    "text_vision_ratio": "0.940346:0.059654"
+  }
+}
+```
+
+
+## === Rollout Step 412 ===
+Step: 411/29790 | 2025-10-22 12:30:11
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 9.030 | 7.402 | 16.188 | 16.188 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.030282,
+      "aei_text": 2.655205,
+      "aei_vision": 0.294033,
+      "text_ratio": 0.900302,
+      "vision_ratio": 0.099698
+    },
+    "middle": {
+      "mdi": 7.401524,
+      "aei_text": 2.539995,
+      "aei_vision": 0.343172,
+      "text_ratio": 0.880974,
+      "vision_ratio": 0.119026
+    },
+    "late": {
+      "mdi": 16.188021,
+      "aei_text": 2.921464,
+      "aei_vision": 0.180471,
+      "text_ratio": 0.94182,
+      "vision_ratio": 0.05818
+    },
+    "all": {
+      "mdi": 16.188021,
+      "aei_text": 2.705555,
+      "aei_vision": 0.272559,
+      "text_ratio": 0.94182,
+      "vision_ratio": 0.05818
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94182,
+      0.05818
+    ],
+    "text_vision_ratio": "0.941820:0.058180"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 9.030282,
+      "aei_text": 2.655205,
+      "aei_vision": 0.294033,
+      "text_ratio": 0.900302,
+      "vision_ratio": 0.099698
+    },
+    "middle": {
+      "mdi": 7.401524,
+      "aei_text": 2.539995,
+      "aei_vision": 0.343172,
+      "text_ratio": 0.880974,
+      "vision_ratio": 0.119026
+    },
+    "late": {
+      "mdi": 16.188021,
+      "aei_text": 2.921464,
+      "aei_vision": 0.180471,
+      "text_ratio": 0.94182,
+      "vision_ratio": 0.05818
+    },
+    "all": {
+      "mdi": 16.188021,
+      "aei_text": 2.705555,
+      "aei_vision": 0.272559,
+      "text_ratio": 0.94182,
+      "vision_ratio": 0.05818
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94182,
+      0.05818
+    ],
+    "text_vision_ratio": "0.941820:0.058180"
+  }
+}
+```
+
+
+## === Rollout Step 413 ===
+Step: 412/29790 | 2025-10-22 12:30:15
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.663 | 11.112 | 15.952 | 15.952 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.662985,
+      "aei_text": 2.854719,
+      "aei_vision": 0.208938,
+      "text_ratio": 0.931801,
+      "vision_ratio": 0.068199
+    },
+    "middle": {
+      "mdi": 11.111858,
+      "aei_text": 2.761847,
+      "aei_vision": 0.24855,
+      "text_ratio": 0.917436,
+      "vision_ratio": 0.082564
+    },
+    "late": {
+      "mdi": 15.951795,
+      "aei_text": 2.916001,
+      "aei_vision": 0.182801,
+      "text_ratio": 0.941009,
+      "vision_ratio": 0.058991
+    },
+    "all": {
+      "mdi": 15.951795,
+      "aei_text": 2.844189,
+      "aei_vision": 0.213429,
+      "text_ratio": 0.941009,
+      "vision_ratio": 0.058991
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941009,
+      0.058991
+    ],
+    "text_vision_ratio": "0.941009:0.058991"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.662985,
+      "aei_text": 2.854719,
+      "aei_vision": 0.208938,
+      "text_ratio": 0.931801,
+      "vision_ratio": 0.068199
+    },
+    "middle": {
+      "mdi": 11.111858,
+      "aei_text": 2.761847,
+      "aei_vision": 0.24855,
+      "text_ratio": 0.917436,
+      "vision_ratio": 0.082564
+    },
+    "late": {
+      "mdi": 15.951795,
+      "aei_text": 2.916001,
+      "aei_vision": 0.182801,
+      "text_ratio": 0.941009,
+      "vision_ratio": 0.058991
+    },
+    "all": {
+      "mdi": 15.951795,
+      "aei_text": 2.844189,
+      "aei_vision": 0.213429,
+      "text_ratio": 0.941009,
+      "vision_ratio": 0.058991
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941009,
+      0.058991
+    ],
+    "text_vision_ratio": "0.941009:0.058991"
+  }
+}
+```
+
+
+## === Rollout Step 414 ===
+Step: 413/29790 | 2025-10-22 12:30:18
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.503 | 8.961 | 15.303 | 15.303 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.502506,
+      "aei_text": 2.887172,
+      "aei_vision": 0.274903,
+      "text_ratio": 0.913062,
+      "vision_ratio": 0.086938
+    },
+    "middle": {
+      "mdi": 8.961449,
+      "aei_text": 2.791827,
+      "aei_vision": 0.311537,
+      "text_ratio": 0.899613,
+      "vision_ratio": 0.100387
+    },
+    "late": {
+      "mdi": 15.303464,
+      "aei_text": 3.079005,
+      "aei_vision": 0.201197,
+      "text_ratio": 0.938663,
+      "vision_ratio": 0.061337
+    },
+    "all": {
+      "mdi": 15.303464,
+      "aei_text": 2.919335,
+      "aei_vision": 0.262546,
+      "text_ratio": 0.938663,
+      "vision_ratio": 0.061337
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938663,
+      0.061337
+    ],
+    "text_vision_ratio": "0.938663:0.061337"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.502506,
+      "aei_text": 2.887172,
+      "aei_vision": 0.274903,
+      "text_ratio": 0.913062,
+      "vision_ratio": 0.086938
+    },
+    "middle": {
+      "mdi": 8.961449,
+      "aei_text": 2.791827,
+      "aei_vision": 0.311537,
+      "text_ratio": 0.899613,
+      "vision_ratio": 0.100387
+    },
+    "late": {
+      "mdi": 15.303464,
+      "aei_text": 3.079005,
+      "aei_vision": 0.201197,
+      "text_ratio": 0.938663,
+      "vision_ratio": 0.061337
+    },
+    "all": {
+      "mdi": 15.303464,
+      "aei_text": 2.919335,
+      "aei_vision": 0.262546,
+      "text_ratio": 0.938663,
+      "vision_ratio": 0.061337
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938663,
+      0.061337
+    ],
+    "text_vision_ratio": "0.938663:0.061337"
+  }
+}
+```
+
+
+## === Rollout Step 415 ===
+Step: 414/29790 | 2025-10-22 12:30:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.909 | 6.204 | 18.284 | 18.284 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.909037,
+      "aei_text": 2.835896,
+      "aei_vision": 0.23813,
+      "text_ratio": 0.922535,
+      "vision_ratio": 0.077465
+    },
+    "middle": {
+      "mdi": 6.20432,
+      "aei_text": 2.455875,
+      "aei_vision": 0.395833,
+      "text_ratio": 0.861194,
+      "vision_ratio": 0.138806
+    },
+    "late": {
+      "mdi": 18.284165,
+      "aei_text": 3.012673,
+      "aei_vision": 0.16477,
+      "text_ratio": 0.948144,
+      "vision_ratio": 0.051856
+    },
+    "all": {
+      "mdi": 18.284165,
+      "aei_text": 2.768148,
+      "aei_vision": 0.266244,
+      "text_ratio": 0.948144,
+      "vision_ratio": 0.051856
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948144,
+      0.051856
+    ],
+    "text_vision_ratio": "0.948144:0.051856"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.909037,
+      "aei_text": 2.835896,
+      "aei_vision": 0.23813,
+      "text_ratio": 0.922535,
+      "vision_ratio": 0.077465
+    },
+    "middle": {
+      "mdi": 6.20432,
+      "aei_text": 2.455875,
+      "aei_vision": 0.395833,
+      "text_ratio": 0.861194,
+      "vision_ratio": 0.138806
+    },
+    "late": {
+      "mdi": 18.284165,
+      "aei_text": 3.012673,
+      "aei_vision": 0.16477,
+      "text_ratio": 0.948144,
+      "vision_ratio": 0.051856
+    },
+    "all": {
+      "mdi": 18.284165,
+      "aei_text": 2.768148,
+      "aei_vision": 0.266244,
+      "text_ratio": 0.948144,
+      "vision_ratio": 0.051856
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948144,
+      0.051856
+    ],
+    "text_vision_ratio": "0.948144:0.051856"
+  }
+}
+```
+
+
+## === Rollout Step 416 ===
+Step: 415/29790 | 2025-10-22 12:30:25
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.942 | 6.911 | 18.837 | 18.837 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.942155,
+      "aei_text": 3.012711,
+      "aei_vision": 0.252275,
+      "text_ratio": 0.922733,
+      "vision_ratio": 0.077267
+    },
+    "middle": {
+      "mdi": 6.911022,
+      "aei_text": 2.65693,
+      "aei_vision": 0.384448,
+      "text_ratio": 0.873594,
+      "vision_ratio": 0.126406
+    },
+    "late": {
+      "mdi": 18.83658,
+      "aei_text": 3.230182,
+      "aei_vision": 0.171485,
+      "text_ratio": 0.949588,
+      "vision_ratio": 0.050412
+    },
+    "all": {
+      "mdi": 18.83658,
+      "aei_text": 2.966608,
+      "aei_vision": 0.269403,
+      "text_ratio": 0.949588,
+      "vision_ratio": 0.050412
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949588,
+      0.050412
+    ],
+    "text_vision_ratio": "0.949588:0.050412"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.942155,
+      "aei_text": 3.012711,
+      "aei_vision": 0.252275,
+      "text_ratio": 0.922733,
+      "vision_ratio": 0.077267
+    },
+    "middle": {
+      "mdi": 6.911022,
+      "aei_text": 2.65693,
+      "aei_vision": 0.384448,
+      "text_ratio": 0.873594,
+      "vision_ratio": 0.126406
+    },
+    "late": {
+      "mdi": 18.83658,
+      "aei_text": 3.230182,
+      "aei_vision": 0.171485,
+      "text_ratio": 0.949588,
+      "vision_ratio": 0.050412
+    },
+    "all": {
+      "mdi": 18.83658,
+      "aei_text": 2.966608,
+      "aei_vision": 0.269403,
+      "text_ratio": 0.949588,
+      "vision_ratio": 0.050412
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949588,
+      0.050412
+    ],
+    "text_vision_ratio": "0.949588:0.050412"
+  }
+}
+```
+
+
+## === Rollout Step 417 ===
+Step: 416/29790 | 2025-10-22 12:30:28
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 8.954 | 6.149 | 16.379 | 16.379 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.954117,
+      "aei_text": 2.130188,
+      "aei_vision": 0.2379,
+      "text_ratio": 0.899539,
+      "vision_ratio": 0.100461
+    },
+    "middle": {
+      "mdi": 6.14939,
+      "aei_text": 2.000541,
+      "aei_vision": 0.325323,
+      "text_ratio": 0.860128,
+      "vision_ratio": 0.139872
+    },
+    "late": {
+      "mdi": 16.378981,
+      "aei_text": 2.276842,
+      "aei_vision": 0.13901,
+      "text_ratio": 0.942459,
+      "vision_ratio": 0.057541
+    },
+    "all": {
+      "mdi": 16.378981,
+      "aei_text": 2.135857,
+      "aei_vision": 0.234078,
+      "text_ratio": 0.942459,
+      "vision_ratio": 0.057541
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942459,
+      0.057541
+    ],
+    "text_vision_ratio": "0.942459:0.057541"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.954117,
+      "aei_text": 2.130188,
+      "aei_vision": 0.2379,
+      "text_ratio": 0.899539,
+      "vision_ratio": 0.100461
+    },
+    "middle": {
+      "mdi": 6.14939,
+      "aei_text": 2.000541,
+      "aei_vision": 0.325323,
+      "text_ratio": 0.860128,
+      "vision_ratio": 0.139872
+    },
+    "late": {
+      "mdi": 16.378981,
+      "aei_text": 2.276842,
+      "aei_vision": 0.13901,
+      "text_ratio": 0.942459,
+      "vision_ratio": 0.057541
+    },
+    "all": {
+      "mdi": 16.378981,
+      "aei_text": 2.135857,
+      "aei_vision": 0.234078,
+      "text_ratio": 0.942459,
+      "vision_ratio": 0.057541
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942459,
+      0.057541
+    ],
+    "text_vision_ratio": "0.942459:0.057541"
+  }
+}
+```
+
+
+## === Rollout Step 418 ===
+Step: 417/29790 | 2025-10-22 12:30:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.035 | 9.933 | 15.823 | 15.823 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.035056,
+      "aei_text": 2.855055,
+      "aei_vision": 0.149989,
+      "text_ratio": 0.950087,
+      "vision_ratio": 0.049913
+    },
+    "middle": {
+      "mdi": 9.932554,
+      "aei_text": 2.609113,
+      "aei_vision": 0.262683,
+      "text_ratio": 0.90853,
+      "vision_ratio": 0.09147
+    },
+    "late": {
+      "mdi": 15.823488,
+      "aei_text": 2.796671,
+      "aei_vision": 0.176742,
+      "text_ratio": 0.940559,
+      "vision_ratio": 0.059441
+    },
+    "all": {
+      "mdi": 15.823488,
+      "aei_text": 2.753613,
+      "aei_vision": 0.196471,
+      "text_ratio": 0.940559,
+      "vision_ratio": 0.059441
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940559,
+      0.059441
+    ],
+    "text_vision_ratio": "0.940559:0.059441"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.035056,
+      "aei_text": 2.855055,
+      "aei_vision": 0.149989,
+      "text_ratio": 0.950087,
+      "vision_ratio": 0.049913
+    },
+    "middle": {
+      "mdi": 9.932554,
+      "aei_text": 2.609113,
+      "aei_vision": 0.262683,
+      "text_ratio": 0.90853,
+      "vision_ratio": 0.09147
+    },
+    "late": {
+      "mdi": 15.823488,
+      "aei_text": 2.796671,
+      "aei_vision": 0.176742,
+      "text_ratio": 0.940559,
+      "vision_ratio": 0.059441
+    },
+    "all": {
+      "mdi": 15.823488,
+      "aei_text": 2.753613,
+      "aei_vision": 0.196471,
+      "text_ratio": 0.940559,
+      "vision_ratio": 0.059441
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.940559,
+      0.059441
+    ],
+    "text_vision_ratio": "0.940559:0.059441"
+  }
+}
+```
+
+
+## === Rollout Step 419 ===
+Step: 418/29790 | 2025-10-22 12:30:35
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 28.316 | 13.459 | 21.154 | 21.154 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.315765,
+      "aei_text": 3.285524,
+      "aei_vision": 0.116032,
+      "text_ratio": 0.965889,
+      "vision_ratio": 0.034111
+    },
+    "middle": {
+      "mdi": 13.459022,
+      "aei_text": 3.007731,
+      "aei_vision": 0.223473,
+      "text_ratio": 0.930839,
+      "vision_ratio": 0.069161
+    },
+    "late": {
+      "mdi": 21.154115,
+      "aei_text": 3.19502,
+      "aei_vision": 0.151035,
+      "text_ratio": 0.954862,
+      "vision_ratio": 0.045138
+    },
+    "all": {
+      "mdi": 21.154115,
+      "aei_text": 3.162758,
+      "aei_vision": 0.163513,
+      "text_ratio": 0.954862,
+      "vision_ratio": 0.045138
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954862,
+      0.045138
+    ],
+    "text_vision_ratio": "0.954862:0.045138"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.315765,
+      "aei_text": 3.285524,
+      "aei_vision": 0.116032,
+      "text_ratio": 0.965889,
+      "vision_ratio": 0.034111
+    },
+    "middle": {
+      "mdi": 13.459022,
+      "aei_text": 3.007731,
+      "aei_vision": 0.223473,
+      "text_ratio": 0.930839,
+      "vision_ratio": 0.069161
+    },
+    "late": {
+      "mdi": 21.154115,
+      "aei_text": 3.19502,
+      "aei_vision": 0.151035,
+      "text_ratio": 0.954862,
+      "vision_ratio": 0.045138
+    },
+    "all": {
+      "mdi": 21.154115,
+      "aei_text": 3.162758,
+      "aei_vision": 0.163513,
+      "text_ratio": 0.954862,
+      "vision_ratio": 0.045138
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954862,
+      0.045138
+    ],
+    "text_vision_ratio": "0.954862:0.045138"
+  }
+}
+```
+
+
+## === Rollout Step 420 ===
+Step: 419/29790 | 2025-10-22 12:30:38
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.933 | 9.694 | 18.618 | 18.618 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.932859,
+      "aei_text": 2.868896,
+      "aei_vision": 0.19212,
+      "text_ratio": 0.937237,
+      "vision_ratio": 0.062763
+    },
+    "middle": {
+      "mdi": 9.694476,
+      "aei_text": 2.675012,
+      "aei_vision": 0.275932,
+      "text_ratio": 0.906494,
+      "vision_ratio": 0.093506
+    },
+    "late": {
+      "mdi": 18.617896,
+      "aei_text": 2.947142,
+      "aei_vision": 0.158296,
+      "text_ratio": 0.949026,
+      "vision_ratio": 0.050974
+    },
+    "all": {
+      "mdi": 18.617896,
+      "aei_text": 2.83035,
+      "aei_vision": 0.208782,
+      "text_ratio": 0.949026,
+      "vision_ratio": 0.050974
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949026,
+      0.050974
+    ],
+    "text_vision_ratio": "0.949026:0.050974"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.932859,
+      "aei_text": 2.868896,
+      "aei_vision": 0.19212,
+      "text_ratio": 0.937237,
+      "vision_ratio": 0.062763
+    },
+    "middle": {
+      "mdi": 9.694476,
+      "aei_text": 2.675012,
+      "aei_vision": 0.275932,
+      "text_ratio": 0.906494,
+      "vision_ratio": 0.093506
+    },
+    "late": {
+      "mdi": 18.617896,
+      "aei_text": 2.947142,
+      "aei_vision": 0.158296,
+      "text_ratio": 0.949026,
+      "vision_ratio": 0.050974
+    },
+    "all": {
+      "mdi": 18.617896,
+      "aei_text": 2.83035,
+      "aei_vision": 0.208782,
+      "text_ratio": 0.949026,
+      "vision_ratio": 0.050974
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949026,
+      0.050974
+    ],
+    "text_vision_ratio": "0.949026:0.050974"
+  }
+}
+```
+
+
+## === Rollout Step 421 ===
+Step: 420/29790 | 2025-10-22 12:30:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.950 | 10.473 | 22.738 | 22.738 |
+| MDI Std | 0.593 | 0.288 | 0.595 | 0.595 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.357108,
+      "aei_text": 3.069926,
+      "aei_vision": 0.213826,
+      "text_ratio": 0.934884,
+      "vision_ratio": 0.065116
+    },
+    "middle": {
+      "mdi": 10.760998,
+      "aei_text": 2.918771,
+      "aei_vision": 0.271236,
+      "text_ratio": 0.914973,
+      "vision_ratio": 0.085027
+    },
+    "late": {
+      "mdi": 23.333021,
+      "aei_text": 3.264539,
+      "aei_vision": 0.139911,
+      "text_ratio": 0.958904,
+      "vision_ratio": 0.041096
+    },
+    "all": {
+      "mdi": 23.333021,
+      "aei_text": 3.084412,
+      "aei_vision": 0.208324,
+      "text_ratio": 0.958904,
+      "vision_ratio": 0.041096
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958904,
+      0.041096
+    ],
+    "text_vision_ratio": "0.958904:0.041096"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.543145,
+      "aei_text": 3.106662,
+      "aei_vision": 0.199873,
+      "text_ratio": 0.939552,
+      "vision_ratio": 0.060448
+    },
+    "middle": {
+      "mdi": 10.184531,
+      "aei_text": 2.886652,
+      "aei_vision": 0.283435,
+      "text_ratio": 0.910591,
+      "vision_ratio": 0.089409
+    },
+    "late": {
+      "mdi": 22.142864,
+      "aei_text": 3.246843,
+      "aei_vision": 0.146632,
+      "text_ratio": 0.95679,
+      "vision_ratio": 0.04321
+    },
+    "all": {
+      "mdi": 22.142864,
+      "aei_text": 3.080053,
+      "aei_vision": 0.20998,
+      "text_ratio": 0.95679,
+      "vision_ratio": 0.04321
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95679,
+      0.04321
+    ],
+    "text_vision_ratio": "0.956790:0.043210"
+  }
+}
+```
+
+
+## === Rollout Step 422 ===
+Step: 421/29790 | 2025-10-22 12:30:46
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.683 | 13.911 | 32.522 | 32.522 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.683455,
+      "aei_text": 2.862375,
+      "aei_vision": 0.194939,
+      "text_ratio": 0.936239,
+      "vision_ratio": 0.063761
+    },
+    "middle": {
+      "mdi": 13.911412,
+      "aei_text": 2.840916,
+      "aei_vision": 0.204215,
+      "text_ratio": 0.932937,
+      "vision_ratio": 0.067063
+    },
+    "late": {
+      "mdi": 32.522409,
+      "aei_text": 3.093305,
+      "aei_vision": 0.095113,
+      "text_ratio": 0.970169,
+      "vision_ratio": 0.029831
+    },
+    "all": {
+      "mdi": 32.522409,
+      "aei_text": 2.932199,
+      "aei_vision": 0.164756,
+      "text_ratio": 0.970169,
+      "vision_ratio": 0.029831
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.970169,
+      0.029831
+    ],
+    "text_vision_ratio": "0.970169:0.029831"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.683455,
+      "aei_text": 2.862375,
+      "aei_vision": 0.194939,
+      "text_ratio": 0.936239,
+      "vision_ratio": 0.063761
+    },
+    "middle": {
+      "mdi": 13.911412,
+      "aei_text": 2.840916,
+      "aei_vision": 0.204215,
+      "text_ratio": 0.932937,
+      "vision_ratio": 0.067063
+    },
+    "late": {
+      "mdi": 32.522409,
+      "aei_text": 3.093305,
+      "aei_vision": 0.095113,
+      "text_ratio": 0.970169,
+      "vision_ratio": 0.029831
+    },
+    "all": {
+      "mdi": 32.522409,
+      "aei_text": 2.932199,
+      "aei_vision": 0.164756,
+      "text_ratio": 0.970169,
+      "vision_ratio": 0.029831
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.970169,
+      0.029831
+    ],
+    "text_vision_ratio": "0.970169:0.029831"
+  }
+}
+```
+
+
+## === Rollout Step 423 ===
+Step: 422/29790 | 2025-10-22 12:30:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.903 | 9.913 | 24.622 | 24.622 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.903123,
+      "aei_text": 2.956256,
+      "aei_vision": 0.24836,
+      "text_ratio": 0.922499,
+      "vision_ratio": 0.077501
+    },
+    "middle": {
+      "mdi": 9.912765,
+      "aei_text": 2.853458,
+      "aei_vision": 0.287857,
+      "text_ratio": 0.908364,
+      "vision_ratio": 0.091636
+    },
+    "late": {
+      "mdi": 24.622349,
+      "aei_text": 3.258244,
+      "aei_vision": 0.132329,
+      "text_ratio": 0.960972,
+      "vision_ratio": 0.039028
+    },
+    "all": {
+      "mdi": 24.622349,
+      "aei_text": 3.022653,
+      "aei_vision": 0.222848,
+      "text_ratio": 0.960972,
+      "vision_ratio": 0.039028
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960972,
+      0.039028
+    ],
+    "text_vision_ratio": "0.960972:0.039028"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.903123,
+      "aei_text": 2.956256,
+      "aei_vision": 0.24836,
+      "text_ratio": 0.922499,
+      "vision_ratio": 0.077501
+    },
+    "middle": {
+      "mdi": 9.912765,
+      "aei_text": 2.853458,
+      "aei_vision": 0.287857,
+      "text_ratio": 0.908364,
+      "vision_ratio": 0.091636
+    },
+    "late": {
+      "mdi": 24.622349,
+      "aei_text": 3.258244,
+      "aei_vision": 0.132329,
+      "text_ratio": 0.960972,
+      "vision_ratio": 0.039028
+    },
+    "all": {
+      "mdi": 24.622349,
+      "aei_text": 3.022653,
+      "aei_vision": 0.222848,
+      "text_ratio": 0.960972,
+      "vision_ratio": 0.039028
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960972,
+      0.039028
+    ],
+    "text_vision_ratio": "0.960972:0.039028"
+  }
+}
+```
+
+
+## === Rollout Step 424 ===
+Step: 423/29790 | 2025-10-22 12:30:53
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.194 | 7.080 | 16.790 | 16.790 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.193743,
+      "aei_text": 2.861283,
+      "aei_vision": 0.216867,
+      "text_ratio": 0.929546,
+      "vision_ratio": 0.070454
+    },
+    "middle": {
+      "mdi": 7.08035,
+      "aei_text": 2.52809,
+      "aei_vision": 0.357057,
+      "text_ratio": 0.876243,
+      "vision_ratio": 0.123757
+    },
+    "late": {
+      "mdi": 16.790316,
+      "aei_text": 2.958,
+      "aei_vision": 0.176173,
+      "text_ratio": 0.94379,
+      "vision_ratio": 0.05621
+    },
+    "all": {
+      "mdi": 16.790316,
+      "aei_text": 2.782458,
+      "aei_vision": 0.250032,
+      "text_ratio": 0.94379,
+      "vision_ratio": 0.05621
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94379,
+      0.05621
+    ],
+    "text_vision_ratio": "0.943790:0.056210"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.193743,
+      "aei_text": 2.861283,
+      "aei_vision": 0.216867,
+      "text_ratio": 0.929546,
+      "vision_ratio": 0.070454
+    },
+    "middle": {
+      "mdi": 7.08035,
+      "aei_text": 2.52809,
+      "aei_vision": 0.357057,
+      "text_ratio": 0.876243,
+      "vision_ratio": 0.123757
+    },
+    "late": {
+      "mdi": 16.790316,
+      "aei_text": 2.958,
+      "aei_vision": 0.176173,
+      "text_ratio": 0.94379,
+      "vision_ratio": 0.05621
+    },
+    "all": {
+      "mdi": 16.790316,
+      "aei_text": 2.782458,
+      "aei_vision": 0.250032,
+      "text_ratio": 0.94379,
+      "vision_ratio": 0.05621
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94379,
+      0.05621
+    ],
+    "text_vision_ratio": "0.943790:0.056210"
+  }
+}
+```
+
+
+## === Rollout Step 425 ===
+Step: 424/29790 | 2025-10-22 12:30:56
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 8.760 | 6.546 | 13.427 | 13.427 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.760307,
+      "aei_text": 2.181534,
+      "aei_vision": 0.249025,
+      "text_ratio": 0.897544,
+      "vision_ratio": 0.102456
+    },
+    "middle": {
+      "mdi": 6.545794,
+      "aei_text": 2.07467,
+      "aei_vision": 0.316947,
+      "text_ratio": 0.867476,
+      "vision_ratio": 0.132524
+    },
+    "late": {
+      "mdi": 13.426578,
+      "aei_text": 2.303418,
+      "aei_vision": 0.171557,
+      "text_ratio": 0.930683,
+      "vision_ratio": 0.069317
+    },
+    "all": {
+      "mdi": 13.426578,
+      "aei_text": 2.186541,
+      "aei_vision": 0.245843,
+      "text_ratio": 0.930683,
+      "vision_ratio": 0.069317
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930683,
+      0.069317
+    ],
+    "text_vision_ratio": "0.930683:0.069317"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.760307,
+      "aei_text": 2.181534,
+      "aei_vision": 0.249025,
+      "text_ratio": 0.897544,
+      "vision_ratio": 0.102456
+    },
+    "middle": {
+      "mdi": 6.545794,
+      "aei_text": 2.07467,
+      "aei_vision": 0.316947,
+      "text_ratio": 0.867476,
+      "vision_ratio": 0.132524
+    },
+    "late": {
+      "mdi": 13.426578,
+      "aei_text": 2.303418,
+      "aei_vision": 0.171557,
+      "text_ratio": 0.930683,
+      "vision_ratio": 0.069317
+    },
+    "all": {
+      "mdi": 13.426578,
+      "aei_text": 2.186541,
+      "aei_vision": 0.245843,
+      "text_ratio": 0.930683,
+      "vision_ratio": 0.069317
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.930683,
+      0.069317
+    ],
+    "text_vision_ratio": "0.930683:0.069317"
+  }
+}
+```
+
+
+## === Rollout Step 426 ===
+Step: 425/29790 | 2025-10-22 12:30:58
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.266 | 8.770 | 25.190 | 25.190 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.265769,
+      "aei_text": 2.611638,
+      "aei_vision": 0.212921,
+      "text_ratio": 0.924618,
+      "vision_ratio": 0.075382
+    },
+    "middle": {
+      "mdi": 8.769936,
+      "aei_text": 2.470745,
+      "aei_vision": 0.281729,
+      "text_ratio": 0.897645,
+      "vision_ratio": 0.102355
+    },
+    "late": {
+      "mdi": 25.190217,
+      "aei_text": 2.818513,
+      "aei_vision": 0.111889,
+      "text_ratio": 0.961818,
+      "vision_ratio": 0.038182
+    },
+    "all": {
+      "mdi": 25.190217,
+      "aei_text": 2.633632,
+      "aei_vision": 0.20218,
+      "text_ratio": 0.961818,
+      "vision_ratio": 0.038182
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961818,
+      0.038182
+    ],
+    "text_vision_ratio": "0.961818:0.038182"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.265769,
+      "aei_text": 2.611638,
+      "aei_vision": 0.212921,
+      "text_ratio": 0.924618,
+      "vision_ratio": 0.075382
+    },
+    "middle": {
+      "mdi": 8.769936,
+      "aei_text": 2.470745,
+      "aei_vision": 0.281729,
+      "text_ratio": 0.897645,
+      "vision_ratio": 0.102355
+    },
+    "late": {
+      "mdi": 25.190217,
+      "aei_text": 2.818513,
+      "aei_vision": 0.111889,
+      "text_ratio": 0.961818,
+      "vision_ratio": 0.038182
+    },
+    "all": {
+      "mdi": 25.190217,
+      "aei_text": 2.633632,
+      "aei_vision": 0.20218,
+      "text_ratio": 0.961818,
+      "vision_ratio": 0.038182
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961818,
+      0.038182
+    ],
+    "text_vision_ratio": "0.961818:0.038182"
+  }
+}
+```
+
+
+## === Rollout Step 427 ===
+Step: 426/29790 | 2025-10-22 12:31:02
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 8.844 | 4.686 | 16.194 | 16.194 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.844229,
+      "aei_text": 2.212132,
+      "aei_vision": 0.250122,
+      "text_ratio": 0.898418,
+      "vision_ratio": 0.101582
+    },
+    "middle": {
+      "mdi": 4.685542,
+      "aei_text": 1.94533,
+      "aei_vision": 0.415177,
+      "text_ratio": 0.824115,
+      "vision_ratio": 0.175885
+    },
+    "late": {
+      "mdi": 16.194462,
+      "aei_text": 2.378982,
+      "aei_vision": 0.146901,
+      "text_ratio": 0.941842,
+      "vision_ratio": 0.058158
+    },
+    "all": {
+      "mdi": 16.194462,
+      "aei_text": 2.178815,
+      "aei_vision": 0.270733,
+      "text_ratio": 0.941842,
+      "vision_ratio": 0.058158
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941842,
+      0.058158
+    ],
+    "text_vision_ratio": "0.941842:0.058158"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.844229,
+      "aei_text": 2.212132,
+      "aei_vision": 0.250122,
+      "text_ratio": 0.898418,
+      "vision_ratio": 0.101582
+    },
+    "middle": {
+      "mdi": 4.685542,
+      "aei_text": 1.94533,
+      "aei_vision": 0.415177,
+      "text_ratio": 0.824115,
+      "vision_ratio": 0.175885
+    },
+    "late": {
+      "mdi": 16.194462,
+      "aei_text": 2.378982,
+      "aei_vision": 0.146901,
+      "text_ratio": 0.941842,
+      "vision_ratio": 0.058158
+    },
+    "all": {
+      "mdi": 16.194462,
+      "aei_text": 2.178815,
+      "aei_vision": 0.270733,
+      "text_ratio": 0.941842,
+      "vision_ratio": 0.058158
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941842,
+      0.058158
+    ],
+    "text_vision_ratio": "0.941842:0.058158"
+  }
+}
+```
+
+
+## === Rollout Step 428 ===
+Step: 427/29790 | 2025-10-22 12:31:05
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.839 | 5.218 | 14.580 | 14.580 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.838917,
+      "aei_text": 2.88179,
+      "aei_vision": 0.208238,
+      "text_ratio": 0.93261,
+      "vision_ratio": 0.06739
+    },
+    "middle": {
+      "mdi": 5.217858,
+      "aei_text": 2.319974,
+      "aei_vision": 0.444622,
+      "text_ratio": 0.839173,
+      "vision_ratio": 0.160827
+    },
+    "late": {
+      "mdi": 14.579858,
+      "aei_text": 2.903417,
+      "aei_vision": 0.199139,
+      "text_ratio": 0.935815,
+      "vision_ratio": 0.064185
+    },
+    "all": {
+      "mdi": 14.579858,
+      "aei_text": 2.701727,
+      "aei_vision": 0.284,
+      "text_ratio": 0.935815,
+      "vision_ratio": 0.064185
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.935815,
+      0.064185
+    ],
+    "text_vision_ratio": "0.935815:0.064185"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.838917,
+      "aei_text": 2.88179,
+      "aei_vision": 0.208238,
+      "text_ratio": 0.93261,
+      "vision_ratio": 0.06739
+    },
+    "middle": {
+      "mdi": 5.217858,
+      "aei_text": 2.319974,
+      "aei_vision": 0.444622,
+      "text_ratio": 0.839173,
+      "vision_ratio": 0.160827
+    },
+    "late": {
+      "mdi": 14.579858,
+      "aei_text": 2.903417,
+      "aei_vision": 0.199139,
+      "text_ratio": 0.935815,
+      "vision_ratio": 0.064185
+    },
+    "all": {
+      "mdi": 14.579858,
+      "aei_text": 2.701727,
+      "aei_vision": 0.284,
+      "text_ratio": 0.935815,
+      "vision_ratio": 0.064185
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.935815,
+      0.064185
+    ],
+    "text_vision_ratio": "0.935815:0.064185"
+  }
+}
+```
+
+
+## === Rollout Step 429 ===
+Step: 428/29790 | 2025-10-22 12:31:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.727 | 19.062 | 18.927 | 18.927 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.727303,
+      "aei_text": 2.965574,
+      "aei_vision": 0.150328,
+      "text_ratio": 0.951754,
+      "vision_ratio": 0.048246
+    },
+    "middle": {
+      "mdi": 19.06187,
+      "aei_text": 2.954748,
+      "aei_vision": 0.155008,
+      "text_ratio": 0.950154,
+      "vision_ratio": 0.049846
+    },
+    "late": {
+      "mdi": 18.927392,
+      "aei_text": 2.952477,
+      "aei_vision": 0.15599,
+      "text_ratio": 0.949818,
+      "vision_ratio": 0.050182
+    },
+    "all": {
+      "mdi": 18.927392,
+      "aei_text": 2.957599,
+      "aei_vision": 0.153775,
+      "text_ratio": 0.949818,
+      "vision_ratio": 0.050182
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949818,
+      0.050182
+    ],
+    "text_vision_ratio": "0.949818:0.050182"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.727303,
+      "aei_text": 2.965574,
+      "aei_vision": 0.150328,
+      "text_ratio": 0.951754,
+      "vision_ratio": 0.048246
+    },
+    "middle": {
+      "mdi": 19.06187,
+      "aei_text": 2.954748,
+      "aei_vision": 0.155008,
+      "text_ratio": 0.950154,
+      "vision_ratio": 0.049846
+    },
+    "late": {
+      "mdi": 18.927392,
+      "aei_text": 2.952477,
+      "aei_vision": 0.15599,
+      "text_ratio": 0.949818,
+      "vision_ratio": 0.050182
+    },
+    "all": {
+      "mdi": 18.927392,
+      "aei_text": 2.957599,
+      "aei_vision": 0.153775,
+      "text_ratio": 0.949818,
+      "vision_ratio": 0.050182
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949818,
+      0.050182
+    ],
+    "text_vision_ratio": "0.949818:0.050182"
+  }
+}
+```
+
+
+## === Rollout Step 430 ===
+Step: 429/29790 | 2025-10-22 12:31:12
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.006 | 6.633 | 22.111 | 22.111 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.005982,
+      "aei_text": 3.027001,
+      "aei_vision": 0.252124,
+      "text_ratio": 0.923112,
+      "vision_ratio": 0.076888
+    },
+    "middle": {
+      "mdi": 6.633021,
+      "aei_text": 2.63404,
+      "aei_vision": 0.39711,
+      "text_ratio": 0.86899,
+      "vision_ratio": 0.13101
+    },
+    "late": {
+      "mdi": 22.111022,
+      "aei_text": 3.305197,
+      "aei_vision": 0.149482,
+      "text_ratio": 0.956731,
+      "vision_ratio": 0.043269
+    },
+    "all": {
+      "mdi": 22.111022,
+      "aei_text": 2.988746,
+      "aei_vision": 0.266239,
+      "text_ratio": 0.956731,
+      "vision_ratio": 0.043269
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956731,
+      0.043269
+    ],
+    "text_vision_ratio": "0.956731:0.043269"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.005982,
+      "aei_text": 3.027001,
+      "aei_vision": 0.252124,
+      "text_ratio": 0.923112,
+      "vision_ratio": 0.076888
+    },
+    "middle": {
+      "mdi": 6.633021,
+      "aei_text": 2.63404,
+      "aei_vision": 0.39711,
+      "text_ratio": 0.86899,
+      "vision_ratio": 0.13101
+    },
+    "late": {
+      "mdi": 22.111022,
+      "aei_text": 3.305197,
+      "aei_vision": 0.149482,
+      "text_ratio": 0.956731,
+      "vision_ratio": 0.043269
+    },
+    "all": {
+      "mdi": 22.111022,
+      "aei_text": 2.988746,
+      "aei_vision": 0.266239,
+      "text_ratio": 0.956731,
+      "vision_ratio": 0.043269
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956731,
+      0.043269
+    ],
+    "text_vision_ratio": "0.956731:0.043269"
+  }
+}
+```
+
+
+## === Rollout Step 431 ===
+Step: 430/29790 | 2025-10-22 12:31:16
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.882 | 10.588 | 29.591 | 29.591 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 531.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 531.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.882022,
+      "aei_text": 3.588411,
+      "aei_vision": 0.27856,
+      "text_ratio": 0.927964,
+      "vision_ratio": 0.072036
+    },
+    "middle": {
+      "mdi": 10.588384,
+      "aei_text": 3.426709,
+      "aei_vision": 0.323629,
+      "text_ratio": 0.913707,
+      "vision_ratio": 0.086293
+    },
+    "late": {
+      "mdi": 29.591457,
+      "aei_text": 4.091733,
+      "aei_vision": 0.138274,
+      "text_ratio": 0.967311,
+      "vision_ratio": 0.032689
+    },
+    "all": {
+      "mdi": 29.591457,
+      "aei_text": 3.702284,
+      "aei_vision": 0.246821,
+      "text_ratio": 0.967311,
+      "vision_ratio": 0.032689
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.967311,
+      0.032689
+    ],
+    "text_vision_ratio": "0.967311:0.032689"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.882022,
+      "aei_text": 3.588411,
+      "aei_vision": 0.27856,
+      "text_ratio": 0.927964,
+      "vision_ratio": 0.072036
+    },
+    "middle": {
+      "mdi": 10.588384,
+      "aei_text": 3.426709,
+      "aei_vision": 0.323629,
+      "text_ratio": 0.913707,
+      "vision_ratio": 0.086293
+    },
+    "late": {
+      "mdi": 29.591457,
+      "aei_text": 4.091733,
+      "aei_vision": 0.138274,
+      "text_ratio": 0.967311,
+      "vision_ratio": 0.032689
+    },
+    "all": {
+      "mdi": 29.591457,
+      "aei_text": 3.702284,
+      "aei_vision": 0.246821,
+      "text_ratio": 0.967311,
+      "vision_ratio": 0.032689
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.967311,
+      0.032689
+    ],
+    "text_vision_ratio": "0.967311:0.032689"
+  }
+}
+```
+
+
+## === Rollout Step 432 ===
+Step: 431/29790 | 2025-10-22 12:31:20
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.746 | 11.810 | 16.302 | 16.302 |
+| MDI Std | 2.694 | 3.125 | 2.088 | 2.088 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.051903,
+      "aei_text": 3.039654,
+      "aei_vision": 0.216316,
+      "text_ratio": 0.933563,
+      "vision_ratio": 0.066437
+    },
+    "middle": {
+      "mdi": 8.685734,
+      "aei_text": 2.772022,
+      "aei_vision": 0.319147,
+      "text_ratio": 0.896755,
+      "vision_ratio": 0.103245
+    },
+    "late": {
+      "mdi": 14.213614,
+      "aei_text": 3.045068,
+      "aei_vision": 0.214236,
+      "text_ratio": 0.934269,
+      "vision_ratio": 0.065731
+    },
+    "all": {
+      "mdi": 14.213614,
+      "aei_text": 2.952248,
+      "aei_vision": 0.2499,
+      "text_ratio": 0.934269,
+      "vision_ratio": 0.065731
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934269,
+      0.065731
+    ],
+    "text_vision_ratio": "0.934269:0.065731"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.440434,
+      "aei_text": 3.177281,
+      "aei_vision": 0.163437,
+      "text_ratio": 0.951077,
+      "vision_ratio": 0.048923
+    },
+    "middle": {
+      "mdi": 14.935167,
+      "aei_text": 3.068008,
+      "aei_vision": 0.205422,
+      "text_ratio": 0.937246,
+      "vision_ratio": 0.062754
+    },
+    "late": {
+      "mdi": 18.390448,
+      "aei_text": 3.156005,
+      "aei_vision": 0.171611,
+      "text_ratio": 0.948428,
+      "vision_ratio": 0.051572
+    },
+    "all": {
+      "mdi": 18.390448,
+      "aei_text": 3.133765,
+      "aei_vision": 0.180157,
+      "text_ratio": 0.948428,
+      "vision_ratio": 0.051572
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948428,
+      0.051572
+    ],
+    "text_vision_ratio": "0.948428:0.051572"
+  }
+}
+```
+
+
+## === Rollout Step 433 ===
+Step: 432/29790 | 2025-10-22 12:31:23
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.178 | 9.518 | 19.462 | 19.462 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.178378,
+      "aei_text": 2.887821,
+      "aei_vision": 0.178499,
+      "text_ratio": 0.941787,
+      "vision_ratio": 0.058213
+    },
+    "middle": {
+      "mdi": 9.518172,
+      "aei_text": 2.656615,
+      "aei_vision": 0.27911,
+      "text_ratio": 0.904926,
+      "vision_ratio": 0.095074
+    },
+    "late": {
+      "mdi": 19.462301,
+      "aei_text": 2.949724,
+      "aei_vision": 0.151561,
+      "text_ratio": 0.95113,
+      "vision_ratio": 0.04887
+    },
+    "all": {
+      "mdi": 19.462301,
+      "aei_text": 2.831387,
+      "aei_vision": 0.203057,
+      "text_ratio": 0.95113,
+      "vision_ratio": 0.04887
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95113,
+      0.04887
+    ],
+    "text_vision_ratio": "0.951130:0.048870"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.178378,
+      "aei_text": 2.887821,
+      "aei_vision": 0.178499,
+      "text_ratio": 0.941787,
+      "vision_ratio": 0.058213
+    },
+    "middle": {
+      "mdi": 9.518172,
+      "aei_text": 2.656615,
+      "aei_vision": 0.27911,
+      "text_ratio": 0.904926,
+      "vision_ratio": 0.095074
+    },
+    "late": {
+      "mdi": 19.462301,
+      "aei_text": 2.949724,
+      "aei_vision": 0.151561,
+      "text_ratio": 0.95113,
+      "vision_ratio": 0.04887
+    },
+    "all": {
+      "mdi": 19.462301,
+      "aei_text": 2.831387,
+      "aei_vision": 0.203057,
+      "text_ratio": 0.95113,
+      "vision_ratio": 0.04887
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95113,
+      0.04887
+    ],
+    "text_vision_ratio": "0.951130:0.048870"
+  }
+}
+```
+
+
+## === Rollout Step 434 ===
+Step: 433/29790 | 2025-10-22 12:31:26
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.471 | 11.151 | 20.308 | 20.308 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 326.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 326.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 326,
+    "text_tokens": 0,
+    "total_tokens": 326
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.470829,
+      "aei_text": 2.772097,
+      "aei_vision": 0.179182,
+      "text_ratio": 0.939287,
+      "vision_ratio": 0.060713
+    },
+    "middle": {
+      "mdi": 11.150606,
+      "aei_text": 2.646529,
+      "aei_vision": 0.237344,
+      "text_ratio": 0.9177,
+      "vision_ratio": 0.0823
+    },
+    "late": {
+      "mdi": 20.307526,
+      "aei_text": 2.855378,
+      "aei_vision": 0.140607,
+      "text_ratio": 0.953068,
+      "vision_ratio": 0.046932
+    },
+    "all": {
+      "mdi": 20.307526,
+      "aei_text": 2.758001,
+      "aei_vision": 0.185711,
+      "text_ratio": 0.953068,
+      "vision_ratio": 0.046932
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953068,
+      0.046932
+    ],
+    "text_vision_ratio": "0.953068:0.046932"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 326,
+    "text_tokens": 0,
+    "total_tokens": 326
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.470829,
+      "aei_text": 2.772097,
+      "aei_vision": 0.179182,
+      "text_ratio": 0.939287,
+      "vision_ratio": 0.060713
+    },
+    "middle": {
+      "mdi": 11.150606,
+      "aei_text": 2.646529,
+      "aei_vision": 0.237344,
+      "text_ratio": 0.9177,
+      "vision_ratio": 0.0823
+    },
+    "late": {
+      "mdi": 20.307526,
+      "aei_text": 2.855378,
+      "aei_vision": 0.140607,
+      "text_ratio": 0.953068,
+      "vision_ratio": 0.046932
+    },
+    "all": {
+      "mdi": 20.307526,
+      "aei_text": 2.758001,
+      "aei_vision": 0.185711,
+      "text_ratio": 0.953068,
+      "vision_ratio": 0.046932
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953068,
+      0.046932
+    ],
+    "text_vision_ratio": "0.953068:0.046932"
+  }
+}
+```
+
+
+## === Rollout Step 435 ===
+Step: 434/29790 | 2025-10-22 12:31:30
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 24.755 | 12.425 | 16.977 | 16.977 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.75514,
+      "aei_text": 3.287329,
+      "aei_vision": 0.132794,
+      "text_ratio": 0.961173,
+      "vision_ratio": 0.038827
+    },
+    "middle": {
+      "mdi": 12.424722,
+      "aei_text": 3.000601,
+      "aei_vision": 0.241502,
+      "text_ratio": 0.925511,
+      "vision_ratio": 0.074489
+    },
+    "late": {
+      "mdi": 16.977366,
+      "aei_text": 3.148445,
+      "aei_vision": 0.18545,
+      "text_ratio": 0.944374,
+      "vision_ratio": 0.055626
+    },
+    "all": {
+      "mdi": 16.977366,
+      "aei_text": 3.145458,
+      "aei_vision": 0.186582,
+      "text_ratio": 0.944374,
+      "vision_ratio": 0.055626
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944374,
+      0.055626
+    ],
+    "text_vision_ratio": "0.944374:0.055626"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.75514,
+      "aei_text": 3.287329,
+      "aei_vision": 0.132794,
+      "text_ratio": 0.961173,
+      "vision_ratio": 0.038827
+    },
+    "middle": {
+      "mdi": 12.424722,
+      "aei_text": 3.000601,
+      "aei_vision": 0.241502,
+      "text_ratio": 0.925511,
+      "vision_ratio": 0.074489
+    },
+    "late": {
+      "mdi": 16.977366,
+      "aei_text": 3.148445,
+      "aei_vision": 0.18545,
+      "text_ratio": 0.944374,
+      "vision_ratio": 0.055626
+    },
+    "all": {
+      "mdi": 16.977366,
+      "aei_text": 3.145458,
+      "aei_vision": 0.186582,
+      "text_ratio": 0.944374,
+      "vision_ratio": 0.055626
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.944374,
+      0.055626
+    ],
+    "text_vision_ratio": "0.944374:0.055626"
+  }
+}
+```
+
+
+## === Rollout Step 436 ===
+Step: 435/29790 | 2025-10-22 12:31:33
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.591 | 10.742 | 18.983 | 18.983 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.590673,
+      "aei_text": 2.829971,
+      "aei_vision": 0.224767,
+      "text_ratio": 0.92642,
+      "vision_ratio": 0.07358
+    },
+    "middle": {
+      "mdi": 10.742423,
+      "aei_text": 2.755131,
+      "aei_vision": 0.256472,
+      "text_ratio": 0.914839,
+      "vision_ratio": 0.085161
+    },
+    "late": {
+      "mdi": 18.983139,
+      "aei_text": 2.988879,
+      "aei_vision": 0.157449,
+      "text_ratio": 0.949958,
+      "vision_ratio": 0.050042
+    },
+    "all": {
+      "mdi": 18.983139,
+      "aei_text": 2.857993,
+      "aei_vision": 0.212896,
+      "text_ratio": 0.949958,
+      "vision_ratio": 0.050042
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949958,
+      0.050042
+    ],
+    "text_vision_ratio": "0.949958:0.050042"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.590673,
+      "aei_text": 2.829971,
+      "aei_vision": 0.224767,
+      "text_ratio": 0.92642,
+      "vision_ratio": 0.07358
+    },
+    "middle": {
+      "mdi": 10.742423,
+      "aei_text": 2.755131,
+      "aei_vision": 0.256472,
+      "text_ratio": 0.914839,
+      "vision_ratio": 0.085161
+    },
+    "late": {
+      "mdi": 18.983139,
+      "aei_text": 2.988879,
+      "aei_vision": 0.157449,
+      "text_ratio": 0.949958,
+      "vision_ratio": 0.050042
+    },
+    "all": {
+      "mdi": 18.983139,
+      "aei_text": 2.857993,
+      "aei_vision": 0.212896,
+      "text_ratio": 0.949958,
+      "vision_ratio": 0.050042
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949958,
+      0.050042
+    ],
+    "text_vision_ratio": "0.949958:0.050042"
+  }
+}
+```
+
+
+## === Rollout Step 437 ===
+Step: 436/29790 | 2025-10-22 12:31:37
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 23.549 | 17.670 | 25.282 | 25.282 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 462.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 462.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 462,
+    "text_tokens": 0,
+    "total_tokens": 462
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.54907,
+      "aei_text": 3.548007,
+      "aei_vision": 0.150664,
+      "text_ratio": 0.959265,
+      "vision_ratio": 0.040735
+    },
+    "middle": {
+      "mdi": 17.669574,
+      "aei_text": 3.419437,
+      "aei_vision": 0.193521,
+      "text_ratio": 0.946437,
+      "vision_ratio": 0.053563
+    },
+    "late": {
+      "mdi": 25.281678,
+      "aei_text": 3.575697,
+      "aei_vision": 0.141434,
+      "text_ratio": 0.961951,
+      "vision_ratio": 0.038049
+    },
+    "all": {
+      "mdi": 25.281678,
+      "aei_text": 3.51438,
+      "aei_vision": 0.161873,
+      "text_ratio": 0.961951,
+      "vision_ratio": 0.038049
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961951,
+      0.038049
+    ],
+    "text_vision_ratio": "0.961951:0.038049"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 462,
+    "text_tokens": 0,
+    "total_tokens": 462
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.54907,
+      "aei_text": 3.548007,
+      "aei_vision": 0.150664,
+      "text_ratio": 0.959265,
+      "vision_ratio": 0.040735
+    },
+    "middle": {
+      "mdi": 17.669574,
+      "aei_text": 3.419437,
+      "aei_vision": 0.193521,
+      "text_ratio": 0.946437,
+      "vision_ratio": 0.053563
+    },
+    "late": {
+      "mdi": 25.281678,
+      "aei_text": 3.575697,
+      "aei_vision": 0.141434,
+      "text_ratio": 0.961951,
+      "vision_ratio": 0.038049
+    },
+    "all": {
+      "mdi": 25.281678,
+      "aei_text": 3.51438,
+      "aei_vision": 0.161873,
+      "text_ratio": 0.961951,
+      "vision_ratio": 0.038049
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961951,
+      0.038049
+    ],
+    "text_vision_ratio": "0.961951:0.038049"
+  }
+}
+```
+
+
+## === Rollout Step 438 ===
+Step: 437/29790 | 2025-10-22 12:31:41
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.725 | 4.871 | 14.217 | 14.217 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.725436,
+      "aei_text": 2.764181,
+      "aei_vision": 0.257722,
+      "text_ratio": 0.914715,
+      "vision_ratio": 0.085285
+    },
+    "middle": {
+      "mdi": 4.871046,
+      "aei_text": 2.269408,
+      "aei_vision": 0.465897,
+      "text_ratio": 0.829673,
+      "vision_ratio": 0.170327
+    },
+    "late": {
+      "mdi": 14.21675,
+      "aei_text": 2.89306,
+      "aei_vision": 0.203497,
+      "text_ratio": 0.934283,
+      "vision_ratio": 0.065717
+    },
+    "all": {
+      "mdi": 14.21675,
+      "aei_text": 2.642216,
+      "aei_vision": 0.309039,
+      "text_ratio": 0.934283,
+      "vision_ratio": 0.065717
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934283,
+      0.065717
+    ],
+    "text_vision_ratio": "0.934283:0.065717"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.725436,
+      "aei_text": 2.764181,
+      "aei_vision": 0.257722,
+      "text_ratio": 0.914715,
+      "vision_ratio": 0.085285
+    },
+    "middle": {
+      "mdi": 4.871046,
+      "aei_text": 2.269408,
+      "aei_vision": 0.465897,
+      "text_ratio": 0.829673,
+      "vision_ratio": 0.170327
+    },
+    "late": {
+      "mdi": 14.21675,
+      "aei_text": 2.89306,
+      "aei_vision": 0.203497,
+      "text_ratio": 0.934283,
+      "vision_ratio": 0.065717
+    },
+    "all": {
+      "mdi": 14.21675,
+      "aei_text": 2.642216,
+      "aei_vision": 0.309039,
+      "text_ratio": 0.934283,
+      "vision_ratio": 0.065717
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.934283,
+      0.065717
+    ],
+    "text_vision_ratio": "0.934283:0.065717"
+  }
+}
+```
+
+
+## === Rollout Step 439 ===
+Step: 438/29790 | 2025-10-22 12:31:44
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 27.713 | 24.023 | 22.402 | 22.402 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.713008,
+      "aei_text": 2.984788,
+      "aei_vision": 0.107703,
+      "text_ratio": 0.965173,
+      "vision_ratio": 0.034827
+    },
+    "middle": {
+      "mdi": 24.023008,
+      "aei_text": 2.951107,
+      "aei_vision": 0.122845,
+      "text_ratio": 0.960037,
+      "vision_ratio": 0.039963
+    },
+    "late": {
+      "mdi": 22.401765,
+      "aei_text": 2.933118,
+      "aei_vision": 0.130932,
+      "text_ratio": 0.957268,
+      "vision_ratio": 0.042732
+    },
+    "all": {
+      "mdi": 22.401765,
+      "aei_text": 2.956338,
+      "aei_vision": 0.120494,
+      "text_ratio": 0.957268,
+      "vision_ratio": 0.042732
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957268,
+      0.042732
+    ],
+    "text_vision_ratio": "0.957268:0.042732"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.713008,
+      "aei_text": 2.984788,
+      "aei_vision": 0.107703,
+      "text_ratio": 0.965173,
+      "vision_ratio": 0.034827
+    },
+    "middle": {
+      "mdi": 24.023008,
+      "aei_text": 2.951107,
+      "aei_vision": 0.122845,
+      "text_ratio": 0.960037,
+      "vision_ratio": 0.039963
+    },
+    "late": {
+      "mdi": 22.401765,
+      "aei_text": 2.933118,
+      "aei_vision": 0.130932,
+      "text_ratio": 0.957268,
+      "vision_ratio": 0.042732
+    },
+    "all": {
+      "mdi": 22.401765,
+      "aei_text": 2.956338,
+      "aei_vision": 0.120494,
+      "text_ratio": 0.957268,
+      "vision_ratio": 0.042732
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957268,
+      0.042732
+    ],
+    "text_vision_ratio": "0.957268:0.042732"
+  }
+}
+```
+
+
+## === Rollout Step 440 ===
+Step: 439/29790 | 2025-10-22 12:31:48
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 11.344 | 7.649 | 19.600 | 19.600 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.34422,
+      "aei_text": 2.983783,
+      "aei_vision": 0.263022,
+      "text_ratio": 0.91899,
+      "vision_ratio": 0.08101
+    },
+    "middle": {
+      "mdi": 7.649264,
+      "aei_text": 2.730808,
+      "aei_vision": 0.357003,
+      "text_ratio": 0.884383,
+      "vision_ratio": 0.115617
+    },
+    "late": {
+      "mdi": 19.599948,
+      "aei_text": 3.245989,
+      "aei_vision": 0.165612,
+      "text_ratio": 0.951456,
+      "vision_ratio": 0.048544
+    },
+    "all": {
+      "mdi": 19.599948,
+      "aei_text": 2.98686,
+      "aei_vision": 0.261879,
+      "text_ratio": 0.951456,
+      "vision_ratio": 0.048544
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951456,
+      0.048544
+    ],
+    "text_vision_ratio": "0.951456:0.048544"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 11.34422,
+      "aei_text": 2.983783,
+      "aei_vision": 0.263022,
+      "text_ratio": 0.91899,
+      "vision_ratio": 0.08101
+    },
+    "middle": {
+      "mdi": 7.649264,
+      "aei_text": 2.730808,
+      "aei_vision": 0.357003,
+      "text_ratio": 0.884383,
+      "vision_ratio": 0.115617
+    },
+    "late": {
+      "mdi": 19.599948,
+      "aei_text": 3.245989,
+      "aei_vision": 0.165612,
+      "text_ratio": 0.951456,
+      "vision_ratio": 0.048544
+    },
+    "all": {
+      "mdi": 19.599948,
+      "aei_text": 2.98686,
+      "aei_vision": 0.261879,
+      "text_ratio": 0.951456,
+      "vision_ratio": 0.048544
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951456,
+      0.048544
+    ],
+    "text_vision_ratio": "0.951456:0.048544"
+  }
+}
+```
+
+
+## === Rollout Step 441 ===
+Step: 440/29790 | 2025-10-22 12:31:51
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.483 | 11.131 | 18.585 | 18.585 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 338.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 338.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 338,
+    "text_tokens": 0,
+    "total_tokens": 338
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.482982,
+      "aei_text": 2.847285,
+      "aei_vision": 0.196595,
+      "text_ratio": 0.935413,
+      "vision_ratio": 0.064587
+    },
+    "middle": {
+      "mdi": 11.130682,
+      "aei_text": 2.734451,
+      "aei_vision": 0.245668,
+      "text_ratio": 0.917564,
+      "vision_ratio": 0.082436
+    },
+    "late": {
+      "mdi": 18.585129,
+      "aei_text": 2.936074,
+      "aei_vision": 0.15798,
+      "text_ratio": 0.948941,
+      "vision_ratio": 0.051059
+    },
+    "all": {
+      "mdi": 18.585129,
+      "aei_text": 2.83927,
+      "aei_vision": 0.200081,
+      "text_ratio": 0.948941,
+      "vision_ratio": 0.051059
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948941,
+      0.051059
+    ],
+    "text_vision_ratio": "0.948941:0.051059"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 338,
+    "text_tokens": 0,
+    "total_tokens": 338
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.482982,
+      "aei_text": 2.847285,
+      "aei_vision": 0.196595,
+      "text_ratio": 0.935413,
+      "vision_ratio": 0.064587
+    },
+    "middle": {
+      "mdi": 11.130682,
+      "aei_text": 2.734451,
+      "aei_vision": 0.245668,
+      "text_ratio": 0.917564,
+      "vision_ratio": 0.082436
+    },
+    "late": {
+      "mdi": 18.585129,
+      "aei_text": 2.936074,
+      "aei_vision": 0.15798,
+      "text_ratio": 0.948941,
+      "vision_ratio": 0.051059
+    },
+    "all": {
+      "mdi": 18.585129,
+      "aei_text": 2.83927,
+      "aei_vision": 0.200081,
+      "text_ratio": 0.948941,
+      "vision_ratio": 0.051059
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.948941,
+      0.051059
+    ],
+    "text_vision_ratio": "0.948941:0.051059"
+  }
+}
+```
+
+
+## === Rollout Step 442 ===
+Step: 441/29790 | 2025-10-22 12:31:55
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.394 | 12.314 | 18.973 | 18.973 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.394405,
+      "aei_text": 3.050999,
+      "aei_vision": 0.211957,
+      "text_ratio": 0.935041,
+      "vision_ratio": 0.064959
+    },
+    "middle": {
+      "mdi": 12.313738,
+      "aei_text": 2.97405,
+      "aei_vision": 0.241523,
+      "text_ratio": 0.92489,
+      "vision_ratio": 0.07511
+    },
+    "late": {
+      "mdi": 18.972896,
+      "aei_text": 3.168063,
+      "aei_vision": 0.166978,
+      "text_ratio": 0.949932,
+      "vision_ratio": 0.050068
+    },
+    "all": {
+      "mdi": 18.972896,
+      "aei_text": 3.06437,
+      "aei_vision": 0.20682,
+      "text_ratio": 0.949932,
+      "vision_ratio": 0.050068
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949932,
+      0.050068
+    ],
+    "text_vision_ratio": "0.949932:0.050068"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.394405,
+      "aei_text": 3.050999,
+      "aei_vision": 0.211957,
+      "text_ratio": 0.935041,
+      "vision_ratio": 0.064959
+    },
+    "middle": {
+      "mdi": 12.313738,
+      "aei_text": 2.97405,
+      "aei_vision": 0.241523,
+      "text_ratio": 0.92489,
+      "vision_ratio": 0.07511
+    },
+    "late": {
+      "mdi": 18.972896,
+      "aei_text": 3.168063,
+      "aei_vision": 0.166978,
+      "text_ratio": 0.949932,
+      "vision_ratio": 0.050068
+    },
+    "all": {
+      "mdi": 18.972896,
+      "aei_text": 3.06437,
+      "aei_vision": 0.20682,
+      "text_ratio": 0.949932,
+      "vision_ratio": 0.050068
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949932,
+      0.050068
+    ],
+    "text_vision_ratio": "0.949932:0.050068"
+  }
+}
+```
+
+
+## === Rollout Step 443 ===
+Step: 442/29790 | 2025-10-22 12:31:58
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.163 | 14.128 | 12.462 | 12.462 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 236.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 236.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.162717,
+      "aei_text": 2.290897,
+      "aei_vision": 0.174044,
+      "text_ratio": 0.929392,
+      "vision_ratio": 0.070608
+    },
+    "middle": {
+      "mdi": 14.127729,
+      "aei_text": 2.307627,
+      "aei_vision": 0.16334,
+      "text_ratio": 0.933896,
+      "vision_ratio": 0.066104
+    },
+    "late": {
+      "mdi": 12.462333,
+      "aei_text": 2.277314,
+      "aei_vision": 0.182736,
+      "text_ratio": 0.925719,
+      "vision_ratio": 0.074281
+    },
+    "all": {
+      "mdi": 12.462333,
+      "aei_text": 2.291946,
+      "aei_vision": 0.173373,
+      "text_ratio": 0.925719,
+      "vision_ratio": 0.074281
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.925719,
+      0.074281
+    ],
+    "text_vision_ratio": "0.925719:0.074281"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 236,
+    "text_tokens": 0,
+    "total_tokens": 236
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.162717,
+      "aei_text": 2.290897,
+      "aei_vision": 0.174044,
+      "text_ratio": 0.929392,
+      "vision_ratio": 0.070608
+    },
+    "middle": {
+      "mdi": 14.127729,
+      "aei_text": 2.307627,
+      "aei_vision": 0.16334,
+      "text_ratio": 0.933896,
+      "vision_ratio": 0.066104
+    },
+    "late": {
+      "mdi": 12.462333,
+      "aei_text": 2.277314,
+      "aei_vision": 0.182736,
+      "text_ratio": 0.925719,
+      "vision_ratio": 0.074281
+    },
+    "all": {
+      "mdi": 12.462333,
+      "aei_text": 2.291946,
+      "aei_vision": 0.173373,
+      "text_ratio": 0.925719,
+      "vision_ratio": 0.074281
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.925719,
+      0.074281
+    ],
+    "text_vision_ratio": "0.925719:0.074281"
+  }
+}
+```
+
+
+## === Rollout Step 444 ===
+Step: 443/29790 | 2025-10-22 12:32:01
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.815 | 12.580 | 17.682 | 17.682 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.814994,
+      "aei_text": 3.228485,
+      "aei_vision": 0.155104,
+      "text_ratio": 0.95416,
+      "vision_ratio": 0.04584
+    },
+    "middle": {
+      "mdi": 12.58034,
+      "aei_text": 3.007115,
+      "aei_vision": 0.239033,
+      "text_ratio": 0.926364,
+      "vision_ratio": 0.073636
+    },
+    "late": {
+      "mdi": 17.682086,
+      "aei_text": 3.165409,
+      "aei_vision": 0.179018,
+      "text_ratio": 0.946473,
+      "vision_ratio": 0.053527
+    },
+    "all": {
+      "mdi": 17.682086,
+      "aei_text": 3.13367,
+      "aei_vision": 0.191052,
+      "text_ratio": 0.946473,
+      "vision_ratio": 0.053527
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946473,
+      0.053527
+    ],
+    "text_vision_ratio": "0.946473:0.053527"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.814994,
+      "aei_text": 3.228485,
+      "aei_vision": 0.155104,
+      "text_ratio": 0.95416,
+      "vision_ratio": 0.04584
+    },
+    "middle": {
+      "mdi": 12.58034,
+      "aei_text": 3.007115,
+      "aei_vision": 0.239033,
+      "text_ratio": 0.926364,
+      "vision_ratio": 0.073636
+    },
+    "late": {
+      "mdi": 17.682086,
+      "aei_text": 3.165409,
+      "aei_vision": 0.179018,
+      "text_ratio": 0.946473,
+      "vision_ratio": 0.053527
+    },
+    "all": {
+      "mdi": 17.682086,
+      "aei_text": 3.13367,
+      "aei_vision": 0.191052,
+      "text_ratio": 0.946473,
+      "vision_ratio": 0.053527
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946473,
+      0.053527
+    ],
+    "text_vision_ratio": "0.946473:0.053527"
+  }
+}
+```
+
+
+## === Rollout Step 445 ===
+Step: 444/29790 | 2025-10-22 12:32:05
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.066 | 11.804 | 20.351 | 20.351 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.065706,
+      "aei_text": 3.115918,
+      "aei_vision": 0.147914,
+      "text_ratio": 0.954681,
+      "vision_ratio": 0.045319
+    },
+    "middle": {
+      "mdi": 11.803897,
+      "aei_text": 2.877808,
+      "aei_vision": 0.243802,
+      "text_ratio": 0.921899,
+      "vision_ratio": 0.078101
+    },
+    "late": {
+      "mdi": 20.350795,
+      "aei_text": 3.104418,
+      "aei_vision": 0.152545,
+      "text_ratio": 0.953163,
+      "vision_ratio": 0.046837
+    },
+    "all": {
+      "mdi": 20.350795,
+      "aei_text": 3.032715,
+      "aei_vision": 0.18142,
+      "text_ratio": 0.953163,
+      "vision_ratio": 0.046837
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953163,
+      0.046837
+    ],
+    "text_vision_ratio": "0.953163:0.046837"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.065706,
+      "aei_text": 3.115918,
+      "aei_vision": 0.147914,
+      "text_ratio": 0.954681,
+      "vision_ratio": 0.045319
+    },
+    "middle": {
+      "mdi": 11.803897,
+      "aei_text": 2.877808,
+      "aei_vision": 0.243802,
+      "text_ratio": 0.921899,
+      "vision_ratio": 0.078101
+    },
+    "late": {
+      "mdi": 20.350795,
+      "aei_text": 3.104418,
+      "aei_vision": 0.152545,
+      "text_ratio": 0.953163,
+      "vision_ratio": 0.046837
+    },
+    "all": {
+      "mdi": 20.350795,
+      "aei_text": 3.032715,
+      "aei_vision": 0.18142,
+      "text_ratio": 0.953163,
+      "vision_ratio": 0.046837
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953163,
+      0.046837
+    ],
+    "text_vision_ratio": "0.953163:0.046837"
+  }
+}
+```
+
+
+## === Rollout Step 446 ===
+Step: 445/29790 | 2025-10-22 12:32:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.381 | 8.546 | 28.420 | 28.420 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.380635,
+      "aei_text": 3.247673,
+      "aei_vision": 0.211153,
+      "text_ratio": 0.938952,
+      "vision_ratio": 0.061048
+    },
+    "middle": {
+      "mdi": 8.545876,
+      "aei_text": 2.886812,
+      "aei_vision": 0.337802,
+      "text_ratio": 0.895243,
+      "vision_ratio": 0.104757
+    },
+    "late": {
+      "mdi": 28.419912,
+      "aei_text": 3.498558,
+      "aei_vision": 0.123102,
+      "text_ratio": 0.966009,
+      "vision_ratio": 0.033991
+    },
+    "all": {
+      "mdi": 28.419912,
+      "aei_text": 3.211014,
+      "aei_vision": 0.224019,
+      "text_ratio": 0.966009,
+      "vision_ratio": 0.033991
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.966009,
+      0.033991
+    ],
+    "text_vision_ratio": "0.966009:0.033991"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.380635,
+      "aei_text": 3.247673,
+      "aei_vision": 0.211153,
+      "text_ratio": 0.938952,
+      "vision_ratio": 0.061048
+    },
+    "middle": {
+      "mdi": 8.545876,
+      "aei_text": 2.886812,
+      "aei_vision": 0.337802,
+      "text_ratio": 0.895243,
+      "vision_ratio": 0.104757
+    },
+    "late": {
+      "mdi": 28.419912,
+      "aei_text": 3.498558,
+      "aei_vision": 0.123102,
+      "text_ratio": 0.966009,
+      "vision_ratio": 0.033991
+    },
+    "all": {
+      "mdi": 28.419912,
+      "aei_text": 3.211014,
+      "aei_vision": 0.224019,
+      "text_ratio": 0.966009,
+      "vision_ratio": 0.033991
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.966009,
+      0.033991
+    ],
+    "text_vision_ratio": "0.966009:0.033991"
+  }
+}
+```
+
+
+## === Rollout Step 447 ===
+Step: 446/29790 | 2025-10-22 12:32:12
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.019 | 10.853 | 15.214 | 15.214 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.018793,
+      "aei_text": 2.897629,
+      "aei_vision": 0.152356,
+      "text_ratio": 0.950047,
+      "vision_ratio": 0.049953
+    },
+    "middle": {
+      "mdi": 10.852696,
+      "aei_text": 2.684871,
+      "aei_vision": 0.247392,
+      "text_ratio": 0.915631,
+      "vision_ratio": 0.084369
+    },
+    "late": {
+      "mdi": 15.214359,
+      "aei_text": 2.82328,
+      "aei_vision": 0.185567,
+      "text_ratio": 0.938326,
+      "vision_ratio": 0.061674
+    },
+    "all": {
+      "mdi": 15.214359,
+      "aei_text": 2.801926,
+      "aei_vision": 0.195105,
+      "text_ratio": 0.938326,
+      "vision_ratio": 0.061674
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938326,
+      0.061674
+    ],
+    "text_vision_ratio": "0.938326:0.061674"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.018793,
+      "aei_text": 2.897629,
+      "aei_vision": 0.152356,
+      "text_ratio": 0.950047,
+      "vision_ratio": 0.049953
+    },
+    "middle": {
+      "mdi": 10.852696,
+      "aei_text": 2.684871,
+      "aei_vision": 0.247392,
+      "text_ratio": 0.915631,
+      "vision_ratio": 0.084369
+    },
+    "late": {
+      "mdi": 15.214359,
+      "aei_text": 2.82328,
+      "aei_vision": 0.185567,
+      "text_ratio": 0.938326,
+      "vision_ratio": 0.061674
+    },
+    "all": {
+      "mdi": 15.214359,
+      "aei_text": 2.801926,
+      "aei_vision": 0.195105,
+      "text_ratio": 0.938326,
+      "vision_ratio": 0.061674
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938326,
+      0.061674
+    ],
+    "text_vision_ratio": "0.938326:0.061674"
+  }
+}
+```
+
+
+## === Rollout Step 448 ===
+Step: 447/29790 | 2025-10-22 12:32:15
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.446 | 6.762 | 17.542 | 17.542 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 324.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 324.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 324,
+    "text_tokens": 0,
+    "total_tokens": 324
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.446259,
+      "aei_text": 2.732051,
+      "aei_vision": 0.219508,
+      "text_ratio": 0.92563,
+      "vision_ratio": 0.07437
+    },
+    "middle": {
+      "mdi": 6.762484,
+      "aei_text": 2.423788,
+      "aei_vision": 0.358417,
+      "text_ratio": 0.871175,
+      "vision_ratio": 0.128825
+    },
+    "late": {
+      "mdi": 17.541649,
+      "aei_text": 2.857658,
+      "aei_vision": 0.162907,
+      "text_ratio": 0.946067,
+      "vision_ratio": 0.053933
+    },
+    "all": {
+      "mdi": 17.541649,
+      "aei_text": 2.671166,
+      "aei_vision": 0.246944,
+      "text_ratio": 0.946067,
+      "vision_ratio": 0.053933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946067,
+      0.053933
+    ],
+    "text_vision_ratio": "0.946067:0.053933"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 324,
+    "text_tokens": 0,
+    "total_tokens": 324
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.446259,
+      "aei_text": 2.732051,
+      "aei_vision": 0.219508,
+      "text_ratio": 0.92563,
+      "vision_ratio": 0.07437
+    },
+    "middle": {
+      "mdi": 6.762484,
+      "aei_text": 2.423788,
+      "aei_vision": 0.358417,
+      "text_ratio": 0.871175,
+      "vision_ratio": 0.128825
+    },
+    "late": {
+      "mdi": 17.541649,
+      "aei_text": 2.857658,
+      "aei_vision": 0.162907,
+      "text_ratio": 0.946067,
+      "vision_ratio": 0.053933
+    },
+    "all": {
+      "mdi": 17.541649,
+      "aei_text": 2.671166,
+      "aei_vision": 0.246944,
+      "text_ratio": 0.946067,
+      "vision_ratio": 0.053933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946067,
+      0.053933
+    ],
+    "text_vision_ratio": "0.946067:0.053933"
+  }
+}
+```
+
+
+## === Rollout Step 449 ===
+Step: 448/29790 | 2025-10-22 12:32:19
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 30.788 | 23.729 | 25.404 | 25.404 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 30.787512,
+      "aei_text": 3.280066,
+      "aei_vision": 0.106539,
+      "text_ratio": 0.968541,
+      "vision_ratio": 0.031459
+    },
+    "middle": {
+      "mdi": 23.729392,
+      "aei_text": 3.20705,
+      "aei_vision": 0.135151,
+      "text_ratio": 0.959562,
+      "vision_ratio": 0.040438
+    },
+    "late": {
+      "mdi": 25.40448,
+      "aei_text": 3.227715,
+      "aei_vision": 0.127053,
+      "text_ratio": 0.962128,
+      "vision_ratio": 0.037872
+    },
+    "all": {
+      "mdi": 25.40448,
+      "aei_text": 3.238277,
+      "aei_vision": 0.122914,
+      "text_ratio": 0.962128,
+      "vision_ratio": 0.037872
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962128,
+      0.037872
+    ],
+    "text_vision_ratio": "0.962128:0.037872"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 30.787512,
+      "aei_text": 3.280066,
+      "aei_vision": 0.106539,
+      "text_ratio": 0.968541,
+      "vision_ratio": 0.031459
+    },
+    "middle": {
+      "mdi": 23.729392,
+      "aei_text": 3.20705,
+      "aei_vision": 0.135151,
+      "text_ratio": 0.959562,
+      "vision_ratio": 0.040438
+    },
+    "late": {
+      "mdi": 25.40448,
+      "aei_text": 3.227715,
+      "aei_vision": 0.127053,
+      "text_ratio": 0.962128,
+      "vision_ratio": 0.037872
+    },
+    "all": {
+      "mdi": 25.40448,
+      "aei_text": 3.238277,
+      "aei_vision": 0.122914,
+      "text_ratio": 0.962128,
+      "vision_ratio": 0.037872
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.962128,
+      0.037872
+    ],
+    "text_vision_ratio": "0.962128:0.037872"
+  }
+}
+```
+
+
+## === Rollout Step 450 ===
+Step: 449/29790 | 2025-10-22 12:32:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.864 | 12.271 | 23.801 | 23.801 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.864113,
+      "aei_text": 3.311059,
+      "aei_vision": 0.166685,
+      "text_ratio": 0.952071,
+      "vision_ratio": 0.047929
+    },
+    "middle": {
+      "mdi": 12.270712,
+      "aei_text": 3.077728,
+      "aei_vision": 0.250819,
+      "text_ratio": 0.924646,
+      "vision_ratio": 0.075354
+    },
+    "late": {
+      "mdi": 23.801221,
+      "aei_text": 3.379546,
+      "aei_vision": 0.14199,
+      "text_ratio": 0.959679,
+      "vision_ratio": 0.040321
+    },
+    "all": {
+      "mdi": 23.801221,
+      "aei_text": 3.256111,
+      "aei_vision": 0.186498,
+      "text_ratio": 0.959679,
+      "vision_ratio": 0.040321
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.959679,
+      0.040321
+    ],
+    "text_vision_ratio": "0.959679:0.040321"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.864113,
+      "aei_text": 3.311059,
+      "aei_vision": 0.166685,
+      "text_ratio": 0.952071,
+      "vision_ratio": 0.047929
+    },
+    "middle": {
+      "mdi": 12.270712,
+      "aei_text": 3.077728,
+      "aei_vision": 0.250819,
+      "text_ratio": 0.924646,
+      "vision_ratio": 0.075354
+    },
+    "late": {
+      "mdi": 23.801221,
+      "aei_text": 3.379546,
+      "aei_vision": 0.14199,
+      "text_ratio": 0.959679,
+      "vision_ratio": 0.040321
+    },
+    "all": {
+      "mdi": 23.801221,
+      "aei_text": 3.256111,
+      "aei_vision": 0.186498,
+      "text_ratio": 0.959679,
+      "vision_ratio": 0.040321
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.959679,
+      0.040321
+    ],
+    "text_vision_ratio": "0.959679:0.040321"
+  }
+}
+```
+
+
+## === Rollout Step 451 ===
+Step: 450/29790 | 2025-10-22 12:32:26
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.461 | 6.670 | 20.234 | 20.234 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.460534,
+      "aei_text": 2.745451,
+      "aei_vision": 0.220332,
+      "text_ratio": 0.925709,
+      "vision_ratio": 0.074291
+    },
+    "middle": {
+      "mdi": 6.670333,
+      "aei_text": 2.42487,
+      "aei_vision": 0.363531,
+      "text_ratio": 0.869628,
+      "vision_ratio": 0.130372
+    },
+    "late": {
+      "mdi": 20.233729,
+      "aei_text": 2.916069,
+      "aei_vision": 0.144119,
+      "text_ratio": 0.952905,
+      "vision_ratio": 0.047095
+    },
+    "all": {
+      "mdi": 20.233729,
+      "aei_text": 2.695463,
+      "aei_vision": 0.242661,
+      "text_ratio": 0.952905,
+      "vision_ratio": 0.047095
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952905,
+      0.047095
+    ],
+    "text_vision_ratio": "0.952905:0.047095"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.460534,
+      "aei_text": 2.745451,
+      "aei_vision": 0.220332,
+      "text_ratio": 0.925709,
+      "vision_ratio": 0.074291
+    },
+    "middle": {
+      "mdi": 6.670333,
+      "aei_text": 2.42487,
+      "aei_vision": 0.363531,
+      "text_ratio": 0.869628,
+      "vision_ratio": 0.130372
+    },
+    "late": {
+      "mdi": 20.233729,
+      "aei_text": 2.916069,
+      "aei_vision": 0.144119,
+      "text_ratio": 0.952905,
+      "vision_ratio": 0.047095
+    },
+    "all": {
+      "mdi": 20.233729,
+      "aei_text": 2.695463,
+      "aei_vision": 0.242661,
+      "text_ratio": 0.952905,
+      "vision_ratio": 0.047095
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952905,
+      0.047095
+    ],
+    "text_vision_ratio": "0.952905:0.047095"
+  }
+}
+```
+
+
+## === Rollout Step 452 ===
+Step: 451/29790 | 2025-10-22 12:32:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.238 | 8.154 | 17.528 | 17.528 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.237816,
+      "aei_text": 2.830844,
+      "aei_vision": 0.213845,
+      "text_ratio": 0.929765,
+      "vision_ratio": 0.070235
+    },
+    "middle": {
+      "mdi": 8.153753,
+      "aei_text": 2.589306,
+      "aei_vision": 0.31756,
+      "text_ratio": 0.890755,
+      "vision_ratio": 0.109245
+    },
+    "late": {
+      "mdi": 17.527911,
+      "aei_text": 2.938441,
+      "aei_vision": 0.167644,
+      "text_ratio": 0.946027,
+      "vision_ratio": 0.053973
+    },
+    "all": {
+      "mdi": 17.527911,
+      "aei_text": 2.786197,
+      "aei_vision": 0.233016,
+      "text_ratio": 0.946027,
+      "vision_ratio": 0.053973
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946027,
+      0.053973
+    ],
+    "text_vision_ratio": "0.946027:0.053973"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.237816,
+      "aei_text": 2.830844,
+      "aei_vision": 0.213845,
+      "text_ratio": 0.929765,
+      "vision_ratio": 0.070235
+    },
+    "middle": {
+      "mdi": 8.153753,
+      "aei_text": 2.589306,
+      "aei_vision": 0.31756,
+      "text_ratio": 0.890755,
+      "vision_ratio": 0.109245
+    },
+    "late": {
+      "mdi": 17.527911,
+      "aei_text": 2.938441,
+      "aei_vision": 0.167644,
+      "text_ratio": 0.946027,
+      "vision_ratio": 0.053973
+    },
+    "all": {
+      "mdi": 17.527911,
+      "aei_text": 2.786197,
+      "aei_vision": 0.233016,
+      "text_ratio": 0.946027,
+      "vision_ratio": 0.053973
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.946027,
+      0.053973
+    ],
+    "text_vision_ratio": "0.946027:0.053973"
+  }
+}
+```
+
+
+## === Rollout Step 453 ===
+Step: 452/29790 | 2025-10-22 12:32:33
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.498 | 8.678 | 21.389 | 21.389 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.497578,
+      "aei_text": 3.236169,
+      "aei_vision": 0.157881,
+      "text_ratio": 0.953483,
+      "vision_ratio": 0.046517
+    },
+    "middle": {
+      "mdi": 8.677988,
+      "aei_text": 2.798947,
+      "aei_vision": 0.322534,
+      "text_ratio": 0.896673,
+      "vision_ratio": 0.103327
+    },
+    "late": {
+      "mdi": 21.388943,
+      "aei_text": 3.25171,
+      "aei_vision": 0.152028,
+      "text_ratio": 0.955335,
+      "vision_ratio": 0.044665
+    },
+    "all": {
+      "mdi": 21.388943,
+      "aei_text": 3.095609,
+      "aei_vision": 0.210814,
+      "text_ratio": 0.955335,
+      "vision_ratio": 0.044665
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955335,
+      0.044665
+    ],
+    "text_vision_ratio": "0.955335:0.044665"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.497578,
+      "aei_text": 3.236169,
+      "aei_vision": 0.157881,
+      "text_ratio": 0.953483,
+      "vision_ratio": 0.046517
+    },
+    "middle": {
+      "mdi": 8.677988,
+      "aei_text": 2.798947,
+      "aei_vision": 0.322534,
+      "text_ratio": 0.896673,
+      "vision_ratio": 0.103327
+    },
+    "late": {
+      "mdi": 21.388943,
+      "aei_text": 3.25171,
+      "aei_vision": 0.152028,
+      "text_ratio": 0.955335,
+      "vision_ratio": 0.044665
+    },
+    "all": {
+      "mdi": 21.388943,
+      "aei_text": 3.095609,
+      "aei_vision": 0.210814,
+      "text_ratio": 0.955335,
+      "vision_ratio": 0.044665
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955335,
+      0.044665
+    ],
+    "text_vision_ratio": "0.955335:0.044665"
+  }
+}
+```
+
+
+## === Rollout Step 454 ===
+Step: 453/29790 | 2025-10-22 12:32:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.301 | 13.135 | 26.143 | 26.143 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.300639,
+      "aei_text": 3.131549,
+      "aei_vision": 0.181008,
+      "text_ratio": 0.945357,
+      "vision_ratio": 0.054643
+    },
+    "middle": {
+      "mdi": 13.134564,
+      "aei_text": 3.006836,
+      "aei_vision": 0.228925,
+      "text_ratio": 0.929251,
+      "vision_ratio": 0.070749
+    },
+    "late": {
+      "mdi": 26.143163,
+      "aei_text": 3.276465,
+      "aei_vision": 0.125328,
+      "text_ratio": 0.963158,
+      "vision_ratio": 0.036842
+    },
+    "all": {
+      "mdi": 26.143163,
+      "aei_text": 3.138284,
+      "aei_vision": 0.17842,
+      "text_ratio": 0.963158,
+      "vision_ratio": 0.036842
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.963158,
+      0.036842
+    ],
+    "text_vision_ratio": "0.963158:0.036842"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.300639,
+      "aei_text": 3.131549,
+      "aei_vision": 0.181008,
+      "text_ratio": 0.945357,
+      "vision_ratio": 0.054643
+    },
+    "middle": {
+      "mdi": 13.134564,
+      "aei_text": 3.006836,
+      "aei_vision": 0.228925,
+      "text_ratio": 0.929251,
+      "vision_ratio": 0.070749
+    },
+    "late": {
+      "mdi": 26.143163,
+      "aei_text": 3.276465,
+      "aei_vision": 0.125328,
+      "text_ratio": 0.963158,
+      "vision_ratio": 0.036842
+    },
+    "all": {
+      "mdi": 26.143163,
+      "aei_text": 3.138284,
+      "aei_vision": 0.17842,
+      "text_ratio": 0.963158,
+      "vision_ratio": 0.036842
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.963158,
+      0.036842
+    ],
+    "text_vision_ratio": "0.963158:0.036842"
+  }
+}
+```
+
+
+## === Rollout Step 455 ===
+Step: 454/29790 | 2025-10-22 12:32:40
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.370 | 9.774 | 22.151 | 22.151 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.369944,
+      "aei_text": 2.995494,
+      "aei_vision": 0.154647,
+      "text_ratio": 0.950908,
+      "vision_ratio": 0.049092
+    },
+    "middle": {
+      "mdi": 9.774245,
+      "aei_text": 2.706828,
+      "aei_vision": 0.276935,
+      "text_ratio": 0.907186,
+      "vision_ratio": 0.092814
+    },
+    "late": {
+      "mdi": 22.151116,
+      "aei_text": 3.036914,
+      "aei_vision": 0.1371,
+      "text_ratio": 0.956806,
+      "vision_ratio": 0.043194
+    },
+    "all": {
+      "mdi": 22.151116,
+      "aei_text": 2.913079,
+      "aei_vision": 0.18956,
+      "text_ratio": 0.956806,
+      "vision_ratio": 0.043194
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956806,
+      0.043194
+    ],
+    "text_vision_ratio": "0.956806:0.043194"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.369944,
+      "aei_text": 2.995494,
+      "aei_vision": 0.154647,
+      "text_ratio": 0.950908,
+      "vision_ratio": 0.049092
+    },
+    "middle": {
+      "mdi": 9.774245,
+      "aei_text": 2.706828,
+      "aei_vision": 0.276935,
+      "text_ratio": 0.907186,
+      "vision_ratio": 0.092814
+    },
+    "late": {
+      "mdi": 22.151116,
+      "aei_text": 3.036914,
+      "aei_vision": 0.1371,
+      "text_ratio": 0.956806,
+      "vision_ratio": 0.043194
+    },
+    "all": {
+      "mdi": 22.151116,
+      "aei_text": 2.913079,
+      "aei_vision": 0.18956,
+      "text_ratio": 0.956806,
+      "vision_ratio": 0.043194
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956806,
+      0.043194
+    ],
+    "text_vision_ratio": "0.956806:0.043194"
+  }
+}
+```
+
+
+## === Rollout Step 456 ===
+Step: 455/29790 | 2025-10-22 12:32:43
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 21.912 | 9.976 | 16.696 | 16.696 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.911662,
+      "aei_text": 3.046288,
+      "aei_vision": 0.139026,
+      "text_ratio": 0.956354,
+      "vision_ratio": 0.043646
+    },
+    "middle": {
+      "mdi": 9.976158,
+      "aei_text": 2.727027,
+      "aei_vision": 0.273354,
+      "text_ratio": 0.908893,
+      "vision_ratio": 0.091107
+    },
+    "late": {
+      "mdi": 16.695945,
+      "aei_text": 2.955928,
+      "aei_vision": 0.177045,
+      "text_ratio": 0.94349,
+      "vision_ratio": 0.05651
+    },
+    "all": {
+      "mdi": 16.695945,
+      "aei_text": 2.909748,
+      "aei_vision": 0.196475,
+      "text_ratio": 0.94349,
+      "vision_ratio": 0.05651
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94349,
+      0.05651
+    ],
+    "text_vision_ratio": "0.943490:0.056510"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.911662,
+      "aei_text": 3.046288,
+      "aei_vision": 0.139026,
+      "text_ratio": 0.956354,
+      "vision_ratio": 0.043646
+    },
+    "middle": {
+      "mdi": 9.976158,
+      "aei_text": 2.727027,
+      "aei_vision": 0.273354,
+      "text_ratio": 0.908893,
+      "vision_ratio": 0.091107
+    },
+    "late": {
+      "mdi": 16.695945,
+      "aei_text": 2.955928,
+      "aei_vision": 0.177045,
+      "text_ratio": 0.94349,
+      "vision_ratio": 0.05651
+    },
+    "all": {
+      "mdi": 16.695945,
+      "aei_text": 2.909748,
+      "aei_vision": 0.196475,
+      "text_ratio": 0.94349,
+      "vision_ratio": 0.05651
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94349,
+      0.05651
+    ],
+    "text_vision_ratio": "0.943490:0.056510"
+  }
+}
+```
+
+
+## === Rollout Step 457 ===
+Step: 456/29790 | 2025-10-22 12:32:47
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 20.071 | 14.689 | 21.287 | 21.287 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.071377,
+      "aei_text": 3.202026,
+      "aei_vision": 0.159532,
+      "text_ratio": 0.952542,
+      "vision_ratio": 0.047458
+    },
+    "middle": {
+      "mdi": 14.688742,
+      "aei_text": 3.072046,
+      "aei_vision": 0.209143,
+      "text_ratio": 0.93626,
+      "vision_ratio": 0.06374
+    },
+    "late": {
+      "mdi": 21.287459,
+      "aei_text": 3.223287,
+      "aei_vision": 0.151417,
+      "text_ratio": 0.955132,
+      "vision_ratio": 0.044868
+    },
+    "all": {
+      "mdi": 21.287459,
+      "aei_text": 3.165786,
+      "aei_vision": 0.173364,
+      "text_ratio": 0.955132,
+      "vision_ratio": 0.044868
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955132,
+      0.044868
+    ],
+    "text_vision_ratio": "0.955132:0.044868"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 20.071377,
+      "aei_text": 3.202026,
+      "aei_vision": 0.159532,
+      "text_ratio": 0.952542,
+      "vision_ratio": 0.047458
+    },
+    "middle": {
+      "mdi": 14.688742,
+      "aei_text": 3.072046,
+      "aei_vision": 0.209143,
+      "text_ratio": 0.93626,
+      "vision_ratio": 0.06374
+    },
+    "late": {
+      "mdi": 21.287459,
+      "aei_text": 3.223287,
+      "aei_vision": 0.151417,
+      "text_ratio": 0.955132,
+      "vision_ratio": 0.044868
+    },
+    "all": {
+      "mdi": 21.287459,
+      "aei_text": 3.165786,
+      "aei_vision": 0.173364,
+      "text_ratio": 0.955132,
+      "vision_ratio": 0.044868
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.955132,
+      0.044868
+    ],
+    "text_vision_ratio": "0.955132:0.044868"
+  }
+}
+```
+
+
+## === Rollout Step 458 ===
+Step: 457/29790 | 2025-10-22 12:32:50
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.975 | 7.605 | 17.332 | 17.332 |
+| MDI Std | 1.844 | 0.247 | 0.107 | 0.107 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.818399,
+      "aei_text": 3.115693,
+      "aei_vision": 0.165566,
+      "text_ratio": 0.949542,
+      "vision_ratio": 0.050458
+    },
+    "middle": {
+      "mdi": 7.852193,
+      "aei_text": 2.672523,
+      "aei_vision": 0.340354,
+      "text_ratio": 0.887034,
+      "vision_ratio": 0.112966
+    },
+    "late": {
+      "mdi": 17.22497,
+      "aei_text": 3.081842,
+      "aei_vision": 0.178917,
+      "text_ratio": 0.94513,
+      "vision_ratio": 0.05487
+    },
+    "all": {
+      "mdi": 17.22497,
+      "aei_text": 2.956686,
+      "aei_vision": 0.228279,
+      "text_ratio": 0.94513,
+      "vision_ratio": 0.05487
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.94513,
+      0.05487
+    ],
+    "text_vision_ratio": "0.945130:0.054870"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.130991,
+      "aei_text": 3.028073,
+      "aei_vision": 0.200124,
+      "text_ratio": 0.938008,
+      "vision_ratio": 0.061992
+    },
+    "middle": {
+      "mdi": 7.358441,
+      "aei_text": 2.629457,
+      "aei_vision": 0.357339,
+      "text_ratio": 0.88036,
+      "vision_ratio": 0.11964
+    },
+    "late": {
+      "mdi": 17.438857,
+      "aei_text": 3.0867,
+      "aei_vision": 0.177001,
+      "text_ratio": 0.945767,
+      "vision_ratio": 0.054233
+    },
+    "all": {
+      "mdi": 17.438857,
+      "aei_text": 2.914743,
+      "aei_vision": 0.244821,
+      "text_ratio": 0.945767,
+      "vision_ratio": 0.054233
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945767,
+      0.054233
+    ],
+    "text_vision_ratio": "0.945767:0.054233"
+  }
+}
+```
+
+
+## === Rollout Step 459 ===
+Step: 458/29790 | 2025-10-22 12:32:54
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.177 | 8.820 | 25.194 | 25.194 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.176593,
+      "aei_text": 2.94697,
+      "aei_vision": 0.242019,
+      "text_ratio": 0.924108,
+      "vision_ratio": 0.075892
+    },
+    "middle": {
+      "mdi": 8.819592,
+      "aei_text": 2.763719,
+      "aei_vision": 0.313361,
+      "text_ratio": 0.898163,
+      "vision_ratio": 0.101837
+    },
+    "late": {
+      "mdi": 25.194152,
+      "aei_text": 3.238456,
+      "aei_vision": 0.12854,
+      "text_ratio": 0.961824,
+      "vision_ratio": 0.038176
+    },
+    "all": {
+      "mdi": 25.194152,
+      "aei_text": 2.983048,
+      "aei_vision": 0.227974,
+      "text_ratio": 0.961824,
+      "vision_ratio": 0.038176
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961824,
+      0.038176
+    ],
+    "text_vision_ratio": "0.961824:0.038176"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.176593,
+      "aei_text": 2.94697,
+      "aei_vision": 0.242019,
+      "text_ratio": 0.924108,
+      "vision_ratio": 0.075892
+    },
+    "middle": {
+      "mdi": 8.819592,
+      "aei_text": 2.763719,
+      "aei_vision": 0.313361,
+      "text_ratio": 0.898163,
+      "vision_ratio": 0.101837
+    },
+    "late": {
+      "mdi": 25.194152,
+      "aei_text": 3.238456,
+      "aei_vision": 0.12854,
+      "text_ratio": 0.961824,
+      "vision_ratio": 0.038176
+    },
+    "all": {
+      "mdi": 25.194152,
+      "aei_text": 2.983048,
+      "aei_vision": 0.227974,
+      "text_ratio": 0.961824,
+      "vision_ratio": 0.038176
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961824,
+      0.038176
+    ],
+    "text_vision_ratio": "0.961824:0.038176"
+  }
+}
+```
+
+
+## === Rollout Step 460 ===
+Step: 459/29790 | 2025-10-22 12:32:58
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.936 | 9.057 | 20.410 | 20.410 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.936392,
+      "aei_text": 2.924535,
+      "aei_vision": 0.195799,
+      "text_ratio": 0.937251,
+      "vision_ratio": 0.062749
+    },
+    "middle": {
+      "mdi": 9.056923,
+      "aei_text": 2.683931,
+      "aei_vision": 0.29634,
+      "text_ratio": 0.900566,
+      "vision_ratio": 0.099434
+    },
+    "late": {
+      "mdi": 20.40995,
+      "aei_text": 3.037009,
+      "aei_vision": 0.1488,
+      "text_ratio": 0.953293,
+      "vision_ratio": 0.046707
+    },
+    "all": {
+      "mdi": 20.40995,
+      "aei_text": 2.881825,
+      "aei_vision": 0.213647,
+      "text_ratio": 0.953293,
+      "vision_ratio": 0.046707
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953293,
+      0.046707
+    ],
+    "text_vision_ratio": "0.953293:0.046707"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.936392,
+      "aei_text": 2.924535,
+      "aei_vision": 0.195799,
+      "text_ratio": 0.937251,
+      "vision_ratio": 0.062749
+    },
+    "middle": {
+      "mdi": 9.056923,
+      "aei_text": 2.683931,
+      "aei_vision": 0.29634,
+      "text_ratio": 0.900566,
+      "vision_ratio": 0.099434
+    },
+    "late": {
+      "mdi": 20.40995,
+      "aei_text": 3.037009,
+      "aei_vision": 0.1488,
+      "text_ratio": 0.953293,
+      "vision_ratio": 0.046707
+    },
+    "all": {
+      "mdi": 20.40995,
+      "aei_text": 2.881825,
+      "aei_vision": 0.213647,
+      "text_ratio": 0.953293,
+      "vision_ratio": 0.046707
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953293,
+      0.046707
+    ],
+    "text_vision_ratio": "0.953293:0.046707"
+  }
+}
+```
+
+
+## === Rollout Step 461 ===
+Step: 460/29790 | 2025-10-22 12:33:01
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 28.138 | 11.340 | 18.679 | 18.679 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.138056,
+      "aei_text": 3.160773,
+      "aei_vision": 0.112331,
+      "text_ratio": 0.965681,
+      "vision_ratio": 0.034319
+    },
+    "middle": {
+      "mdi": 11.340493,
+      "aei_text": 2.827331,
+      "aei_vision": 0.249313,
+      "text_ratio": 0.918966,
+      "vision_ratio": 0.081034
+    },
+    "late": {
+      "mdi": 18.679284,
+      "aei_text": 3.038275,
+      "aei_vision": 0.162655,
+      "text_ratio": 0.949185,
+      "vision_ratio": 0.050815
+    },
+    "all": {
+      "mdi": 18.679284,
+      "aei_text": 3.008793,
+      "aei_vision": 0.174766,
+      "text_ratio": 0.949185,
+      "vision_ratio": 0.050815
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949185,
+      0.050815
+    ],
+    "text_vision_ratio": "0.949185:0.050815"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.138056,
+      "aei_text": 3.160773,
+      "aei_vision": 0.112331,
+      "text_ratio": 0.965681,
+      "vision_ratio": 0.034319
+    },
+    "middle": {
+      "mdi": 11.340493,
+      "aei_text": 2.827331,
+      "aei_vision": 0.249313,
+      "text_ratio": 0.918966,
+      "vision_ratio": 0.081034
+    },
+    "late": {
+      "mdi": 18.679284,
+      "aei_text": 3.038275,
+      "aei_vision": 0.162655,
+      "text_ratio": 0.949185,
+      "vision_ratio": 0.050815
+    },
+    "all": {
+      "mdi": 18.679284,
+      "aei_text": 3.008793,
+      "aei_vision": 0.174766,
+      "text_ratio": 0.949185,
+      "vision_ratio": 0.050815
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.949185,
+      0.050815
+    ],
+    "text_vision_ratio": "0.949185:0.050815"
+  }
+}
+```
+
+
+## === Rollout Step 462 ===
+Step: 461/29790 | 2025-10-22 12:33:04
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.881 | 11.830 | 19.771 | 19.771 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.881337,
+      "aei_text": 2.937154,
+      "aei_vision": 0.184944,
+      "text_ratio": 0.940763,
+      "vision_ratio": 0.059237
+    },
+    "middle": {
+      "mdi": 11.829709,
+      "aei_text": 2.811794,
+      "aei_vision": 0.237689,
+      "text_ratio": 0.922056,
+      "vision_ratio": 0.077944
+    },
+    "late": {
+      "mdi": 19.770825,
+      "aei_text": 3.014348,
+      "aei_vision": 0.152464,
+      "text_ratio": 0.951856,
+      "vision_ratio": 0.048144
+    },
+    "all": {
+      "mdi": 19.770825,
+      "aei_text": 2.921099,
+      "aei_vision": 0.191699,
+      "text_ratio": 0.951856,
+      "vision_ratio": 0.048144
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951856,
+      0.048144
+    ],
+    "text_vision_ratio": "0.951856:0.048144"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.881337,
+      "aei_text": 2.937154,
+      "aei_vision": 0.184944,
+      "text_ratio": 0.940763,
+      "vision_ratio": 0.059237
+    },
+    "middle": {
+      "mdi": 11.829709,
+      "aei_text": 2.811794,
+      "aei_vision": 0.237689,
+      "text_ratio": 0.922056,
+      "vision_ratio": 0.077944
+    },
+    "late": {
+      "mdi": 19.770825,
+      "aei_text": 3.014348,
+      "aei_vision": 0.152464,
+      "text_ratio": 0.951856,
+      "vision_ratio": 0.048144
+    },
+    "all": {
+      "mdi": 19.770825,
+      "aei_text": 2.921099,
+      "aei_vision": 0.191699,
+      "text_ratio": 0.951856,
+      "vision_ratio": 0.048144
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951856,
+      0.048144
+    ],
+    "text_vision_ratio": "0.951856:0.048144"
+  }
+}
+```
+
+
+## === Rollout Step 463 ===
+Step: 462/29790 | 2025-10-22 12:33:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 27.593 | 13.241 | 20.564 | 20.564 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 486.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 486.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.593213,
+      "aei_text": 3.845382,
+      "aei_vision": 0.13936,
+      "text_ratio": 0.965027,
+      "vision_ratio": 0.034973
+    },
+    "middle": {
+      "mdi": 13.24141,
+      "aei_text": 3.445779,
+      "aei_vision": 0.260227,
+      "text_ratio": 0.929782,
+      "vision_ratio": 0.070218
+    },
+    "late": {
+      "mdi": 20.563732,
+      "aei_text": 3.709698,
+      "aei_vision": 0.1804,
+      "text_ratio": 0.953626,
+      "vision_ratio": 0.046374
+    },
+    "all": {
+      "mdi": 20.563732,
+      "aei_text": 3.666953,
+      "aei_vision": 0.193329,
+      "text_ratio": 0.953626,
+      "vision_ratio": 0.046374
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953626,
+      0.046374
+    ],
+    "text_vision_ratio": "0.953626:0.046374"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 486,
+    "text_tokens": 0,
+    "total_tokens": 486
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.593213,
+      "aei_text": 3.845382,
+      "aei_vision": 0.13936,
+      "text_ratio": 0.965027,
+      "vision_ratio": 0.034973
+    },
+    "middle": {
+      "mdi": 13.24141,
+      "aei_text": 3.445779,
+      "aei_vision": 0.260227,
+      "text_ratio": 0.929782,
+      "vision_ratio": 0.070218
+    },
+    "late": {
+      "mdi": 20.563732,
+      "aei_text": 3.709698,
+      "aei_vision": 0.1804,
+      "text_ratio": 0.953626,
+      "vision_ratio": 0.046374
+    },
+    "all": {
+      "mdi": 20.563732,
+      "aei_text": 3.666953,
+      "aei_vision": 0.193329,
+      "text_ratio": 0.953626,
+      "vision_ratio": 0.046374
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953626,
+      0.046374
+    ],
+    "text_vision_ratio": "0.953626:0.046374"
+  }
+}
+```
+
+
+## === Rollout Step 464 ===
+Step: 463/29790 | 2025-10-22 12:33:12
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.435 | 6.461 | 16.641 | 16.641 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.434871,
+      "aei_text": 2.574552,
+      "aei_vision": 0.246726,
+      "text_ratio": 0.912548,
+      "vision_ratio": 0.087452
+    },
+    "middle": {
+      "mdi": 6.461161,
+      "aei_text": 2.334903,
+      "aei_vision": 0.361375,
+      "text_ratio": 0.865973,
+      "vision_ratio": 0.134027
+    },
+    "late": {
+      "mdi": 16.641246,
+      "aei_text": 2.745429,
+      "aei_vision": 0.164977,
+      "text_ratio": 0.943315,
+      "vision_ratio": 0.056685
+    },
+    "all": {
+      "mdi": 16.641246,
+      "aei_text": 2.551628,
+      "aei_vision": 0.257693,
+      "text_ratio": 0.943315,
+      "vision_ratio": 0.056685
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943315,
+      0.056685
+    ],
+    "text_vision_ratio": "0.943315:0.056685"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.434871,
+      "aei_text": 2.574552,
+      "aei_vision": 0.246726,
+      "text_ratio": 0.912548,
+      "vision_ratio": 0.087452
+    },
+    "middle": {
+      "mdi": 6.461161,
+      "aei_text": 2.334903,
+      "aei_vision": 0.361375,
+      "text_ratio": 0.865973,
+      "vision_ratio": 0.134027
+    },
+    "late": {
+      "mdi": 16.641246,
+      "aei_text": 2.745429,
+      "aei_vision": 0.164977,
+      "text_ratio": 0.943315,
+      "vision_ratio": 0.056685
+    },
+    "all": {
+      "mdi": 16.641246,
+      "aei_text": 2.551628,
+      "aei_vision": 0.257693,
+      "text_ratio": 0.943315,
+      "vision_ratio": 0.056685
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943315,
+      0.056685
+    ],
+    "text_vision_ratio": "0.943315:0.056685"
+  }
+}
+```
+
+
+## === Rollout Step 465 ===
+Step: 464/29790 | 2025-10-22 12:33:15
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.984 | 10.938 | 16.563 | 16.563 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.983985,
+      "aei_text": 2.934894,
+      "aei_vision": 0.146862,
+      "text_ratio": 0.952345,
+      "vision_ratio": 0.047655
+    },
+    "middle": {
+      "mdi": 10.937973,
+      "aei_text": 2.706736,
+      "aei_vision": 0.247462,
+      "text_ratio": 0.916234,
+      "vision_ratio": 0.083766
+    },
+    "late": {
+      "mdi": 16.562638,
+      "aei_text": 2.874376,
+      "aei_vision": 0.173546,
+      "text_ratio": 0.943061,
+      "vision_ratio": 0.056939
+    },
+    "all": {
+      "mdi": 16.562638,
+      "aei_text": 2.838669,
+      "aei_vision": 0.18929,
+      "text_ratio": 0.943061,
+      "vision_ratio": 0.056939
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943061,
+      0.056939
+    ],
+    "text_vision_ratio": "0.943061:0.056939"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.983985,
+      "aei_text": 2.934894,
+      "aei_vision": 0.146862,
+      "text_ratio": 0.952345,
+      "vision_ratio": 0.047655
+    },
+    "middle": {
+      "mdi": 10.937973,
+      "aei_text": 2.706736,
+      "aei_vision": 0.247462,
+      "text_ratio": 0.916234,
+      "vision_ratio": 0.083766
+    },
+    "late": {
+      "mdi": 16.562638,
+      "aei_text": 2.874376,
+      "aei_vision": 0.173546,
+      "text_ratio": 0.943061,
+      "vision_ratio": 0.056939
+    },
+    "all": {
+      "mdi": 16.562638,
+      "aei_text": 2.838669,
+      "aei_vision": 0.18929,
+      "text_ratio": 0.943061,
+      "vision_ratio": 0.056939
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.943061,
+      0.056939
+    ],
+    "text_vision_ratio": "0.943061:0.056939"
+  }
+}
+```
+
+
+## === Rollout Step 466 ===
+Step: 465/29790 | 2025-10-22 12:33:19
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.547 | 11.677 | 16.448 | 16.448 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.547405,
+      "aei_text": 2.830373,
+      "aei_vision": 0.161299,
+      "text_ratio": 0.946084,
+      "vision_ratio": 0.053916
+    },
+    "middle": {
+      "mdi": 11.676821,
+      "aei_text": 2.681264,
+      "aei_vision": 0.229623,
+      "text_ratio": 0.921116,
+      "vision_ratio": 0.078884
+    },
+    "late": {
+      "mdi": 16.448446,
+      "aei_text": 2.809609,
+      "aei_vision": 0.170813,
+      "text_ratio": 0.942688,
+      "vision_ratio": 0.057312
+    },
+    "all": {
+      "mdi": 16.448446,
+      "aei_text": 2.773749,
+      "aei_vision": 0.187245,
+      "text_ratio": 0.942688,
+      "vision_ratio": 0.057312
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942688,
+      0.057312
+    ],
+    "text_vision_ratio": "0.942688:0.057312"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.547405,
+      "aei_text": 2.830373,
+      "aei_vision": 0.161299,
+      "text_ratio": 0.946084,
+      "vision_ratio": 0.053916
+    },
+    "middle": {
+      "mdi": 11.676821,
+      "aei_text": 2.681264,
+      "aei_vision": 0.229623,
+      "text_ratio": 0.921116,
+      "vision_ratio": 0.078884
+    },
+    "late": {
+      "mdi": 16.448446,
+      "aei_text": 2.809609,
+      "aei_vision": 0.170813,
+      "text_ratio": 0.942688,
+      "vision_ratio": 0.057312
+    },
+    "all": {
+      "mdi": 16.448446,
+      "aei_text": 2.773749,
+      "aei_vision": 0.187245,
+      "text_ratio": 0.942688,
+      "vision_ratio": 0.057312
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.942688,
+      0.057312
+    ],
+    "text_vision_ratio": "0.942688:0.057312"
+  }
+}
+```
+
+
+## === Rollout Step 467 ===
+Step: 466/29790 | 2025-10-22 12:33:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.226 | 22.018 | 20.836 | 20.836 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.225978,
+      "aei_text": 3.198752,
+      "aei_vision": 0.166377,
+      "text_ratio": 0.950559,
+      "vision_ratio": 0.049441
+    },
+    "middle": {
+      "mdi": 22.01792,
+      "aei_text": 3.248444,
+      "aei_vision": 0.147536,
+      "text_ratio": 0.956556,
+      "vision_ratio": 0.043444
+    },
+    "late": {
+      "mdi": 20.835856,
+      "aei_text": 3.228848,
+      "aei_vision": 0.154966,
+      "text_ratio": 0.954204,
+      "vision_ratio": 0.045796
+    },
+    "all": {
+      "mdi": 20.835856,
+      "aei_text": 3.225348,
+      "aei_vision": 0.156293,
+      "text_ratio": 0.954204,
+      "vision_ratio": 0.045796
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954204,
+      0.045796
+    ],
+    "text_vision_ratio": "0.954204:0.045796"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.225978,
+      "aei_text": 3.198752,
+      "aei_vision": 0.166377,
+      "text_ratio": 0.950559,
+      "vision_ratio": 0.049441
+    },
+    "middle": {
+      "mdi": 22.01792,
+      "aei_text": 3.248444,
+      "aei_vision": 0.147536,
+      "text_ratio": 0.956556,
+      "vision_ratio": 0.043444
+    },
+    "late": {
+      "mdi": 20.835856,
+      "aei_text": 3.228848,
+      "aei_vision": 0.154966,
+      "text_ratio": 0.954204,
+      "vision_ratio": 0.045796
+    },
+    "all": {
+      "mdi": 20.835856,
+      "aei_text": 3.225348,
+      "aei_vision": 0.156293,
+      "text_ratio": 0.954204,
+      "vision_ratio": 0.045796
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954204,
+      0.045796
+    ],
+    "text_vision_ratio": "0.954204:0.045796"
+  }
+}
+```
+
+
+## === Rollout Step 468 ===
+Step: 467/29790 | 2025-10-22 12:33:26
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.312 | 6.132 | 19.279 | 19.279 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.312254,
+      "aei_text": 2.9691,
+      "aei_vision": 0.171503,
+      "text_ratio": 0.945392,
+      "vision_ratio": 0.054608
+    },
+    "middle": {
+      "mdi": 6.13186,
+      "aei_text": 2.43349,
+      "aei_vision": 0.39686,
+      "text_ratio": 0.859784,
+      "vision_ratio": 0.140216
+    },
+    "late": {
+      "mdi": 19.279083,
+      "aei_text": 3.00612,
+      "aei_vision": 0.155927,
+      "text_ratio": 0.950688,
+      "vision_ratio": 0.049312
+    },
+    "all": {
+      "mdi": 19.279083,
+      "aei_text": 2.802903,
+      "aei_vision": 0.24143,
+      "text_ratio": 0.950688,
+      "vision_ratio": 0.049312
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950688,
+      0.049312
+    ],
+    "text_vision_ratio": "0.950688:0.049312"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.312254,
+      "aei_text": 2.9691,
+      "aei_vision": 0.171503,
+      "text_ratio": 0.945392,
+      "vision_ratio": 0.054608
+    },
+    "middle": {
+      "mdi": 6.13186,
+      "aei_text": 2.43349,
+      "aei_vision": 0.39686,
+      "text_ratio": 0.859784,
+      "vision_ratio": 0.140216
+    },
+    "late": {
+      "mdi": 19.279083,
+      "aei_text": 3.00612,
+      "aei_vision": 0.155927,
+      "text_ratio": 0.950688,
+      "vision_ratio": 0.049312
+    },
+    "all": {
+      "mdi": 19.279083,
+      "aei_text": 2.802903,
+      "aei_vision": 0.24143,
+      "text_ratio": 0.950688,
+      "vision_ratio": 0.049312
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.950688,
+      0.049312
+    ],
+    "text_vision_ratio": "0.950688:0.049312"
+  }
+}
+```
+
+
+## === Rollout Step 469 ===
+Step: 468/29790 | 2025-10-22 12:33:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.141 | 9.605 | 14.673 | 14.673 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.141192,
+      "aei_text": 2.707174,
+      "aei_vision": 0.266948,
+      "text_ratio": 0.910243,
+      "vision_ratio": 0.089757
+    },
+    "middle": {
+      "mdi": 9.605278,
+      "aei_text": 2.679257,
+      "aei_vision": 0.278936,
+      "text_ratio": 0.905707,
+      "vision_ratio": 0.094293
+    },
+    "late": {
+      "mdi": 14.672634,
+      "aei_text": 2.872873,
+      "aei_vision": 0.195798,
+      "text_ratio": 0.936195,
+      "vision_ratio": 0.063805
+    },
+    "all": {
+      "mdi": 14.672634,
+      "aei_text": 2.753101,
+      "aei_vision": 0.247227,
+      "text_ratio": 0.936195,
+      "vision_ratio": 0.063805
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.936195,
+      0.063805
+    ],
+    "text_vision_ratio": "0.936195:0.063805"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.141192,
+      "aei_text": 2.707174,
+      "aei_vision": 0.266948,
+      "text_ratio": 0.910243,
+      "vision_ratio": 0.089757
+    },
+    "middle": {
+      "mdi": 9.605278,
+      "aei_text": 2.679257,
+      "aei_vision": 0.278936,
+      "text_ratio": 0.905707,
+      "vision_ratio": 0.094293
+    },
+    "late": {
+      "mdi": 14.672634,
+      "aei_text": 2.872873,
+      "aei_vision": 0.195798,
+      "text_ratio": 0.936195,
+      "vision_ratio": 0.063805
+    },
+    "all": {
+      "mdi": 14.672634,
+      "aei_text": 2.753101,
+      "aei_vision": 0.247227,
+      "text_ratio": 0.936195,
+      "vision_ratio": 0.063805
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.936195,
+      0.063805
+    ],
+    "text_vision_ratio": "0.936195:0.063805"
+  }
+}
+```
+
+
+## === Rollout Step 470 ===
+Step: 469/29790 | 2025-10-22 12:33:33
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.142 | 6.204 | 15.158 | 15.158 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.141521,
+      "aei_text": 2.918591,
+      "aei_vision": 0.192754,
+      "text_ratio": 0.938048,
+      "vision_ratio": 0.061952
+    },
+    "middle": {
+      "mdi": 6.203836,
+      "aei_text": 2.441402,
+      "aei_vision": 0.393531,
+      "text_ratio": 0.861185,
+      "vision_ratio": 0.138815
+    },
+    "late": {
+      "mdi": 15.158204,
+      "aei_text": 2.919027,
+      "aei_vision": 0.192571,
+      "text_ratio": 0.938112,
+      "vision_ratio": 0.061888
+    },
+    "all": {
+      "mdi": 15.158204,
+      "aei_text": 2.759673,
+      "aei_vision": 0.259619,
+      "text_ratio": 0.938112,
+      "vision_ratio": 0.061888
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938112,
+      0.061888
+    ],
+    "text_vision_ratio": "0.938112:0.061888"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.141521,
+      "aei_text": 2.918591,
+      "aei_vision": 0.192754,
+      "text_ratio": 0.938048,
+      "vision_ratio": 0.061952
+    },
+    "middle": {
+      "mdi": 6.203836,
+      "aei_text": 2.441402,
+      "aei_vision": 0.393531,
+      "text_ratio": 0.861185,
+      "vision_ratio": 0.138815
+    },
+    "late": {
+      "mdi": 15.158204,
+      "aei_text": 2.919027,
+      "aei_vision": 0.192571,
+      "text_ratio": 0.938112,
+      "vision_ratio": 0.061888
+    },
+    "all": {
+      "mdi": 15.158204,
+      "aei_text": 2.759673,
+      "aei_vision": 0.259619,
+      "text_ratio": 0.938112,
+      "vision_ratio": 0.061888
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938112,
+      0.061888
+    ],
+    "text_vision_ratio": "0.938112:0.061888"
+  }
+}
+```
+
+
+## === Rollout Step 471 ===
+Step: 470/29790 | 2025-10-22 12:33:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.965 | 7.063 | 22.329 | 22.329 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 439.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 439.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 439,
+    "text_tokens": 0,
+    "total_tokens": 439
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.964854,
+      "aei_text": 3.309981,
+      "aei_vision": 0.237022,
+      "text_ratio": 0.933177,
+      "vision_ratio": 0.066823
+    },
+    "middle": {
+      "mdi": 7.063371,
+      "aei_text": 2.819191,
+      "aei_vision": 0.399128,
+      "text_ratio": 0.875982,
+      "vision_ratio": 0.124018
+    },
+    "late": {
+      "mdi": 22.329287,
+      "aei_text": 3.546696,
+      "aei_vision": 0.158836,
+      "text_ratio": 0.957135,
+      "vision_ratio": 0.042865
+    },
+    "all": {
+      "mdi": 22.329287,
+      "aei_text": 3.225289,
+      "aei_vision": 0.264996,
+      "text_ratio": 0.957135,
+      "vision_ratio": 0.042865
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957135,
+      0.042865
+    ],
+    "text_vision_ratio": "0.957135:0.042865"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 439,
+    "text_tokens": 0,
+    "total_tokens": 439
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.964854,
+      "aei_text": 3.309981,
+      "aei_vision": 0.237022,
+      "text_ratio": 0.933177,
+      "vision_ratio": 0.066823
+    },
+    "middle": {
+      "mdi": 7.063371,
+      "aei_text": 2.819191,
+      "aei_vision": 0.399128,
+      "text_ratio": 0.875982,
+      "vision_ratio": 0.124018
+    },
+    "late": {
+      "mdi": 22.329287,
+      "aei_text": 3.546696,
+      "aei_vision": 0.158836,
+      "text_ratio": 0.957135,
+      "vision_ratio": 0.042865
+    },
+    "all": {
+      "mdi": 22.329287,
+      "aei_text": 3.225289,
+      "aei_vision": 0.264996,
+      "text_ratio": 0.957135,
+      "vision_ratio": 0.042865
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.957135,
+      0.042865
+    ],
+    "text_vision_ratio": "0.957135:0.042865"
+  }
+}
+```
+
+
+## === Rollout Step 472 ===
+Step: 471/29790 | 2025-10-22 12:33:40
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.662 | 8.772 | 20.981 | 20.981 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.661564,
+      "aei_text": 3.042868,
+      "aei_vision": 0.194289,
+      "text_ratio": 0.939982,
+      "vision_ratio": 0.060018
+    },
+    "middle": {
+      "mdi": 8.771649,
+      "aei_text": 2.742696,
+      "aei_vision": 0.312677,
+      "text_ratio": 0.897663,
+      "vision_ratio": 0.102337
+    },
+    "late": {
+      "mdi": 20.981187,
+      "aei_text": 3.154301,
+      "aei_vision": 0.150339,
+      "text_ratio": 0.954507,
+      "vision_ratio": 0.045493
+    },
+    "all": {
+      "mdi": 20.981187,
+      "aei_text": 2.979955,
+      "aei_vision": 0.219102,
+      "text_ratio": 0.954507,
+      "vision_ratio": 0.045493
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954507,
+      0.045493
+    ],
+    "text_vision_ratio": "0.954507:0.045493"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.661564,
+      "aei_text": 3.042868,
+      "aei_vision": 0.194289,
+      "text_ratio": 0.939982,
+      "vision_ratio": 0.060018
+    },
+    "middle": {
+      "mdi": 8.771649,
+      "aei_text": 2.742696,
+      "aei_vision": 0.312677,
+      "text_ratio": 0.897663,
+      "vision_ratio": 0.102337
+    },
+    "late": {
+      "mdi": 20.981187,
+      "aei_text": 3.154301,
+      "aei_vision": 0.150339,
+      "text_ratio": 0.954507,
+      "vision_ratio": 0.045493
+    },
+    "all": {
+      "mdi": 20.981187,
+      "aei_text": 2.979955,
+      "aei_vision": 0.219102,
+      "text_ratio": 0.954507,
+      "vision_ratio": 0.045493
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954507,
+      0.045493
+    ],
+    "text_vision_ratio": "0.954507:0.045493"
+  }
+}
+```
+
+
+## === Rollout Step 473 ===
+Step: 472/29790 | 2025-10-22 12:33:44
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 28.103 | 21.294 | 30.290 | 30.290 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.102991,
+      "aei_text": 3.087046,
+      "aei_vision": 0.109848,
+      "text_ratio": 0.965639,
+      "vision_ratio": 0.034361
+    },
+    "middle": {
+      "mdi": 21.293514,
+      "aei_text": 3.012854,
+      "aei_vision": 0.141492,
+      "text_ratio": 0.955144,
+      "vision_ratio": 0.044856
+    },
+    "late": {
+      "mdi": 30.289578,
+      "aei_text": 3.104303,
+      "aei_vision": 0.102487,
+      "text_ratio": 0.96804,
+      "vision_ratio": 0.03196
+    },
+    "all": {
+      "mdi": 30.289578,
+      "aei_text": 3.068068,
+      "aei_vision": 0.117942,
+      "text_ratio": 0.96804,
+      "vision_ratio": 0.03196
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96804,
+      0.03196
+    ],
+    "text_vision_ratio": "0.968040:0.031960"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.102991,
+      "aei_text": 3.087046,
+      "aei_vision": 0.109848,
+      "text_ratio": 0.965639,
+      "vision_ratio": 0.034361
+    },
+    "middle": {
+      "mdi": 21.293514,
+      "aei_text": 3.012854,
+      "aei_vision": 0.141492,
+      "text_ratio": 0.955144,
+      "vision_ratio": 0.044856
+    },
+    "late": {
+      "mdi": 30.289578,
+      "aei_text": 3.104303,
+      "aei_vision": 0.102487,
+      "text_ratio": 0.96804,
+      "vision_ratio": 0.03196
+    },
+    "all": {
+      "mdi": 30.289578,
+      "aei_text": 3.068068,
+      "aei_vision": 0.117942,
+      "text_ratio": 0.96804,
+      "vision_ratio": 0.03196
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96804,
+      0.03196
+    ],
+    "text_vision_ratio": "0.968040:0.031960"
+  }
+}
+```
+
+
+## === Rollout Step 474 ===
+Step: 473/29790 | 2025-10-22 12:33:47
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.206 | 12.049 | 26.867 | 26.867 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.205935,
+      "aei_text": 2.854364,
+      "aei_vision": 0.187714,
+      "text_ratio": 0.938294,
+      "vision_ratio": 0.061706
+    },
+    "middle": {
+      "mdi": 12.049404,
+      "aei_text": 2.759985,
+      "aei_vision": 0.229056,
+      "text_ratio": 0.923368,
+      "vision_ratio": 0.076632
+    },
+    "late": {
+      "mdi": 26.866704,
+      "aei_text": 3.02579,
+      "aei_vision": 0.112622,
+      "text_ratio": 0.964115,
+      "vision_ratio": 0.035885
+    },
+    "all": {
+      "mdi": 26.866704,
+      "aei_text": 2.880046,
+      "aei_vision": 0.176464,
+      "text_ratio": 0.964115,
+      "vision_ratio": 0.035885
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964115,
+      0.035885
+    ],
+    "text_vision_ratio": "0.964115:0.035885"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.205935,
+      "aei_text": 2.854364,
+      "aei_vision": 0.187714,
+      "text_ratio": 0.938294,
+      "vision_ratio": 0.061706
+    },
+    "middle": {
+      "mdi": 12.049404,
+      "aei_text": 2.759985,
+      "aei_vision": 0.229056,
+      "text_ratio": 0.923368,
+      "vision_ratio": 0.076632
+    },
+    "late": {
+      "mdi": 26.866704,
+      "aei_text": 3.02579,
+      "aei_vision": 0.112622,
+      "text_ratio": 0.964115,
+      "vision_ratio": 0.035885
+    },
+    "all": {
+      "mdi": 26.866704,
+      "aei_text": 2.880046,
+      "aei_vision": 0.176464,
+      "text_ratio": 0.964115,
+      "vision_ratio": 0.035885
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.964115,
+      0.035885
+    ],
+    "text_vision_ratio": "0.964115:0.035885"
+  }
+}
+```
+
+
+## === Rollout Step 475 ===
+Step: 474/29790 | 2025-10-22 12:33:50
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.535 | 5.828 | 19.477 | 19.477 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.53455,
+      "aei_text": 2.849143,
+      "aei_vision": 0.227303,
+      "text_ratio": 0.926115,
+      "vision_ratio": 0.073885
+    },
+    "middle": {
+      "mdi": 5.82805,
+      "aei_text": 2.405402,
+      "aei_vision": 0.412728,
+      "text_ratio": 0.853545,
+      "vision_ratio": 0.146455
+    },
+    "late": {
+      "mdi": 19.476682,
+      "aei_text": 3.021813,
+      "aei_vision": 0.15515,
+      "text_ratio": 0.951164,
+      "vision_ratio": 0.048836
+    },
+    "all": {
+      "mdi": 19.476682,
+      "aei_text": 2.758786,
+      "aei_vision": 0.265061,
+      "text_ratio": 0.951164,
+      "vision_ratio": 0.048836
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951164,
+      0.048836
+    ],
+    "text_vision_ratio": "0.951164:0.048836"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.53455,
+      "aei_text": 2.849143,
+      "aei_vision": 0.227303,
+      "text_ratio": 0.926115,
+      "vision_ratio": 0.073885
+    },
+    "middle": {
+      "mdi": 5.82805,
+      "aei_text": 2.405402,
+      "aei_vision": 0.412728,
+      "text_ratio": 0.853545,
+      "vision_ratio": 0.146455
+    },
+    "late": {
+      "mdi": 19.476682,
+      "aei_text": 3.021813,
+      "aei_vision": 0.15515,
+      "text_ratio": 0.951164,
+      "vision_ratio": 0.048836
+    },
+    "all": {
+      "mdi": 19.476682,
+      "aei_text": 2.758786,
+      "aei_vision": 0.265061,
+      "text_ratio": 0.951164,
+      "vision_ratio": 0.048836
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951164,
+      0.048836
+    ],
+    "text_vision_ratio": "0.951164:0.048836"
+  }
+}
+```
+
+
+## === Rollout Step 476 ===
+Step: 475/29790 | 2025-10-22 12:33:54
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 27.314 | 13.123 | 29.789 | 29.789 |
+| MDI Std | 0.777 | 0.068 | 0.404 | 0.404 |
+| Vision Tokens | 485.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 485.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 485,
+    "text_tokens": 0,
+    "total_tokens": 485
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 28.090834,
+      "aei_text": 3.882528,
+      "aei_vision": 0.138213,
+      "text_ratio": 0.965625,
+      "vision_ratio": 0.034375
+    },
+    "middle": {
+      "mdi": 13.054813,
+      "aei_text": 3.458668,
+      "aei_vision": 0.264934,
+      "text_ratio": 0.92885,
+      "vision_ratio": 0.07115
+    },
+    "late": {
+      "mdi": 30.193193,
+      "aei_text": 3.911507,
+      "aei_vision": 0.129549,
+      "text_ratio": 0.967942,
+      "vision_ratio": 0.032058
+    },
+    "all": {
+      "mdi": 30.193193,
+      "aei_text": 3.750901,
+      "aei_vision": 0.177566,
+      "text_ratio": 0.967942,
+      "vision_ratio": 0.032058
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.967942,
+      0.032058
+    ],
+    "text_vision_ratio": "0.967942:0.032058"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 485,
+    "text_tokens": 0,
+    "total_tokens": 485
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.53661,
+      "aei_text": 3.858482,
+      "aei_vision": 0.145402,
+      "text_ratio": 0.963685,
+      "vision_ratio": 0.036315
+    },
+    "middle": {
+      "mdi": 13.191719,
+      "aei_text": 3.466004,
+      "aei_vision": 0.262741,
+      "text_ratio": 0.929536,
+      "vision_ratio": 0.070464
+    },
+    "late": {
+      "mdi": 29.384538,
+      "aei_text": 3.900801,
+      "aei_vision": 0.13275,
+      "text_ratio": 0.967089,
+      "vision_ratio": 0.032911
+    },
+    "all": {
+      "mdi": 29.384538,
+      "aei_text": 3.741763,
+      "aei_vision": 0.180298,
+      "text_ratio": 0.967089,
+      "vision_ratio": 0.032911
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.967089,
+      0.032911
+    ],
+    "text_vision_ratio": "0.967089:0.032911"
+  }
+}
+```
+
+
+## === Rollout Step 477 ===
+Step: 476/29790 | 2025-10-22 12:33:58
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.723 | 6.579 | 20.161 | 20.161 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 301.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 301.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.723391,
+      "aei_text": 2.65575,
+      "aei_vision": 0.180376,
+      "text_ratio": 0.9364,
+      "vision_ratio": 0.0636
+    },
+    "middle": {
+      "mdi": 6.579051,
+      "aei_text": 2.310639,
+      "aei_vision": 0.351212,
+      "text_ratio": 0.868057,
+      "vision_ratio": 0.131943
+    },
+    "late": {
+      "mdi": 20.160965,
+      "aei_text": 2.745077,
+      "aei_vision": 0.136158,
+      "text_ratio": 0.952743,
+      "vision_ratio": 0.047257
+    },
+    "all": {
+      "mdi": 20.160965,
+      "aei_text": 2.570489,
+      "aei_vision": 0.222582,
+      "text_ratio": 0.952743,
+      "vision_ratio": 0.047257
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952743,
+      0.047257
+    ],
+    "text_vision_ratio": "0.952743:0.047257"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 301,
+    "text_tokens": 0,
+    "total_tokens": 301
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.723391,
+      "aei_text": 2.65575,
+      "aei_vision": 0.180376,
+      "text_ratio": 0.9364,
+      "vision_ratio": 0.0636
+    },
+    "middle": {
+      "mdi": 6.579051,
+      "aei_text": 2.310639,
+      "aei_vision": 0.351212,
+      "text_ratio": 0.868057,
+      "vision_ratio": 0.131943
+    },
+    "late": {
+      "mdi": 20.160965,
+      "aei_text": 2.745077,
+      "aei_vision": 0.136158,
+      "text_ratio": 0.952743,
+      "vision_ratio": 0.047257
+    },
+    "all": {
+      "mdi": 20.160965,
+      "aei_text": 2.570489,
+      "aei_vision": 0.222582,
+      "text_ratio": 0.952743,
+      "vision_ratio": 0.047257
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952743,
+      0.047257
+    ],
+    "text_vision_ratio": "0.952743:0.047257"
+  }
+}
+```
+
+
+## === Rollout Step 478 ===
+Step: 477/29790 | 2025-10-22 12:34:01
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.979 | 13.360 | 13.875 | 13.875 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 218.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 218.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.978818,
+      "aei_text": 2.179029,
+      "aei_vision": 0.145474,
+      "text_ratio": 0.937417,
+      "vision_ratio": 0.062583
+    },
+    "middle": {
+      "mdi": 13.359737,
+      "aei_text": 2.156981,
+      "aei_vision": 0.161454,
+      "text_ratio": 0.930361,
+      "vision_ratio": 0.069639
+    },
+    "late": {
+      "mdi": 13.875422,
+      "aei_text": 2.164512,
+      "aei_vision": 0.155996,
+      "text_ratio": 0.932775,
+      "vision_ratio": 0.067225
+    },
+    "all": {
+      "mdi": 13.875422,
+      "aei_text": 2.166841,
+      "aei_vision": 0.154308,
+      "text_ratio": 0.932775,
+      "vision_ratio": 0.067225
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.932775,
+      0.067225
+    ],
+    "text_vision_ratio": "0.932775:0.067225"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 218,
+    "text_tokens": 0,
+    "total_tokens": 218
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.978818,
+      "aei_text": 2.179029,
+      "aei_vision": 0.145474,
+      "text_ratio": 0.937417,
+      "vision_ratio": 0.062583
+    },
+    "middle": {
+      "mdi": 13.359737,
+      "aei_text": 2.156981,
+      "aei_vision": 0.161454,
+      "text_ratio": 0.930361,
+      "vision_ratio": 0.069639
+    },
+    "late": {
+      "mdi": 13.875422,
+      "aei_text": 2.164512,
+      "aei_vision": 0.155996,
+      "text_ratio": 0.932775,
+      "vision_ratio": 0.067225
+    },
+    "all": {
+      "mdi": 13.875422,
+      "aei_text": 2.166841,
+      "aei_vision": 0.154308,
+      "text_ratio": 0.932775,
+      "vision_ratio": 0.067225
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.932775,
+      0.067225
+    ],
+    "text_vision_ratio": "0.932775:0.067225"
+  }
+}
+```
+
+
+## === Rollout Step 479 ===
+Step: 478/29790 | 2025-10-22 12:34:04
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.518 | 10.589 | 16.015 | 16.015 |
+| MDI Std | 6.680 | 2.680 | 7.044 | 7.044 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 8.838474,
+      "aei_text": 2.783111,
+      "aei_vision": 0.314886,
+      "text_ratio": 0.898358,
+      "vision_ratio": 0.101642
+    },
+    "middle": {
+      "mdi": 7.908933,
+      "aei_text": 2.710639,
+      "aei_vision": 0.342731,
+      "text_ratio": 0.887753,
+      "vision_ratio": 0.112247
+    },
+    "late": {
+      "mdi": 8.97151,
+      "aei_text": 2.792531,
+      "aei_vision": 0.311267,
+      "text_ratio": 0.899714,
+      "vision_ratio": 0.100286
+    },
+    "all": {
+      "mdi": 8.97151,
+      "aei_text": 2.762094,
+      "aei_vision": 0.322961,
+      "text_ratio": 0.899714,
+      "vision_ratio": 0.100286
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.899714,
+      0.100286
+    ],
+    "text_vision_ratio": "0.899714:0.100286"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.197943,
+      "aei_text": 3.224576,
+      "aei_vision": 0.145265,
+      "text_ratio": 0.956893,
+      "vision_ratio": 0.043107
+    },
+    "middle": {
+      "mdi": 13.26813,
+      "aei_text": 3.011851,
+      "aei_vision": 0.226999,
+      "text_ratio": 0.929914,
+      "vision_ratio": 0.070086
+    },
+    "late": {
+      "mdi": 23.059436,
+      "aei_text": 3.237268,
+      "aei_vision": 0.140388,
+      "text_ratio": 0.958436,
+      "vision_ratio": 0.041564
+    },
+    "all": {
+      "mdi": 23.059436,
+      "aei_text": 3.157898,
+      "aei_vision": 0.170884,
+      "text_ratio": 0.958436,
+      "vision_ratio": 0.041564
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.958436,
+      0.041564
+    ],
+    "text_vision_ratio": "0.958436:0.041564"
+  }
+}
+```
+
+
+## === Rollout Step 480 ===
+Step: 479/29790 | 2025-10-22 12:34:08
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 26.079 | 22.279 | 20.752 | 20.752 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.078691,
+      "aei_text": 2.970954,
+      "aei_vision": 0.113923,
+      "text_ratio": 0.963071,
+      "vision_ratio": 0.036929
+    },
+    "middle": {
+      "mdi": 22.27853,
+      "aei_text": 2.931653,
+      "aei_vision": 0.131591,
+      "text_ratio": 0.957042,
+      "vision_ratio": 0.042958
+    },
+    "late": {
+      "mdi": 20.752396,
+      "aei_text": 2.912212,
+      "aei_vision": 0.140331,
+      "text_ratio": 0.954028,
+      "vision_ratio": 0.045972
+    },
+    "all": {
+      "mdi": 20.752396,
+      "aei_text": 2.938273,
+      "aei_vision": 0.128615,
+      "text_ratio": 0.954028,
+      "vision_ratio": 0.045972
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954028,
+      0.045972
+    ],
+    "text_vision_ratio": "0.954028:0.045972"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 26.078691,
+      "aei_text": 2.970954,
+      "aei_vision": 0.113923,
+      "text_ratio": 0.963071,
+      "vision_ratio": 0.036929
+    },
+    "middle": {
+      "mdi": 22.27853,
+      "aei_text": 2.931653,
+      "aei_vision": 0.131591,
+      "text_ratio": 0.957042,
+      "vision_ratio": 0.042958
+    },
+    "late": {
+      "mdi": 20.752396,
+      "aei_text": 2.912212,
+      "aei_vision": 0.140331,
+      "text_ratio": 0.954028,
+      "vision_ratio": 0.045972
+    },
+    "all": {
+      "mdi": 20.752396,
+      "aei_text": 2.938273,
+      "aei_vision": 0.128615,
+      "text_ratio": 0.954028,
+      "vision_ratio": 0.045972
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954028,
+      0.045972
+    ],
+    "text_vision_ratio": "0.954028:0.045972"
+  }
+}
+```
+
+
+## === Rollout Step 481 ===
+Step: 480/29790 | 2025-10-22 12:34:11
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.333 | 10.688 | 16.139 | 16.139 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.332533,
+      "aei_text": 2.946075,
+      "aei_vision": 0.169974,
+      "text_ratio": 0.945452,
+      "vision_ratio": 0.054548
+    },
+    "middle": {
+      "mdi": 10.688234,
+      "aei_text": 2.742905,
+      "aei_vision": 0.256628,
+      "text_ratio": 0.914444,
+      "vision_ratio": 0.085556
+    },
+    "late": {
+      "mdi": 16.139461,
+      "aei_text": 2.920352,
+      "aei_vision": 0.180945,
+      "text_ratio": 0.941655,
+      "vision_ratio": 0.058345
+    },
+    "all": {
+      "mdi": 16.139461,
+      "aei_text": 2.869777,
+      "aei_vision": 0.202516,
+      "text_ratio": 0.941655,
+      "vision_ratio": 0.058345
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941655,
+      0.058345
+    ],
+    "text_vision_ratio": "0.941655:0.058345"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.332533,
+      "aei_text": 2.946075,
+      "aei_vision": 0.169974,
+      "text_ratio": 0.945452,
+      "vision_ratio": 0.054548
+    },
+    "middle": {
+      "mdi": 10.688234,
+      "aei_text": 2.742905,
+      "aei_vision": 0.256628,
+      "text_ratio": 0.914444,
+      "vision_ratio": 0.085556
+    },
+    "late": {
+      "mdi": 16.139461,
+      "aei_text": 2.920352,
+      "aei_vision": 0.180945,
+      "text_ratio": 0.941655,
+      "vision_ratio": 0.058345
+    },
+    "all": {
+      "mdi": 16.139461,
+      "aei_text": 2.869777,
+      "aei_vision": 0.202516,
+      "text_ratio": 0.941655,
+      "vision_ratio": 0.058345
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.941655,
+      0.058345
+    ],
+    "text_vision_ratio": "0.941655:0.058345"
+  }
+}
+```
+
+
+## === Rollout Step 482 ===
+Step: 481/29790 | 2025-10-22 12:34:14
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.560 | 8.632 | 17.309 | 17.309 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.559848,
+      "aei_text": 3.072178,
+      "aei_vision": 0.165528,
+      "text_ratio": 0.948875,
+      "vision_ratio": 0.051125
+    },
+    "middle": {
+      "mdi": 8.631875,
+      "aei_text": 2.705036,
+      "aei_vision": 0.313378,
+      "text_ratio": 0.896178,
+      "vision_ratio": 0.103822
+    },
+    "late": {
+      "mdi": 17.308942,
+      "aei_text": 3.046199,
+      "aei_vision": 0.17599,
+      "text_ratio": 0.945382,
+      "vision_ratio": 0.054618
+    },
+    "all": {
+      "mdi": 17.308942,
+      "aei_text": 2.941138,
+      "aei_vision": 0.218299,
+      "text_ratio": 0.945382,
+      "vision_ratio": 0.054618
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945382,
+      0.054618
+    ],
+    "text_vision_ratio": "0.945382:0.054618"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.559848,
+      "aei_text": 3.072178,
+      "aei_vision": 0.165528,
+      "text_ratio": 0.948875,
+      "vision_ratio": 0.051125
+    },
+    "middle": {
+      "mdi": 8.631875,
+      "aei_text": 2.705036,
+      "aei_vision": 0.313378,
+      "text_ratio": 0.896178,
+      "vision_ratio": 0.103822
+    },
+    "late": {
+      "mdi": 17.308942,
+      "aei_text": 3.046199,
+      "aei_vision": 0.17599,
+      "text_ratio": 0.945382,
+      "vision_ratio": 0.054618
+    },
+    "all": {
+      "mdi": 17.308942,
+      "aei_text": 2.941138,
+      "aei_vision": 0.218299,
+      "text_ratio": 0.945382,
+      "vision_ratio": 0.054618
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.945382,
+      0.054618
+    ],
+    "text_vision_ratio": "0.945382:0.054618"
+  }
+}
+```
+
+
+## === Rollout Step 483 ===
+Step: 482/29790 | 2025-10-22 12:34:18
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 13.900 | 9.910 | 20.771 | 20.771 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.900202,
+      "aei_text": 3.092849,
+      "aei_vision": 0.222504,
+      "text_ratio": 0.932887,
+      "vision_ratio": 0.067113
+    },
+    "middle": {
+      "mdi": 9.909739,
+      "aei_text": 2.903188,
+      "aei_vision": 0.292963,
+      "text_ratio": 0.908339,
+      "vision_ratio": 0.091661
+    },
+    "late": {
+      "mdi": 20.770768,
+      "aei_text": 3.268235,
+      "aei_vision": 0.157348,
+      "text_ratio": 0.954067,
+      "vision_ratio": 0.045933
+    },
+    "all": {
+      "mdi": 20.770768,
+      "aei_text": 3.088091,
+      "aei_vision": 0.224272,
+      "text_ratio": 0.954067,
+      "vision_ratio": 0.045933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954067,
+      0.045933
+    ],
+    "text_vision_ratio": "0.954067:0.045933"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 13.900202,
+      "aei_text": 3.092849,
+      "aei_vision": 0.222504,
+      "text_ratio": 0.932887,
+      "vision_ratio": 0.067113
+    },
+    "middle": {
+      "mdi": 9.909739,
+      "aei_text": 2.903188,
+      "aei_vision": 0.292963,
+      "text_ratio": 0.908339,
+      "vision_ratio": 0.091661
+    },
+    "late": {
+      "mdi": 20.770768,
+      "aei_text": 3.268235,
+      "aei_vision": 0.157348,
+      "text_ratio": 0.954067,
+      "vision_ratio": 0.045933
+    },
+    "all": {
+      "mdi": 20.770768,
+      "aei_text": 3.088091,
+      "aei_vision": 0.224272,
+      "text_ratio": 0.954067,
+      "vision_ratio": 0.045933
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954067,
+      0.045933
+    ],
+    "text_vision_ratio": "0.954067:0.045933"
+  }
+}
+```
+
+
+## === Rollout Step 484 ===
+Step: 483/29790 | 2025-10-22 12:34:22
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 12.600 | 6.268 | 19.662 | 19.662 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 416.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 416.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.599683,
+      "aei_text": 3.115735,
+      "aei_vision": 0.247287,
+      "text_ratio": 0.926469,
+      "vision_ratio": 0.073531
+    },
+    "middle": {
+      "mdi": 6.267909,
+      "aei_text": 2.630967,
+      "aei_vision": 0.419752,
+      "text_ratio": 0.862409,
+      "vision_ratio": 0.137591
+    },
+    "late": {
+      "mdi": 19.662396,
+      "aei_text": 3.334178,
+      "aei_vision": 0.169571,
+      "text_ratio": 0.951603,
+      "vision_ratio": 0.048397
+    },
+    "all": {
+      "mdi": 19.662396,
+      "aei_text": 3.02696,
+      "aei_vision": 0.27887,
+      "text_ratio": 0.951603,
+      "vision_ratio": 0.048397
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951603,
+      0.048397
+    ],
+    "text_vision_ratio": "0.951603:0.048397"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 416,
+    "text_tokens": 0,
+    "total_tokens": 416
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 12.599683,
+      "aei_text": 3.115735,
+      "aei_vision": 0.247287,
+      "text_ratio": 0.926469,
+      "vision_ratio": 0.073531
+    },
+    "middle": {
+      "mdi": 6.267909,
+      "aei_text": 2.630967,
+      "aei_vision": 0.419752,
+      "text_ratio": 0.862409,
+      "vision_ratio": 0.137591
+    },
+    "late": {
+      "mdi": 19.662396,
+      "aei_text": 3.334178,
+      "aei_vision": 0.169571,
+      "text_ratio": 0.951603,
+      "vision_ratio": 0.048397
+    },
+    "all": {
+      "mdi": 19.662396,
+      "aei_text": 3.02696,
+      "aei_vision": 0.27887,
+      "text_ratio": 0.951603,
+      "vision_ratio": 0.048397
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.951603,
+      0.048397
+    ],
+    "text_vision_ratio": "0.951603:0.048397"
+  }
+}
+```
+
+
+## === Rollout Step 485 ===
+Step: 484/29790 | 2025-10-22 12:34:25
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.982 | 7.171 | 23.925 | 23.925 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.982471,
+      "aei_text": 3.246767,
+      "aei_vision": 0.17104,
+      "text_ratio": 0.949956,
+      "vision_ratio": 0.050044
+    },
+    "middle": {
+      "mdi": 7.171457,
+      "aei_text": 2.692685,
+      "aei_vision": 0.375472,
+      "text_ratio": 0.877623,
+      "vision_ratio": 0.122377
+    },
+    "late": {
+      "mdi": 23.925375,
+      "aei_text": 3.332795,
+      "aei_vision": 0.1393,
+      "text_ratio": 0.95988,
+      "vision_ratio": 0.04012
+    },
+    "all": {
+      "mdi": 23.925375,
+      "aei_text": 3.090749,
+      "aei_vision": 0.228604,
+      "text_ratio": 0.95988,
+      "vision_ratio": 0.04012
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95988,
+      0.04012
+    ],
+    "text_vision_ratio": "0.959880:0.040120"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.982471,
+      "aei_text": 3.246767,
+      "aei_vision": 0.17104,
+      "text_ratio": 0.949956,
+      "vision_ratio": 0.050044
+    },
+    "middle": {
+      "mdi": 7.171457,
+      "aei_text": 2.692685,
+      "aei_vision": 0.375472,
+      "text_ratio": 0.877623,
+      "vision_ratio": 0.122377
+    },
+    "late": {
+      "mdi": 23.925375,
+      "aei_text": 3.332795,
+      "aei_vision": 0.1393,
+      "text_ratio": 0.95988,
+      "vision_ratio": 0.04012
+    },
+    "all": {
+      "mdi": 23.925375,
+      "aei_text": 3.090749,
+      "aei_vision": 0.228604,
+      "text_ratio": 0.95988,
+      "vision_ratio": 0.04012
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.95988,
+      0.04012
+    ],
+    "text_vision_ratio": "0.959880:0.040120"
+  }
+}
+```
+
+
+## === Rollout Step 486 ===
+Step: 485/29790 | 2025-10-22 12:34:29
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.584 | 13.301 | 20.983 | 20.983 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.583536,
+      "aei_text": 2.831017,
+      "aei_vision": 0.161004,
+      "text_ratio": 0.946189,
+      "vision_ratio": 0.053811
+    },
+    "middle": {
+      "mdi": 13.300844,
+      "aei_text": 2.733826,
+      "aei_vision": 0.205538,
+      "text_ratio": 0.930074,
+      "vision_ratio": 0.069926
+    },
+    "late": {
+      "mdi": 20.983108,
+      "aei_text": 2.882581,
+      "aei_vision": 0.137376,
+      "text_ratio": 0.954511,
+      "vision_ratio": 0.045489
+    },
+    "all": {
+      "mdi": 20.983108,
+      "aei_text": 2.815808,
+      "aei_vision": 0.167973,
+      "text_ratio": 0.954511,
+      "vision_ratio": 0.045489
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954511,
+      0.045489
+    ],
+    "text_vision_ratio": "0.954511:0.045489"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.583536,
+      "aei_text": 2.831017,
+      "aei_vision": 0.161004,
+      "text_ratio": 0.946189,
+      "vision_ratio": 0.053811
+    },
+    "middle": {
+      "mdi": 13.300844,
+      "aei_text": 2.733826,
+      "aei_vision": 0.205538,
+      "text_ratio": 0.930074,
+      "vision_ratio": 0.069926
+    },
+    "late": {
+      "mdi": 20.983108,
+      "aei_text": 2.882581,
+      "aei_vision": 0.137376,
+      "text_ratio": 0.954511,
+      "vision_ratio": 0.045489
+    },
+    "all": {
+      "mdi": 20.983108,
+      "aei_text": 2.815808,
+      "aei_vision": 0.167973,
+      "text_ratio": 0.954511,
+      "vision_ratio": 0.045489
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.954511,
+      0.045489
+    ],
+    "text_vision_ratio": "0.954511:0.045489"
+  }
+}
+```
+
+
+## === Rollout Step 487 ===
+Step: 486/29790 | 2025-10-22 12:34:32
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 18.528 | 12.354 | 22.129 | 22.129 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.528424,
+      "aei_text": 3.223479,
+      "aei_vision": 0.173975,
+      "text_ratio": 0.948793,
+      "vision_ratio": 0.051207
+    },
+    "middle": {
+      "mdi": 12.353651,
+      "aei_text": 3.031284,
+      "aei_vision": 0.245376,
+      "text_ratio": 0.925114,
+      "vision_ratio": 0.074886
+    },
+    "late": {
+      "mdi": 22.129485,
+      "aei_text": 3.29142,
+      "aei_vision": 0.148735,
+      "text_ratio": 0.956765,
+      "vision_ratio": 0.043235
+    },
+    "all": {
+      "mdi": 22.129485,
+      "aei_text": 3.182061,
+      "aei_vision": 0.189362,
+      "text_ratio": 0.956765,
+      "vision_ratio": 0.043235
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956765,
+      0.043235
+    ],
+    "text_vision_ratio": "0.956765:0.043235"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 18.528424,
+      "aei_text": 3.223479,
+      "aei_vision": 0.173975,
+      "text_ratio": 0.948793,
+      "vision_ratio": 0.051207
+    },
+    "middle": {
+      "mdi": 12.353651,
+      "aei_text": 3.031284,
+      "aei_vision": 0.245376,
+      "text_ratio": 0.925114,
+      "vision_ratio": 0.074886
+    },
+    "late": {
+      "mdi": 22.129485,
+      "aei_text": 3.29142,
+      "aei_vision": 0.148735,
+      "text_ratio": 0.956765,
+      "vision_ratio": 0.043235
+    },
+    "all": {
+      "mdi": 22.129485,
+      "aei_text": 3.182061,
+      "aei_vision": 0.189362,
+      "text_ratio": 0.956765,
+      "vision_ratio": 0.043235
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.956765,
+      0.043235
+    ],
+    "text_vision_ratio": "0.956765:0.043235"
+  }
+}
+```
+
+
+## === Rollout Step 488 ===
+Step: 487/29790 | 2025-10-22 12:34:36
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.039 | 16.937 | 24.739 | 24.739 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.03924,
+      "aei_text": 2.906082,
+      "aei_vision": 0.170552,
+      "text_ratio": 0.944565,
+      "vision_ratio": 0.055435
+    },
+    "middle": {
+      "mdi": 16.937073,
+      "aei_text": 2.904,
+      "aei_vision": 0.171458,
+      "text_ratio": 0.94425,
+      "vision_ratio": 0.05575
+    },
+    "late": {
+      "mdi": 24.739143,
+      "aei_text": 3.0177,
+      "aei_vision": 0.121981,
+      "text_ratio": 0.961149,
+      "vision_ratio": 0.038851
+    },
+    "all": {
+      "mdi": 24.739143,
+      "aei_text": 2.942594,
+      "aei_vision": 0.154664,
+      "text_ratio": 0.961149,
+      "vision_ratio": 0.038851
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961149,
+      0.038851
+    ],
+    "text_vision_ratio": "0.961149:0.038851"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.03924,
+      "aei_text": 2.906082,
+      "aei_vision": 0.170552,
+      "text_ratio": 0.944565,
+      "vision_ratio": 0.055435
+    },
+    "middle": {
+      "mdi": 16.937073,
+      "aei_text": 2.904,
+      "aei_vision": 0.171458,
+      "text_ratio": 0.94425,
+      "vision_ratio": 0.05575
+    },
+    "late": {
+      "mdi": 24.739143,
+      "aei_text": 3.0177,
+      "aei_vision": 0.121981,
+      "text_ratio": 0.961149,
+      "vision_ratio": 0.038851
+    },
+    "all": {
+      "mdi": 24.739143,
+      "aei_text": 2.942594,
+      "aei_vision": 0.154664,
+      "text_ratio": 0.961149,
+      "vision_ratio": 0.038851
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.961149,
+      0.038851
+    ],
+    "text_vision_ratio": "0.961149:0.038851"
+  }
+}
+```
+
+
+## === Rollout Step 489 ===
+Step: 488/29790 | 2025-10-22 12:34:39
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 22.225 | 10.392 | 18.217 | 18.217 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.225314,
+      "aei_text": 3.000975,
+      "aei_vision": 0.135025,
+      "text_ratio": 0.956944,
+      "vision_ratio": 0.043056
+    },
+    "middle": {
+      "mdi": 10.392477,
+      "aei_text": 2.710078,
+      "aei_vision": 0.260773,
+      "text_ratio": 0.912223,
+      "vision_ratio": 0.087777
+    },
+    "late": {
+      "mdi": 18.217435,
+      "aei_text": 2.939999,
+      "aei_vision": 0.161384,
+      "text_ratio": 0.947964,
+      "vision_ratio": 0.052036
+    },
+    "all": {
+      "mdi": 18.217435,
+      "aei_text": 2.883684,
+      "aei_vision": 0.185727,
+      "text_ratio": 0.947964,
+      "vision_ratio": 0.052036
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947964,
+      0.052036
+    ],
+    "text_vision_ratio": "0.947964:0.052036"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 22.225314,
+      "aei_text": 3.000975,
+      "aei_vision": 0.135025,
+      "text_ratio": 0.956944,
+      "vision_ratio": 0.043056
+    },
+    "middle": {
+      "mdi": 10.392477,
+      "aei_text": 2.710078,
+      "aei_vision": 0.260773,
+      "text_ratio": 0.912223,
+      "vision_ratio": 0.087777
+    },
+    "late": {
+      "mdi": 18.217435,
+      "aei_text": 2.939999,
+      "aei_vision": 0.161384,
+      "text_ratio": 0.947964,
+      "vision_ratio": 0.052036
+    },
+    "all": {
+      "mdi": 18.217435,
+      "aei_text": 2.883684,
+      "aei_vision": 0.185727,
+      "text_ratio": 0.947964,
+      "vision_ratio": 0.052036
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947964,
+      0.052036
+    ],
+    "text_vision_ratio": "0.947964:0.052036"
+  }
+}
+```
+
+
+## === Rollout Step 490 ===
+Step: 489/29790 | 2025-10-22 12:34:42
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.143 | 8.927 | 15.242 | 15.242 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 278.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 278.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 278,
+    "text_tokens": 0,
+    "total_tokens": 278
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.142634,
+      "aei_text": 2.381359,
+      "aei_vision": 0.234787,
+      "text_ratio": 0.910255,
+      "vision_ratio": 0.089745
+    },
+    "middle": {
+      "mdi": 8.926832,
+      "aei_text": 2.333343,
+      "aei_vision": 0.261385,
+      "text_ratio": 0.899263,
+      "vision_ratio": 0.100737
+    },
+    "late": {
+      "mdi": 15.24154,
+      "aei_text": 2.508134,
+      "aei_vision": 0.164559,
+      "text_ratio": 0.938429,
+      "vision_ratio": 0.061571
+    },
+    "all": {
+      "mdi": 15.24154,
+      "aei_text": 2.407612,
+      "aei_vision": 0.220244,
+      "text_ratio": 0.938429,
+      "vision_ratio": 0.061571
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938429,
+      0.061571
+    ],
+    "text_vision_ratio": "0.938429:0.061571"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 278,
+    "text_tokens": 0,
+    "total_tokens": 278
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.142634,
+      "aei_text": 2.381359,
+      "aei_vision": 0.234787,
+      "text_ratio": 0.910255,
+      "vision_ratio": 0.089745
+    },
+    "middle": {
+      "mdi": 8.926832,
+      "aei_text": 2.333343,
+      "aei_vision": 0.261385,
+      "text_ratio": 0.899263,
+      "vision_ratio": 0.100737
+    },
+    "late": {
+      "mdi": 15.24154,
+      "aei_text": 2.508134,
+      "aei_vision": 0.164559,
+      "text_ratio": 0.938429,
+      "vision_ratio": 0.061571
+    },
+    "all": {
+      "mdi": 15.24154,
+      "aei_text": 2.407612,
+      "aei_vision": 0.220244,
+      "text_ratio": 0.938429,
+      "vision_ratio": 0.061571
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.938429,
+      0.061571
+    ],
+    "text_vision_ratio": "0.938429:0.061571"
+  }
+}
+```
+
+
+## === Rollout Step 491 ===
+Step: 490/29790 | 2025-10-22 12:34:45
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 17.442 | 12.292 | 25.427 | 25.427 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.442093,
+      "aei_text": 2.891939,
+      "aei_vision": 0.165802,
+      "text_ratio": 0.945776,
+      "vision_ratio": 0.054224
+    },
+    "middle": {
+      "mdi": 12.291544,
+      "aei_text": 2.758913,
+      "aei_vision": 0.224456,
+      "text_ratio": 0.924764,
+      "vision_ratio": 0.075236
+    },
+    "late": {
+      "mdi": 25.427101,
+      "aei_text": 3.000357,
+      "aei_vision": 0.117998,
+      "text_ratio": 0.96216,
+      "vision_ratio": 0.03784
+    },
+    "all": {
+      "mdi": 25.427101,
+      "aei_text": 2.883736,
+      "aei_vision": 0.169419,
+      "text_ratio": 0.96216,
+      "vision_ratio": 0.03784
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96216,
+      0.03784
+    ],
+    "text_vision_ratio": "0.962160:0.037840"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 17.442093,
+      "aei_text": 2.891939,
+      "aei_vision": 0.165802,
+      "text_ratio": 0.945776,
+      "vision_ratio": 0.054224
+    },
+    "middle": {
+      "mdi": 12.291544,
+      "aei_text": 2.758913,
+      "aei_vision": 0.224456,
+      "text_ratio": 0.924764,
+      "vision_ratio": 0.075236
+    },
+    "late": {
+      "mdi": 25.427101,
+      "aei_text": 3.000357,
+      "aei_vision": 0.117998,
+      "text_ratio": 0.96216,
+      "vision_ratio": 0.03784
+    },
+    "all": {
+      "mdi": 25.427101,
+      "aei_text": 2.883736,
+      "aei_vision": 0.169419,
+      "text_ratio": 0.96216,
+      "vision_ratio": 0.03784
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96216,
+      0.03784
+    ],
+    "text_vision_ratio": "0.962160:0.037840"
+  }
+}
+```
+
+
+## === Rollout Step 492 ===
+Step: 491/29790 | 2025-10-22 12:34:49
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 29.318 | 16.413 | 26.005 | 26.005 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 324.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 324.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 324,
+    "text_tokens": 0,
+    "total_tokens": 324
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 29.31795,
+      "aei_text": 3.005423,
+      "aei_vision": 0.102511,
+      "text_ratio": 0.967016,
+      "vision_ratio": 0.032984
+    },
+    "middle": {
+      "mdi": 16.413017,
+      "aei_text": 2.846903,
+      "aei_vision": 0.173454,
+      "text_ratio": 0.942572,
+      "vision_ratio": 0.057428
+    },
+    "late": {
+      "mdi": 26.005131,
+      "aei_text": 2.978552,
+      "aei_vision": 0.114537,
+      "text_ratio": 0.96297,
+      "vision_ratio": 0.03703
+    },
+    "all": {
+      "mdi": 26.005131,
+      "aei_text": 2.943626,
+      "aei_vision": 0.130167,
+      "text_ratio": 0.96297,
+      "vision_ratio": 0.03703
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96297,
+      0.03703
+    ],
+    "text_vision_ratio": "0.962970:0.037030"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 324,
+    "text_tokens": 0,
+    "total_tokens": 324
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 29.31795,
+      "aei_text": 3.005423,
+      "aei_vision": 0.102511,
+      "text_ratio": 0.967016,
+      "vision_ratio": 0.032984
+    },
+    "middle": {
+      "mdi": 16.413017,
+      "aei_text": 2.846903,
+      "aei_vision": 0.173454,
+      "text_ratio": 0.942572,
+      "vision_ratio": 0.057428
+    },
+    "late": {
+      "mdi": 26.005131,
+      "aei_text": 2.978552,
+      "aei_vision": 0.114537,
+      "text_ratio": 0.96297,
+      "vision_ratio": 0.03703
+    },
+    "all": {
+      "mdi": 26.005131,
+      "aei_text": 2.943626,
+      "aei_vision": 0.130167,
+      "text_ratio": 0.96297,
+      "vision_ratio": 0.03703
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.96297,
+      0.03703
+    ],
+    "text_vision_ratio": "0.962970:0.037030"
+  }
+}
+```
+
+
+## === Rollout Step 493 ===
+Step: 492/29790 | 2025-10-22 12:34:52
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.067 | 8.512 | 20.629 | 20.629 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.067018,
+      "aei_text": 3.119882,
+      "aei_vision": 0.207067,
+      "text_ratio": 0.937761,
+      "vision_ratio": 0.062239
+    },
+    "middle": {
+      "mdi": 8.512425,
+      "aei_text": 2.795497,
+      "aei_vision": 0.328402,
+      "text_ratio": 0.894874,
+      "vision_ratio": 0.105126
+    },
+    "late": {
+      "mdi": 20.628549,
+      "aei_text": 3.252008,
+      "aei_vision": 0.157646,
+      "text_ratio": 0.953765,
+      "vision_ratio": 0.046235
+    },
+    "all": {
+      "mdi": 20.628549,
+      "aei_text": 3.055796,
+      "aei_vision": 0.231038,
+      "text_ratio": 0.953765,
+      "vision_ratio": 0.046235
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953765,
+      0.046235
+    ],
+    "text_vision_ratio": "0.953765:0.046235"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.067018,
+      "aei_text": 3.119882,
+      "aei_vision": 0.207067,
+      "text_ratio": 0.937761,
+      "vision_ratio": 0.062239
+    },
+    "middle": {
+      "mdi": 8.512425,
+      "aei_text": 2.795497,
+      "aei_vision": 0.328402,
+      "text_ratio": 0.894874,
+      "vision_ratio": 0.105126
+    },
+    "late": {
+      "mdi": 20.628549,
+      "aei_text": 3.252008,
+      "aei_vision": 0.157646,
+      "text_ratio": 0.953765,
+      "vision_ratio": 0.046235
+    },
+    "all": {
+      "mdi": 20.628549,
+      "aei_text": 3.055796,
+      "aei_vision": 0.231038,
+      "text_ratio": 0.953765,
+      "vision_ratio": 0.046235
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.953765,
+      0.046235
+    ],
+    "text_vision_ratio": "0.953765:0.046235"
+  }
+}
+```
+
+
+## === Rollout Step 494 ===
+Step: 493/29790 | 2025-10-22 12:34:56
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 15.151 | 7.384 | 18.226 | 18.226 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.150819,
+      "aei_text": 2.90754,
+      "aei_vision": 0.191906,
+      "text_ratio": 0.938084,
+      "vision_ratio": 0.061916
+    },
+    "middle": {
+      "mdi": 7.384005,
+      "aei_text": 2.546477,
+      "aei_vision": 0.344864,
+      "text_ratio": 0.880725,
+      "vision_ratio": 0.119275
+    },
+    "late": {
+      "mdi": 18.225921,
+      "aei_text": 2.975208,
+      "aei_vision": 0.16324,
+      "text_ratio": 0.947987,
+      "vision_ratio": 0.052013
+    },
+    "all": {
+      "mdi": 18.225921,
+      "aei_text": 2.809742,
+      "aei_vision": 0.233337,
+      "text_ratio": 0.947987,
+      "vision_ratio": 0.052013
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947987,
+      0.052013
+    ],
+    "text_vision_ratio": "0.947987:0.052013"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 15.150819,
+      "aei_text": 2.90754,
+      "aei_vision": 0.191906,
+      "text_ratio": 0.938084,
+      "vision_ratio": 0.061916
+    },
+    "middle": {
+      "mdi": 7.384005,
+      "aei_text": 2.546477,
+      "aei_vision": 0.344864,
+      "text_ratio": 0.880725,
+      "vision_ratio": 0.119275
+    },
+    "late": {
+      "mdi": 18.225921,
+      "aei_text": 2.975208,
+      "aei_vision": 0.16324,
+      "text_ratio": 0.947987,
+      "vision_ratio": 0.052013
+    },
+    "all": {
+      "mdi": 18.225921,
+      "aei_text": 2.809742,
+      "aei_vision": 0.233337,
+      "text_ratio": 0.947987,
+      "vision_ratio": 0.052013
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947987,
+      0.052013
+    ],
+    "text_vision_ratio": "0.947987:0.052013"
+  }
+}
+```
+
+
+## === Rollout Step 495 ===
+Step: 494/29790 | 2025-10-22 12:34:59
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 14.369 | 6.609 | 24.377 | 24.377 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.369401,
+      "aei_text": 3.10932,
+      "aei_vision": 0.216385,
+      "text_ratio": 0.934936,
+      "vision_ratio": 0.065064
+    },
+    "middle": {
+      "mdi": 6.609348,
+      "aei_text": 2.623366,
+      "aei_vision": 0.396918,
+      "text_ratio": 0.868583,
+      "vision_ratio": 0.131417
+    },
+    "late": {
+      "mdi": 24.377039,
+      "aei_text": 3.324662,
+      "aei_vision": 0.136385,
+      "text_ratio": 0.960594,
+      "vision_ratio": 0.039406
+    },
+    "all": {
+      "mdi": 24.377039,
+      "aei_text": 3.019116,
+      "aei_vision": 0.249896,
+      "text_ratio": 0.960594,
+      "vision_ratio": 0.039406
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960594,
+      0.039406
+    ],
+    "text_vision_ratio": "0.960594:0.039406"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 14.369401,
+      "aei_text": 3.10932,
+      "aei_vision": 0.216385,
+      "text_ratio": 0.934936,
+      "vision_ratio": 0.065064
+    },
+    "middle": {
+      "mdi": 6.609348,
+      "aei_text": 2.623366,
+      "aei_vision": 0.396918,
+      "text_ratio": 0.868583,
+      "vision_ratio": 0.131417
+    },
+    "late": {
+      "mdi": 24.377039,
+      "aei_text": 3.324662,
+      "aei_vision": 0.136385,
+      "text_ratio": 0.960594,
+      "vision_ratio": 0.039406
+    },
+    "all": {
+      "mdi": 24.377039,
+      "aei_text": 3.019116,
+      "aei_vision": 0.249896,
+      "text_ratio": 0.960594,
+      "vision_ratio": 0.039406
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.960594,
+      0.039406
+    ],
+    "text_vision_ratio": "0.960594:0.039406"
+  }
+}
+```
+
+
+## === Rollout Step 496 ===
+Step: 495/29790 | 2025-10-22 12:35:03
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 25.337 | 17.021 | 28.609 | 28.609 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 393.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 393.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.336893,
+      "aei_text": 3.240145,
+      "aei_vision": 0.127882,
+      "text_ratio": 0.96203,
+      "vision_ratio": 0.03797
+    },
+    "middle": {
+      "mdi": 17.021472,
+      "aei_text": 3.100714,
+      "aei_vision": 0.182165,
+      "text_ratio": 0.944511,
+      "vision_ratio": 0.055489
+    },
+    "late": {
+      "mdi": 28.609436,
+      "aei_text": 3.274623,
+      "aei_vision": 0.11446,
+      "text_ratio": 0.966227,
+      "vision_ratio": 0.033773
+    },
+    "all": {
+      "mdi": 28.609436,
+      "aei_text": 3.205161,
+      "aei_vision": 0.141502,
+      "text_ratio": 0.966227,
+      "vision_ratio": 0.033773
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.966227,
+      0.033773
+    ],
+    "text_vision_ratio": "0.966227:0.033773"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 393,
+    "text_tokens": 0,
+    "total_tokens": 393
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.336893,
+      "aei_text": 3.240145,
+      "aei_vision": 0.127882,
+      "text_ratio": 0.96203,
+      "vision_ratio": 0.03797
+    },
+    "middle": {
+      "mdi": 17.021472,
+      "aei_text": 3.100714,
+      "aei_vision": 0.182165,
+      "text_ratio": 0.944511,
+      "vision_ratio": 0.055489
+    },
+    "late": {
+      "mdi": 28.609436,
+      "aei_text": 3.274623,
+      "aei_vision": 0.11446,
+      "text_ratio": 0.966227,
+      "vision_ratio": 0.033773
+    },
+    "all": {
+      "mdi": 28.609436,
+      "aei_text": 3.205161,
+      "aei_vision": 0.141502,
+      "text_ratio": 0.966227,
+      "vision_ratio": 0.033773
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.966227,
+      0.033773
+    ],
+    "text_vision_ratio": "0.966227:0.033773"
+  }
+}
+```
+
+
+## === Rollout Step 497 ===
+Step: 496/29790 | 2025-10-22 12:35:07
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 19.545 | 11.661 | 26.257 | 26.257 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 531.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 531.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.545011,
+      "aei_text": 3.892792,
+      "aei_vision": 0.199171,
+      "text_ratio": 0.951326,
+      "vision_ratio": 0.048674
+    },
+    "middle": {
+      "mdi": 11.66097,
+      "aei_text": 3.52141,
+      "aei_vision": 0.301983,
+      "text_ratio": 0.921017,
+      "vision_ratio": 0.078983
+    },
+    "late": {
+      "mdi": 26.256688,
+      "aei_text": 4.054456,
+      "aei_vision": 0.154416,
+      "text_ratio": 0.963312,
+      "vision_ratio": 0.036688
+    },
+    "all": {
+      "mdi": 26.256688,
+      "aei_text": 3.822886,
+      "aei_vision": 0.218523,
+      "text_ratio": 0.963312,
+      "vision_ratio": 0.036688
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.963312,
+      0.036688
+    ],
+    "text_vision_ratio": "0.963312:0.036688"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 531,
+    "text_tokens": 0,
+    "total_tokens": 531
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 19.545011,
+      "aei_text": 3.892792,
+      "aei_vision": 0.199171,
+      "text_ratio": 0.951326,
+      "vision_ratio": 0.048674
+    },
+    "middle": {
+      "mdi": 11.66097,
+      "aei_text": 3.52141,
+      "aei_vision": 0.301983,
+      "text_ratio": 0.921017,
+      "vision_ratio": 0.078983
+    },
+    "late": {
+      "mdi": 26.256688,
+      "aei_text": 4.054456,
+      "aei_vision": 0.154416,
+      "text_ratio": 0.963312,
+      "vision_ratio": 0.036688
+    },
+    "all": {
+      "mdi": 26.256688,
+      "aei_text": 3.822886,
+      "aei_vision": 0.218523,
+      "text_ratio": 0.963312,
+      "vision_ratio": 0.036688
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.963312,
+      0.036688
+    ],
+    "text_vision_ratio": "0.963312:0.036688"
+  }
+}
+```
+
+
+## === Rollout Step 498 ===
+Step: 497/29790 | 2025-10-22 12:35:10
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 10.237 | 6.777 | 17.972 | 17.972 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 347.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 347.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.237126,
+      "aei_text": 2.760036,
+      "aei_vision": 0.26961,
+      "text_ratio": 0.911009,
+      "vision_ratio": 0.088991
+    },
+    "middle": {
+      "mdi": 6.776606,
+      "aei_text": 2.515297,
+      "aei_vision": 0.371174,
+      "text_ratio": 0.871409,
+      "vision_ratio": 0.128591
+    },
+    "late": {
+      "mdi": 17.972302,
+      "aei_text": 3.006598,
+      "aei_vision": 0.167291,
+      "text_ratio": 0.947292,
+      "vision_ratio": 0.052708
+    },
+    "all": {
+      "mdi": 17.972302,
+      "aei_text": 2.760644,
+      "aei_vision": 0.269358,
+      "text_ratio": 0.947292,
+      "vision_ratio": 0.052708
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947292,
+      0.052708
+    ],
+    "text_vision_ratio": "0.947292:0.052708"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 347,
+    "text_tokens": 0,
+    "total_tokens": 347
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 10.237126,
+      "aei_text": 2.760036,
+      "aei_vision": 0.26961,
+      "text_ratio": 0.911009,
+      "vision_ratio": 0.088991
+    },
+    "middle": {
+      "mdi": 6.776606,
+      "aei_text": 2.515297,
+      "aei_vision": 0.371174,
+      "text_ratio": 0.871409,
+      "vision_ratio": 0.128591
+    },
+    "late": {
+      "mdi": 17.972302,
+      "aei_text": 3.006598,
+      "aei_vision": 0.167291,
+      "text_ratio": 0.947292,
+      "vision_ratio": 0.052708
+    },
+    "all": {
+      "mdi": 17.972302,
+      "aei_text": 2.760644,
+      "aei_vision": 0.269358,
+      "text_ratio": 0.947292,
+      "vision_ratio": 0.052708
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.947292,
+      0.052708
+    ],
+    "text_vision_ratio": "0.947292:0.052708"
+  }
+}
+```
+
+
+## === Rollout Step 499 ===
+Step: 498/29790 | 2025-10-22 12:35:14
+
+### Enhanced MDI Attention Diagnostics
+
+#### Overall Statistics
+
+| Metric | Early | Middle | Late | All |
+|--------|-------|--------|------|-----|
+| MDI Mean | 16.292 | 8.338 | 20.125 | 20.125 |
+| MDI Std | 0.000 | 0.000 | 0.000 | 0.000 |
+| Vision Tokens | 370.0 ± 0.0 |
+| Text Tokens | 0.0 ± 0.0 |
+| Total Tokens | 370.0 ± 0.0 |
+| Vision Ratio | 1.000 |
+| Text Ratio | 1.000 |
+
+#### Sample 1
+
+```json
+{
+  "sample": 1,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.291644,
+      "aei_text": 3.02252,
+      "aei_vision": 0.185526,
+      "text_ratio": 0.942169,
+      "vision_ratio": 0.057831
+    },
+    "middle": {
+      "mdi": 8.338227,
+      "aei_text": 2.683919,
+      "aei_vision": 0.321881,
+      "text_ratio": 0.892913,
+      "vision_ratio": 0.107087
+    },
+    "late": {
+      "mdi": 20.124825,
+      "aei_text": 3.100632,
+      "aei_vision": 0.15407,
+      "text_ratio": 0.952662,
+      "vision_ratio": 0.047338
+    },
+    "all": {
+      "mdi": 20.124825,
+      "aei_text": 2.93569,
+      "aei_vision": 0.220492,
+      "text_ratio": 0.952662,
+      "vision_ratio": 0.047338
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952662,
+      0.047338
+    ],
+    "text_vision_ratio": "0.952662:0.047338"
+  }
+}
+```
+
+#### Sample 2
+
+```json
+{
+  "sample": 2,
+  "token_counts": {
+    "vision_tokens": 370,
+    "text_tokens": 0,
+    "total_tokens": 370
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 16.291644,
+      "aei_text": 3.02252,
+      "aei_vision": 0.185526,
+      "text_ratio": 0.942169,
+      "vision_ratio": 0.057831
+    },
+    "middle": {
+      "mdi": 8.338227,
+      "aei_text": 2.683919,
+      "aei_vision": 0.321881,
+      "text_ratio": 0.892913,
+      "vision_ratio": 0.107087
+    },
+    "late": {
+      "mdi": 20.124825,
+      "aei_text": 3.100632,
+      "aei_vision": 0.15407,
+      "text_ratio": 0.952662,
+      "vision_ratio": 0.047338
+    },
+    "all": {
+      "mdi": 20.124825,
+      "aei_text": 2.93569,
+      "aei_vision": 0.220492,
+      "text_ratio": 0.952662,
+      "vision_ratio": 0.047338
+    }
+  },
+  "overall": {
+    "balance_score": 0.0,
+    "attention_distribution": [
+      0.952662,
+      0.047338
+    ],
+    "text_vision_ratio": "0.952662:0.047338"
+  }
+}
+```
+
