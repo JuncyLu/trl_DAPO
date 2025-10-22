@@ -9,9 +9,9 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
   --max_prompt_length 2048 \
   --max_completion_length 2048 \
   --dataset_path /home/lujunxi57/aokvqa_trl_data \
-  --per_device_train_batch_size 1 \
+  --per_device_train_batch_size 4 \
   --gradient_accumulation_steps 2 \
-  --num_generations 2 \
+  --num_generations 8 \
   --report_to tensorboard \
   --enable_detailed_logging
 
