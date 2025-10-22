@@ -673,11 +673,11 @@ class GRPOConfig(TrainingArguments):
         },
     )
     prompt_preview_chars: int = field(
-        default=100,
+        default=500,
         metadata={"help": "Number of prompt characters to include in rollout console/file previews."},
     )
     completion_preview_chars: int = field(
-        default=200,
+        default=2000,
         metadata={"help": "Number of completion characters to include in rollout console/file previews."},
     )
     colorize_output: bool = field(

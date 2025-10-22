@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional, Union
 
 import datasets
+import numpy as np
 import torch
 import torch.utils.data
 import transformers
@@ -1566,32 +1567,105 @@ class GRPOTrainer(BaseTrainer):
         
         for res in sample_results:
             if res is None:
-                results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
+                default_result = {
+                    "mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, 
+                    "attention_distribution": [0.5, 0.5],
+                    "num_vision_tokens": 0, "num_text_tokens": 0,
+                    "early_mdi": 1.0, "middle_mdi": 1.0, "late_mdi": 1.0,
+                    "early_aei_text": 0.0, "early_aei_vision": 0.0,
+                    "middle_aei_text": 0.0, "middle_aei_vision": 0.0,
+                    "late_aei_text": 0.0, "late_aei_vision": 0.0,
+                    "aei_text": 0.0, "aei_vision": 0.0,
+                    "early_text_ratio": 0.5, "early_vision_ratio": 0.5,
+                    "middle_text_ratio": 0.5, "middle_vision_ratio": 0.5,
+                    "late_text_ratio": 0.5, "late_vision_ratio": 0.5
+                }
+                results.append(default_result)
                 continue
                 
             segments = getattr(res, "segments", {}) if res is not None else {}
-            segment = segments.get("late") or segments.get("all") if isinstance(segments, dict) else None
             
-            if segment is None or not hasattr(segment, "mdi") or segment.mdi is None:
-                results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
-                continue
-                
-            mdi = float(segment.mdi)
+            # 获取token计数信息
+            num_vision_tokens = getattr(res, "num_vision_tokens", 0)
+            num_text_tokens = getattr(res, "num_text_tokens", 0)
             
-            if not (mdi > 0) or not (mdi < float("inf")):
-                results.append({"mdi": 1.0, "balance": 0.5, "text_ratio": 0.5, "vision_ratio": 0.5, "attention_distribution": [0.5, 0.5]})
-                continue
+            # 处理各个阶段的metrics
+            def process_segment(segment_name):
+                segment = segments.get(segment_name)
+                if segment is None or not hasattr(segment, "mdi") or segment.mdi is None:
+                    return {
+                        "mdi": 1.0, "aei_text": 0.0, "aei_vision": 0.0,
+                        "text_ratio": 0.5, "vision_ratio": 0.5
+                    }
                 
+                mdi = float(segment.mdi)
+                if not (mdi > 0) or not (mdi < float("inf")):
+                    return {
+                        "mdi": 1.0, "aei_text": 0.0, "aei_vision": 0.0,
+                        "text_ratio": 0.5, "vision_ratio": 0.5
+                    }
+                
+                aei_text = float(getattr(segment, "aei_text", 0.0))
+                aei_vision = float(getattr(segment, "aei_vision", 0.0))
+                text_ratio = mdi / (1.0 + mdi)
+                vision_ratio = 1.0 / (1.0 + mdi)
+                
+                return {
+                    "mdi": round(float(mdi), 6),
+                    "aei_text": round(float(aei_text), 6),
+                    "aei_vision": round(float(aei_vision), 6),
+                    "text_ratio": round(float(text_ratio), 6),
+                    "vision_ratio": round(float(vision_ratio), 6)
+                }
+            
+            # 处理所有阶段
+            early_data = process_segment("early")
+            middle_data = process_segment("middle")
+            late_data = process_segment("late")
+            all_data = process_segment("all")
+            
+            # 使用late或all作为主要指标
+            main_segment = late_data if late_data["mdi"] != 1.0 else all_data
+            mdi = main_segment["mdi"]
+            
             balance = max(0.0, min(1.0, 1.0 - abs(math.log(mdi)) / logR))
             text_ratio = mdi / (1.0 + mdi)
             vision_ratio = 1.0 / (1.0 + mdi)
             
             result = {
+                # 主要指标
                 "mdi": round(float(mdi), 6),
                 "balance": round(float(balance), 6),
                 "text_ratio": round(float(text_ratio), 6),
                 "vision_ratio": round(float(vision_ratio), 6),
                 "attention_distribution": [round(float(text_ratio), 6), round(float(vision_ratio), 6)],
+                
+                # Token计数
+                "num_vision_tokens": int(num_vision_tokens),
+                "num_text_tokens": int(num_text_tokens),
+                
+                # 各阶段MDI
+                "early_mdi": early_data["mdi"],
+                "middle_mdi": middle_data["mdi"],
+                "late_mdi": late_data["mdi"],
+                
+                # 各阶段AEI
+                "early_aei_text": early_data["aei_text"],
+                "early_aei_vision": early_data["aei_vision"],
+                "middle_aei_text": middle_data["aei_text"],
+                "middle_aei_vision": middle_data["aei_vision"],
+                "late_aei_text": late_data["aei_text"],
+                "late_aei_vision": late_data["aei_vision"],
+                "aei_text": all_data["aei_text"],
+                "aei_vision": all_data["aei_vision"],
+                
+                # 各阶段比例
+                "early_text_ratio": early_data["text_ratio"],
+                "early_vision_ratio": early_data["vision_ratio"],
+                "middle_text_ratio": middle_data["text_ratio"],
+                "middle_vision_ratio": middle_data["vision_ratio"],
+                "late_text_ratio": late_data["text_ratio"],
+                "late_vision_ratio": late_data["vision_ratio"]
             }
             results.append(result)
             
@@ -1676,31 +1750,201 @@ class GRPOTrainer(BaseTrainer):
                 os.makedirs(os.path.dirname(self.args.rollout_log_path), exist_ok=True)
                 with open(self.args.rollout_log_path, "a", encoding="utf-8") as f:
                     f.write(f"\n## {header} | {ts}\n\n")
-                    for r in rows:
-                        f.write(f"### Sample {r[0]}\n\n")
+                    
+                    # 添加总体统计信息
+                    if rows:
+                        f.write("### Overall Statistics\n\n")
+                        f.write("| Metric | Value |\n")
+                        f.write("|--------|-------|\n")
+                        
+                        # 计算各种统计信息
+                        accuracy_scores = [r[4] for r in rows]
+                        format_scores = [r[5] for r in rows]
+                        mdi_scores = [r[6] for r in rows]
+                        total_scores = [r[7] for r in rows]
+                        
+                        f.write(f"| Accuracy Mean | {np.mean(accuracy_scores):.3f} ± {np.std(accuracy_scores):.3f} |\n")
+                        f.write(f"| Format Mean | {np.mean(format_scores):.3f} ± {np.std(format_scores):.3f} |\n")
+                        f.write(f"| MDI Mean | {np.mean(mdi_scores):.3f} ± {np.std(mdi_scores):.3f} |\n")
+                        f.write(f"| Total Reward Mean | {np.mean(total_scores):.3f} ± {np.std(total_scores):.3f} |\n")
+                        f.write(f"| Accuracy Rate | {np.mean([1 if s > 0 else 0 for s in accuracy_scores]):.3f} |\n")
+                        f.write(f"| Format Rate | {np.mean([1 if s > 0 else 0 for s in format_scores]):.3f} |\n")
+                        f.write(f"| Success Rate | {np.mean([1 if s > 0 else 0 for s in total_scores]):.3f} |\n\n")
+                        
+                        # 添加MDI统计信息
+                        if mdi_info:
+                            f.write("### MDI Statistics\n\n")
+                            f.write("| Stage | MDI Mean | MDI Std | AEI Text | AEI Vision |\n")
+                            f.write("|-------|----------|---------|----------|------------|\n")
+                            
+                            early_mdi = [info.get("early_mdi", 0) for info in mdi_info if info.get("early_mdi") is not None]
+                            middle_mdi = [info.get("middle_mdi", 0) for info in mdi_info if info.get("middle_mdi") is not None]
+                            late_mdi = [info.get("late_mdi", 0) for info in mdi_info if info.get("late_mdi") is not None]
+                            all_mdi = [info.get("mdi", 0) for info in mdi_info if info.get("mdi") is not None]
+                            
+                            early_aei_text = [info.get("early_aei_text", 0) for info in mdi_info]
+                            early_aei_vision = [info.get("early_aei_vision", 0) for info in mdi_info]
+                            middle_aei_text = [info.get("middle_aei_text", 0) for info in mdi_info]
+                            middle_aei_vision = [info.get("middle_aei_vision", 0) for info in mdi_info]
+                            late_aei_text = [info.get("late_aei_text", 0) for info in mdi_info]
+                            late_aei_vision = [info.get("late_aei_vision", 0) for info in mdi_info]
+                            all_aei_text = [info.get("aei_text", 0) for info in mdi_info]
+                            all_aei_vision = [info.get("aei_vision", 0) for info in mdi_info]
+                            
+                            f.write(f"| Early | {np.mean(early_mdi):.3f} | {np.std(early_mdi):.3f} | {np.mean(early_aei_text):.3f} | {np.mean(early_aei_vision):.3f} |\n")
+                            f.write(f"| Middle | {np.mean(middle_mdi):.3f} | {np.std(middle_mdi):.3f} | {np.mean(middle_aei_text):.3f} | {np.mean(middle_aei_vision):.3f} |\n")
+                            f.write(f"| Late | {np.mean(late_mdi):.3f} | {np.std(late_mdi):.3f} | {np.mean(late_aei_text):.3f} | {np.mean(late_aei_vision):.3f} |\n")
+                            f.write(f"| All | {np.mean(all_mdi):.3f} | {np.std(all_mdi):.3f} | {np.mean(all_aei_text):.3f} | {np.mean(all_aei_vision):.3f} |\n\n")
+                    
+                    # 详细的样本信息
+                    for i, (r, info) in enumerate(zip(rows, mdi_info), start=1):
+                        f.write(f"### Sample {i}\n\n")
                         f.write(f"**Prompt:** {r[1]}\n\n")
                         f.write(f"**Completion:** {r[2]}\n\n")
                         f.write(f"**Solution:** {r[3]}\n\n")
                         f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, mdi={r[6]:.3f}, total={r[7]:.3f}\n\n")
+                        
+                        # 添加详细的metrics信息
+                        if info:
+                            f.write("**Detailed Metrics:**\n\n")
+                            f.write("```json\n")
+                            detailed_metrics = {
+                                "rewards": {
+                                    "accuracy": float(r[4]),
+                                    "format": float(r[5]),
+                                    "mdi": float(r[6]),
+                                    "total": float(r[7])
+                                },
+                                "attention_metrics": {
+                                    "early": {
+                                        "mdi": info.get("early_mdi"),
+                                        "aei_text": info.get("early_aei_text"),
+                                        "aei_vision": info.get("early_aei_vision"),
+                                        "text_ratio": info.get("early_text_ratio"),
+                                        "vision_ratio": info.get("early_vision_ratio")
+                                    },
+                                    "middle": {
+                                        "mdi": info.get("middle_mdi"),
+                                        "aei_text": info.get("middle_aei_text"),
+                                        "aei_vision": info.get("middle_aei_vision"),
+                                        "text_ratio": info.get("middle_text_ratio"),
+                                        "vision_ratio": info.get("middle_vision_ratio")
+                                    },
+                                    "late": {
+                                        "mdi": info.get("late_mdi"),
+                                        "aei_text": info.get("late_aei_text"),
+                                        "aei_vision": info.get("late_aei_vision"),
+                                        "text_ratio": info.get("late_text_ratio"),
+                                        "vision_ratio": info.get("late_vision_ratio")
+                                    },
+                                    "all": {
+                                        "mdi": info.get("mdi"),
+                                        "aei_text": info.get("aei_text"),
+                                        "aei_vision": info.get("aei_vision"),
+                                        "text_ratio": info.get("text_ratio"),
+                                        "vision_ratio": info.get("vision_ratio")
+                                    }
+                                },
+                                "token_counts": {
+                                    "vision_tokens": info.get("num_vision_tokens", 0),
+                                    "text_tokens": info.get("num_text_tokens", 0),
+                                    "total_tokens": info.get("num_vision_tokens", 0) + info.get("num_text_tokens", 0)
+                                },
+                                "overall": {
+                                    "balance_score": info.get("balance"),
+                                    "attention_distribution": info.get("attention_distribution")
+                                }
+                            }
+                            f.write(json.dumps(detailed_metrics, ensure_ascii=False, indent=2))
+                            f.write("\n```\n\n")
+                        
                         f.write("---\n\n")
             if getattr(self.args, "attention_diag_log_path", None):
                 # 确保目录存在
                 os.makedirs(os.path.dirname(self.args.attention_diag_log_path), exist_ok=True)
                 with open(self.args.attention_diag_log_path, "a", encoding="utf-8") as f:
                     f.write(f"\n## {header} | {ts}\n\n")
-                    f.write("### MDI Attention Diagnostics\n\n")
+                    f.write("### Enhanced MDI Attention Diagnostics\n\n")
+                    
+                    # 添加总体统计信息
+                    if mdi_info:
+                        f.write("#### Overall Statistics\n\n")
+                        f.write("| Metric | Early | Middle | Late | All |\n")
+                        f.write("|--------|-------|--------|------|-----|\n")
+                        
+                        # 计算各阶段的统计信息
+                        early_mdi = [info.get("early_mdi", 0) for info in mdi_info if info.get("early_mdi") is not None]
+                        middle_mdi = [info.get("middle_mdi", 0) for info in mdi_info if info.get("middle_mdi") is not None]
+                        late_mdi = [info.get("late_mdi", 0) for info in mdi_info if info.get("late_mdi") is not None]
+                        all_mdi = [info.get("mdi", 0) for info in mdi_info if info.get("mdi") is not None]
+                        
+                        f.write(f"| MDI Mean | {np.mean(early_mdi):.3f} | {np.mean(middle_mdi):.3f} | {np.mean(late_mdi):.3f} | {np.mean(all_mdi):.3f} |\n")
+                        f.write(f"| MDI Std | {np.std(early_mdi):.3f} | {np.std(middle_mdi):.3f} | {np.std(late_mdi):.3f} | {np.std(all_mdi):.3f} |\n")
+                        
+                        # Vision/Text Token统计
+                        vision_tokens = [info.get("num_vision_tokens", 0) for info in mdi_info]
+                        text_tokens = [info.get("num_text_tokens", 0) for info in mdi_info]
+                        total_tokens = [v + t for v, t in zip(vision_tokens, text_tokens)]
+                        
+                        f.write(f"| Vision Tokens | {np.mean(vision_tokens):.1f} ± {np.std(vision_tokens):.1f} |\n")
+                        f.write(f"| Text Tokens | {np.mean(text_tokens):.1f} ± {np.std(text_tokens):.1f} |\n")
+                        f.write(f"| Total Tokens | {np.mean(total_tokens):.1f} ± {np.std(total_tokens):.1f} |\n")
+                        f.write(f"| Vision Ratio | {np.mean([v/t if t > 0 else 0 for v, t in zip(vision_tokens, total_tokens)]):.3f} |\n")
+                        f.write(f"| Text Ratio | {np.mean([t/v if v > 0 else 0 for v, t in zip(vision_tokens, total_tokens)]):.3f} |\n\n")
+                    
+                    # 详细的样本信息
                     for i, info in enumerate(mdi_info, start=1):
                         f.write(f"#### Sample {i}\n\n")
                         f.write(f"```json\n")
+                        
+                        # 构建完整的诊断信息
+                        sample_data = {
+                            "sample": i,
+                            "token_counts": {
+                                "vision_tokens": info.get("num_vision_tokens", 0),
+                                "text_tokens": info.get("num_text_tokens", 0),
+                                "total_tokens": info.get("num_vision_tokens", 0) + info.get("num_text_tokens", 0)
+                            },
+                            "attention_metrics": {
+                                "early": {
+                                    "mdi": info.get("early_mdi"),
+                                    "aei_text": info.get("early_aei_text"),
+                                    "aei_vision": info.get("early_aei_vision"),
+                                    "text_ratio": info.get("early_text_ratio"),
+                                    "vision_ratio": info.get("early_vision_ratio")
+                                },
+                                "middle": {
+                                    "mdi": info.get("middle_mdi"),
+                                    "aei_text": info.get("middle_aei_text"),
+                                    "aei_vision": info.get("middle_aei_vision"),
+                                    "text_ratio": info.get("middle_text_ratio"),
+                                    "vision_ratio": info.get("middle_vision_ratio")
+                                },
+                                "late": {
+                                    "mdi": info.get("late_mdi"),
+                                    "aei_text": info.get("late_aei_text"),
+                                    "aei_vision": info.get("late_aei_vision"),
+                                    "text_ratio": info.get("late_text_ratio"),
+                                    "vision_ratio": info.get("late_vision_ratio")
+                                },
+                                "all": {
+                                    "mdi": info.get("mdi"),
+                                    "aei_text": info.get("aei_text"),
+                                    "aei_vision": info.get("aei_vision"),
+                                    "text_ratio": info.get("text_ratio"),
+                                    "vision_ratio": info.get("vision_ratio")
+                                }
+                            },
+                            "overall": {
+                                "balance_score": info.get("balance"),
+                                "attention_distribution": info.get("attention_distribution"),
+                                "text_vision_ratio": f"{info.get('text_ratio', 0):.6f}:{info.get('vision_ratio', 0):.6f}"
+                            }
+                        }
+                        
                         f.write(
                             json.dumps(
-                                {
-                                    "sample": i,
-                                    "MDI Value": info.get("mdi"),
-                                    "Balance Score": info.get("balance"),
-                                    "Text-Vision Ratio": f"{info.get('text_ratio')}:{info.get('vision_ratio')}",
-                                    "Attention Distribution": info.get("attention_distribution"),
-                                },
+                                sample_data,
                                 ensure_ascii=False,
                                 indent=2
                             )

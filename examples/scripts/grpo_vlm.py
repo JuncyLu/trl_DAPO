@@ -136,6 +136,15 @@ class DataArguments:
             )
         },
     )
+    enable_detailed_logging: bool = field(
+        default=False,
+        metadata={
+            "help": (
+                "Enable detailed logging including rollout results, attention diagnostics, and terminal markdown. "
+                "When enabled, creates timestamped directories for organized log storage."
+            )
+        },
+    )
 
 
 def _parse_data_files_arg(s: str) -> Dict[str, Union[str, list[str]]]:
@@ -222,31 +231,34 @@ if __name__ == "__main__":
         default_logs_dir = os.path.join(os.getcwd(), "training_logs")
         os.makedirs(default_logs_dir, exist_ok=True)
 
-    # Configure rollout/attention diagnostics log paths if available on this TRL version
-    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    try:
-        # 强制启用实时rollout日志记录
-        if getattr(training_args, "realtime_rollout_logging", None) is None:
-            setattr(training_args, "realtime_rollout_logging", True)
+    # Configure detailed logging if enabled
+    if data_args.enable_detailed_logging:
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        logs_dir = os.path.join(default_logs_dir, ts)
+        os.makedirs(logs_dir, exist_ok=True)
         
-        # 设置rollout日志路径
-        if getattr(training_args, "rollout_log_path", None) in (None, ""):
-            training_args.rollout_log_path = os.path.join(default_logs_dir, f"rollout_results_{ts}.md")
-        
-        # 设置注意力诊断日志路径
-        if getattr(training_args, "attention_diag_log_path", None) in (None, ""):
-            training_args.attention_diag_log_path = os.path.join(default_logs_dir, f"attention_diagnostics_{ts}.md")
-        
-        # 启用彩色输出以支持美观的表格显示
-        if getattr(training_args, "colorize_output", None) is None:
-            setattr(training_args, "colorize_output", True)
+        try:
+            # 强制启用实时rollout日志记录
+            if getattr(training_args, "realtime_rollout_logging", None) is None:
+                setattr(training_args, "realtime_rollout_logging", True)
             
-        print(f"📝 Rollout log will be saved to: {training_args.rollout_log_path}")
-        print(f"🧠 Attention diagnostics will be saved to: {training_args.attention_diag_log_path}")
-    except Exception as e:
-        print(f"⚠️ Failed to configure logging paths: {e}")
-        # Older TRL versions may not expose these attributes; ignore silently
-        pass
+            # 设置所有日志路径
+            training_args.rollout_log_path = os.path.join(logs_dir, "rollout_results.md")
+            training_args.attention_diag_log_path = os.path.join(logs_dir, "attention_diagnostics.md")
+            data_args.terminal_markdown_log = os.path.join(logs_dir, "run_terminal.md")
+            
+            # 启用彩色输出以支持美观的表格显示
+            if getattr(training_args, "colorize_output", None) is None:
+                setattr(training_args, "colorize_output", True)
+                
+            print(f"📁 Training logs directory: {os.path.abspath(logs_dir)}")
+            print(f"📝 Rollout log will be saved to: {training_args.rollout_log_path}")
+            print(f"🧠 Attention diagnostics will be saved to: {training_args.attention_diag_log_path}")
+            print(f"📄 Terminal markdown log: {data_args.terminal_markdown_log}")
+        except Exception as e:
+            print(f"⚠️ Failed to configure detailed logging: {e}")
+            # Fallback to basic logging
+            pass
 
     # Pretty tee of terminal output into a Markdown file if requested
     if data_args.terminal_markdown_log:
