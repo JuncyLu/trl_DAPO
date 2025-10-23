@@ -28,7 +28,7 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --top_p 1.0 \
     --logging_steps 10 \
     --save_strategy steps \
-    --save_steps 10 \
+    --save_steps 30 \
     --eval_strategy steps \
     --eval_steps 10 \
     --report_to tensorboard \

@@ -17,8 +17,13 @@ import re
 
 def think_format_reward(completions: list[list[dict[str, str]]], **kwargs) -> list[float]:
     r"""
-    Reward function that checks if the reasoning process is enclosed within `"<think>"` and `"</think>"` tags. The
-    function returns a reward of 1.0 if the format is correct, otherwise 0.0.
+    Reward function that checks if the reasoning process is enclosed within exactly one pair of `<think>` and `</think>` tags.
+    The function returns a reward of 1.0 if the format is correct, otherwise 0.0.
+    
+    Strict constraints:
+    - Must contain exactly one pair of <think></think> tags
+    - No other XML-like tags allowed (e.g., <html>, <answer>, etc.)
+    - No nested or multiple <think> tags allowed
 
     Args:
         completions (`list[list[dict[str, str]]]`):
@@ -39,12 +44,29 @@ def think_format_reward(completions: list[list[dict[str, str]]], **kwargs) -> li
     >>> completions = [
     ...     [{"content": "<think>\nThis is my reasoning.\n</think>\nThis is my answer."}],
     ...     [{"content": "<think>\nThis is my reasoning.\nThis is my answer."}],
+    ...     [{"content": "<think><think>nested</think></think>"}],
+    ...     [{"content": "<html><think>reasoning</think></html>"}],
     ... ]
     >>> think_format_reward(completions)
-    [1.0, 0.0]
+    [1.0, 0.0, 0.0, 0.0]
     ```
     """
-    pattern = r"^<think>(?!.*<think>)(.*?)</think>.*$"
+    def check_format(content: str) -> bool:
+        # Check for exactly one pair of <think></think> tags
+        think_open_count = content.count('<think>')
+        think_close_count = content.count('</think>')
+        
+        if think_open_count != 1 or think_close_count != 1:
+            return False
+        
+        # Check for other XML-like tags (case insensitive)
+        other_tags_pattern = r'<(?!/?think>)[a-zA-Z][a-zA-Z0-9]*>'
+        if re.search(other_tags_pattern, content, re.IGNORECASE):
+            return False
+        
+        # Check for proper nesting - no nested <think> tags
+        pattern = r'^<think>(?!.*<think>)(.*?)</think>.*$'
+        return bool(re.match(pattern, content, re.DOTALL | re.MULTILINE))
+    
     completion_contents = [completion[0]["content"] for completion in completions]
-    matches = [re.match(pattern, content, re.DOTALL | re.MULTILINE) for content in completion_contents]
-    return [1.0 if match else 0.0 for match in matches]
+    return [1.0 if check_format(content) else 0.0 for content in completion_contents]

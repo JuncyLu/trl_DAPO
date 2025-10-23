@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import inspect
+import math
 import os
 import textwrap
 import json
@@ -1780,16 +1781,55 @@ class GRPOTrainer(BaseTrainer):
         # Prepare per-sample summary rows
         rows = []
         name_to_idx = {n: i for i, n in enumerate(reward_names)}
+        # Optional fallback component rewards exposed by a custom aggregator (local to this process)
+        last_component_rewards = getattr(self, "_last_component_rewards", None)
         for idx, (p, c, sol) in enumerate(zip(prompts_text, completions_text, solutions)):
             preview_p = self._truncate_text(p, self.args.prompt_preview_chars)
             preview_c = self._truncate_text(c, self.args.completion_preview_chars)
-            # prefer named accuracy_reward; fallback to mc_idx_reward if present
+            # 获取各个奖励组件的值
+            # 1) 优先从 rewards_per_func_local 中按名称索引
             acc_idx = name_to_idx.get("accuracy_reward")
             if acc_idx is None:
                 acc_idx = name_to_idx.get("mc_idx_reward")
-            acc = float(rewards_per_func_local[idx, acc_idx].item()) if rewards_per_func_local.numel() and acc_idx is not None else 0.0
-            fmt = float(rewards_per_func_local[idx, name_to_idx.get("think_format_reward", 0)].item()) if rewards_per_func_local.numel() and "think_format_reward" in name_to_idx else 0.0
-            mdi_val = float(rewards_per_func_local[idx, name_to_idx.get("mdi_reward", 0)].item()) if rewards_per_func_local.numel() and ("mdi_reward" in name_to_idx) else 0.0
+            if rewards_per_func_local.numel() and acc_idx is not None:
+                acc = float(rewards_per_func_local[idx, acc_idx].item())
+            # 2) 若不存在相应的reward列（例如使用自定义聚合器），尝试从自定义聚合器暴露的组件中读取
+            elif last_component_rewards and isinstance(last_component_rewards, dict):
+                try:
+                    # 支持 accuracy_reward 或 mc_idx_reward 两种命名
+                    acc_list = last_component_rewards.get("accuracy_reward")
+                    if acc_list is None:
+                        acc_list = last_component_rewards.get("mc_idx_reward")
+                    acc = float(acc_list[idx]) if acc_list is not None else 0.0
+                except Exception:
+                    acc = 0.0
+            else:
+                acc = 0.0
+            
+            fmt_idx = name_to_idx.get("think_format_reward")
+            if rewards_per_func_local.numel() and fmt_idx is not None:
+                fmt = float(rewards_per_func_local[idx, fmt_idx].item())
+            elif last_component_rewards and isinstance(last_component_rewards, dict):
+                try:
+                    fmt_list = last_component_rewards.get("think_format_reward")
+                    fmt = float(fmt_list[idx]) if fmt_list is not None else 0.0
+                except Exception:
+                    fmt = 0.0
+            else:
+                fmt = 0.0
+            
+            mdi_idx = name_to_idx.get("mdi_reward")
+            if rewards_per_func_local.numel() and mdi_idx is not None:
+                mdi_val = float(rewards_per_func_local[idx, mdi_idx].item())
+            elif last_component_rewards and isinstance(last_component_rewards, dict):
+                try:
+                    mdi_list = last_component_rewards.get("mdi_reward")
+                    mdi_val = float(mdi_list[idx]) if mdi_list is not None else 0.0
+                except Exception:
+                    mdi_val = 0.0
+            else:
+                mdi_val = 0.0
+            
             tot = float(total_rewards_local[idx].item()) if total_rewards_local.numel() else 0.0
             rows.append((idx + 1, preview_p, preview_c, sol or "", acc, fmt, mdi_val, tot))
 
@@ -1801,10 +1841,10 @@ class GRPOTrainer(BaseTrainer):
             table.add_column("Prompt")
             table.add_column("Completion")
             table.add_column("Solution", style="italic")
-            table.add_column("acc", style="green")
-            table.add_column("format", style="magenta")
-            table.add_column("mdi", style="yellow")
-            table.add_column("total", style="bold")
+            table.add_column("Accuracy", style="green")
+            table.add_column("Format", style="magenta")
+            table.add_column("MDI", style="yellow")
+            table.add_column("Total", style="bold")
             for r in rows:
                 table.add_row(str(r[0]), r[1], r[2], r[3], f"{r[4]:.3f}", f"{r[5]:.3f}", f"{r[6]:.3f}", f"{r[7]:.3f}")
             self._console.print(table)
@@ -2348,7 +2388,9 @@ class GRPOTrainer(BaseTrainer):
                 pass  # Successfully logged rollout results
             except Exception as e:
                 # Failed to emit rollout logs - continue training
-                pass
+                logger.warning("Failed to emit rollout logs: %s", e)
+                import traceback
+                logger.debug("Rollout logging error traceback: %s", traceback.format_exc())
 
         output = {
             "prompt_ids": prompt_ids,
@@ -2591,45 +2633,130 @@ class GRPOTrainer(BaseTrainer):
         if mode == "eval":
             metrics = {f"eval_{key}": val for key, val in metrics.items()}
 
-        # Also expose total reward under a structured key for TB
+        # 为TensorBoard添加核心指标（只保留指定的指标）
+        tensorboard_metrics = {}
+        
+        # 保留四个reward指标
         if "reward" in metrics:
-            metrics.setdefault("rewards/total_reward", metrics["reward"])
+            tensorboard_metrics["rewards/total"] = metrics["reward"]
+        
+        # 添加奖励组件指标
+        for key, val in metrics.items():
+            if "reward" in key.lower():
+                if "accuracy" in key.lower() or "acc" in key.lower():
+                    tensorboard_metrics["rewards/accuracy"] = val
+                elif "format" in key.lower() or "think" in key.lower():
+                    tensorboard_metrics["rewards/format"] = val
+                elif "mdi" in key.lower():
+                    tensorboard_metrics["rewards/mdi"] = val
+                elif "custom_reward_aggregator" in key.lower() and "mean" in key.lower():
+                    # 对于自定义奖励聚合器，我们需要从原始数据中提取组件
+                    # 这里我们使用总奖励作为占位符，实际组件需要从训练过程中获取
+                    tensorboard_metrics["rewards/total"] = val
+        
+        # 如果没有找到具体的奖励组件，尝试从自定义聚合器暴露的组件中回填
+        if (
+            ("rewards/accuracy" not in tensorboard_metrics
+             or "rewards/format" not in tensorboard_metrics
+             or "rewards/mdi" not in tensorboard_metrics)
+            and hasattr(self, "_last_component_rewards")
+            and isinstance(getattr(self, "_last_component_rewards"), dict)
+        ):
+            try:
+                comp = self._last_component_rewards
+                # 支持 accuracy_reward 或 mc_idx_reward 两种命名
+                acc_list = comp.get("accuracy_reward") if comp.get("accuracy_reward") is not None else comp.get("mc_idx_reward")
+                fmt_list = comp.get("think_format_reward")
+                mdi_list = comp.get("mdi_reward")
+                if acc_list is not None:
+                    tensorboard_metrics["rewards/accuracy"] = float(sum(acc_list) / max(1, len(acc_list)))
+                if fmt_list is not None:
+                    tensorboard_metrics["rewards/format"] = float(sum(fmt_list) / max(1, len(fmt_list)))
+                if mdi_list is not None:
+                    tensorboard_metrics["rewards/mdi"] = float(sum(mdi_list) / max(1, len(mdi_list)))
+            except Exception:
+                # 回退失败则下面默认置0
+                pass
+        
+        # 若仍缺失，使用0占位
+        if "rewards/accuracy" not in tensorboard_metrics:
+            tensorboard_metrics["rewards/accuracy"] = 0.0
+        if "rewards/format" not in tensorboard_metrics:
+            tensorboard_metrics["rewards/format"] = 0.0
+        if "rewards/mdi" not in tensorboard_metrics:
+            tensorboard_metrics["rewards/mdi"] = 0.0
+        
+        # 添加MDI指标
+        for key, val in metrics.items():
+            if "attention" in key.lower() and "mdi" in key.lower():
+                tensorboard_metrics["attention/mdi"] = val
+        
+        # 添加文本和视觉注意力比例
+        for key, val in metrics.items():
+            if "attention" in key.lower():
+                if "text" in key.lower() and "ratio" in key.lower():
+                    tensorboard_metrics["attention/text_ratio"] = val
+                elif "vision" in key.lower() and "ratio" in key.lower():
+                    tensorboard_metrics["attention/vision_ratio"] = val
+        
+        # 添加AEI指标
+        for key, val in metrics.items():
+            if "aei" in key.lower():
+                if "text" in key.lower():
+                    tensorboard_metrics["attention/aei_text"] = val
+                elif "vision" in key.lower():
+                    tensorboard_metrics["attention/aei_vision"] = val
+        
+        # eval 模式下，复制一份带 eval_ 前缀，便于区分
+        if mode == "eval":
+            eval_tb = {f"eval_{k}": v for k, v in tensorboard_metrics.items()}
+            tensorboard_metrics.update(eval_tb)
+
+        # 只更新TensorBoard指标，不覆盖原始指标
+        metrics.update(tensorboard_metrics)
         
         # 合并日志，添加调试信息
         logs = {**logs, **metrics}
         
         # 添加调试信息（仅在主进程）
-        if self.accelerator.is_main_process and len(metrics) > 0:
-            print(f"\n📊 Logging {len(metrics)} metrics for {mode} mode")
-            print("=" * 60)
+        if self.accelerator.is_main_process:
+            print(f"\n📊 Step {self.state.global_step} - {mode} mode")
+            print(f"📊 Total metrics available: {len(metrics)}")
             
-            # 按类别分组显示指标
-            reward_metrics = {k: v for k, v in metrics.items() if 'reward' in k}
-            attention_metrics = {k: v for k, v in metrics.items() if 'attention' in k}
-            other_metrics = {k: v for k, v in metrics.items() if 'reward' not in k and 'attention' not in k}
+            # 显示核心指标
+            core_metrics = {}
             
-            if reward_metrics:
-                print("🎯 Reward Metrics:")
-                for key, val in list(reward_metrics.items())[:3]:
+            # 收集核心指标
+            for key, val in metrics.items():
+                if (key in ['rewards/total', 'rewards/accuracy', 'rewards/format', 'rewards/mdi'] or
+                    key in ['attention/mdi', 'attention/text_ratio', 'attention/vision_ratio'] or
+                    key in ['attention/aei_text', 'attention/aei_vision']):
+                    core_metrics[key] = val
+            
+            if core_metrics:
+                print("📊 Core Metrics:")
+                # 按类别显示
+                reward_keys = ['rewards/total', 'rewards/accuracy', 'rewards/format', 'rewards/mdi']
+                attention_keys = ['attention/mdi', 'attention/text_ratio', 'attention/vision_ratio', 'attention/aei_text', 'attention/aei_vision']
+                
+                print("🎯 Rewards:")
+                for key in reward_keys:
+                    if key in core_metrics:
+                        print(f"   {key}: {core_metrics[key]:.4f}")
+                
+                print("🧠 Attention:")
+                for key in attention_keys:
+                    if key in core_metrics:
+                        print(f"   {key}: {core_metrics[key]:.4f}")
+            else:
+                # 如果没有核心指标，显示所有指标的前几个
+                print("📈 Available Metrics:")
+                for key, val in list(metrics.items())[:8]:
                     print(f"   {key}: {val:.4f}")
-                if len(reward_metrics) > 3:
-                    print(f"   ... and {len(reward_metrics) - 3} more reward metrics")
+                if len(metrics) > 8:
+                    print(f"   ... and {len(metrics) - 8} more metrics")
             
-            if attention_metrics:
-                print("🧠 Attention Metrics:")
-                for key, val in list(attention_metrics.items())[:3]:
-                    print(f"   {key}: {val:.4f}")
-                if len(attention_metrics) > 3:
-                    print(f"   ... and {len(attention_metrics) - 3} more attention metrics")
-            
-            if other_metrics:
-                print("📈 Other Metrics:")
-                for key, val in list(other_metrics.items())[:3]:
-                    print(f"   {key}: {val:.4f}")
-                if len(other_metrics) > 3:
-                    print(f"   ... and {len(other_metrics) - 3} more metrics")
-            
-            print("=" * 60)
+            print("-" * 60)
         
         super().log(logs, start_time)
         self._metrics[mode].clear()

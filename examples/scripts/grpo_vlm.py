@@ -649,19 +649,64 @@ if __name__ == "__main__":
     def mdi_reward_with_trainer(completions, **kwargs):
         trainer = trainer_ref["t"]
         if trainer is None:
-            return [0.0] * len(completions)
+            return [0.40] * len(completions)  # 返回默认系数而不是0
         
-        # 传递原始attention参数给MDI reward函数
-        return mdi_reward(
-            completions,
-            attention_text=getattr(trainer, "_attention_text_current_batch", []),
-            attention_vision=getattr(trainer, "_attention_vision_current_batch", []),
-            num_text_tokens=getattr(trainer, "_num_text_tokens_current_batch", []),
-            num_vision_tokens=getattr(trainer, "_num_vision_tokens_current_batch", []),
-            **kwargs
-        )
-    reward_funcs = [mc_idx_reward, think_format_reward, mdi_reward_with_trainer]
-    reward_weights = [4.0, 1.0, 1.0]
+        try:
+            # 传递原始attention参数给MDI reward函数
+            return mdi_reward(
+                completions,
+                attention_text=getattr(trainer, "_attention_text_current_batch", []),
+                attention_vision=getattr(trainer, "_attention_vision_current_batch", []),
+                num_text_tokens=getattr(trainer, "_num_text_tokens_current_batch", []),
+                num_vision_tokens=getattr(trainer, "_num_vision_tokens_current_batch", []),
+                **kwargs
+            )
+        except Exception as e:
+            print(f"Warning: MDI reward calculation failed: {e}")
+            return [0.40] * len(completions)  # 返回默认系数
+    # 自定义reward聚合函数，实现新的公式：R_i = (4.0 * acc[i]) * c[i] + 1.0 * format[i]
+    def custom_reward_aggregator(prompts, completions, completion_ids, **kwargs):
+        try:
+            # 计算各个reward函数
+            accuracy_rewards = mc_idx_reward(completions, **kwargs)
+            format_rewards = think_format_reward(completions, **kwargs)
+            mdi_coefficients = mdi_reward_with_trainer(completions, **kwargs)
+            
+            # 将组件奖励暴露给 Trainer 以便日志记录（仅当前进程本地样本顺序）
+            try:
+                tr = trainer_ref.get("t")
+                if tr is not None:
+                    tr._last_component_rewards = {
+                        "accuracy_reward": list(map(float, accuracy_rewards)),
+                        # 兼容备用命名，防止Trainer使用 mc_idx_reward 名称查询失败
+                        "mc_idx_reward": list(map(float, accuracy_rewards)),
+                        "think_format_reward": list(map(float, format_rewards)),
+                        # 这里的mdi_reward是系数，仍然写入以便观察
+                        "mdi_reward": list(map(float, mdi_coefficients)),
+                    }
+            except Exception:
+                # 仅影响日志回退，不影响训练
+                pass
+
+            # 应用新公式：R_i = (4.0 * acc[i]) * c[i] + 1.0 * format[i]
+            final_rewards = []
+            for acc, fmt, coef in zip(accuracy_rewards, format_rewards, mdi_coefficients):
+                reward = (4.0 * acc) * coef + 1.0 * fmt
+                final_rewards.append(reward)
+            
+            return final_rewards
+        except Exception as e:
+            print(f"Warning: Custom reward aggregator failed: {e}")
+            # 返回默认奖励（仅基于准确率）
+            try:
+                accuracy_rewards = mc_idx_reward(completions, **kwargs)
+                return [4.0 * acc for acc in accuracy_rewards]
+            except Exception as e2:
+                print(f"Warning: Fallback reward calculation also failed: {e2}")
+                return [0.0] * len(completions)
+
+    reward_funcs = [custom_reward_aggregator]
+    reward_weights = [1.0]  # 只有一个聚合函数，权重为1
 
     # 设置奖励权重到训练参数中
     training_args.reward_weights = reward_weights
