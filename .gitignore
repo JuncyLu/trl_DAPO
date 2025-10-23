@@ -1,4 +1,5 @@
 /aokvqa_trl_test_small/
+/aokvqa_trl_test_large/
 A-OKVQA_question_id.txt
 prepare_aokvqa_for_trl_test.py
 runs/

@@ -19,18 +19,17 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --dtype bfloat16 \
     --max_prompt_length 1024 \
     --max_completion_length 256 \
-    --data_files '{"train": "./aokvqa_trl_test_small/train.parquet", "test": "./aokvqa_trl_test_small/test.parquet"}' \
+    --data_files '{"train": "./aokvqa_trl_test_large/train.parquet", "test": "./aokvqa_trl_test_large/test.parquet"}' \
     --per_device_train_batch_size 4 \
     --gradient_accumulation_steps 4 \
-    --num_train_epochs 1 \
-    --num_generations 2 \
+    --num_train_epochs 2 \
+    --num_generations 4 \
     --temperature 1.0 \
     --top_p 1.0 \
-    --logging_steps 10 \
-    --save_strategy steps \
-    --save_steps 30 \
+    --logging_steps 1 \
     --eval_strategy steps \
     --eval_steps 10 \
     --report_to tensorboard \
     --output_dir runs/grpo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
-    --enable_detailed_logging
+    --enable_detailed_logging \
+    --save_strategy no

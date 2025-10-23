@@ -249,6 +249,21 @@ if __name__ == "__main__":
         default_logs_dir = os.path.join(os.getcwd(), "training_logs")
         os.makedirs(default_logs_dir, exist_ok=True)
 
+    # Distributed-exit stability: prefer no persistent workers to avoid teardown hangs
+    try:
+        if getattr(training_args, "dataloader_persistent_workers", None) is None or training_args.dataloader_persistent_workers:
+            training_args.dataloader_persistent_workers = False
+    except Exception:
+        pass
+
+    # Avoid multi-process trackers (e.g., TensorBoard) writing simultaneously
+    try:
+        if not _is_main_process():
+            # Transformers accepts list or string; set to disable on non-main
+            setattr(training_args, "report_to", [])
+    except Exception:
+        pass
+
     # Configure detailed logging if enabled
     if data_args.enable_detailed_logging:
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -319,7 +334,12 @@ if __name__ == "__main__":
                         self._file.close()
                     except Exception:
                         pass
-                    return self._stream.close()
+                    # Do NOT close underlying stdout/stderr; let runtime own it
+                    try:
+                        self._stream.flush()
+                    except Exception:
+                        pass
+                    return None
 
             # Install tee for stdout and stderr
             _orig_stdout, _orig_stderr = sys.stdout, sys.stderr
@@ -328,18 +348,29 @@ if __name__ == "__main__":
 
             @atexit.register
             def _close_markdown_tee():
-                try:
-                    if hasattr(sys.stdout, "close"):
-                        sys.stdout.close()
-                except Exception:
-                    pass
-                try:
-                    if hasattr(sys.stderr, "close"):
-                        sys.stderr.close()
-                except Exception:
-                    pass
+                # Close only the log files; do not close real stdout/stderr
+                for stream in (sys.stdout, sys.stderr):
+                    try:
+                        if hasattr(stream, "_file"):
+                            stream._file.write("\n```\n")
+                            stream._file.flush()
+                            stream._file.close()
+                    except Exception:
+                        pass
         except Exception as _e:
             print(f"⚠️ Failed to enable terminal markdown logging: {_e}")
+
+    # Reduce noisy dict-style logs from HF Trainer and others; keep our pretty prints
+    try:
+        from transformers.utils import logging as hf_logging
+        hf_logging.set_verbosity_warning()
+    except Exception:
+        pass
+    for name in ("transformers", "transformers.trainer", "accelerate", "datasets", "trl"):
+        try:
+            logging.getLogger(name).setLevel(logging.WARNING)
+        except Exception:
+            pass
     ################
     # Model
     ################
@@ -723,7 +754,37 @@ if __name__ == "__main__":
 
     trainer.train()
 
-    # Save and push to hub
-    trainer.save_model(training_args.output_dir)
-    if training_args.push_to_hub:
-        trainer.push_to_hub(dataset_name=script_args.dataset_name)
+    # Coordinated save/push across ranks to avoid multi-writer conflicts
+    try:
+        trainer.accelerator.wait_for_everyone()
+    except Exception:
+        pass
+
+    if getattr(trainer, "accelerator", None) is not None:
+        is_main = trainer.accelerator.is_main_process
+    else:
+        is_main = _is_main_process()
+
+    if is_main:
+        try:
+            trainer.save_model(training_args.output_dir)
+        except Exception as e:
+            logger.warning("Model save failed on main process: %s", e)
+        if training_args.push_to_hub:
+            try:
+                trainer.push_to_hub(dataset_name=script_args.dataset_name)
+            except Exception as e:
+                logger.warning("push_to_hub failed: %s", e)
+
+    try:
+        trainer.accelerator.wait_for_everyone()
+    except Exception:
+        pass
+
+    # Best-effort cleanup to help NCCL/DS teardown
+    try:
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+            torch.cuda.empty_cache()
+    except Exception:
+        pass
