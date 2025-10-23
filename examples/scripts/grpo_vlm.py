@@ -100,7 +100,7 @@ from trl import (
     get_peft_config,
     get_quantization_config,
 )
-from trl.rewards import accuracy_reward, think_format_reward
+from trl.rewards import accuracy_reward, think_format_reward, mdi_reward
 
 
 # Enable logging in a Hugging Face Space
@@ -558,33 +558,6 @@ if __name__ == "__main__":
     ################
     # Training
     ################
-    def mdi_reward(completions, **kwargs):
-        """基于真实MDI计算奖励。
-        从trainer获取真实的MDI平衡分数，应用奖励公式：r = w * (2*balance - 1)
-        """
-        trainer = kwargs.get("trainer")
-        if trainer is None:
-            return [0.0] * len(completions)
-        balances = getattr(trainer, "_mdi_balance_scores_current_batch", None)
-        if not balances:
-            return [0.0] * len(completions)
-        try:
-            balances = list(balances)
-        except TypeError:
-            balances = [balances]
-        if len(balances) < len(completions):
-            repeats = (len(completions) + len(balances) - 1) // len(balances)
-            balances = (balances * repeats)[: len(completions)]
-        elif len(balances) > len(completions):
-            balances = balances[: len(completions)]
-        weight = 1.0
-        rewards = []
-        for b in balances:
-            try:
-                rewards.append(weight * (2.0 * float(b) - 1.0))
-            except Exception:
-                rewards.append(0.0)
-        return rewards
 
     def mc_idx_reward(completions, label_idx, **kwargs):
         """Match predicted letter to gold letter from label_idx (0->A, 1->B, ...).
@@ -672,10 +645,21 @@ if __name__ == "__main__":
     # 将trainer注入MDI奖励函数
     trainer_ref = {"t": None}
 
-    @wraps(mdi_reward)
+    from functools import partial
     def mdi_reward_with_trainer(completions, **kwargs):
         trainer = trainer_ref["t"]
-        return mdi_reward(completions, trainer=trainer, **kwargs)
+        if trainer is None:
+            return [0.0] * len(completions)
+        
+        # 传递原始attention参数给MDI reward函数
+        return mdi_reward(
+            completions,
+            attention_text=getattr(trainer, "_attention_text_current_batch", []),
+            attention_vision=getattr(trainer, "_attention_vision_current_batch", []),
+            num_text_tokens=getattr(trainer, "_num_text_tokens_current_batch", []),
+            num_vision_tokens=getattr(trainer, "_num_vision_tokens_current_batch", []),
+            **kwargs
+        )
     reward_funcs = [mc_idx_reward, think_format_reward, mdi_reward_with_trainer]
     reward_weights = [4.0, 1.0, 1.0]
 

@@ -27,11 +27,10 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --temperature 1.0 \
     --top_p 1.0 \
     --logging_steps 10 \
-    --eval_size 0 \
     --save_strategy steps \
-    --save_steps 50 \
+    --save_steps 10 \
     --eval_strategy steps \
-    --eval_steps 50 \
+    --eval_steps 10 \
     --report_to tensorboard \
     --output_dir runs/grpo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
     --enable_detailed_logging

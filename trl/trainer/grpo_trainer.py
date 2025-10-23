@@ -384,8 +384,11 @@ class GRPOTrainer(BaseTrainer):
         self._rollout_step_count = 0
         self._console = None
 
-        # current batch mdi balance cache for reward
-        self._mdi_balance_scores_current_batch = []
+        # current batch attention parameters for reward
+        self._attention_text_current_batch = []
+        self._attention_vision_current_batch = []
+        self._num_text_tokens_current_batch = []
+        self._num_vision_tokens_current_batch = []
         
         # 设置注意力诊断标志（在super().__init__之前）
         self.compute_attention_metrics = args.compute_attention_metrics
@@ -864,7 +867,6 @@ class GRPOTrainer(BaseTrainer):
                 self._logs["attention"].extend(sample_results)
             if isinstance(self._attention_skip_reasons, deque):
                 self._attention_skip_reasons.extend(skip_reasons)
-            self._mdi_balance_scores_current_batch = [0.5 for _ in sample_results]
             return
 
         for segment in segments:
@@ -884,16 +886,6 @@ class GRPOTrainer(BaseTrainer):
                 mdi_tensor = torch.where(torch.isfinite(mdi_tensor), mdi_tensor, torch.full_like(mdi_tensor, float("nan")))
                 gathered_mdi = self.accelerator.gather(mdi_tensor)
                 self._metrics[mode][f"attention/{segment}/mdi"].append(torch.nanmean(gathered_mdi).item())
-
-                ratio = getattr(self.args, "mdi_balance_ratio", 2.0)
-                if ratio <= 1.0:
-                    ratio = 2.0
-                logR = torch.tensor(float(torch.log(torch.tensor(ratio)).item()), device=device)
-                mdi_pos = torch.where(gathered_mdi > 0, gathered_mdi, torch.full_like(gathered_mdi, float("nan")))
-                balance = 1.0 - torch.abs(torch.log(mdi_pos)) / logR
-                balance = torch.clamp(balance, min=0.0, max=1.0)
-                self._metrics[mode][f"attention/{segment}/mdi_balance"].append(torch.nanmean(balance).item())
-                self._metrics[mode][f"attention/{segment}/mdi_penalty"].append(1.0 - torch.nanmean(balance).item())
 
             if aei_text_vals:
                 aei_text_tensor = torch.tensor(aei_text_vals, device=device, dtype=torch.float32)
@@ -921,28 +913,52 @@ class GRPOTrainer(BaseTrainer):
         if isinstance(self._attention_skip_reasons, deque):
             self._attention_skip_reasons.extend(skip_reasons)
 
-        # Expose per-sample balance scores for reward usage
+        # 为MDI reward准备原始attention参数
         try:
-            ratio = getattr(self.args, "mdi_balance_ratio", 2.0)
-            if ratio <= 1.0:
-                ratio = 2.0
-            import math
-            logR = math.log(ratio)
-            balances = []
+            attention_text_list = []
+            attention_vision_list = []
+            num_text_tokens_list = []
+            num_vision_tokens_list = []
+            
             for res in sample_results:
                 if res is None:
-                    balances.append(0.5)
+                    # 提供默认值
+                    attention_text_list.append(0.0)
+                    attention_vision_list.append(0.0)
+                    num_text_tokens_list.append(1)
+                    num_vision_tokens_list.append(1)
                     continue
+                
+                # 获取late segment的attention值，如果没有则使用all segment
                 seg = res.segments.get("late") or res.segments.get("all")
-                mdi = float(seg.mdi) if seg and seg.mdi is not None else None
-                if mdi is None or not (mdi > 0) or not math.isfinite(mdi):
-                    balances.append(0.5)
-                else:
-                    b = max(0.0, min(1.0, 1.0 - abs(math.log(mdi)) / logR))
-                    balances.append(float(b))
-            self._mdi_balance_scores_current_batch = balances
+                if seg is None:
+                    attention_text_list.append(0.0)
+                    attention_vision_list.append(0.0)
+                    num_text_tokens_list.append(1)
+                    num_vision_tokens_list.append(1)
+                    continue
+                
+                # 提取原始attention参数
+                attention_text = float(seg.attention_text) if seg.attention_text is not None else 0.0
+                attention_vision = float(seg.attention_vision) if seg.attention_vision is not None else 0.0
+                num_text_tokens = int(res.num_instruction_tokens) if res.num_instruction_tokens is not None else 1
+                num_vision_tokens = int(res.num_vision_tokens) if res.num_vision_tokens is not None else 1
+                
+                attention_text_list.append(attention_text)
+                attention_vision_list.append(attention_vision)
+                num_text_tokens_list.append(num_text_tokens)
+                num_vision_tokens_list.append(num_vision_tokens)
+            
+            # 存储原始attention参数供reward函数使用
+            self._attention_text_current_batch = attention_text_list
+            self._attention_vision_current_batch = attention_vision_list
+            self._num_text_tokens_current_batch = num_text_tokens_list
+            self._num_vision_tokens_current_batch = num_vision_tokens_list
         except Exception:
-            self._mdi_balance_scores_current_batch = []
+            self._attention_text_current_batch = []
+            self._attention_vision_current_batch = []
+            self._num_text_tokens_current_batch = []
+            self._num_vision_tokens_current_batch = []
 
     @profiling_decorator
     def _get_last_hidden_state(
@@ -1624,12 +1640,6 @@ class GRPOTrainer(BaseTrainer):
         sample_results: list,
         skip_reasons: Optional[list[Optional[str]]] = None,
     ) -> list[dict]:
-        import math
-
-        ratio_R = getattr(self.args, "mdi_balance_ratio", 2.0)
-        if ratio_R <= 1.0:
-            ratio_R = 2.0
-        logR = math.log(ratio_R)
         results = []
         if skip_reasons is None:
             skip_reasons = [None] * len(sample_results)
@@ -1639,7 +1649,6 @@ class GRPOTrainer(BaseTrainer):
                 reason = skip_reasons[idx] if idx < len(skip_reasons) else None
                 default_result = {
                     "mdi": 1.0,
-                    "balance": 0.5,
                     "text_ratio": 0.5,
                     "vision_ratio": 0.5,
                     "attention_distribution": [0.5, 0.5],
@@ -1715,13 +1724,11 @@ class GRPOTrainer(BaseTrainer):
             main_segment = late_data if late_data["mdi"] != 1.0 else all_data
             mdi = main_segment["mdi"]
 
-            balance = max(0.0, min(1.0, 1.0 - abs(math.log(mdi)) / logR))
             text_ratio = mdi / (1.0 + mdi)
             vision_ratio = 1.0 / (1.0 + mdi)
 
             result = {
                 "mdi": round(float(mdi), 6),
-                "balance": round(float(balance), 6),
                 "text_ratio": round(float(text_ratio), 6),
                 "vision_ratio": round(float(vision_ratio), 6),
                 "attention_distribution": [round(float(text_ratio), 6), round(float(vision_ratio), 6)],
@@ -1810,7 +1817,6 @@ class GRPOTrainer(BaseTrainer):
                         {
                             "sample": i,
                             "MDI Value": info.get("mdi"),
-                            "Balance Score": info.get("balance"),
                             "Text-Vision Ratio": f"{info.get('text_ratio')}:{info.get('vision_ratio')}",
                             "Attention Distribution": info.get("attention_distribution"),
                         },
@@ -1930,7 +1936,6 @@ class GRPOTrainer(BaseTrainer):
                                     "total_tokens": float((info.get("num_vision_tokens", 0) or 0) + (info.get("num_text_tokens", 0) or 0)),
                                 },
                                 "overall": {
-                                    "balance_score": info.get("balance"),
                                     "attention_distribution": info.get("attention_distribution"),
                                     "skip_reason": info.get("skip_reason"),
                                 },
@@ -2021,7 +2026,6 @@ class GRPOTrainer(BaseTrainer):
                                 }
                             },
                             "overall": {
-                                "balance_score": info.get("balance"),
                                 "attention_distribution": info.get("attention_distribution"),
                                 "text_vision_ratio": f"{info.get('text_ratio', 0):.6f}:{info.get('vision_ratio', 0):.6f}",
                                 "skip_reason": info.get("skip_reason"),
