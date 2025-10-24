@@ -807,9 +807,10 @@ class GRPOTrainer(BaseTrainer):
 
     def _get_eval_sampler(self, eval_dataset) -> Sampler:
         # See _get_train_sampler for an explanation of the sampler.
+        # For evaluation, we only need 1 generation per sample, not num_generations
         return RepeatSampler(
             data_source=eval_dataset,
-            mini_repeat_count=self.num_generations,
+            mini_repeat_count=1,  # Only repeat once for evaluation
             seed=self.args.seed,
         )
 
@@ -1333,6 +1334,7 @@ class GRPOTrainer(BaseTrainer):
 
     def _generate_single_turn(self, prompts: list[str], images: Optional[list]):
         device = self.accelerator.device
+        mode = "train" if self.model.training else "eval"
 
         # If the prompts are conversational and the inputs contain images, we need to convert the prompts from
         # [{"role": "user", "content": "What color is the sky?"}] to
@@ -1368,21 +1370,32 @@ class GRPOTrainer(BaseTrainer):
                     all_images = gather_object(images)
 
                 if self.accelerator.is_main_process:
-                    # Since 'prompts' contains 'num_generations' duplicates, we first take unique prompts, and generate
-                    # num_generations outputs for each one. This is faster than generating outputs for each duplicate
-                    # prompt individually.
-                    ordered_set_of_prompts = all_prompts_text[:: self.num_generations]
-
-                    if images is not None:
-                        ordered_set_of_images = all_images[:: self.num_generations]
+                    # In evaluation mode, generate only once per prompt
+                    # In training mode, generate num_generations per prompt
+                    if mode == "eval":
+                        # For evaluation, use all prompts directly without deduplication
+                        ordered_set_of_prompts = all_prompts_text
+                        if images is not None:
+                            ordered_set_of_images = all_images
+                        else:
+                            ordered_set_of_images = None
+                        n_generations = 1
                     else:
-                        ordered_set_of_images = None
+                        # Since 'prompts' contains 'num_generations' duplicates, we first take unique prompts, and generate
+                        # num_generations outputs for each one. This is faster than generating outputs for each duplicate
+                        # prompt individually.
+                        ordered_set_of_prompts = all_prompts_text[:: self.num_generations]
+                        if images is not None:
+                            ordered_set_of_images = all_images[:: self.num_generations]
+                        else:
+                            ordered_set_of_images = None
+                        n_generations = self.num_generations
 
                     with profiling_context(self, "vLLM.generate"):
                         output = self.vllm_client.generate(
                             prompts=ordered_set_of_prompts,
                             images=ordered_set_of_images,
-                            n=self.num_generations,
+                            n=n_generations,
                             repetition_penalty=self.repetition_penalty,
                             temperature=self.temperature,
                             top_p=self.top_p,
@@ -1402,16 +1415,26 @@ class GRPOTrainer(BaseTrainer):
                 broadcast_object_list(obj_list, from_process=0)
                 all_prompt_ids, all_completion_ids, all_logprobs = obj_list[0]
 
-                # At this point, we only get 1 copy of each prompt, so we need to repeat them num_generations times
-                all_prompt_ids = [ids for ids in all_prompt_ids for _ in range(self.num_generations)]
+                if mode == "eval":
+                    # In evaluation mode, we already have one completion per prompt
+                    process_slice = slice(
+                        self.accelerator.process_index * len(prompts),
+                        (self.accelerator.process_index + 1) * len(prompts),
+                    )
+                    prompt_ids = all_prompt_ids[process_slice]
+                    completion_ids = all_completion_ids[process_slice]
+                    logprobs = all_logprobs[process_slice]
+                else:
+                    # At this point, we only get 1 copy of each prompt, so we need to repeat them num_generations times
+                    all_prompt_ids = [ids for ids in all_prompt_ids for _ in range(self.num_generations)]
 
-                process_slice = slice(
-                    self.accelerator.process_index * len(prompts),
-                    (self.accelerator.process_index + 1) * len(prompts),
-                )
-                prompt_ids = all_prompt_ids[process_slice]
-                completion_ids = all_completion_ids[process_slice]
-                logprobs = all_logprobs[process_slice]
+                    process_slice = slice(
+                        self.accelerator.process_index * len(prompts),
+                        (self.accelerator.process_index + 1) * len(prompts),
+                    )
+                    prompt_ids = all_prompt_ids[process_slice]
+                    completion_ids = all_completion_ids[process_slice]
+                    logprobs = all_logprobs[process_slice]
 
             # Generate completions using colocated vLLM instances: each device holds vLLM copy and work on their own batch of prompts
             elif self.vllm_mode == "colocate":
@@ -1818,6 +1841,19 @@ class GRPOTrainer(BaseTrainer):
             else:
                 fmt = 0.0
             
+            # 获取长度奖励
+            length_idx = name_to_idx.get("length_reward")
+            if rewards_per_func_local.numel() and length_idx is not None:
+                length_val = float(rewards_per_func_local[idx, length_idx].item())
+            elif last_component_rewards and isinstance(last_component_rewards, dict):
+                try:
+                    length_list = last_component_rewards.get("length_reward")
+                    length_val = float(length_list[idx]) if length_list is not None else 0.0
+                except Exception:
+                    length_val = 0.0
+            else:
+                length_val = 0.0
+            
             mdi_idx = name_to_idx.get("mdi_reward")
             if rewards_per_func_local.numel() and mdi_idx is not None:
                 mdi_val = float(rewards_per_func_local[idx, mdi_idx].item())
@@ -1831,7 +1867,7 @@ class GRPOTrainer(BaseTrainer):
                 mdi_val = 0.0
             
             tot = float(total_rewards_local[idx].item()) if total_rewards_local.numel() else 0.0
-            rows.append((idx + 1, preview_p, preview_c, sol or "", acc, fmt, mdi_val, tot))
+            rows.append((idx + 1, preview_p, preview_c, sol or "", acc, fmt, length_val, mdi_val, tot))
 
         # Console pretty print
         if 'Console' in globals() and Console is not None and hasattr(self, "_console") and self._console is not None:
@@ -1843,10 +1879,11 @@ class GRPOTrainer(BaseTrainer):
             table.add_column("Solution", style="italic")
             table.add_column("Accuracy", style="green")
             table.add_column("Format", style="magenta")
+            table.add_column("Length", style="cyan")
             table.add_column("MDI", style="yellow")
             table.add_column("Total", style="bold")
             for r in rows:
-                table.add_row(str(r[0]), r[1], r[2], r[3], f"{r[4]:.3f}", f"{r[5]:.3f}", f"{r[6]:.3f}", f"{r[7]:.3f}")
+                table.add_row(str(r[0]), r[1], r[2], r[3], f"{r[4]:.3f}", f"{r[5]:.3f}", f"{r[6]:.3f}", f"{r[7]:.3f}", f"{r[8]:.3f}")
             self._console.print(table)
 
             # MDI section
@@ -1885,11 +1922,13 @@ class GRPOTrainer(BaseTrainer):
                         # 计算各种统计信息
                         accuracy_scores = [r[4] for r in rows]
                         format_scores = [r[5] for r in rows]
-                        mdi_scores = [r[6] for r in rows]
-                        total_scores = [r[7] for r in rows]
+                        length_scores = [r[6] for r in rows]
+                        mdi_scores = [r[7] for r in rows]
+                        total_scores = [r[8] for r in rows]
                         
                         f.write(f"| Accuracy Mean | {np.mean(accuracy_scores):.3f} ± {np.std(accuracy_scores):.3f} |\n")
                         f.write(f"| Format Mean | {np.mean(format_scores):.3f} ± {np.std(format_scores):.3f} |\n")
+                        f.write(f"| Length Mean | {np.mean(length_scores):.3f} ± {np.std(length_scores):.3f} |\n")
                         f.write(f"| MDI Mean | {np.mean(mdi_scores):.3f} ± {np.std(mdi_scores):.3f} |\n")
                         f.write(f"| Total Reward Mean | {np.mean(total_scores):.3f} ± {np.std(total_scores):.3f} |\n")
                         f.write(f"| Accuracy Rate | {np.mean([1 if s > 0 else 0 for s in accuracy_scores]):.3f} |\n")
@@ -1927,7 +1966,7 @@ class GRPOTrainer(BaseTrainer):
                         f.write(f"**Prompt:** {r[1]}\n\n")
                         f.write(f"**Completion:** {r[2]}\n\n")
                         f.write(f"**Solution:** {r[3]}\n\n")
-                        f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, mdi={r[6]:.3f}, total={r[7]:.3f}\n\n")
+                        f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, mdi={r[7]:.3f}, total={r[8]:.3f}\n\n")
                         
                         # 添加详细的metrics信息
                         if info:
@@ -1937,8 +1976,9 @@ class GRPOTrainer(BaseTrainer):
                                 "rewards": {
                                     "accuracy": float(r[4]),
                                     "format": float(r[5]),
-                                    "mdi": float(r[6]),
-                                    "total": float(r[7])
+                                    "length": float(r[6]),
+                                    "mdi": float(r[7]),
+                                    "total": float(r[8])
                                 },
                                 "attention_metrics": {
                                     "early": {
@@ -2214,8 +2254,19 @@ class GRPOTrainer(BaseTrainer):
                 ref_per_token_logps = None
 
         # Decode
-        prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=True)
-        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
+        # Filter out invalid token IDs (like -100) before decoding to prevent None tokens
+        filtered_prompt_ids = []
+        for ids in prompt_ids:
+            filtered_ids = [id_val for id_val in ids if id_val != -100 and id_val is not None]
+            filtered_prompt_ids.append(filtered_ids)
+        
+        filtered_completion_ids = []
+        for ids in completion_ids:
+            filtered_ids = [id_val for id_val in ids if id_val != -100 and id_val is not None]
+            filtered_completion_ids.append(filtered_ids)
+        
+        prompts_text = self.processing_class.batch_decode(filtered_prompt_ids, skip_special_tokens=True)
+        completions_text = self.processing_class.batch_decode(filtered_completion_ids, skip_special_tokens=True)
         if is_conversational(inputs[0]):
             completions = []
             for prompt, completion in zip(prompts, completions_text):
@@ -2647,6 +2698,8 @@ class GRPOTrainer(BaseTrainer):
                     tensorboard_metrics["rewards/accuracy"] = val
                 elif "format" in key.lower() or "think" in key.lower():
                     tensorboard_metrics["rewards/format"] = val
+                elif "length" in key.lower():
+                    tensorboard_metrics["rewards/length"] = val
                 elif "mdi" in key.lower():
                     tensorboard_metrics["rewards/mdi"] = val
                 elif "custom_reward_aggregator" in key.lower() and "mean" in key.lower():
@@ -2658,7 +2711,8 @@ class GRPOTrainer(BaseTrainer):
         if (
             ("rewards/accuracy" not in tensorboard_metrics
              or "rewards/format" not in tensorboard_metrics
-             or "rewards/mdi" not in tensorboard_metrics)
+             or "rewards/mdi" not in tensorboard_metrics
+             or "rewards/length" not in tensorboard_metrics)
             and hasattr(self, "_last_component_rewards")
             and isinstance(getattr(self, "_last_component_rewards"), dict)
         ):
@@ -2667,11 +2721,14 @@ class GRPOTrainer(BaseTrainer):
                 # 支持 accuracy_reward 或 mc_idx_reward 两种命名
                 acc_list = comp.get("accuracy_reward") if comp.get("accuracy_reward") is not None else comp.get("mc_idx_reward")
                 fmt_list = comp.get("think_format_reward")
+                length_list = comp.get("length_reward")
                 mdi_list = comp.get("mdi_reward")
                 if acc_list is not None:
                     tensorboard_metrics["rewards/accuracy"] = float(sum(acc_list) / max(1, len(acc_list)))
                 if fmt_list is not None:
                     tensorboard_metrics["rewards/format"] = float(sum(fmt_list) / max(1, len(fmt_list)))
+                if length_list is not None:
+                    tensorboard_metrics["rewards/length"] = float(sum(length_list) / max(1, len(length_list)))
                 if mdi_list is not None:
                     tensorboard_metrics["rewards/mdi"] = float(sum(mdi_list) / max(1, len(mdi_list)))
             except Exception:
@@ -2683,6 +2740,8 @@ class GRPOTrainer(BaseTrainer):
             tensorboard_metrics["rewards/accuracy"] = 0.0
         if "rewards/format" not in tensorboard_metrics:
             tensorboard_metrics["rewards/format"] = 0.0
+        if "rewards/length" not in tensorboard_metrics:
+            tensorboard_metrics["rewards/length"] = 0.0
         if "rewards/mdi" not in tensorboard_metrics:
             tensorboard_metrics["rewards/mdi"] = 0.0
         
@@ -2728,7 +2787,7 @@ class GRPOTrainer(BaseTrainer):
             
             # 收集核心指标
             for key, val in metrics.items():
-                if (key in ['rewards/total', 'rewards/accuracy', 'rewards/format', 'rewards/mdi'] or
+                if (key in ['rewards/total', 'rewards/accuracy', 'rewards/format', 'rewards/length', 'rewards/mdi'] or
                     key in ['attention/mdi', 'attention/text_ratio', 'attention/vision_ratio'] or
                     key in ['attention/aei_text', 'attention/aei_vision']):
                     core_metrics[key] = val
@@ -2736,7 +2795,7 @@ class GRPOTrainer(BaseTrainer):
             if core_metrics:
                 print("📊 Core Metrics:")
                 # 按类别显示
-                reward_keys = ['rewards/total', 'rewards/accuracy', 'rewards/format', 'rewards/mdi']
+                reward_keys = ['rewards/total', 'rewards/accuracy', 'rewards/format', 'rewards/length', 'rewards/mdi']
                 attention_keys = ['attention/mdi', 'attention/text_ratio', 'attention/vision_ratio', 'attention/aei_text', 'attention/aei_vision']
                 
                 print("🎯 Rewards:")

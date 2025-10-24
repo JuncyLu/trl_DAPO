@@ -28,8 +28,15 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --top_p 1.0 \
     --logging_steps 1 \
     --eval_strategy steps \
-    --eval_steps 10 \
+    --eval_steps 1 \
     --report_to tensorboard \
-    --output_dir runs/grpo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
+    --output_dir runs/grpo-Qwen2.5-VL-7B-Instruct-$(date +%Y%m%d_%H%M%S) \
     --enable_detailed_logging \
-    --save_strategy no
+    --save_strategy steps \
+    --save_steps 562 \
+    --accuracy_weight 4.0 \
+    --format_weight 1.0 \
+    --length_weight 1.0 \
+    --mdi_as_coefficient 0 \
+    --max_completion_len 256 \
+    --soft_punish_cache 50

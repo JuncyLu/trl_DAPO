@@ -1276,7 +1276,13 @@ class OnlineDPOTrainer(BaseTrainer):
 
         # Decode the completions, and format them if the input is conversational
         device = logprobs.device
-        completions = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
+        # Filter out invalid token IDs (like -100) before decoding to prevent None tokens
+        filtered_completion_ids = []
+        for ids in completion_ids:
+            filtered_ids = [id_val for id_val in ids if id_val != -100 and id_val is not None]
+            filtered_completion_ids.append(filtered_ids)
+        
+        completions = self.processing_class.batch_decode(filtered_completion_ids, skip_special_tokens=True)
         if is_conversational({"prompt": prompts[0]}):
             completions = [[{"role": "assistant", "content": completion}] for completion in completions]
 

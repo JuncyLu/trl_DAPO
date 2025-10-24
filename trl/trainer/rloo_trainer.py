@@ -1317,8 +1317,19 @@ class RLOOTrainer(BaseTrainer):
                 ref_per_token_logps = None
 
         # Decode
-        prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=True)
-        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
+        # Filter out invalid token IDs (like -100) before decoding to prevent None tokens
+        filtered_prompt_ids = []
+        for ids in prompt_ids:
+            filtered_ids = [id_val for id_val in ids if id_val != -100 and id_val is not None]
+            filtered_prompt_ids.append(filtered_ids)
+        
+        filtered_completion_ids = []
+        for ids in completion_ids:
+            filtered_ids = [id_val for id_val in ids if id_val != -100 and id_val is not None]
+            filtered_completion_ids.append(filtered_ids)
+        
+        prompts_text = self.processing_class.batch_decode(filtered_prompt_ids, skip_special_tokens=True)
+        completions_text = self.processing_class.batch_decode(filtered_completion_ids, skip_special_tokens=True)
         if is_conversational(inputs[0]):
             completions = []
             for prompt, completion in zip(prompts, completions_text):

@@ -16,7 +16,7 @@ import math
 from typing import List, Optional
 
 
-def mdi_reward_legacy(completions: List[List[dict]], **kwargs) -> List[float]:
+def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     """
     MDI 系数版（与 accuracy 相乘）- 旧版本备份：
       - 仅使用原始注意力参数：A_T, A_O, |T|, |O|
@@ -42,44 +42,44 @@ def mdi_reward_legacy(completions: List[List[dict]], **kwargs) -> List[float]:
 
     # 基本校验
     if not (isinstance(A_T, list) and isinstance(A_O, list) and isinstance(N_T, list) and isinstance(N_O, list)):
-        return [0.40] * n
+        return [0.70] * n
 
     m = min(len(A_T), len(A_O), len(N_T), len(N_O), n)
     if m == 0:
-        return [0.40] * n
+        return [0.70] * n
 
     eps = 1e-6
     coefs: List[float] = []
 
     # 分段线性映射（根据 rollout 中的 MDI 分布定标）：
     #   区间        -> 系数范围（线性插值）
-    #   MDI <= 5    -> 1.00
-    #   5–10        -> 1.00 -> 0.95
-    #   10–20       -> 0.95 -> 0.80
-    #   20–30       -> 0.80 -> 0.70
-    #   30–40       -> 0.70 -> 0.55
-    #   40–60       -> 0.55 -> 0.40
-    #   > 60        -> 0.40
+    #   MDI <= 5    -> 1.30
+    #   5–10        -> 1.30 -> 1.20
+    #   10–20       -> 1.20 -> 1.00
+    #   20–30       -> 1.00 -> 0.90
+    #   30–40       -> 0.90 -> 0.80
+    #   40–60       -> 0.80 -> 0.70
+    #   > 60        -> 0.70
     def map_mdi_to_coef(x: float) -> float:
         if x <= 5.0:
-            return 1.00
+            return 1.30
         elif x <= 10.0:
-            # [5,10] -> [1.00,0.95]
-            return 1.00 - (x - 5.0) * (1.00 - 0.95) / 5.0
+            # [5,10] -> [1.30,1.20]
+            return 1.30 - (x - 5.0) * (1.30 - 1.20) / 5.0
         elif x <= 20.0:
-            # [10,20] -> [0.95,0.80]
-            return 0.95 - (x - 10.0) * (0.95 - 0.80) / 10.0
+            # [10,20] -> [1.20,1.00]
+            return 1.20 - (x - 10.0) * (1.20 - 1.00) / 10.0
         elif x <= 30.0:
-            # [20,30] -> [0.80,0.70]
-            return 0.80 - (x - 20.0) * (0.80 - 0.70) / 10.0
+            # [20,30] -> [1.00,0.90]
+            return 1.00 - (x - 20.0) * (1.00 - 0.90) / 10.0
         elif x <= 40.0:
-            # [30,40] -> [0.70,0.55]
-            return 0.70 - (x - 30.0) * (0.70 - 0.55) / 10.0
+            # [30,40] -> [0.90,0.80]
+            return 0.90 - (x - 30.0) * (0.90 - 0.80) / 10.0
         elif x <= 60.0:
-            # [40,60] -> [0.55,0.40]
-            return 0.55 - (x - 40.0) * (0.55 - 0.40) / 20.0
+            # [40,60] -> [0.80,0.70]
+            return 0.80 - (x - 40.0) * (0.80 - 0.70) / 20.0
         else:
-            return 0.40
+            return 0.70
 
     for i in range(m):
         try:
@@ -95,15 +95,15 @@ def mdi_reward_legacy(completions: List[List[dict]], **kwargs) -> List[float]:
             c = map_mdi_to_coef(mdi)
 
             # 安全裁剪
-            if c < 0.40: c = 0.40
-            if c > 1.00: c = 1.00
+            if c < 0.70: c = 0.70
+            if c > 1.30: c = 1.30
             coefs.append(float(c))
         except Exception:
-            coefs.append(0.40)
+            coefs.append(0.70)
 
     # 对齐长度
     if len(coefs) < n:
-        coefs.extend([0.40] * (n - len(coefs)))
+        coefs.extend([0.70] * (n - len(coefs)))
     elif len(coefs) > n:
         coefs = coefs[:n]
 
@@ -162,7 +162,7 @@ def aei_reward(completions: List[List[dict]], modality: str = "text", **kwargs) 
     return rewards
 
 
-def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
+def mdi_reward_legacy(completions: List[List[dict]], **kwargs) -> List[float]:
     """
     新版MDI奖励函数，使用新公式和系数表：
       - 新MDI公式：MDI = exp(-|log(A_T/|T| / A_O/|O|) + ε|)
@@ -185,11 +185,11 @@ def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
 
     # 基本校验
     if not (isinstance(A_T, list) and isinstance(A_O, list) and isinstance(N_T, list) and isinstance(N_O, list)):
-        return [0.40] * n
+        return [0.70] * n
 
     m = min(len(A_T), len(A_O), len(N_T), len(N_O), n)
     if m == 0:
-        return [0.40] * n
+        return [0.70] * n
 
     eps = 1e-6
     epsilon = math.log(0.5)  # ln(0.5) ≈ -0.693
@@ -263,7 +263,7 @@ def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
 
     # 对齐长度
     if len(coefs) < n:
-        coefs.extend([0.40] * (n - len(coefs)))
+        coefs.extend([0.70] * (n - len(coefs)))
     elif len(coefs) > n:
         coefs = coefs[:n]
 

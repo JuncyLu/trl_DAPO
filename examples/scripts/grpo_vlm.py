@@ -100,7 +100,7 @@ from trl import (
     get_peft_config,
     get_quantization_config,
 )
-from trl.rewards import accuracy_reward, think_format_reward, mdi_reward
+from trl.rewards import accuracy_reward, think_format_reward, mdi_reward, get_soft_overlong_punishment
 
 
 # Enable logging in a Hugging Face Space
@@ -166,6 +166,36 @@ class DataArguments:
     )
 
 
+@dataclass
+class RewardArguments:
+    """Reward function configuration arguments."""
+
+    accuracy_weight: float = field(
+        default=4.0,
+        metadata={"help": "Weight for accuracy reward (multiplier for accuracy score)."}
+    )
+    format_weight: float = field(
+        default=1.0,
+        metadata={"help": "Weight for format reward (multiplier for format score)."}
+    )
+    length_weight: float = field(
+        default=0.0,
+        metadata={"help": "Weight for length penalty reward (0 to disable)."}
+    )
+    mdi_as_coefficient: int = field(
+        default=1,
+        metadata={"help": "Whether to use MDI as coefficient for accuracy (1) or as separate reward (0)."}
+    )
+    max_completion_len: int = field(
+        default=256,
+        metadata={"help": "Maximum completion length for length penalty."}
+    )
+    soft_punish_cache: int = field(
+        default=50,
+        metadata={"help": "Soft punishment cache length for length penalty."}
+    )
+
+
 def _parse_data_files_arg(s: str) -> Dict[str, Union[str, list[str]]]:
     import json
 
@@ -220,8 +250,8 @@ if __name__ == "__main__":
 
     sys.argv = filtered_argv
 
-    parser = TrlParser((ScriptArguments, GRPOConfig, ModelConfig, DataArguments))
-    script_args, training_args, model_args, data_args = parser.parse_args_and_config()
+    parser = TrlParser((ScriptArguments, GRPOConfig, ModelConfig, DataArguments, RewardArguments))
+    script_args, training_args, model_args, data_args, reward_args = parser.parse_args_and_config()
     # Force DAPO strategy by default for this VLM script.
     # Users can still override via CLI: --loss_type grpo|dr_grpo|bnpo
     training_args.loss_type = "dapo"
@@ -695,13 +725,26 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Warning: MDI reward calculation failed: {e}")
             return [0.40] * len(completions)  # 返回默认系数
-    # 自定义reward聚合函数，实现新的公式：R_i = (4.0 * acc[i]) * c[i] + 1.0 * format[i]
+    # 创建长度惩罚函数
+    length_penalty_func = get_soft_overlong_punishment(
+        max_completion_len=reward_args.max_completion_len,
+        soft_punish_cache=reward_args.soft_punish_cache
+    )
+    
+    # 自定义reward聚合函数，支持可配置的权重
     def custom_reward_aggregator(prompts, completions, completion_ids, **kwargs):
         try:
             # 计算各个reward函数
             accuracy_rewards = mc_idx_reward(completions, **kwargs)
             format_rewards = think_format_reward(completions, **kwargs)
             mdi_coefficients = mdi_reward_with_trainer(completions, **kwargs)
+            
+            # 计算长度惩罚（如果启用）
+            length_rewards = []
+            if reward_args.length_weight > 0:
+                length_rewards = length_penalty_func(completion_ids, **kwargs)
+            else:
+                length_rewards = [0.0] * len(completions)
             
             # 将组件奖励暴露给 Trainer 以便日志记录（仅当前进程本地样本顺序）
             try:
@@ -712,6 +755,7 @@ if __name__ == "__main__":
                         # 兼容备用命名，防止Trainer使用 mc_idx_reward 名称查询失败
                         "mc_idx_reward": list(map(float, accuracy_rewards)),
                         "think_format_reward": list(map(float, format_rewards)),
+                        "length_reward": list(map(float, length_rewards)),
                         # 这里的mdi_reward是系数，仍然写入以便观察
                         "mdi_reward": list(map(float, mdi_coefficients)),
                     }
@@ -719,10 +763,15 @@ if __name__ == "__main__":
                 # 仅影响日志回退，不影响训练
                 pass
 
-            # 应用新公式：R_i = (4.0 * acc[i]) * c[i] + 1.0 * format[i]
+            # 应用可配置的奖励公式
             final_rewards = []
-            for acc, fmt, coef in zip(accuracy_rewards, format_rewards, mdi_coefficients):
-                reward = (4.0 * acc) * coef + 1.0 * fmt
+            for acc, fmt, length, coef in zip(accuracy_rewards, format_rewards, length_rewards, mdi_coefficients):
+                if reward_args.mdi_as_coefficient == 1:
+                    # MDI作为准确率的系数
+                    reward = (reward_args.accuracy_weight * acc) * coef + reward_args.format_weight * fmt + reward_args.length_weight * length
+                else:
+                    # MDI作为独立的奖励项
+                    reward = reward_args.accuracy_weight * acc + reward_args.format_weight * fmt + reward_args.length_weight * length
                 final_rewards.append(reward)
             
             return final_rewards
@@ -731,7 +780,7 @@ if __name__ == "__main__":
             # 返回默认奖励（仅基于准确率）
             try:
                 accuracy_rewards = mc_idx_reward(completions, **kwargs)
-                return [4.0 * acc for acc in accuracy_rewards]
+                return [reward_args.accuracy_weight * acc for acc in accuracy_rewards]
             except Exception as e2:
                 print(f"Warning: Fallback reward calculation also failed: {e2}")
                 return [0.0] * len(completions)
