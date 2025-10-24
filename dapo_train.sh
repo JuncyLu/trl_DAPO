@@ -13,7 +13,7 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1
 export PYTORCH_ALLOC_CONF=expandable_segments:True
 
 accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml \
-    examples/scripts/grpo_vlm.py \
+    examples/scripts/dapo_vlm.py \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
     --learning_rate 1e-5 \
     --dtype bfloat16 \
@@ -22,15 +22,15 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --data_files '{"train": "./aokvqa_trl_test_large/train.parquet", "test": "./aokvqa_trl_test_large/test.parquet"}' \
     --per_device_train_batch_size 4 \
     --gradient_accumulation_steps 4 \
-    --num_train_epochs 2 \
-    --num_generations 4 \
+    --num_train_epochs 1 \
+    --num_generations 2 \
     --temperature 1.0 \
     --top_p 1.0 \
     --logging_steps 1 \
     --eval_strategy steps \
-    --eval_steps 1 \
+    --eval_steps 10 \
     --report_to tensorboard \
-    --output_dir runs/grpo-Qwen2.5-VL-7B-Instruct-$(date +%Y%m%d_%H%M%S) \
+    --output_dir runs/dapo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
     --enable_detailed_logging \
     --save_strategy steps \
     --save_steps 562 \
@@ -39,4 +39,6 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --length_weight 1.0 \
     --mdi_as_coefficient 0 \
     --max_completion_len 256 \
-    --soft_punish_cache 50
+    --soft_punish_cache 50 \
+    --replay_buffer_size 64 \
+    --filter_min_reward 2.0

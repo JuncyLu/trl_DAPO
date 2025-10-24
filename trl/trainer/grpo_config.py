@@ -616,6 +616,26 @@ class GRPOConfig(TrainingArguments):
         },
     )
 
+    # --- Dynamic sampling buffer (replay buffer) ---
+    replay_buffer_size: int = field(
+        default=0,
+        metadata={
+            "help": "Size of the replay buffer. 0 disables buffering (keeps current behavior)."
+        },
+    )
+    filter_min_reward: float = field(
+        default=2.0,
+        metadata={
+            "help": "Group mean reward threshold. Groups with mean reward <= this value are filtered out from the buffer."
+        },
+    )
+    replay_var_epsilon: float = field(
+        default=1e-6,
+        metadata={
+            "help": "Minimum std threshold to consider a group as having variance. Helps avoid numerical noise (bfloat16/short sequences)."
+        },
+    )
+
     # Parameters that control the logging
     log_completions: bool = field(
         default=False,

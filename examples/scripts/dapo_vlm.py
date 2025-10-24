@@ -261,6 +261,13 @@ if __name__ == "__main__":
     # DAPO paper recommends asymmetric clipping with higher upper bound
     if getattr(training_args, "epsilon_high", None) is None:
         training_args.epsilon_high = 0.28
+    # Enable dynamic sampling buffer with default values if provided via CLI; else keep disabled
+    if getattr(training_args, "replay_buffer_size", None) is None:
+        training_args.replay_buffer_size = 0
+    if getattr(training_args, "filter_min_reward", None) is None:
+        training_args.filter_min_reward = 2.0
+    if getattr(training_args, "replay_var_epsilon", None) is None:
+        training_args.replay_var_epsilon = 1e-6
     # 强制启用注意力指标计算（MDI reward必需）
     training_args.compute_attention_metrics = True
     # 确保模型生成时输出注意力（供真实MDI使用）

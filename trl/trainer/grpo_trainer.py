@@ -18,6 +18,7 @@ import os
 import textwrap
 import json
 from datetime import datetime
+import heapq
 from collections import defaultdict, deque
 from contextlib import nullcontext, contextmanager
 from functools import partial
@@ -380,6 +381,34 @@ class GRPOTrainer(BaseTrainer):
                 reward_processing_classes[i] = reward_processing_class
 
         self.reward_processing_classes = reward_processing_classes
+
+        # --- Dynamic sampling replay buffer (optional; no-op when size==0) ---
+        class _ReplayBuffer:
+            def __init__(self, max_size: int):
+                self.max_size = max_size
+                self.heap = []  # min-heap of (score, data)
+
+            def add(self, scores: list[float], data: list[dict]):
+                for score, datum in zip(scores, data):
+                    # 修复：使用id作为唯一标识，避免tensor比较问题
+                    if len(self.heap) < self.max_size:
+                        heapq.heappush(self.heap, (float(score), id(datum), datum))
+                    else:
+                        if float(score) > float(self.heap[0][0]):
+                            heapq.heapreplace(self.heap, (float(score), id(datum), datum))
+
+            def sample(self, num_samples: int) -> list[dict]:
+                if not self.heap:
+                    return None
+                scores = torch.tensor([item[0] for item in self.heap], dtype=torch.float32)
+                probs = scores / scores.sum().clamp(min=1e-8)
+                replacement = num_samples > len(self.heap)
+                idxs = torch.multinomial(probs, num_samples, replacement=replacement).tolist()
+                return [self.heap[i][2] for i in idxs]  # 修复：现在datum是第3个元素
+
+        self.replay_buffer = None
+        if getattr(args, "replay_buffer_size", 0) and args.replay_buffer_size > 0:
+            self.replay_buffer = _ReplayBuffer(args.replay_buffer_size)
 
         # Realtime rollout logging setup (main process only)
         self._rollout_step_count = 0
@@ -2177,6 +2206,8 @@ class GRPOTrainer(BaseTrainer):
         batch_size = self.args.per_device_train_batch_size if mode == "train" else self.args.per_device_eval_batch_size
 
         num_images = [len(img_list) for img_list in images] if images is not None else None
+        # Maintain a mutable copy to keep consistency when groups are replaced from the buffer
+        num_images_list = list(num_images) if num_images is not None else None
 
         # Get forward_kwargs for models with multimodal inputs
         if images is not None:
@@ -2443,6 +2474,108 @@ class GRPOTrainer(BaseTrainer):
                 import traceback
                 logger.debug("Rollout logging error traceback: %s", traceback.format_exc())
 
+        # --- Dynamic sampling replay buffer integration ---
+        if self.replay_buffer is not None:
+            # Per-group views (use local process rewards to match local batch size)
+            num_groups = completion_ids.size(0) // self.num_generations
+            group_adv = advantages.view(num_groups, self.num_generations)
+            local_rewards = rewards[process_slice]
+            group_rewards = local_rewards.view(num_groups, self.num_generations)
+            group_std = group_rewards.std(dim=1)
+            eps_var = float(getattr(self.args, "replay_var_epsilon", 1e-6))
+            groups_with_variance = group_std > eps_var
+
+            # Only enqueue groups passing mean reward threshold
+            filter_min = getattr(self.args, "filter_min_reward", None)
+            if filter_min is not None:
+                group_mean = group_rewards.mean(dim=1)
+                groups_with_variance = groups_with_variance & (group_mean > float(filter_min))
+
+            # Buffer add: score = sum(|adv|) * std
+            if groups_with_variance.any():
+                scores = (group_adv.abs().sum(dim=1) * group_std)
+
+                # Build buffered outputs per selected group (trim to max valid length within group)
+                buffered_items = []
+                for group_idx in groups_with_variance.nonzero(as_tuple=True)[0].tolist():
+                    start = group_idx * self.num_generations
+                    end = (group_idx + 1) * self.num_generations
+
+                    # Determine max valid completion length in this group
+                    group_completion_mask = completion_mask[start:end]
+                    group_max_len = group_completion_mask.sum(dim=1).max().item()
+
+                    item = {
+                        "prompt_ids": prompt_ids[start:end, :prompt_mask[start:end].sum(dim=1).max().item()],
+                        "prompt_mask": prompt_mask[start:end, :prompt_mask[start:end].sum(dim=1).max().item()],
+                        "completion_ids": completion_ids[start:end, :group_max_len],
+                        "completion_mask": completion_mask[start:end, :group_max_len],
+                        "advantages": group_adv[group_idx].detach().cpu().tolist(),
+                    }
+                    if old_per_token_logps is not None:
+                        item["old_per_token_logps"] = old_per_token_logps[start:end, :group_max_len]
+                    if ref_per_token_logps is not None:
+                        item["ref_per_token_logps"] = ref_per_token_logps[start:end, :group_max_len]
+                    # Do not store vision fields in buffer to avoid inconsistency across packed tensors
+                    buffered_items.append(item)
+
+                self.replay_buffer.add(scores[groups_with_variance].detach().cpu().tolist(), buffered_items)
+
+            # Replace groups with zero variance using buffer samples
+            groups_without_variance = (~groups_with_variance)
+            num_to_replace = int(groups_without_variance.sum().item())
+            if num_to_replace > 0:
+                sampled = self.replay_buffer.sample(num_to_replace)
+                if sampled:
+                    # For shape alignment, compute target lengths
+                    cur_p_len = prompt_ids.size(1)
+                    cur_c_len = completion_ids.size(1)
+                    tgt_p_len = cur_p_len
+                    tgt_c_len = cur_c_len
+                    for s in sampled:
+                        tgt_p_len = max(tgt_p_len, s["prompt_ids"].size(1))
+                        tgt_c_len = max(tgt_c_len, s["completion_ids"].size(1))
+
+                    # If sampled longer, pad whole batch once
+                    if tgt_p_len > cur_p_len:
+                        prompt_ids = pad(list(prompt_ids.unbind(0)), padding_value=self.pad_token_id, pad_to_multiple_of=tgt_p_len, padding_side="left")
+                        prompt_mask = pad(list(prompt_mask.unbind(0)), padding_value=0, pad_to_multiple_of=tgt_p_len, padding_side="left")
+                    if tgt_c_len > cur_c_len:
+                        completion_ids = pad(list(completion_ids.unbind(0)), padding_value=self.pad_token_id, pad_to_multiple_of=tgt_c_len, padding_side="right")
+                        completion_mask = pad(list(completion_mask.unbind(0)), padding_value=0, pad_to_multiple_of=tgt_c_len, padding_side="right")
+                        if old_per_token_logps is not None:
+                            old_per_token_logps = pad(list(old_per_token_logps.unbind(0)), padding_value=0.0, pad_to_multiple_of=tgt_c_len, padding_side="right")
+                        if ref_per_token_logps is not None:
+                            ref_per_token_logps = pad(list(ref_per_token_logps.unbind(0)), padding_value=0.0, pad_to_multiple_of=tgt_c_len, padding_side="right")
+
+                    # Assign replacements
+                    replace_groups = groups_without_variance.nonzero(as_tuple=True)[0].tolist()
+                    for s, gidx in zip(sampled, replace_groups):
+                        start = gidx * self.num_generations
+                        end = (gidx + 1) * self.num_generations
+                        # Pad sampled tensors up to target lens if needed
+                        def _pad_to(t, tgt_len, side):
+                            if t.size(1) < tgt_len:
+                                return pad(t, padding_value=(0 if t.dtype == torch.long else 0.0), pad_to_multiple_of=tgt_len, padding_side=side)
+                            return t
+                        sp_ids = _pad_to(s["prompt_ids"].to(prompt_ids.device), prompt_ids.size(1), "left") if "prompt_ids" in s else None
+                        sp_msk = _pad_to(s["prompt_mask"].to(prompt_mask.device), prompt_mask.size(1), "left") if "prompt_mask" in s else None
+                        sc_ids = _pad_to(s["completion_ids"].to(completion_ids.device), completion_ids.size(1), "right")
+                        sc_msk = _pad_to(s["completion_mask"].to(completion_mask.device), completion_mask.size(1), "right")
+                        # For multimodal batches, keep original prompts to preserve image-token alignment
+                        if images is None and sp_ids is not None and sp_msk is not None:
+                            prompt_ids[start:end] = sp_ids
+                            prompt_mask[start:end] = sp_msk
+                        completion_ids[start:end] = sc_ids
+                        completion_mask[start:end] = sc_msk
+                        # advantages stored as list
+                        advantages[start:end] = torch.tensor(s["advantages"], device=advantages.device)
+                        if old_per_token_logps is not None and "old_per_token_logps" in s:
+                            old_per_token_logps[start:end] = _pad_to(s["old_per_token_logps"].to(old_per_token_logps.device), old_per_token_logps.size(1), "right")
+                        if ref_per_token_logps is not None and "ref_per_token_logps" in s:
+                            ref_per_token_logps[start:end] = _pad_to(s["ref_per_token_logps"].to(ref_per_token_logps.device), ref_per_token_logps.size(1), "right")
+                        # Do not replace packed vision tensors here; keep original vision alignment
+
         output = {
             "prompt_ids": prompt_ids,
             "prompt_mask": prompt_mask,
@@ -2468,7 +2601,8 @@ class GRPOTrainer(BaseTrainer):
         if "token_type_ids" in forward_kwargs:
             output["token_type_ids"] = forward_kwargs["token_type_ids"]
         if images is not None:
-            output["num_images"] = num_images
+            # Provide as list[int] for downstream split routines
+            output["num_images"] = num_images_list if num_images_list is not None else []
         return output
 
     def compute_liger_loss(self, unwrapped_model, inputs):
