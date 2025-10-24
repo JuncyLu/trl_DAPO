@@ -1819,6 +1819,7 @@ class GRPOTrainer(BaseTrainer):
         total_rewards_local: torch.Tensor,
         reward_names: list[str],
         mdi_info: list[dict],
+        original_prompts: Optional[list[str]] = None,
     ) -> None:
         if not (self.accelerator.is_main_process and getattr(self.args, "realtime_rollout_logging", False)):
             return
@@ -1992,7 +1993,23 @@ class GRPOTrainer(BaseTrainer):
                     # 详细的样本信息
                     for i, (r, info) in enumerate(zip(rows, mdi_info), start=1):
                         f.write(f"### Sample {i}\n\n")
-                        f.write(f"**Prompt:** {r[1]}\n\n")
+                        # 显示处理后的prompt，但保留special token
+                        if original_prompts and idx < len(original_prompts):
+                            # 使用maybe_apply_chat_template处理原始prompt，但保留special token
+                            try:
+                                processed_prompt = maybe_apply_chat_template(
+                                    {"prompt": original_prompts[idx]}, 
+                                    self.processing_class
+                                )["prompt"]
+                                f.write(f"**Prompt:** {processed_prompt}\n\n")
+                            except Exception:
+                                # 如果处理失败，格式化显示原始prompt
+                                prompt_str = str(original_prompts[idx])
+                                if len(prompt_str) > 500:
+                                    prompt_str = prompt_str[:500] + "..."
+                                f.write(f"**Prompt:** {prompt_str}\n\n")
+                        else:
+                            f.write(f"**Prompt:** {r[1]}\n\n")
                         f.write(f"**Completion:** {r[2]}\n\n")
                         f.write(f"**Solution:** {r[3]}\n\n")
                         f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, mdi={r[7]:.3f}, total={r[8]:.3f}\n\n")
@@ -2466,6 +2483,7 @@ class GRPOTrainer(BaseTrainer):
                     total_rewards_local=local_total_rewards.detach().cpu(),
                     reward_names=self.reward_func_names,
                     mdi_info=mdi_info,
+                    original_prompts=prompts,
                 )
                 pass  # Successfully logged rollout results
             except Exception as e:

@@ -60,9 +60,12 @@ def think_format_reward(completions: list[list[dict[str, str]]], **kwargs) -> li
             return False
         
         # Check for other XML-like tags (case insensitive)
-        other_tags_pattern = r'<(?!/?think>)[a-zA-Z][a-zA-Z0-9]*>'
-        if re.search(other_tags_pattern, content, re.IGNORECASE):
-            return False
+        # Find all XML tags and check if any are not the allowed ones
+        all_tags = re.findall(r'<[^>]+>', content)
+        allowed_tags = ['<think>', '</think>']
+        for tag in all_tags:
+            if tag.lower() not in [t.lower() for t in allowed_tags]:
+                return False
         
         # Check for proper nesting - no nested <think> tags
         pattern = r'^<think>(?!.*<think>)(.*?)</think>.*$'

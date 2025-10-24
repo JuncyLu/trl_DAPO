@@ -28,7 +28,7 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --top_p 1.0 \
     --logging_steps 1 \
     --eval_strategy steps \
-    --eval_steps 10 \
+    --eval_steps 5 \
     --report_to tensorboard \
     --output_dir runs/dapo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
     --enable_detailed_logging \
