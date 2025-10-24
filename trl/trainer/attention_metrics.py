@@ -71,8 +71,12 @@ def _collect_llm_attention_for_sample(
             cur[1:, 0] = 0.0
         if normalize_rows:
             cur = _row_normalize(cur)
-        for row in cur:
-            per_layer_rows[layer_idx].append(row.detach().cpu())
+        # 直接移动到CPU，避免在GPU上逐行操作
+        cur_cpu = cur.detach().cpu()
+        for row in cur_cpu:
+            per_layer_rows[layer_idx].append(row)
+        # 清理中间张量
+        del attn, attn_avg, cur
 
     for step_layers in outputs_attentions[1:]:
         for layer_idx, layer_attn in enumerate(step_layers):
@@ -87,8 +91,13 @@ def _collect_llm_attention_for_sample(
                 row[0] = 0.0
             if normalize_rows:
                 row = _row_normalize(row)
-            row = torch.cat([row, torch.zeros(1, dtype=row.dtype, device=row.device)])
-            per_layer_rows[layer_idx].append(row.detach().cpu())
+            # 直接移动到CPU，避免GPU上的cat操作
+            row_cpu = row.detach().cpu()
+            # 在CPU上添加padding
+            row_cpu = torch.cat([row_cpu, torch.zeros(1, dtype=row_cpu.dtype)])
+            per_layer_rows[layer_idx].append(row_cpu)
+            # 清理中间张量
+            del attn, attn_avg, row
 
     result: Dict[int, torch.Tensor] = {}
     for layer_idx, rows in per_layer_rows.items():
@@ -103,6 +112,11 @@ def _collect_llm_attention_for_sample(
                 row = torch.cat([row, pad], dim=0)
             padded_rows.append(row)
         result[layer_idx] = torch.stack(padded_rows, dim=0)
+        # 清理中间数据
+        del padded_rows
+    
+    # 清理所有中间数据
+    del per_layer_rows
     return result
 
 
@@ -277,6 +291,9 @@ def _compute_segment_metrics(
         attn_text_total += gen_attn_norm[:, text_keys_mask].sum().item()
         attn_vision_total += gen_attn_norm[:, vision_keys_mask].sum().item()
         num_layers_with_data += 1
+        
+        # 清理中间张量
+        del gen_attn, gen_attn_norm, text_keys_mask, vision_keys_mask
 
     if num_layers_with_data == 0:
         return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
@@ -383,6 +400,9 @@ def compute_qwen_attention_metrics_for_batch(
             )
         )
         skip_reasons.append(None)
+        
+        # 清理中间数据
+        del per_layer_attn, input_ids_sample, spans, instruction_mask, vision_mask
 
     return results, skip_reasons
 

@@ -375,7 +375,7 @@ class GRPOConfig(TrainingArguments):
         },
     )
     repetition_penalty: float = field(
-        default=1.0,
+        default=1.08,
         metadata={
             "help": "Float that penalizes new tokens based on whether they appear in the prompt and the generated "
             "text so far. Values > 1.0 encourage the model to use new tokens, while values < 1.0 encourage the model "

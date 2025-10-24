@@ -11,6 +11,8 @@ export CUDA_DEVICE_MAX_CONNECTIONS=1
 
 # 内存碎片缓解
 export PYTORCH_ALLOC_CONF=expandable_segments:True
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export CUDA_LAUNCH_BLOCKING=1
 
 accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml \
     examples/scripts/dapo_vlm.py \
@@ -18,14 +20,14 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --learning_rate 1e-5 \
     --dtype bfloat16 \
     --max_prompt_length 1024 \
-    --max_completion_length 256 \
+    --max_completion_length 128 \
     --data_files '{"train": "./aokvqa_trl_test_large/train.parquet", "test": "./aokvqa_trl_test_large/test.parquet"}' \
     --per_device_train_batch_size 4 \
-    --gradient_accumulation_steps 4 \
+    --gradient_accumulation_steps 8 \
     --num_train_epochs 1 \
     --num_generations 2 \
-    --temperature 1.0 \
-    --top_p 1.0 \
+    --temperature 0.85 \
+    --top_p 0.9 \
     --logging_steps 1 \
     --eval_strategy steps \
     --eval_steps 5 \
@@ -34,11 +36,12 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --enable_detailed_logging \
     --save_strategy steps \
     --save_steps 562 \
-    --accuracy_weight 4.0 \
-    --format_weight 1.0 \
-    --length_weight 1.0 \
+    --accuracy_weight 3.0 \
+    --format_weight 2.0 \
+    --length_weight 0.0 \
     --mdi_as_coefficient 0 \
-    --max_completion_len 256 \
-    --soft_punish_cache 50 \
-    --replay_buffer_size 64 \
-    --filter_min_reward 2.0
+    --max_completion_len 128 \
+    --soft_punish_cache 30 \
+    --replay_buffer_size 24 \
+    --filter_min_reward 3.0 \
+    --max_grad_norm 1.0

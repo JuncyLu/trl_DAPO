@@ -14,6 +14,17 @@
 
 import re
 
+# 软格式奖励的辅助正则表达式
+ALLOWED_NOISE = re.compile(r'^[\s:.,;!?\"\'\-\(\)\[\]_]*$')
+BAD_PATTERNS = [
+    re.compile(r'</think>{2,}', re.I),   # 多重关闭
+    re.compile(r'[-_=]{4,}'),            # 连续符号风暴
+]
+
+FORMAT_FULL = re.compile(
+    r'(?s)^\s*<think>(?P<thought>.*?)</think>\s*Answer\s*:\s*(?P<ans>[A-J])\s*$'
+)
+
 
 def think_format_reward(completions: list[list[dict[str, str]]], **kwargs) -> list[float]:
     r"""
@@ -73,3 +84,67 @@ def think_format_reward(completions: list[list[dict[str, str]]], **kwargs) -> li
     
     completion_contents = [completion[0]["content"] for completion in completions]
     return [1.0 if check_format(content) else 0.0 for content in completion_contents]
+
+
+def soft_think_format_reward(text: str) -> float:
+    """
+    可塑 + 反作弊的格式奖励函数
+    
+    Args:
+        text: 要评估的文本内容
+        
+    Returns:
+        float: 0.0-1.0之间的格式奖励分数
+    """
+    text = (text or "").strip()
+    score = 0.0
+
+    # 反作弊先扣分
+    penalty = 0.0
+    for pat in BAD_PATTERNS:
+        if pat.search(text):
+            penalty -= 0.25   # 可调，最多叠到 -0.75
+
+    # 完整匹配直接高分
+    m = FORMAT_FULL.match(text)
+    if m:
+        thought = (m.group("thought") or "").strip()
+        score = 0.9 + min(len(thought) / 80.0, 0.1)  # 0.9~1.0
+    else:
+        # 组件式部分得分
+        has_open  = "<think>" in text
+        has_close = "</think>" in text
+        if has_open:  score += 0.3
+        if has_close: score += 0.3
+        if re.search(r"Answer\s*:\s*[A-J]\b", text): score += 0.3
+
+        # 思考段长度给予最多 0.1
+        mm = re.search(r"<think>(?P<t>.*?)</think>", text, re.S)
+        if mm:
+            t = (mm.group("t") or "").strip()
+            if t and not ALLOWED_NOISE.fullmatch(t):
+                score += min(len(t) / 80.0, 0.1)
+
+        # 顺序错误扣分（Answer 出现在 think 之前）
+        pos_think = text.find("<think>")
+        pos_ans   = re.search(r"Answer\s*:", text)
+        if pos_think >= 0 and pos_ans and pos_think > pos_ans.start():
+            penalty -= 0.2
+
+    score = max(0.0, min(1.0, score + penalty))
+    return float(score)
+
+
+def soft_think_format_reward_batch(completions: list[list[dict[str, str]]], **kwargs) -> list[float]:
+    """
+    批量处理软格式奖励函数，兼容TRL训练器接口
+    
+    Args:
+        completions: 完成文本列表，每个元素是包含"content"键的字典列表
+        **kwargs: 其他参数（保持兼容性）
+        
+    Returns:
+        list[float]: 每个完成文本的格式奖励分数
+    """
+    completion_contents = [completion[0]["content"] for completion in completions]
+    return [soft_think_format_reward(content) for content in completion_contents]
