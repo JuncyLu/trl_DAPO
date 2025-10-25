@@ -721,6 +721,13 @@ class GRPOTrainer(BaseTrainer):
                         with open(self.args.attention_diag_log_path, "w", encoding="utf-8") as f:
                             f.write("# Attention Diagnostics Log\n\n")
                             f.write("This file contains MDI attention diagnostics from GRPO training.\n\n")
+
+                if getattr(self.args, "eval_log_path", None):
+                    os.makedirs(os.path.dirname(self.args.eval_log_path), exist_ok=True)
+                    if not os.path.exists(self.args.eval_log_path):
+                        with open(self.args.eval_log_path, "w", encoding="utf-8") as f:
+                            f.write("# Evaluation Log\n\n")
+                            f.write("This file contains detailed evaluation results from GRPO training.\n\n")
             except Exception as e:
                 logger.exception("Failed to set up logging files: %s", e)
             if getattr(self.args, "colorize_output", False) and Console is not None:
@@ -1774,7 +1781,11 @@ class GRPOTrainer(BaseTrainer):
             late_data = process_segment("late")
             all_data = process_segment("all")
 
-            main_segment = late_data if late_data["mdi"] != 1.0 else all_data
+            # 修复MDI选择逻辑：优先使用late段，如果无效则使用all段
+            if late_data["mdi"] != 1.0:
+                main_segment = late_data
+            else:
+                main_segment = all_data
             mdi = main_segment["mdi"]
 
             text_ratio = mdi / (1.0 + mdi)
@@ -1790,13 +1801,16 @@ class GRPOTrainer(BaseTrainer):
                 "early_mdi": early_data["mdi"],
                 "middle_mdi": middle_data["mdi"],
                 "late_mdi": late_data["mdi"],
+                "all_mdi": all_data["mdi"],
                 "early_aei_text": early_data["aei_text"],
                 "early_aei_vision": early_data["aei_vision"],
                 "middle_aei_text": middle_data["aei_text"],
                 "middle_aei_vision": middle_data["aei_vision"],
                 "late_aei_text": late_data["aei_text"],
                 "late_aei_vision": late_data["aei_vision"],
-                "aei_text": all_data["aei_text"],
+                "all_aei_text": all_data["aei_text"],
+                "all_aei_vision": all_data["aei_vision"],
+                "aei_text": all_data["aei_text"], 
                 "aei_vision": all_data["aei_vision"],
                 "early_text_ratio": early_data["text_ratio"],
                 "early_vision_ratio": early_data["vision_ratio"],
@@ -1804,6 +1818,8 @@ class GRPOTrainer(BaseTrainer):
                 "middle_vision_ratio": middle_data["vision_ratio"],
                 "late_text_ratio": late_data["text_ratio"],
                 "late_vision_ratio": late_data["vision_ratio"],
+                "all_text_ratio": all_data["text_ratio"],
+                "all_vision_ratio": all_data["vision_ratio"],
                 "skip_reason": None,
             }
             results.append(result)
@@ -1858,12 +1874,12 @@ class GRPOTrainer(BaseTrainer):
             else:
                 acc = 0.0
             
-            fmt_idx = name_to_idx.get("think_format_reward")
+            fmt_idx = name_to_idx.get("format_reward")
             if rewards_per_func_local.numel() and fmt_idx is not None:
                 fmt = float(rewards_per_func_local[idx, fmt_idx].item())
             elif last_component_rewards and isinstance(last_component_rewards, dict):
                 try:
-                    fmt_list = last_component_rewards.get("think_format_reward")
+                    fmt_list = last_component_rewards.get("format_reward")
                     fmt = float(fmt_list[idx]) if fmt_list is not None else 0.0
                 except Exception:
                     fmt = 0.0
@@ -1973,7 +1989,7 @@ class GRPOTrainer(BaseTrainer):
                             early_mdi = [info.get("early_mdi", 0) for info in mdi_info if info.get("early_mdi") is not None]
                             middle_mdi = [info.get("middle_mdi", 0) for info in mdi_info if info.get("middle_mdi") is not None]
                             late_mdi = [info.get("late_mdi", 0) for info in mdi_info if info.get("late_mdi") is not None]
-                            all_mdi = [info.get("mdi", 0) for info in mdi_info if info.get("mdi") is not None]
+                            all_mdi = [info.get("all_mdi", 0) for info in mdi_info if info.get("all_mdi") is not None]
                             
                             early_aei_text = [info.get("early_aei_text", 0) for info in mdi_info]
                             early_aei_vision = [info.get("early_aei_vision", 0) for info in mdi_info]
@@ -1981,8 +1997,8 @@ class GRPOTrainer(BaseTrainer):
                             middle_aei_vision = [info.get("middle_aei_vision", 0) for info in mdi_info]
                             late_aei_text = [info.get("late_aei_text", 0) for info in mdi_info]
                             late_aei_vision = [info.get("late_aei_vision", 0) for info in mdi_info]
-                            all_aei_text = [info.get("aei_text", 0) for info in mdi_info]
-                            all_aei_vision = [info.get("aei_vision", 0) for info in mdi_info]
+                            all_aei_text = [info.get("all_aei_text", 0) for info in mdi_info]
+                            all_aei_vision = [info.get("all_aei_vision", 0) for info in mdi_info]
                             
                             f.write(f"| Early | {np.mean(early_mdi):.3f} | {np.std(early_mdi):.3f} | {np.mean(early_aei_text):.3f} | {np.mean(early_aei_vision):.3f} |\n")
                             f.write(f"| Middle | {np.mean(middle_mdi):.3f} | {np.std(middle_mdi):.3f} | {np.mean(middle_aei_text):.3f} | {np.mean(middle_aei_vision):.3f} |\n")
@@ -1995,7 +2011,18 @@ class GRPOTrainer(BaseTrainer):
                         f.write(f"**Prompt:** {r[1]}\n\n")
                         f.write(f"**Completion:** {r[2]}\n\n")
                         f.write(f"**Solution:** {r[3]}\n\n")
-                        f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, mdi={r[7]:.3f}, total={r[8]:.3f}\n\n")
+                        # 根据MDI使用方式显示不同的标签
+                        mdi_as_coefficient = getattr(self.args, 'mdi_as_coefficient', 0) if hasattr(self, 'args') else 0
+                        
+                        # 获取真正的MDI值
+                        true_mdi = info.get("mdi", 0.0) if info else 0.0
+                        
+                        if mdi_as_coefficient == 1:
+                            # MDI作为系数
+                            f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, mdi_coe={r[7]:.3f}, mdi={true_mdi:.3f}, total={r[8]:.3f}\n\n")
+                        else:
+                            # MDI作为加法项
+                            f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, mdi_add={r[7]:.3f}, mdi={true_mdi:.3f}, total={r[8]:.3f}\n\n")
                         
                         # 添加详细的metrics信息
                         if info:
@@ -2032,11 +2059,11 @@ class GRPOTrainer(BaseTrainer):
                                         "vision_ratio": info.get("late_vision_ratio")
                                     },
                                     "all": {
-                                        "mdi": info.get("mdi"),
-                                        "aei_text": info.get("aei_text"),
-                                        "aei_vision": info.get("aei_vision"),
-                                        "text_ratio": info.get("text_ratio"),
-                                        "vision_ratio": info.get("vision_ratio")
+                                        "mdi": info.get("all_mdi"),
+                                        "aei_text": info.get("all_aei_text"),
+                                        "aei_vision": info.get("all_aei_vision"),
+                                        "text_ratio": info.get("all_text_ratio"),
+                                        "vision_ratio": info.get("all_vision_ratio")
                                     }
                                 },
                                 "token_counts": {
@@ -2070,7 +2097,7 @@ class GRPOTrainer(BaseTrainer):
                         early_mdi = [info.get("early_mdi", 0) for info in mdi_info if info.get("early_mdi") is not None]
                         middle_mdi = [info.get("middle_mdi", 0) for info in mdi_info if info.get("middle_mdi") is not None]
                         late_mdi = [info.get("late_mdi", 0) for info in mdi_info if info.get("late_mdi") is not None]
-                        all_mdi = [info.get("mdi", 0) for info in mdi_info if info.get("mdi") is not None]
+                        all_mdi = [info.get("all_mdi", 0) for info in mdi_info if info.get("all_mdi") is not None]
                         
                         f.write(f"| MDI Mean | {np.mean(early_mdi):.3f} | {np.mean(middle_mdi):.3f} | {np.mean(late_mdi):.3f} | {np.mean(all_mdi):.3f} |\n")
                         f.write(f"| MDI Std | {np.std(early_mdi):.3f} | {np.std(middle_mdi):.3f} | {np.std(late_mdi):.3f} | {np.std(all_mdi):.3f} |\n")
@@ -2127,11 +2154,11 @@ class GRPOTrainer(BaseTrainer):
                                     "vision_ratio": info.get("late_vision_ratio")
                                 },
                                 "all": {
-                                    "mdi": info.get("mdi"),
-                                    "aei_text": info.get("aei_text"),
-                                    "aei_vision": info.get("aei_vision"),
-                                    "text_ratio": info.get("text_ratio"),
-                                    "vision_ratio": info.get("vision_ratio")
+                                    "mdi": info.get("all_mdi"),
+                                    "aei_text": info.get("all_aei_text"),
+                                    "aei_vision": info.get("all_aei_vision"),
+                                    "text_ratio": info.get("all_text_ratio"),
+                                    "vision_ratio": info.get("all_vision_ratio")
                                 }
                             },
                             "overall": {
@@ -2152,6 +2179,297 @@ class GRPOTrainer(BaseTrainer):
         except Exception as e:
             # 添加调试信息
             print(f"⚠️  Warning: Failed to write to log files: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _emit_eval_logs(self, metrics: dict[str, float], logs: dict[str, float]) -> None:
+        """
+        记录evaluation日志到eval_log.md文件，包含所有样本的详细信息
+        
+        Args:
+            metrics: 计算得到的指标字典
+            logs: 原始日志字典
+        """
+        if not (self.accelerator.is_main_process and getattr(self.args, "eval_log_path", None)):
+            return
+            
+        try:
+            from datetime import datetime
+            import json
+            
+            # 获取当前时间戳
+            ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # 构建header
+            step = getattr(self.state, "global_step", 0)
+            epoch = getattr(self.state, "epoch", 0)
+            header = f"=== Evaluation Step {step} ==="
+            
+            # 确保目录存在
+            os.makedirs(os.path.dirname(self.args.eval_log_path), exist_ok=True)
+            
+            with open(self.args.eval_log_path, "a", encoding="utf-8") as f:
+                f.write(f"\n## {header} | {ts}\n\n")
+                
+                # 添加总体统计信息
+                f.write("### Overall Statistics\n\n")
+                f.write("| Metric | Value |\n")
+                f.write("|--------|-------|\n")
+                
+                # 核心指标
+                core_metrics = {
+                    "eval_loss": logs.get("eval_loss", 0.0),
+                    "eval_reward": metrics.get("eval_reward", 0.0),
+                    "eval_accuracy": metrics.get("eval_accuracy", 0.0),
+                    "eval_format": metrics.get("eval_format", 0.0),
+                    "eval_length": metrics.get("eval_length", 0.0),
+                    "eval_mdi": metrics.get("eval_mdi", 0.0),
+                }
+                
+                for key, value in core_metrics.items():
+                    if value is not None:
+                        f.write(f"| {key} | {value:.4f} |\n")
+                
+                # 注意力指标
+                attention_metrics = {
+                    "eval_attention/early/mdi": logs.get("eval_attention/early/mdi"),
+                    "eval_attention/middle/mdi": logs.get("eval_attention/middle/mdi"),
+                    "eval_attention/late/mdi": logs.get("eval_attention/late/mdi"),
+                    "eval_attention/all/mdi": logs.get("eval_attention/all/mdi"),
+                }
+                
+                if any(v is not None for v in attention_metrics.values()):
+                    f.write("\n### Attention Statistics\n\n")
+                    f.write("| Stage | MDI | AEI Text | AEI Vision |\n")
+                    f.write("|-------|-----|----------|------------|\n")
+                    
+                    stages = ["early", "middle", "late", "all"]
+                    for stage in stages:
+                        mdi_key = f"eval_attention/{stage}/mdi"
+                        aei_text_key = f"eval_attention/{stage}/aei_text"
+                        aei_vision_key = f"eval_attention/{stage}/aei_vision"
+                        
+                        mdi_val = logs.get(mdi_key, 0.0)
+                        aei_text_val = logs.get(aei_text_key, 0.0)
+                        aei_vision_val = logs.get(aei_vision_key, 0.0)
+                        
+                        f.write(f"| {stage.title()} | {mdi_val:.3f} | {aei_text_val:.3f} | {aei_vision_val:.3f} |\n")
+                
+                # 获取样本数据 - 从最近的eval结果中获取
+                eval_samples = self._get_eval_samples()
+                
+                if eval_samples:
+                    f.write(f"\n### Evaluation Samples ({len(eval_samples)} samples)\n\n")
+                    
+                    for i, sample in enumerate(eval_samples, 1):
+                        f.write(f"### Sample {i}\n\n")
+                        
+                        # 显示prompt
+                        f.write(f"**Prompt:** {sample.get('prompt', 'N/A')}\n\n")
+                        
+                        # 显示completion
+                        f.write(f"**Completion:** {sample.get('completion', 'N/A')}\n\n")
+                        
+                        # 显示solution（如果有）
+                        if 'solution' in sample:
+                            f.write(f"**Solution:** {sample['solution']}\n\n")
+                        
+                        # 显示rewards - 尝试从组件奖励中获取具体值
+                        rewards = sample.get('rewards', {})
+                        f.write(f"**Rewards:** ")
+                        
+                        # 尝试从_last_component_rewards获取各个组件的值
+                        if (hasattr(self, "_last_component_rewards") 
+                            and isinstance(self._last_component_rewards, dict)
+                            and len(self._last_component_rewards) > 0):
+                            
+                            # 获取各个组件的值
+                            comp = self._last_component_rewards
+                            acc_list = comp.get("accuracy_reward") or comp.get("mc_idx_reward", [])
+                            fmt_list = comp.get("format_reward", [])
+                            length_list = comp.get("length_reward", [])
+                            mdi_list = comp.get("mdi_reward", [])
+                            
+                            # 获取当前样本的索引（使用eval_samples中的索引）
+                            sample_idx = eval_samples.index(sample) if sample in eval_samples else 0
+                            
+                            # 构建rewards字符串
+                            reward_parts = []
+                            if acc_list and sample_idx < len(acc_list):
+                                reward_parts.append(f"accuracy={acc_list[sample_idx]:.3f}")
+                            if fmt_list and sample_idx < len(fmt_list):
+                                reward_parts.append(f"format={fmt_list[sample_idx]:.3f}")
+                            if length_list and sample_idx < len(length_list):
+                                reward_parts.append(f"length={length_list[sample_idx]:.3f}")
+                            
+                            # 根据MDI使用方式显示不同的标签
+                            if mdi_list and sample_idx < len(mdi_list):
+                                # 检查MDI是作为系数还是加法使用
+                                # 通过检查trainer的配置或参数来判断
+                                mdi_as_coefficient = getattr(self.args, 'mdi_as_coefficient', 0) if hasattr(self, 'args') else 0
+                                
+                                if mdi_as_coefficient == 1:
+                                    # MDI作为系数
+                                    reward_parts.append(f"mdi_coe={mdi_list[sample_idx]:.3f}")
+                                else:
+                                    # MDI作为加法项
+                                    reward_parts.append(f"mdi_add={mdi_list[sample_idx]:.3f}")
+                                
+                                # 计算并显示真正的MDI值（需要从attention参数计算）
+                                # 这里我们需要获取原始的attention参数来计算真正的MDI
+                                if (hasattr(self, "_attention_text_current_batch") and 
+                                    hasattr(self, "_attention_vision_current_batch") and
+                                    hasattr(self, "_num_text_tokens_current_batch") and
+                                    hasattr(self, "_num_vision_tokens_current_batch")):
+                                    
+                                    try:
+                                        a_t = float(self._attention_text_current_batch[sample_idx])
+                                        a_o = float(self._attention_vision_current_batch[sample_idx])
+                                        t = int(self._num_text_tokens_current_batch[sample_idx])
+                                        o = int(self._num_vision_tokens_current_batch[sample_idx])
+                                        
+                                        # 计算真正的MDI值
+                                        text_density = a_t / max(1, t)
+                                        vision_density = a_o / max(1, o)
+                                        true_mdi = text_density / max(vision_density, 1e-6)
+                                        
+                                        reward_parts.append(f"mdi={true_mdi:.3f}")
+                                    except (IndexError, ValueError, TypeError):
+                                        # 如果无法计算真正的MDI，跳过
+                                        pass
+                            
+                            if reward_parts:
+                                f.write(", ".join(reward_parts))
+                            else:
+                                # 回退到原始格式
+                                for key, value in rewards.items():
+                                    reward_parts.append(f"{key}={value:.3f}")
+                                f.write(", ".join(reward_parts))
+                        else:
+                            # 回退到原始格式
+                            for key, value in rewards.items():
+                                reward_parts.append(f"{key}={value:.3f}")
+                            f.write(", ".join(reward_parts))
+                        
+                        f.write(f", total={sample.get('total_reward', 0.0):.3f}\n\n")
+                        
+                        # 显示详细指标（如果有）
+                        if 'detailed_metrics' in sample:
+                            f.write("**Detailed Metrics:**\n\n")
+                            f.write("```json\n")
+                            f.write(json.dumps(sample['detailed_metrics'], ensure_ascii=False, indent=2))
+                            f.write("\n```\n\n")
+                        
+                        f.write("---\n\n")
+                
+        except Exception as e:
+            logger.warning("Failed to emit eval logs: %s", e)
+            import traceback
+            traceback.print_exc()
+
+    def _get_eval_samples(self) -> list[dict]:
+        """
+        获取最近的evaluation样本数据
+        
+        Returns:
+            list[dict]: 包含样本信息的字典列表
+        """
+        try:
+            # 从最近的eval结果中获取样本数据
+            # 这里需要从trainer的状态中获取eval样本
+            eval_samples = []
+            
+            # 检查是否有存储的eval样本数据
+            if hasattr(self, '_last_eval_samples'):
+                eval_samples = self._last_eval_samples
+            elif hasattr(self, '_logs') and 'eval_prompt' in self._logs:
+                # 从logs中构建样本数据
+                prompts = self._logs.get('eval_prompt', [])
+                completions = self._logs.get('eval_completion', [])
+                rewards = self._logs.get('eval_rewards', {})
+                
+                for i in range(len(prompts)):
+                    sample = {
+                        'prompt': prompts[i] if i < len(prompts) else 'N/A',
+                        'completion': completions[i] if i < len(completions) else 'N/A',
+                        'rewards': {},
+                        'total_reward': 0.0
+                    }
+                    
+                    # 添加各个reward组件
+                    for reward_name, reward_values in rewards.items():
+                        if isinstance(reward_values, list) and i < len(reward_values):
+                            sample['rewards'][reward_name] = float(reward_values[i])
+                            sample['total_reward'] += float(reward_values[i])
+                    
+                    eval_samples.append(sample)
+            
+            return eval_samples
+            
+        except Exception as e:
+            logger.warning("Failed to get eval samples: %s", e)
+            return []
+
+    def _collect_eval_samples(self, prompts_text: list[str], completions_text: list[str], 
+                             rewards_per_func: torch.Tensor, inputs: list[dict]) -> None:
+        """
+        在evaluation模式下收集样本数据
+        
+        Args:
+            prompts_text: prompt文本列表
+            completions_text: completion文本列表
+            rewards_per_func: 各reward函数的奖励值
+            inputs: 输入数据列表
+        """
+        try:
+            # 初始化eval样本存储
+            if not hasattr(self, '_last_eval_samples'):
+                self._last_eval_samples = []
+            
+            # 获取当前进程的样本数据
+            process_slice = slice(
+                self.accelerator.process_index * len(prompts_text),
+                (self.accelerator.process_index + 1) * len(prompts_text),
+            )
+            
+            local_prompts = prompts_text[process_slice]
+            local_completions = completions_text[process_slice]
+            local_rewards = rewards_per_func[process_slice]
+            
+            # 为每个样本创建详细信息
+            for i, (prompt, completion) in enumerate(zip(local_prompts, local_completions)):
+                sample = {
+                    'prompt': prompt,
+                    'completion': completion,
+                    'rewards': {},
+                    'total_reward': 0.0,
+                    'detailed_metrics': {}
+                }
+                
+                # 添加各个reward组件
+                for j, reward_name in enumerate(self.reward_func_names):
+                    reward_value = float(local_rewards[i, j])
+                    sample['rewards'][reward_name] = reward_value
+                    sample['total_reward'] += reward_value
+                
+                # 添加solution信息（如果有）
+                if i < len(inputs) and 'solution' in inputs[i]:
+                    sample['solution'] = inputs[i]['solution']
+                
+                # 添加详细指标
+                sample['detailed_metrics'] = {
+                    'step': getattr(self.state, "global_step", 0),
+                    'epoch': getattr(self.state, "epoch", 0),
+                    'rewards': sample['rewards'],
+                    'total_reward': sample['total_reward'],
+                    'prompt_length': len(prompt),
+                    'completion_length': len(completion),
+                }
+                
+                self._last_eval_samples.append(sample)
+            
+        except Exception as e:
+            logger.warning("Failed to collect eval samples: %s", e)
             import traceback
             traceback.print_exc()
 
@@ -2378,6 +2696,10 @@ class GRPOTrainer(BaseTrainer):
         for i, name in enumerate(self.reward_func_names):
             self._logs["rewards"][name].extend(rewards_per_func[:, i].tolist())
         self._logs["advantages"].extend(all_process_advantages.tolist())
+        
+        # 在evaluation模式下收集样本数据
+        if mode == "eval":
+            self._collect_eval_samples(prompts_text, completions_text, rewards_per_func, inputs)
 
         if images is not None:
             self._logs["images"].extend(gather_object(images))
@@ -2504,10 +2826,19 @@ class GRPOTrainer(BaseTrainer):
                     # Determine max valid completion length in this group
                     group_completion_mask = completion_mask[start:end]
                     group_max_len = group_completion_mask.sum(dim=1).max().item()
+                    
+                    # Safety check: ensure group_max_len is at least 1 to avoid tensor size mismatch
+                    if group_max_len == 0:
+                        group_max_len = 1
 
+                    # Safety check for prompt length
+                    prompt_max_len = prompt_mask[start:end].sum(dim=1).max().item()
+                    if prompt_max_len == 0:
+                        prompt_max_len = 1
+                    
                     item = {
-                        "prompt_ids": prompt_ids[start:end, :prompt_mask[start:end].sum(dim=1).max().item()],
-                        "prompt_mask": prompt_mask[start:end, :prompt_mask[start:end].sum(dim=1).max().item()],
+                        "prompt_ids": prompt_ids[start:end, :prompt_max_len],
+                        "prompt_mask": prompt_mask[start:end, :prompt_max_len],
                         "completion_ids": completion_ids[start:end, :group_max_len],
                         "completion_mask": completion_mask[start:end, :group_max_len],
                         "advantages": group_adv[group_idx].detach().cpu().tolist(),
@@ -2817,6 +3148,9 @@ class GRPOTrainer(BaseTrainer):
         # start with "eval_". We need to add the prefix "eval_" to the keys in `metrics` to match the format.
         if mode == "eval":
             metrics = {f"eval_{key}": val for key, val in metrics.items()}
+            
+            # 记录eval日志到文件
+            self._emit_eval_logs(metrics, logs)
 
         # 为TensorBoard添加核心指标（只保留指定的指标）
         tensorboard_metrics = {}
@@ -2854,7 +3188,7 @@ class GRPOTrainer(BaseTrainer):
                 comp = self._last_component_rewards
                 # 支持 accuracy_reward 或 mc_idx_reward 两种命名
                 acc_list = comp.get("accuracy_reward") if comp.get("accuracy_reward") is not None else comp.get("mc_idx_reward")
-                fmt_list = comp.get("think_format_reward")
+                fmt_list = comp.get("format_reward")
                 length_list = comp.get("length_reward")
                 mdi_list = comp.get("mdi_reward")
                 if acc_list is not None:

@@ -17,14 +17,14 @@ export CUDA_LAUNCH_BLOCKING=1
 accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml \
     examples/scripts/dapo_vlm.py \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-    --learning_rate 1e-5 \
+    --learning_rate 5e-5 \
     --dtype bfloat16 \
     --max_prompt_length 1024 \
-    --max_completion_length 128 \
+    --max_completion_length 256 \
     --data_files '{"train": "./aokvqa_trl_test_large/train.parquet", "test": "./aokvqa_trl_test_large/test.parquet"}' \
     --per_device_train_batch_size 4 \
-    --gradient_accumulation_steps 8 \
-    --num_train_epochs 1 \
+    --gradient_accumulation_steps 4 \
+    --num_train_epochs 2 \
     --num_generations 2 \
     --temperature 0.85 \
     --top_p 0.9 \
@@ -36,12 +36,12 @@ accelerate launch --config_file examples/accelerate_configs/deepspeed_zero2.yaml
     --enable_detailed_logging \
     --save_strategy steps \
     --save_steps 562 \
-    --accuracy_weight 3.0 \
-    --format_weight 2.0 \
-    --length_weight 0.0 \
+    --accuracy_weight 2.0 \
+    --format_weight 1.0 \
+    --length_weight 1.0 \
     --mdi_as_coefficient 0 \
-    --max_completion_len 128 \
+    --mdi_add_weight 1.0 \
     --soft_punish_cache 30 \
     --replay_buffer_size 24 \
-    --filter_min_reward 3.0 \
+    --filter_min_reward 1.0 \
     --max_grad_norm 1.0

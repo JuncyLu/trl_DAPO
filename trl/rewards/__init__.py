@@ -21,17 +21,17 @@ from ..import_utils import _LazyModule
 
 _import_structure = {
     "accuracy_rewards": ["accuracy_reward"],
-    "format_rewards": ["think_format_reward"],
+    "format_rewards": ["format_reward"],
     "other_rewards": ["get_soft_overlong_punishment"],
-    "attention_reward": ["mdi_reward", "aei_reward"],
+    "attention_reward": ["mdi_reward", "aei_reward", "mdi_reward_as_additive"],
 }
 
 
 if TYPE_CHECKING:
     from .accuracy_rewards import accuracy_reward
-    from .format_rewards import think_format_reward
+    from .format_rewards import format_reward
     from .other_rewards import get_soft_overlong_punishment
-    from .attention_reward import mdi_reward, aei_reward
+    from .attention_reward import mdi_reward, aei_reward, mdi_reward_as_additive
 
 
 else:

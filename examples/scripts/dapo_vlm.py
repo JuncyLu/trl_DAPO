@@ -100,7 +100,7 @@ from trl import (
     get_peft_config,
     get_quantization_config,
 )
-from trl.rewards import accuracy_reward, think_format_reward, mdi_reward, get_soft_overlong_punishment
+from trl.rewards import accuracy_reward, format_reward, mdi_reward, mdi_reward_as_additive, get_soft_overlong_punishment
 
 
 # Enable logging in a Hugging Face Space
@@ -185,6 +185,10 @@ class RewardArguments:
     mdi_as_coefficient: int = field(
         default=1,
         metadata={"help": "Whether to use MDI as coefficient for accuracy (1) or as separate reward (0)."}
+    )
+    mdi_add_weight: float = field(
+        default=1.0,
+        metadata={"help": "Weight for MDI reward when used as separate reward (mdi_as_coefficient=0)."}
     )
     max_completion_len: int = field(
         default=256,
@@ -315,6 +319,7 @@ if __name__ == "__main__":
             # 设置所有日志路径
             training_args.rollout_log_path = os.path.join(logs_dir, "rollout_results.md")
             training_args.attention_diag_log_path = os.path.join(logs_dir, "attention_diagnostics.md")
+            training_args.eval_log_path = os.path.join(logs_dir, "eval_log.md")
             data_args.terminal_markdown_log = os.path.join(logs_dir, "run_terminal.md")
             
             # 启用彩色输出以支持美观的表格显示
@@ -496,11 +501,23 @@ if __name__ == "__main__":
             eval_dataset = None
 
     SYSTEM_PROMPT = (
-        "You are a precise assistant. For each question, first think privately and output exactly one reasoning block: "
-        "<think> This is my reasoning.\n </think>; then on a new line output the final choice "
-        "exactly as Answer: X. Rules: produce exactly one pair of <think>…</think> before the "
-        "answer; no text before <think> or after Answer: X; no code fences; X must be a single uppercase "
-        "letter from the options provided (e.g., A/B/C/D); if more options exist, extend accordingly; be concise and accurate."
+        "You are a Visual Question Answering assistant. Follow the rules strictly:\n"
+        "\n"
+        "1) Think silently first and then produce the answer.\n"
+        "2) Your output MUST contain exactly two parts:\n"
+        "   - <think> ... </think>: structured reasoning, 20–120 tokens.\n"
+        "   - <answer>X</answer>: the final answer, where X is ONE capital letter from A to J.\n"
+        "\n"
+        "3) Formatting rules:\n"
+        "   - Tags must appear in order: <think> → </think> → <answer> → </answer>.\n"
+        "   - DO NOT output any additional tags, markdown, symbols, or repeated closing tags.\n"
+        "   - DO NOT output multiple answers.\n"
+        "   - Stop generation immediately after </answer>.\n"
+        "   - Use the same language as the question.\n"
+        "\n"
+        "Format example:\n"
+        "<think>Here is my structured reasoning...</think>\n"
+        "<answer>C</answer>\n"
     )
 
     def make_conversation(example):
@@ -709,12 +726,12 @@ if __name__ == "__main__":
                 scores.append(0.0)
         return scores
 
-    # 设置奖励函数权重：mc_idx_reward:think_format_reward:mdi_reward = 4:1:1
+    # 设置奖励函数权重：mc_idx_reward:format_reward:mdi_reward = 4:1:1
     # 将trainer注入MDI奖励函数
     trainer_ref = {"t": None}
 
     from functools import partial
-    def mdi_reward_with_trainer(completions, **kwargs):
+    def mdi_coe_with_trainer(completions, **kwargs):
         trainer = trainer_ref["t"]
         if trainer is None:
             return [0.40] * len(completions)  # 返回默认系数而不是0
@@ -732,6 +749,28 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Warning: MDI reward calculation failed: {e}")
             return [0.40] * len(completions)  # 返回默认系数
+
+    def mdi_add_with_trainer(completions, **kwargs):
+        """
+        MDI作为加法项的奖励函数包装器，从trainer获取注意力参数
+        """
+        trainer = trainer_ref["t"]
+        if trainer is None:
+            return [0.5] * len(completions)  # 返回默认奖励值
+        
+        try:
+            # 获取注意力参数并传递给mdi_reward_as_additive函数
+            return mdi_reward_as_additive(
+                completions,
+                attention_text=getattr(trainer, "_attention_text_current_batch", []),
+                attention_vision=getattr(trainer, "_attention_vision_current_batch", []),
+                num_text_tokens=getattr(trainer, "_num_text_tokens_current_batch", []),
+                num_vision_tokens=getattr(trainer, "_num_vision_tokens_current_batch", []),
+                **kwargs
+            )
+        except Exception as e:
+            print(f"Warning: MDI additive reward calculation failed: {e}")
+            return [0.5] * len(completions)
     # 创建长度惩罚函数
     length_penalty_func = get_soft_overlong_punishment(
         max_completion_len=reward_args.max_completion_len,
@@ -743,8 +782,15 @@ if __name__ == "__main__":
         try:
             # 计算各个reward函数
             accuracy_rewards = mc_idx_reward(completions, **kwargs)
-            format_rewards = think_format_reward(completions, **kwargs)
-            mdi_coefficients = mdi_reward_with_trainer(completions, **kwargs)
+            format_rewards = format_reward(completions, **kwargs)
+            
+            # 根据mdi_as_coefficient参数选择MDI计算方式
+            if reward_args.mdi_as_coefficient == 1:
+                # MDI作为系数
+                mdi_values = mdi_coe_with_trainer(completions, **kwargs)
+            else:
+                # MDI作为加法项
+                mdi_values = mdi_add_with_trainer(completions, **kwargs)
             
             # 计算长度惩罚（如果启用）
             length_rewards = []
@@ -761,10 +807,10 @@ if __name__ == "__main__":
                         "accuracy_reward": list(map(float, accuracy_rewards)),
                         # 兼容备用命名，防止Trainer使用 mc_idx_reward 名称查询失败
                         "mc_idx_reward": list(map(float, accuracy_rewards)),
-                        "think_format_reward": list(map(float, format_rewards)),
+                        "format_reward": list(map(float, format_rewards)),
                         "length_reward": list(map(float, length_rewards)),
-                        # 这里的mdi_reward是系数，仍然写入以便观察
-                        "mdi_reward": list(map(float, mdi_coefficients)),
+                        # MDI值（系数或奖励）
+                        "mdi_reward": list(map(float, mdi_values)),
                     }
             except Exception:
                 # 仅影响日志回退，不影响训练
@@ -772,13 +818,13 @@ if __name__ == "__main__":
 
             # 应用可配置的奖励公式
             final_rewards = []
-            for acc, fmt, length, coef in zip(accuracy_rewards, format_rewards, length_rewards, mdi_coefficients):
+            for acc, fmt, length, mdi in zip(accuracy_rewards, format_rewards, length_rewards, mdi_values):
                 if reward_args.mdi_as_coefficient == 1:
                     # MDI作为准确率的系数
-                    reward = (reward_args.accuracy_weight * acc) * coef + reward_args.format_weight * fmt + reward_args.length_weight * length
+                    reward = (reward_args.accuracy_weight * acc) * mdi + reward_args.format_weight * fmt + reward_args.length_weight * length
                 else:
-                    # MDI作为独立的奖励项
-                    reward = reward_args.accuracy_weight * acc + reward_args.format_weight * fmt + reward_args.length_weight * length
+                    # MDI作为独立的奖励项（映射到0-1范围）
+                    reward = reward_args.accuracy_weight * acc + reward_args.format_weight * fmt + reward_args.length_weight * length + reward_args.mdi_add_weight * mdi
                 final_rewards.append(reward)
             
             return final_rewards

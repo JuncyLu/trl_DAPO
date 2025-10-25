@@ -268,3 +268,98 @@ def mdi_reward_legacy(completions: List[List[dict]], **kwargs) -> List[float]:
         coefs = coefs[:n]
 
     return coefs
+
+
+def mdi_reward_as_additive(completions: List[List[dict]], **kwargs) -> List[float]:
+    """
+    MDI作为加法项的奖励函数，映射到0-1范围
+    自定义映射规则：
+    - 1 < MDI < 15: reward = 1.0 (满分)
+    - 15 <= MDI <= 60: 线性映射 1.0 -> 0.0
+    - MDI > 60: reward = 0.0
+    
+    需要 kwargs:
+      - attention_text: List[float]   # A_T（所有输出 token 对文本 token 的总注意力）
+      - attention_vision: List[float] # A_O（所有输出 token 对非文本 token 的总注意力）
+      - num_text_tokens: List[int]    # |T|
+      - num_vision_tokens: List[int]  # |O|
+    """
+    n = len(completions) if isinstance(completions, list) else 0
+    if n == 0:
+        return []
+
+    A_T = kwargs.get("attention_text", [])
+    A_O = kwargs.get("attention_vision", [])
+    N_T = kwargs.get("num_text_tokens", [])
+    N_O = kwargs.get("num_vision_tokens", [])
+
+    # 基本校验
+    if not (isinstance(A_T, list) and isinstance(A_O, list) and isinstance(N_T, list) and isinstance(N_O, list)):
+        return [0.5] * n
+
+    m = min(len(A_T), len(A_O), len(N_T), len(N_O), n)
+    if m == 0:
+        return [0.5] * n
+
+    eps = 1e-6
+    rewards = []
+
+    for i in range(m):
+        try:
+            a_t = float(A_T[i])
+            a_o = float(A_O[i])
+            t = int(N_T[i])
+            o = int(N_O[i])
+
+            # 计算MDI
+            if t <= 0 or o <= 0:
+                rewards.append(0.5)
+                continue
+
+            text_density = a_t / t
+            vision_density = a_o / o
+
+            if vision_density <= eps:
+                rewards.append(0.5)
+                continue
+
+            # 计算MDI = (A_T/|T|) / (A_O/|O|)
+            mdi = text_density / vision_density
+
+            # 将MDI映射到0-1范围 - 激进映射：强烈鼓励低MDI值
+            # MDI < 5: 满分 (1.0) - 理想状态
+            # 5 <= MDI < 10: 轻微惩罚 (0.9-1.0)
+            # 10 <= MDI < 15: 中等惩罚 (0.7-0.9)
+            # 15 <= MDI < 20: 强惩罚 (0.4-0.7)
+            # 20 <= MDI < 30: 极强惩罚 (0.1-0.4)
+            # MDI >= 30: 最低分 (0.0) - 不可接受
+            if mdi < 5.0:
+                # MDI < 5: 满分 (理想状态)
+                normalized = 1.0
+            elif mdi < 10.0:
+                # 5 <= MDI < 10: 轻微惩罚 1.0 -> 0.9
+                normalized = 1.0 - (mdi - 5.0) * 0.1 / 5.0
+            elif mdi < 15.0:
+                # 10 <= MDI < 15: 中等惩罚 0.9 -> 0.7
+                normalized = 0.9 - (mdi - 10.0) * 0.2 / 5.0
+            elif mdi < 20.0:
+                # 15 <= MDI < 20: 强惩罚 0.7 -> 0.4
+                normalized = 0.7 - (mdi - 15.0) * 0.3 / 5.0
+            elif mdi < 30.0:
+                # 20 <= MDI < 30: 极强惩罚 0.4 -> 0.1
+                normalized = 0.4 - (mdi - 20.0) * 0.3 / 10.0
+            else:
+                # MDI >= 30: 最低分 (不可接受)
+                normalized = 0.0
+            rewards.append(float(normalized))
+
+        except Exception:
+            rewards.append(0.5)
+
+    # 对齐长度
+    if len(rewards) < n:
+        rewards.extend([0.5] * (n - len(rewards)))
+    elif len(rewards) > n:
+        rewards = rewards[:n]
+
+    return rewards
