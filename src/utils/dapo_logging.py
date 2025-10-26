@@ -70,22 +70,28 @@ def emit_rollout_logs(
         mdi_val = 0.0
         
         if rewards_per_func_local.numel() > 0:
-            # 尝试从奖励函数名称中获取各个组件
+            # 尝试从奖励函数名称中获取各个组件（兼容不同命名）
             name_to_idx = {name: i for i, name in enumerate(reward_names)}
-            
-            acc_idx = name_to_idx.get("accuracy_reward") or name_to_idx.get("mc_idx_reward")
+
+            def any_index(*candidates):
+                for key in candidates:
+                    if key in name_to_idx:
+                        return name_to_idx[key]
+                return None
+
+            acc_idx = any_index("accuracy_reward", "mc_idx_reward")
             if acc_idx is not None and idx < rewards_per_func_local.shape[0]:
                 acc = float(rewards_per_func_local[idx, acc_idx].item())
-            
-            fmt_idx = name_to_idx.get("format_reward")
+
+            fmt_idx = any_index("format_reward", "think_format_reward")
             if fmt_idx is not None and idx < rewards_per_func_local.shape[0]:
                 fmt = float(rewards_per_func_local[idx, fmt_idx].item())
-            
-            length_idx = name_to_idx.get("length_reward")
+
+            length_idx = any_index("length_reward", "soft_overlong_punishment_reward")
             if length_idx is not None and idx < rewards_per_func_local.shape[0]:
                 length_val = float(rewards_per_func_local[idx, length_idx].item())
-            
-            mdi_idx = name_to_idx.get("mdi_reward")
+
+            mdi_idx = any_index("mdi_reward", "mdi_reward_as_additive")
             if mdi_idx is not None and idx < rewards_per_func_local.shape[0]:
                 mdi_val = float(rewards_per_func_local[idx, mdi_idx].item())
         

@@ -1102,7 +1102,13 @@ class DAPOTrainer(BaseTrainer):
             if att_list:
                 # Get the most recent attention results for this batch
                 sample_results = att_list[-len(prompts):]
-                mdi_metrics = compute_real_mdi_metrics(sample_results, [])
+                # Align skip reasons with the same recent slice
+                if hasattr(self, '_attention_skip_reasons'):
+                    skips = list(self._attention_skip_reasons)
+                    skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
+                else:
+                    skip_slice = [None] * len(sample_results)
+                mdi_metrics = compute_real_mdi_metrics(sample_results, skip_slice)
                 
                 # Extract attention data for reward functions
                 reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in mdi_metrics]
@@ -1153,7 +1159,7 @@ class DAPOTrainer(BaseTrainer):
         rewards_per_func = gather(rewards_per_func)
         return rewards_per_func
 
-    def _generate_single_turn(self, prompts: list):
+    def _generate_single_turn(self, prompts: list, images: Optional[list] = None):
         device = self.accelerator.device
 
         # Generate completions using either vLLM or regular generation
@@ -1356,12 +1362,15 @@ class DAPOTrainer(BaseTrainer):
                 "truncation": True,
                 "add_special_tokens": False,
             }
-            if is_conversational({"prompt": prompts[0]}):
-                generate_inputs = self.processing_class.apply_chat_template(
-                    conversation=prompts, add_generation_prompt=True, **processor_kwargs, tokenize=True, return_dict=True
-                )
+            # Build text with chat template and include images if provided
+            prompts_text = [
+                apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"]
+                for prompt in prompts
+            ]
+            if images is not None:
+                generate_inputs = self.processing_class(text=prompts_text, images=images, **processor_kwargs)
             else:
-                generate_inputs = self.processing_class(text=prompts, **processor_kwargs)
+                generate_inputs = self.processing_class(text=prompts_text, **processor_kwargs)
             generate_inputs = super()._prepare_inputs(generate_inputs)
 
             with (
@@ -1407,11 +1416,13 @@ class DAPOTrainer(BaseTrainer):
 
         return prompt_ids, completion_ids, logprobs, extra_fields, attention_context
 
-    def _generate(self, prompts: list):
+    def _generate(self, prompts: list, images: Optional[list] = None):
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
 
-        prompt_ids, completion_ids, logprobs, extra_fields, attention_context = self._generate_single_turn(prompts)
+        prompt_ids, completion_ids, logprobs, extra_fields, attention_context = self._generate_single_turn(
+            prompts, images
+        )
 
         # Get completion length per sequence, used for logging
         prompt_lengths = torch.tensor([len(ids) for ids in prompt_ids], device=device)
@@ -1484,7 +1495,7 @@ class DAPOTrainer(BaseTrainer):
             prompts = [prepare_multimodal_messages(prompt, image_list) for prompt, image_list in zip(prompts, images)]
 
         prompt_ids_list, completion_ids_list, num_items_in_batch, sampling_per_token_logps_list, extra_fields = (
-            self._generate(prompts)
+            self._generate(prompts, images)
         )
 
         # Convert lists of token IDs to padded tensors
@@ -1876,7 +1887,14 @@ class DAPOTrainer(BaseTrainer):
                     att_list = list(self._logs['attention'])
                     if att_list:
                         sample_results = att_list[-len(prompts):]
-                        mdi_info = compute_real_mdi_metrics(sample_results, [])
+                        if hasattr(self, '_attention_skip_reasons'):
+                            skips = list(self._attention_skip_reasons)
+                            skip_slice = (
+                                skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
+                            )
+                        else:
+                            skip_slice = [None] * len(sample_results)
+                        mdi_info = compute_real_mdi_metrics(sample_results, skip_slice)
                 
                 # Get solutions if available
                 solutions = [inp.get("solution", "") for inp in inputs]
@@ -2154,108 +2172,145 @@ class DAPOTrainer(BaseTrainer):
         """Return the base unwrapped model for config access."""
         if model is None:
             model = self.model
-        return unwrap_model_for_generation(model)
+        return unwrap_model_for_generation(model, self.accelerator)
     
     @contextmanager
     def _temporary_attn_impl(self, attn_impl: str = "eager"):
-        """Context manager for temporarily switching attention implementation."""
+        """
+        Temporarily switch attention implementation on the base model config.
+        Mirrors old repo behavior: toggle config on the unwrapped base model
+        and do not yield a model (call generate on the existing unwrapped model).
+        """
         if not self.compute_attention_metrics:
             yield
             return
-        
-        # Get the unwrapped model
-        unwrapped_model = self._unwrap_model_for_config()
-        
-        # Store original attention implementation
-        original_attn_impl = None
-        if hasattr(unwrapped_model.config, 'attn_implementation'):
-            original_attn_impl = unwrapped_model.config.attn_implementation
-        
+
+        base = self._unwrap_model_for_config()
+        cfg = getattr(base, "config", None)
+        if cfg is None:
+            yield
+            return
+        prev = getattr(cfg, "_attn_implementation", None)
         try:
-            # Temporarily set attention implementation
-            if hasattr(unwrapped_model.config, 'attn_implementation'):
-                unwrapped_model.config.attn_implementation = attn_impl
+            setattr(cfg, "_attn_implementation", attn_impl)
             yield
         finally:
-            # Restore original attention implementation
-            if original_attn_impl is not None and hasattr(unwrapped_model.config, 'attn_implementation'):
-                unwrapped_model.config.attn_implementation = original_attn_impl
+            if prev is None:
+                try:
+                    delattr(cfg, "_attn_implementation")
+                except Exception:
+                    pass
+            else:
+                setattr(cfg, "_attn_implementation", prev)
 
     def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> None:
-        """Process attention outputs and compute metrics."""
+        """Process attention outputs and compute metrics (aligned with old repo logic)."""
         if not self.compute_attention_metrics or attention_context is None:
             return
-        
         try:
             outputs = attention_context.get("outputs")
-            inputs = attention_context.get("inputs")
-            
-            if outputs is None or not hasattr(outputs, 'attentions') or outputs.attentions is None:
+            generate_inputs = attention_context.get("inputs")
+            if outputs is None or getattr(outputs, "attentions", None) is None:
                 return
-            
-            # Extract necessary data
-            input_ids = inputs.get("input_ids")
-            sequences = outputs.sequences
-            image_grid_thw = inputs.get("image_grid_thw")
-            
-            if input_ids is None or sequences is None:
+            if generate_inputs is None or "input_ids" not in generate_inputs:
                 return
-            
-            # Compute attention metrics
-            sample_results, skip_reasons = compute_qwen_attention_metrics_for_batch(
+
+            # Move relevant tensors to CPU to reduce GPU pressure during analysis
+            input_ids = generate_inputs["input_ids"].detach().cpu()
+            sequences = outputs.sequences.detach().cpu()
+            image_grid_thw = generate_inputs.get("image_grid_thw")
+            if isinstance(image_grid_thw, torch.Tensor):
+                image_grid_thw_cpu = image_grid_thw.detach().cpu()
+            else:
+                image_grid_thw_cpu = None
+
+            # Compute per-sample attention metrics
+            sample_results_tuple = compute_qwen_attention_metrics_for_batch(
                 self.model,
                 self.processing_class,
                 outputs.attentions,
                 input_ids,
                 sequences,
-                image_grid_thw=image_grid_thw,
+                image_grid_thw=image_grid_thw_cpu,
             )
-            
-            # Store results
-            if hasattr(self, '_logs') and 'attention' in self._logs:
-                self._logs['attention'].extend(sample_results)
-                self._attention_skip_reasons.extend(skip_reasons)
-            
-            # Log attention metrics
-            self._log_attention_metrics(sample_results, mode, skip_reasons)
-            
-        except Exception as e:
-            logger.warning(f"Failed to process attention metrics: {e}")
+            if isinstance(sample_results_tuple, tuple):
+                sample_results, skip_reasons = sample_results_tuple
+            else:
+                sample_results = sample_results_tuple
+                skip_reasons = [None] * len(sample_results)
 
-    def _log_attention_metrics(self, sample_results: List[Optional[AttentionSampleResult]], mode: str, skip_reasons: List[Optional[str]]) -> None:
-        """Log attention metrics to trainer metrics."""
+            # Free attention tensors quickly to avoid memory bloat
+            outputs.attentions = None
+            attention_context["outputs"] = None
+            attention_context["inputs"] = None
+
+            if not sample_results:
+                return
+
+            # Log and store metrics
+            self._log_attention_metrics(sample_results, mode, skip_reasons)
+        except Exception:
+            # Do not fail training on diagnostics
+            pass
+
+    def _log_attention_metrics(
+        self,
+        sample_results: List[Optional[AttentionSampleResult]],
+        mode: str,
+        skip_reasons: List[Optional[str]],
+    ) -> None:
+        """Aggregate and log attention metrics (aligned with old repo logic)."""
+        device = self.accelerator.device
+        segments = ["early", "middle", "late", "all"]
+
         if not sample_results:
             return
-        
-        # Compute real MDI metrics for logging
-        mdi_metrics = compute_real_mdi_metrics(sample_results, skip_reasons)
-        
-        # Log overall statistics
-        valid_results = [r for r in sample_results if r is not None]
+
+        valid_results = [(idx, res) for idx, res in enumerate(sample_results) if res is not None]
         if not valid_results:
+            # still extend internal buffers for completeness
+            if isinstance(self._logs.get("attention"), deque):
+                self._logs["attention"].extend(sample_results)
+            if isinstance(self._attention_skip_reasons, deque):
+                self._attention_skip_reasons.extend(skip_reasons)
             return
-        
-        # Extract metrics for different segments
-        segments = ["early", "middle", "late", "all"]
+
         for segment in segments:
-            mdi_values = []
-            aei_text_values = []
-            aei_vision_values = []
-            
-            for result in valid_results:
-                if result.segments and segment in result.segments:
-                    seg_data = result.segments[segment]
-                    if hasattr(seg_data, 'mdi') and seg_data.mdi is not None and not math.isnan(seg_data.mdi):
-                        mdi_values.append(seg_data.mdi)
-                    if hasattr(seg_data, 'aei_text') and seg_data.aei_text is not None and not math.isnan(seg_data.aei_text):
-                        aei_text_values.append(seg_data.aei_text)
-                    if hasattr(seg_data, 'aei_vision') and seg_data.aei_vision is not None and not math.isnan(seg_data.aei_vision):
-                        aei_vision_values.append(seg_data.aei_vision)
-            
-            # Log metrics
-            if mdi_values:
-                self._metrics[mode][f"attention/{segment}/mdi"].append(torch.tensor(mdi_values).mean().item())
-            if aei_text_values:
-                self._metrics[mode][f"attention/{segment}/aei_text"].append(torch.tensor(aei_text_values).mean().item())
-            if aei_vision_values:
-                self._metrics[mode][f"attention/{segment}/aei_vision"].append(torch.tensor(aei_vision_values).mean().item())
+            mdi_vals = []
+            aei_text_vals = []
+            aei_vision_vals = []
+            for _, result in valid_results:
+                seg = result.segments.get(segment)
+                if seg is None:
+                    continue
+                mdi_vals.append(seg.mdi)
+                aei_text_vals.append(seg.aei_text)
+                aei_vision_vals.append(seg.aei_vision)
+
+            if mdi_vals:
+                mdi_tensor = torch.tensor(mdi_vals, device=device, dtype=torch.float32)
+                mdi_tensor = torch.where(torch.isfinite(mdi_tensor), mdi_tensor, torch.full_like(mdi_tensor, float("nan")))
+                gathered_mdi = self.accelerator.gather(mdi_tensor)
+                self._metrics[mode][f"attention/{segment}/mdi"].append(torch.nanmean(gathered_mdi).item())
+
+            if aei_text_vals:
+                aei_text_tensor = torch.tensor(aei_text_vals, device=device, dtype=torch.float32)
+                aei_text_tensor = torch.where(
+                    torch.isfinite(aei_text_tensor), aei_text_tensor, torch.full_like(aei_text_tensor, float("nan"))
+                )
+                gathered_aei_text = self.accelerator.gather(aei_text_tensor)
+                self._metrics[mode][f"attention/{segment}/aei_text"].append(torch.nanmean(gathered_aei_text).item())
+
+            if aei_vision_vals:
+                aei_vision_tensor = torch.tensor(aei_vision_vals, device=device, dtype=torch.float32)
+                aei_vision_tensor = torch.where(
+                    torch.isfinite(aei_vision_tensor), aei_vision_tensor, torch.full_like(aei_vision_tensor, float("nan"))
+                )
+                gathered_aei_vision = self.accelerator.gather(aei_vision_tensor)
+                self._metrics[mode][f"attention/{segment}/aei_vision"].append(torch.nanmean(gathered_aei_vision).item())
+
+        # Persist sample-level results for downstream logging and rewards
+        if isinstance(self._logs.get("attention"), deque):
+            self._logs["attention"].extend(sample_results)
+        if isinstance(self._attention_skip_reasons, deque):
+            self._attention_skip_reasons.extend(skip_reasons)

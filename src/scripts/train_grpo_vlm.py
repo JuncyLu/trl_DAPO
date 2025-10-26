@@ -84,7 +84,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.trainer import DAPOConfig, DAPOTrainer
-from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_punishment
+from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_punishment, mdi_reward_as_additive
 
 
 # Enable logging in a Hugging Face Space
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     trainer = DAPOTrainer(
         model=model_args.model_name_or_path,
         args=training_args,
-        reward_funcs=[think_format_reward, accuracy_reward, length_reward_func],
+        reward_funcs=[accuracy_reward, mdi_reward_as_additive, think_format_reward, length_reward_func],
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         peft_config=get_peft_config(model_args),
