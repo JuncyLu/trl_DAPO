@@ -1,6 +1,6 @@
 accelerate launch \
-    --config_file configs/deepspeed_zero2.yaml \
-    scripts/train_grpo_vlm.py \
+    --config_file src/configs/deepspeed_zero2.yaml \
+    src/scripts/train_grpo_vlm.py \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
     --output_dir runs/dapo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
     --learning_rate 5e-5 \

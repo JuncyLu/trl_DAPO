@@ -19,9 +19,9 @@ from transformers import TrainingArguments
 
 
 @dataclass
-class GRPOConfig(TrainingArguments):
+class DAPOConfig(TrainingArguments):
     r"""
-    Configuration class for the [`GRPOTrainer`].
+    Configuration class for the [`DAPOTrainer`].
 
     This class includes only the parameters that are specific to GRPO training. For a full list of training arguments,
     please refer to the [`~transformers.TrainingArguments`] documentation. Note that default values in this class may
@@ -35,8 +35,8 @@ class GRPOConfig(TrainingArguments):
         > Parameters that control the model and reference model
 
         model_init_kwargs (`str`, `dict[str, Any]`, *optional*):
-            Keyword arguments for [`~transformers.AutoModelForCausalLM.from_pretrained`], used when the `model`
-            argument of the [`GRPOTrainer`] is provided as a string.
+            Keyword arguments for [`~transformers.AutoModelForCausalLM.from_pretrained`],             used when the `model`
+            argument of the [`DAPOTrainer`] is provided as a string.
         disable_dropout (`bool`, *optional*, defaults to `False`):
             Whether to disable dropout in the model. This is useful for training with a reference model, as it prevents
             the model from generating different logprobs for the same input.

@@ -47,21 +47,21 @@ from transformers import (
 from transformers.trainer_utils import seed_worker
 from transformers.utils import is_datasets_available, is_peft_available, is_rich_available
 
-from ..data_utils import (
+from trl.data_utils import (
     apply_chat_template,
     is_conversational,
     prepare_multimodal_messages,
     prepare_multimodal_messages_vllm,
 )
-from ..extras.profiling import profiling_context, profiling_decorator
-from ..extras.vllm_client import VLLMClient
-from ..import_utils import is_liger_kernel_available, is_vllm_available
-from ..models import prepare_deepspeed, prepare_fsdp, prepare_peft_model, unwrap_model_for_generation
-from ..models.utils import _ForwardRedirection
-from .base_trainer import BaseTrainer
-from .callbacks import SyncRefModelCallback
-from .grpo_config import GRPOConfig
-from .utils import (
+from trl.extras.profiling import profiling_context, profiling_decorator
+from trl.extras.vllm_client import VLLMClient
+from trl.import_utils import is_liger_kernel_available, is_vllm_available
+from trl.models import prepare_deepspeed, prepare_fsdp, prepare_peft_model, unwrap_model_for_generation
+from trl.models.utils import _ForwardRedirection
+from trl.trainer.base_trainer import BaseTrainer
+from trl.trainer.callbacks import SyncRefModelCallback
+from .dapo_config import DAPOConfig
+from trl.trainer.utils import (
     RepeatSampler,
     disable_dropout_in_model,
     ensure_master_addr_port,
@@ -107,9 +107,9 @@ RewardFunc = Union[str, PreTrainedModel, Callable[[list, list], list[float]]]
 RolloutFunc = Callable[[list[str], Any, Any], dict[str, Any]]
 
 
-class GRPOTrainer(BaseTrainer):
+class DAPOTrainer(BaseTrainer):
     """
-    Trainer for the Group Relative Policy Optimization (GRPO) method. This algorithm was initially proposed in the
+    Trainer for the DAPO (Data-Augmented Policy Optimization) method. This algorithm was initially proposed in the
     paper [DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language
     Models](https://huggingface.co/papers/2402.03300).
 
@@ -170,7 +170,7 @@ class GRPOTrainer(BaseTrainer):
                   reward function's signature.
             - A list of reward functions, where each item can independently be any of the above types. Mixing different
             types within the list (e.g., a string model ID and a custom reward function) is allowed.
-        args ([`GRPOConfig`], *optional*):
+        args ([`DAPOConfig`], *optional*):
             Configuration for this trainer. If `None`, a default configuration is used.
         train_dataset ([`~datasets.Dataset`] or [`~datasets.IterableDataset`]):
             Dataset to use for training. It must include a column `"prompt"`. Any additional columns in the dataset is
@@ -234,7 +234,7 @@ class GRPOTrainer(BaseTrainer):
         self,
         model: Union[str, PreTrainedModel],
         reward_funcs: Union[RewardFunc, list[RewardFunc]],
-        args: Optional[GRPOConfig] = None,
+        args: Optional[DAPOConfig] = None,
         train_dataset: Optional[Union[Dataset, IterableDataset]] = None,
         eval_dataset: Optional[Union[Dataset, IterableDataset, dict[str, Union[Dataset, IterableDataset]]]] = None,
         processing_class: Optional[Union[PreTrainedTokenizerBase, ProcessorMixin]] = None,
@@ -248,7 +248,7 @@ class GRPOTrainer(BaseTrainer):
         if args is None:
             model_name = model if isinstance(model, str) else get_config_model_id(model.config)
             model_name = model_name.split("/")[-1]
-            args = GRPOConfig(f"{model_name}-GRPO")
+            args = DAPOConfig(f"{model_name}-DAPO")
 
         # Models
         # Trained model
@@ -263,7 +263,7 @@ class GRPOTrainer(BaseTrainer):
                 model_init_kwargs["dtype"] = dtype
             else:
                 raise ValueError(
-                    "Invalid `dtype` passed to `GRPOConfig`. Expected either 'auto' or a string representing "
+                    "Invalid `dtype` passed to `DAPOConfig`. Expected either 'auto' or a string representing "
                     f"a `torch.dtype` (e.g., 'float32'), but got {dtype}."
                 )
             # Disable caching if gradient checkpointing is enabled (not supported)
@@ -274,7 +274,7 @@ class GRPOTrainer(BaseTrainer):
             model_id = get_config_model_id(model.config)
             if args.model_init_kwargs is not None:
                 logger.warning(
-                    "You passed `model_init_kwargs` to the `GRPOConfig`, but your model is already instantiated. "
+                    "You passed `model_init_kwargs` to the `DAPOConfig`, but your model is already instantiated. "
                     "The `model_init_kwargs` will be ignored."
                 )
 

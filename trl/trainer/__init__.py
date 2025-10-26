@@ -22,8 +22,6 @@ _import_structure = {
         "LogCompletionsCallback",
         "SyncRefModelCallback",
     ],
-    "grpo_config": ["GRPOConfig"],
-    "grpo_trainer": ["GRPOTrainer"],
     "judges": [
         "BasePairwiseJudge",
     ],
@@ -42,8 +40,6 @@ if TYPE_CHECKING:
         LogCompletionsCallback,
         SyncRefModelCallback,
     )
-    from .grpo_config import GRPOConfig
-    from .grpo_trainer import GRPOTrainer
     from .judges import (
         BasePairwiseJudge,
     )

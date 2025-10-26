@@ -72,8 +72,6 @@ import torch
 from datasets import load_dataset
 
 from trl import (
-    GRPOConfig,
-    GRPOTrainer,
     ModelConfig,
     ScriptArguments,
     TrlParser,
@@ -81,6 +79,11 @@ from trl import (
     get_peft_config,
     get_quantization_config,
 )
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
+from src.dapo import DAPOConfig, DAPOTrainer
 from trl.rewards import accuracy_reward, think_format_reward
 
 
@@ -89,7 +92,7 @@ os.environ.setdefault("TRACKIO_SPACE_ID", "trl-trackio")
 
 
 if __name__ == "__main__":
-    parser = TrlParser((ScriptArguments, GRPOConfig, ModelConfig))
+    parser = TrlParser((ScriptArguments, DAPOConfig, ModelConfig))
     script_args, training_args, model_args = parser.parse_args_and_config()
     ################
     # Model
@@ -152,7 +155,7 @@ if __name__ == "__main__":
     ################
     # Training
     ################
-    trainer = GRPOTrainer(
+    trainer = DAPOTrainer(
         model=model_args.model_name_or_path,
         args=training_args,
         reward_funcs=[think_format_reward, accuracy_reward],
