@@ -1,3 +1,8 @@
+aokvqa_images_small/
+aokvqa_openr1_small/
+archive/
+runs/
+tools/
 *.bak
 .gitattributes
 .last_checked

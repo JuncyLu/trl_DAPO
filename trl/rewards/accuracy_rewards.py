@@ -1,17 +1,4 @@
-# Copyright 2020-2025 The HuggingFace Team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+import re
 from typing import Optional
 
 from trl.import_utils import is_math_verify_available
@@ -22,72 +9,92 @@ if is_math_verify_available():
     from math_verify import LatexExtractionConfig, parse, verify
 
 
-def accuracy_reward(completions: list[list[dict[str, str]]], solution: list[str], **kwargs) -> list[Optional[float]]:
-    r"""
-    Reward function that checks if the completion is the same as the ground truth.
-        - If both gold and prediction are parseable → use math verification.
-        - If not parseable → compare as normalized text.
-
-    Args:
-        completions (`list[list[dict[str, str]]]`):
-            List of completions to be evaluated. Each completion must be a list of one message, i.e. a dictionary
-            containing the key `"content"` with the value being the text of the completion.
-        solution: (`list[str]`):
-            List of the raw-text solutions to the questions/problems/prompts.
-        **kwargs:
-            Additional keyword arguments. This function does not use them, but they are required in the function
-            signature to ensure compatibility with trainers like [`GRPOTrainer`].
-    Example:
-    ```python
-    >>> from trl.rewards import accuracy_reward
-
-    >>> solution = [r"\frac{1}{3}", r"\frac{1}{3}"]
-    >>> completion = [
-    ...     [{"role": "assistant", "content": r"My answer is \boxed{\frac{1}{3}}"}],
-    ...     [{"role": "assistant", "content": r"My answer is \boxed{\frac{1}{2}}"}],
-    ... ]
-    >>> accuracy_reward(completion, solution)
-    [1.0, 0.0]
-    ```
+def accuracy_reward(completions: list[list[dict[str, str]]], solution: list[str], problems: list[str] = None, **kwargs) -> list[Optional[float]]:
     """
-    if not is_math_verify_available():
-        raise ImportError("Please install the `math_verify` package to use accuracy_reward")
-
-    contents = [completion[0]["content"] for completion in completions]
-    rewards = []
-    for content, sol in zip(contents, solution):
-        gold_parsed = parse(
-            sol,
-            extraction_mode="first_match",
-        )
-        if len(gold_parsed) != 0:
-            # We require the answer to be provided in correct latex (no malformed operators)
-            answer_parsed = parse(
-                content,
-                extraction_config=[
-                    LatexExtractionConfig(
-                        normalization_config=NormalizationConfig(
-                            nits=False,
-                            malformed_operators=False,
-                            basic_latex=True,
-                            boxed="all",
-                            units=True,
-                        ),
-                        # Ensures that boxed is tried first
-                        boxed_match_priority=0,
-                        try_extract_without_anchor=False,
-                    )
-                ],
-                extraction_mode="first_match",
-            )
-            # Compute binary rewards if verifiable, `None` otherwise to skip this example
-            try:
-                reward = float(verify(gold_parsed, answer_parsed))
-            except Exception:
-                reward = None
-        else:
-            # If the gold solution is not parseable, we assign `None` to skip this example
-            reward = float(content.strip().lower() == sol.strip().lower())
-        rewards.append(reward)
-
-    return rewards
+    多选题奖励函数：匹配预测字母与正确选项。
+    优先从 <answer> 标签提取，否则通过显式模式或最后出现的字母匹配。
+    
+    Args:
+        completions: 待评估的完成列表，每个完成包含 content 键
+        solution: 正确答案文本列表
+        problems: 可选的问题文本列表，用于选项匹配
+        **kwargs: 兼容性参数
+    
+    Returns:
+        每个完成的准确度分数列表 (1.0 或 0.0)
+    """
+    # 全角字符映射和正则模式（按优先级排序）
+    fullwidth_map = {"Ａ": "A", "Ｂ": "B", "Ｃ": "C", "Ｄ": "D", "Ｅ": "E", "Ｆ": "F", "Ｇ": "G", "Ｈ": "H", "Ｉ": "I", "Ｊ": "J"}
+    answer_patterns = [
+        re.compile(r"(?i)(?:final\s*answer|answer|答案)\s*(?:is|为|是)?\s*[:：\-]?\s*(?:option|choice|选项)?\s*[\(\[\s]*([A-JＡ-Ｊ])"),
+        re.compile(r"(?i)(?:option|choice|选项)\s*(?:is|为|是)?\s*[:：\-]?\s*[\(\[\s]*([A-JＡ-Ｊ])"),
+        re.compile(r"(?i)[（(]?([A-JＡ-Ｊ])[)）]?$"),
+    ]
+    
+    scores = []
+    for i, (comp, sol) in enumerate(zip(completions, solution)):
+        try:
+            # 收集文本内容
+            def _collect_text(node) -> list[str]:
+                if isinstance(node, str):
+                    return [node]
+                if isinstance(node, dict):
+                    texts = []
+                    if "text" in node and isinstance(node["text"], str):
+                        texts.append(node["text"])
+                    if "content" in node:
+                        texts.extend(_collect_text(node["content"]))
+                    return texts
+                if isinstance(node, list):
+                    texts = []
+                    for item in node:
+                        texts.extend(_collect_text(item))
+                    return texts
+                return []
+            
+            pieces = _collect_text(comp)
+            text = "\n".join(pieces) if pieces else str(comp)
+            
+            # 优先从 <answer> 标签提取
+            answer_match = re.search(r"<answer>(.*?)</answer>", text, re.DOTALL)
+            pred = answer_match.group(1).strip() if answer_match else None
+            
+            # 否则使用显式模式匹配
+            if pred is None:
+                # 清理 redacted_reasoning 标签
+                text = re.sub(r"<think>.*?</think>", " ", text, flags=re.IGNORECASE | re.DOTALL)
+                
+                # 从后往前搜索包含关键词的行
+                lines = [line.strip() for line in text.splitlines() if line.strip()]
+                keywords = ("answer", "答案", "选项", "choice", "option")
+                
+                for line in reversed(lines):
+                    if not any(k in line.lower() for k in keywords):
+                        continue
+                    for pattern in answer_patterns:
+                        match = pattern.search(line)
+                        if match:
+                            pred = match.group(1)
+                            break
+                    if pred:
+                        break
+                
+                # 最后尝试提取所有字母，取最后一个
+                if pred is None:
+                    cands = re.findall(r"\b([A-JＡ-Ｊ])\b", text)
+                    pred = cands[-1] if cands else None
+                
+                # 标准化全角字符
+                if pred:
+                    pred = fullwidth_map.get(pred, pred).upper()
+            
+            # 直接比较预测字母和正确答案字母
+            if pred and sol and pred.strip().upper() == sol.strip().upper():
+                scores.append(1.0)
+            else:
+                scores.append(0.0)
+                    
+        except Exception:
+            scores.append(0.0)
+    
+    return scores
