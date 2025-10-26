@@ -23,6 +23,13 @@ _import_structure = {
     "accuracy_rewards": ["accuracy_reward"],
     "format_rewards": ["think_format_reward"],
     "length_rewards": ["get_soft_overlong_punishment"],
+    "attention_rewards": ["mdi_reward", "mdi_reward_legacy", "mdi_reward_as_additive", "aei_reward"],
+    "reward_utils": [
+        "RewardWeightManager", 
+        "RewardWeightConfig", 
+        "create_reward_weight_manager",
+        "calculate_reward_metrics"
+    ],
 }
 
 
@@ -30,6 +37,13 @@ if TYPE_CHECKING:
     from .accuracy_rewards import accuracy_reward
     from .format_rewards import think_format_reward
     from .length_rewards import get_soft_overlong_punishment
+    from .attention_rewards import mdi_reward, mdi_reward_legacy, mdi_reward_as_additive, aei_reward
+    from .reward_utils import (
+        RewardWeightManager, 
+        RewardWeightConfig, 
+        create_reward_weight_manager,
+        calculate_reward_metrics
+    )
 
 
 else:

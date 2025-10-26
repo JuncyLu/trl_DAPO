@@ -14,6 +14,7 @@
 
 import heapq
 import inspect
+import math
 import os
 import textwrap
 import warnings
@@ -21,7 +22,7 @@ from collections import defaultdict, deque
 from contextlib import nullcontext
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, List, Optional, Union
 
 import datasets
 import torch
@@ -62,6 +63,13 @@ from trl.models.utils import _ForwardRedirection
 from trl.trainer.base_trainer import BaseTrainer
 from trl.trainer.callbacks import SyncRefModelCallback
 from .dapo_config import DAPOConfig
+from ..rewards.reward_utils import create_reward_weight_manager, calculate_reward_metrics
+from ..utils.attention_metrics import (
+    compute_qwen_attention_metrics_for_batch,
+    AttentionSampleResult,
+)
+from ..utils.dapo_logging import emit_rollout_logs, emit_eval_logs, compute_real_mdi_metrics
+from contextlib import contextmanager
 from trl.trainer.utils import (
     RepeatSampler,
     disable_dropout_in_model,
@@ -324,16 +332,14 @@ class DAPOTrainer(BaseTrainer):
                 self.reward_func_names.append(reward_funcs[i].__name__)
         self.reward_funcs = reward_funcs
 
-        # Reward weights
-        if args.reward_weights is not None:
-            if len(args.reward_weights) != len(reward_funcs):
-                raise ValueError(
-                    f"Number of reward weights ({len(args.reward_weights)}) must match number of reward "
-                    f"functions ({len(reward_funcs)})"
-                )
-            self.reward_weights = torch.tensor(args.reward_weights, dtype=torch.float32)
-        else:
-            self.reward_weights = torch.ones(len(reward_funcs), dtype=torch.float32)
+        # Initialize reward weight manager
+        self.reward_weight_manager = create_reward_weight_manager(
+            use_segmented_weights=args.use_segmented_reward_weights,
+            early_weights=args.early_reward_weights,
+            late_weights=args.late_reward_weights,
+            static_weights=args.reward_weights,
+            reward_func_names=self.reward_func_names
+        )
 
         # Reward processing class
         if reward_processing_classes is None:
@@ -534,6 +540,12 @@ class DAPOTrainer(BaseTrainer):
             "rewards": defaultdict(lambda: deque(maxlen=args.generation_batch_size)),
             "advantages": deque(maxlen=args.generation_batch_size),
         }
+
+        # Initialize attention tracking
+        self.compute_attention_metrics = args.compute_attention_metrics
+        if self.compute_attention_metrics:
+            self._logs["attention"] = deque(maxlen=1000)
+            self._attention_skip_reasons = deque(maxlen=1000)
 
         # Ensure each process receives a unique seed to prevent duplicate completions when generating with
         # transformers if num_generations exceeds per_device_train_batch_size. We could skip it if we use vLLM, but
@@ -1084,6 +1096,20 @@ class DAPOTrainer(BaseTrainer):
         # This allows for dynamic reward shaping based on training progress.
         reward_kwargs["trainer_state"] = self.state
 
+        # Add attention data for reward functions if available
+        if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
+            att_list = list(self._logs['attention'])
+            if att_list:
+                # Get the most recent attention results for this batch
+                sample_results = att_list[-len(prompts):]
+                mdi_metrics = compute_real_mdi_metrics(sample_results, [])
+                
+                # Extract attention data for reward functions
+                reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in mdi_metrics]
+                reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in mdi_metrics]
+                reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in mdi_metrics]
+                reward_kwargs["num_vision_tokens"] = [m.get("num_vision_tokens", 0) for m in mdi_metrics]
+
         for i, (reward_func, reward_processing_class, reward_func_name) in enumerate(
             zip(self.reward_funcs, self.reward_processing_classes, self.reward_func_names)
         ):
@@ -1215,6 +1241,7 @@ class DAPOTrainer(BaseTrainer):
                         extra_fields[key] = values[process_slice]
                     else:
                         extra_fields[key] = values
+                attention_context = None  # vLLM server doesn't support attention output
 
             # Generate completions using colocated vLLM instances: each device holds vLLM copy and work on their own batch of prompts
             elif self.vllm_mode == "colocate":
@@ -1280,6 +1307,7 @@ class DAPOTrainer(BaseTrainer):
                     logprobs = all_logprobs
 
                 extra_fields = {}  # No extra fields for colocate mode
+                attention_context = None  # vLLM doesn't support attention output
 
                 if self.args.vllm_enable_sleep_mode:
                     self.llm.sleep(level=2)
@@ -1316,6 +1344,7 @@ class DAPOTrainer(BaseTrainer):
             prompt_ids = generate_inputs["inputs"]
             logprobs = None  # not used in this case
             extra_fields = {}  # No extra fields for paged mode
+            attention_context = None  # paged mode doesn't support attention output
 
         else:
             # Regular generation path
@@ -1343,9 +1372,23 @@ class DAPOTrainer(BaseTrainer):
                 torch.no_grad(),
                 FSDP.summon_full_params(self.model_wrapped, recurse=False) if self.is_fsdp_enabled else nullcontext(),
             ):
-                prompt_completion_ids = unwrapped_model.generate(
-                    **generate_inputs, generation_config=self.generation_config, disable_compile=True
-                )
+                # Collect attention data if enabled
+                attention_context = None
+                if self.compute_attention_metrics:
+                    with self._temporary_attn_impl("eager"):
+                        attention_outputs = unwrapped_model.generate(
+                            **generate_inputs,
+                            generation_config=self.generation_config,
+                            disable_compile=True,
+                            return_dict_in_generate=True,
+                            output_attentions=True,
+                        )
+                    prompt_completion_ids = attention_outputs.sequences
+                    attention_context = {"outputs": attention_outputs, "inputs": generate_inputs}
+                else:
+                    prompt_completion_ids = unwrapped_model.generate(
+                        **generate_inputs, generation_config=self.generation_config, disable_compile=True
+                    )
             # Compute prompt length and extract completion ids
             prompt_ids, prompt_mask = generate_inputs["input_ids"], generate_inputs["attention_mask"]
             prompt_length = prompt_ids.size(1)
@@ -1362,13 +1405,13 @@ class DAPOTrainer(BaseTrainer):
             logprobs = None  # not used in this case
             extra_fields = {}  # No extra fields for non-rollout_func paths
 
-        return prompt_ids, completion_ids, logprobs, extra_fields
+        return prompt_ids, completion_ids, logprobs, extra_fields, attention_context
 
     def _generate(self, prompts: list):
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
 
-        prompt_ids, completion_ids, logprobs, extra_fields = self._generate_single_turn(prompts)
+        prompt_ids, completion_ids, logprobs, extra_fields, attention_context = self._generate_single_turn(prompts)
 
         # Get completion length per sequence, used for logging
         prompt_lengths = torch.tensor([len(ids) for ids in prompt_ids], device=device)
@@ -1400,6 +1443,10 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode]["completions/min_terminated_length"].append(term_completion_lengths.float().min().item())
         self._metrics[mode]["completions/max_terminated_length"].append(term_completion_lengths.float().max().item())
 
+        # Process attention metrics if available
+        if attention_context is not None:
+            self._process_attention_metrics(attention_context, mode)
+
         return prompt_ids, completion_ids, total_completion_tokens, logprobs, extra_fields
 
     def _generate_and_score_completions(
@@ -1407,6 +1454,16 @@ class DAPOTrainer(BaseTrainer):
     ) -> dict[str, Union[torch.Tensor, Any]]:
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
+        
+        # 更新分段权重（仅在训练模式下）
+        if mode == "train":
+            weight_metrics = self.reward_weight_manager.update_weights(
+                self.state.global_step, 
+                self.args.max_steps if self.args.max_steps > 0 else self.state.max_steps
+            )
+            # 将权重指标添加到metrics中
+            for key, value in weight_metrics.items():
+                self._metrics[mode][key].append(value)
 
         prompts = [x["prompt"] for x in inputs]
 
@@ -1560,8 +1617,8 @@ class DAPOTrainer(BaseTrainer):
         # rewards_per_func to extract each process's subset.
         rewards_per_func = self._calculate_rewards(inputs, prompts, completions, completion_ids_list)
 
-        # Apply weights to each reward function's output and sum
-        rewards = (rewards_per_func * self.reward_weights.to(device).unsqueeze(0)).nansum(dim=1)
+        # Apply weights to each reward function's output and sum using reward weight manager
+        rewards = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
 
         # Compute grouped-wise rewards
         mean_grouped_rewards = rewards.view(-1, self.num_generations).mean(dim=1)
@@ -1594,12 +1651,10 @@ class DAPOTrainer(BaseTrainer):
         all_process_advantages = advantages.clone()  # keep the aggregated advantages for logging
         advantages = advantages[process_slice]
 
-        # Calculate mean reward per function, but only for samples where the function was applied (non-NaN values)
-        for i, reward_func_name in enumerate(self.reward_func_names):
-            mean_rewards = torch.nanmean(rewards_per_func[:, i]).item()
-            self._metrics[mode][f"rewards/{reward_func_name}/mean"].append(mean_rewards)
-            std_func_rewards = nanstd(rewards_per_func[:, i]).item()
-            self._metrics[mode][f"rewards/{reward_func_name}/std"].append(std_func_rewards)
+        # Calculate reward metrics using utility function
+        reward_metrics = calculate_reward_metrics(rewards_per_func, self.reward_func_names, device)
+        for key, value in reward_metrics.items():
+            self._metrics[mode][key].append(value)
         self._metrics[mode]["reward"].append(mean_grouped_rewards.mean().item())
         self._metrics[mode]["reward_std"].append(std_rewards.mean().item())
         self._metrics[mode]["frac_reward_zero_std"].append(is_std_zero.float().mean().item())
@@ -1609,6 +1664,7 @@ class DAPOTrainer(BaseTrainer):
         self._logs["completion"].extend(gather_object(completions_text))
         for i, name in enumerate(self.reward_func_names):
             self._logs["rewards"][name].extend(rewards_per_func[:, i].tolist())
+        self._logs["rewards"]["total"].extend(rewards.tolist())
         self._logs["advantages"].extend(all_process_advantages.tolist())
 
         if images is not None:
@@ -1674,7 +1730,9 @@ class DAPOTrainer(BaseTrainer):
             output["num_images"] = num_images
 
         # --- Dynamic sampling replay buffer integration ---
-        if self.replay_buffer is not None:
+        # Only apply during training; evaluation may generate a different number of completions per prompt
+        # which can cause shape mismatches (e.g., len(completions) < num_generations).
+        if mode == "train" and self.replay_buffer is not None:
             # Per-group views (use local process rewards to match local batch size)
             num_groups = completion_ids.size(0) // self.num_generations
             group_adv = advantages.view(num_groups, self.num_generations)
@@ -1771,7 +1829,6 @@ class DAPOTrainer(BaseTrainer):
                         sc_ids = _pad_to(s["completion_ids"].to(completion_ids.device), completion_ids.size(1), "right")
                         sc_msk = _pad_to(s["completion_mask"].to(completion_mask.device), completion_mask.size(1), "right")
                         s_adv = torch.tensor(s["advantages"], device=advantages.device, dtype=advantages.dtype)
-                        s_adv = s_adv.unsqueeze(0).expand(self.num_generations, -1).flatten()
 
                         # For multimodal inputs, only replace completion part to maintain image token alignment
                         if images is not None:
@@ -1807,6 +1864,42 @@ class DAPOTrainer(BaseTrainer):
                         output["old_per_token_logps"] = old_per_token_logps
                     if ref_per_token_logps is not None:
                         output["ref_per_token_logps"] = ref_per_token_logps
+
+        # Emit rollout logs if enabled
+        if (self.accelerator.is_main_process and 
+            getattr(self.args, "realtime_rollout_logging", False) and 
+            mode == "train"):
+            try:
+                # Get MDI info for logging
+                mdi_info = []
+                if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
+                    att_list = list(self._logs['attention'])
+                    if att_list:
+                        sample_results = att_list[-len(prompts):]
+                        mdi_info = compute_real_mdi_metrics(sample_results, [])
+                
+                # Get solutions if available
+                solutions = [inp.get("solution", "") for inp in inputs]
+                
+                # Call rollout logging
+                emit_rollout_logs(
+                    prompts_text=prompts_text,
+                    completions_text=completions_text,
+                    solutions=solutions,
+                    rewards_per_func_local=rewards_per_func[process_slice],
+                    total_rewards_local=rewards[process_slice],
+                    reward_names=self.reward_func_names,
+                    mdi_info=mdi_info,
+                    log_path=getattr(self.args, "rollout_log_path", None),
+                    attention_diag_log_path=getattr(self.args, "attention_diag_log_path", None),
+                    prompt_preview_chars=getattr(self.args, "prompt_preview_chars", 2000),
+                    completion_preview_chars=getattr(self.args, "completion_preview_chars", 2000),
+                    mdi_as_coefficient=getattr(self.args, "mdi_as_coefficient", 0),
+                    step=self.state.global_step,
+                    epoch=self.state.epoch,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to emit rollout logs: {e}")
 
         return output
 
@@ -2015,15 +2108,16 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode].clear()
 
         if self.accelerator.is_main_process and self.log_completions:
-            if is_rich_available():
-                print_prompt_completions_sample(
-                    self._logs["prompt"],
-                    self._logs["completion"],
-                    self._logs["rewards"],
-                    self._logs["advantages"],
-                    self.state.global_step,
-                    self.num_completions_to_print,
-                )
+            # 注释掉终端打印，只保留wandb记录
+            # if is_rich_available():
+            #     print_prompt_completions_sample(
+            #         self._logs["prompt"],
+            #         self._logs["completion"],
+            #         self._logs["rewards"],
+            #         self._logs["advantages"],
+            #         self.state.global_step,
+            #         self.num_completions_to_print,
+            #     )
 
             if self.args.report_to and "wandb" in self.args.report_to and wandb.run is not None:
                 import pandas as pd
@@ -2055,3 +2149,113 @@ class DAPOTrainer(BaseTrainer):
             model_name = self.args.hub_model_id.split("/")[-1]
         self.create_model_card(model_name=model_name)
         super()._save_checkpoint(model, trial)
+
+    def _unwrap_model_for_config(self, model=None):
+        """Return the base unwrapped model for config access."""
+        if model is None:
+            model = self.model
+        return unwrap_model_for_generation(model)
+    
+    @contextmanager
+    def _temporary_attn_impl(self, attn_impl: str = "eager"):
+        """Context manager for temporarily switching attention implementation."""
+        if not self.compute_attention_metrics:
+            yield
+            return
+        
+        # Get the unwrapped model
+        unwrapped_model = self._unwrap_model_for_config()
+        
+        # Store original attention implementation
+        original_attn_impl = None
+        if hasattr(unwrapped_model.config, 'attn_implementation'):
+            original_attn_impl = unwrapped_model.config.attn_implementation
+        
+        try:
+            # Temporarily set attention implementation
+            if hasattr(unwrapped_model.config, 'attn_implementation'):
+                unwrapped_model.config.attn_implementation = attn_impl
+            yield
+        finally:
+            # Restore original attention implementation
+            if original_attn_impl is not None and hasattr(unwrapped_model.config, 'attn_implementation'):
+                unwrapped_model.config.attn_implementation = original_attn_impl
+
+    def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> None:
+        """Process attention outputs and compute metrics."""
+        if not self.compute_attention_metrics or attention_context is None:
+            return
+        
+        try:
+            outputs = attention_context.get("outputs")
+            inputs = attention_context.get("inputs")
+            
+            if outputs is None or not hasattr(outputs, 'attentions') or outputs.attentions is None:
+                return
+            
+            # Extract necessary data
+            input_ids = inputs.get("input_ids")
+            sequences = outputs.sequences
+            image_grid_thw = inputs.get("image_grid_thw")
+            
+            if input_ids is None or sequences is None:
+                return
+            
+            # Compute attention metrics
+            sample_results, skip_reasons = compute_qwen_attention_metrics_for_batch(
+                self.model,
+                self.processing_class,
+                outputs.attentions,
+                input_ids,
+                sequences,
+                image_grid_thw=image_grid_thw,
+            )
+            
+            # Store results
+            if hasattr(self, '_logs') and 'attention' in self._logs:
+                self._logs['attention'].extend(sample_results)
+                self._attention_skip_reasons.extend(skip_reasons)
+            
+            # Log attention metrics
+            self._log_attention_metrics(sample_results, mode, skip_reasons)
+            
+        except Exception as e:
+            logger.warning(f"Failed to process attention metrics: {e}")
+
+    def _log_attention_metrics(self, sample_results: List[Optional[AttentionSampleResult]], mode: str, skip_reasons: List[Optional[str]]) -> None:
+        """Log attention metrics to trainer metrics."""
+        if not sample_results:
+            return
+        
+        # Compute real MDI metrics for logging
+        mdi_metrics = compute_real_mdi_metrics(sample_results, skip_reasons)
+        
+        # Log overall statistics
+        valid_results = [r for r in sample_results if r is not None]
+        if not valid_results:
+            return
+        
+        # Extract metrics for different segments
+        segments = ["early", "middle", "late", "all"]
+        for segment in segments:
+            mdi_values = []
+            aei_text_values = []
+            aei_vision_values = []
+            
+            for result in valid_results:
+                if result.segments and segment in result.segments:
+                    seg_data = result.segments[segment]
+                    if hasattr(seg_data, 'mdi') and seg_data.mdi is not None and not math.isnan(seg_data.mdi):
+                        mdi_values.append(seg_data.mdi)
+                    if hasattr(seg_data, 'aei_text') and seg_data.aei_text is not None and not math.isnan(seg_data.aei_text):
+                        aei_text_values.append(seg_data.aei_text)
+                    if hasattr(seg_data, 'aei_vision') and seg_data.aei_vision is not None and not math.isnan(seg_data.aei_vision):
+                        aei_vision_values.append(seg_data.aei_vision)
+            
+            # Log metrics
+            if mdi_values:
+                self._metrics[mode][f"attention/{segment}/mdi"].append(torch.tensor(mdi_values).mean().item())
+            if aei_text_values:
+                self._metrics[mode][f"attention/{segment}/aei_text"].append(torch.tensor(aei_text_values).mean().item())
+            if aei_vision_values:
+                self._metrics[mode][f"attention/{segment}/aei_vision"].append(torch.tensor(aei_vision_values).mean().item())

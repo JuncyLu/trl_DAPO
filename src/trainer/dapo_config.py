@@ -523,6 +523,24 @@ class DAPOConfig(TrainingArguments):
             "rewards are weighted equally with weight `1.0`."
         },
     )
+    use_segmented_reward_weights: bool = field(
+        default=False,
+        metadata={
+            "help": "Whether to use segmented reward weights. If True, uses different weights for first 10% and last 90% of training steps."
+        },
+    )
+    early_reward_weights: Optional[list[float]] = field(
+        default=None,
+        metadata={
+            "help": "Reward weights for the first 10% of training steps. Format: [w_fmt, w_len, w_acc]. Default: [2.5, 1.0, 0.5]"
+        },
+    )
+    late_reward_weights: Optional[list[float]] = field(
+        default=None,
+        metadata={
+            "help": "Reward weights for the last 90% of training steps. Format: [w_fmt, w_len, w_acc]. Default: [0.5, 1.0, 2.5]"
+        },
+    )
     soft_punish_cache: int = field(
         default=50,
         metadata={
@@ -662,6 +680,42 @@ class DAPOConfig(TrainingArguments):
             "help": "Whether to log unique prompts in wandb. If `True`, only unique prompts are logged. If `False`, "
             "all prompts are logged."
         },
+    )
+
+    # --- Attention metrics configuration ---
+    compute_attention_metrics: bool = field(
+        default=True,
+        metadata={"help": "Whether to compute attention metrics during generation."}
+    )
+
+    realtime_rollout_logging: bool = field(
+        default=True,
+        metadata={"help": "Enable real-time rollout logging to markdown files."}
+    )
+
+    rollout_log_path: Optional[str] = field(
+        default="./training_logs/rollout_results.md",
+        metadata={"help": "Path to save rollout logs (markdown format)."}
+    )
+
+    attention_diag_log_path: Optional[str] = field(
+        default="./training_logs/attention_diagnostics.md",
+        metadata={"help": "Path to save attention diagnostic logs."}
+    )
+
+    eval_log_path: Optional[str] = field(
+        default="./training_logs/eval_results.md",
+        metadata={"help": "Path to save evaluation logs."}
+    )
+
+    prompt_preview_chars: int = field(
+        default=2000,
+        metadata={"help": "Number of characters to preview for prompts in logs."}
+    )
+
+    completion_preview_chars: int = field(
+        default=2000,
+        metadata={"help": "Number of characters to preview for completions in logs."}
     )
 
     def __post_init__(self):
