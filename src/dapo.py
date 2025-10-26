@@ -12,23 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .trainer.dapo_config import DAPOConfig
+from .trainer.dapo_trainer import DAPOTrainer
 
-import sys
-from typing import TYPE_CHECKING
-
-from ..import_utils import _LazyModule
-
-
-_import_structure = {
-    "accuracy_rewards": ["accuracy_reward"],
-    "format_rewards": ["think_format_reward"],
-}
-
-
-if TYPE_CHECKING:
-    from .accuracy_rewards import accuracy_reward
-    from .format_rewards import think_format_reward
-
-
-else:
-    sys.modules[__name__] = _LazyModule(__name__, __file__, _import_structure, module_spec=__spec__)
+__all__ = ["DAPOConfig", "DAPOTrainer"]

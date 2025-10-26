@@ -523,6 +523,34 @@ class DAPOConfig(TrainingArguments):
             "rewards are weighted equally with weight `1.0`."
         },
     )
+    soft_punish_cache: int = field(
+        default=50,
+        metadata={
+            "help": "Cache size for soft overlong punishment. Used in length reward function to define the soft "
+            "penalty zone. Completions longer than (max_completion_length - soft_punish_cache) will be penalized."
+        },
+    )
+
+    # --- Dynamic sampling buffer (replay buffer) ---
+    replay_buffer_size: int = field(
+        default=0,
+        metadata={
+            "help": "Size of the replay buffer. 0 disables buffering (keeps current behavior)."
+        },
+    )
+    filter_min_reward: float = field(
+        default=2.0,
+        metadata={
+            "help": "Group mean reward threshold. Groups with mean reward <= this value are filtered out from the buffer."
+        },
+    )
+    replay_var_epsilon: float = field(
+        default=1e-6,
+        metadata={
+            "help": "Minimum variance threshold to consider a group as having variance. Helps avoid numerical noise."
+        },
+    )
+
     scale_rewards: str = field(
         default="group",
         metadata={

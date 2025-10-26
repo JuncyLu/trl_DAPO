@@ -41,7 +41,7 @@ from trl import (
     get_dataset,
     get_peft_config,
 )
-from src.dapo.rewards import accuracy_reward, get_soft_overlong_punishment, think_format_reward
+from src.rewards import accuracy_reward, get_soft_overlong_punishment, think_format_reward
 
 
 logger = logging.get_logger(__name__)
