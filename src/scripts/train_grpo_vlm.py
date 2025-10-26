@@ -84,7 +84,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.dapo import DAPOConfig, DAPOTrainer
-from trl.rewards import accuracy_reward, think_format_reward
+from src.dapo.rewards import accuracy_reward, think_format_reward
 
 
 # Enable logging in a Hugging Face Space
