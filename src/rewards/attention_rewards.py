@@ -318,25 +318,27 @@ def mdi_reward_as_additive(completions: List[List[dict]], **kwargs) -> List[floa
             # 15 <= MDI < 20: 强惩罚 (0.4-0.7)
             # 20 <= MDI < 30: 极强惩罚 (0.1-0.4)
             # MDI >= 30: 最低分 (0.0) - 不可接受
-            if mdi < 5.0:
-                # MDI < 5: 满分 (理想状态)
-                normalized = 1.0
-            elif mdi < 10.0:
-                # 5 <= MDI < 10: 轻微惩罚 1.0 -> 0.9
-                normalized = 1.0 - (mdi - 5.0) * 0.1 / 5.0
-            elif mdi < 15.0:
-                # 10 <= MDI < 15: 中等惩罚 0.9 -> 0.7
-                normalized = 0.9 - (mdi - 10.0) * 0.2 / 5.0
-            elif mdi < 20.0:
-                # 15 <= MDI < 20: 强惩罚 0.7 -> 0.4
-                normalized = 0.7 - (mdi - 15.0) * 0.3 / 5.0
-            elif mdi < 30.0:
-                # 20 <= MDI < 30: 极强惩罚 0.4 -> 0.1
-                normalized = 0.4 - (mdi - 20.0) * 0.3 / 10.0
+            if mdi <= 7.0:
+                # MDI <= 7: 1.00
+                normalized = 1.00
+            elif mdi <= 10.0:
+                # 7 < MDI <= 10: 0.85 -> 0.70 (线性下降)
+                # 0.85 - (mdi - 7) * (0.15 / 3)
+                normalized = 0.85 - (mdi - 7.0) * 0.05
+            elif mdi <= 15.0:
+                # 10 < MDI <= 15: 0.70 -> 0.30 (线性下降)
+                # 0.70 - (mdi - 10) * (0.40 / 5)
+                normalized = 0.70 - (mdi - 10.0) * 0.08
+            elif mdi <= 20.0:
+                # 15 < MDI <= 20: 0.30 -> 0.05 (线性下降)
+                # 0.30 - (mdi - 15) * (0.25 / 5)
+                normalized = 0.30 - (mdi - 15.0) * 0.05
             else:
-                # MDI >= 30: 最低分 (不可接受)
-                normalized = 0.0
+                # MDI > 20: 0.00
+                normalized = 0.00
             
+            # 确保奖励值在 [0.00, 1.00] 之间
+            normalized = max(0.00, min(1.00, normalized))
             rewards.append(float(normalized))
 
         except Exception:

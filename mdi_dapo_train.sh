@@ -30,13 +30,13 @@ accelerate launch \
   --per_device_train_batch_size 4 \
   --gradient_accumulation_steps 8 \
   --num_generations 4 \
-  --num_train_epochs 1 \
+  --num_train_epochs 2 \
   --report_to wandb \
   --log_completions \
   --logging_steps 1.0 \
   --do_eval \
   --eval_strategy steps \
-  --eval_steps 10 \
+  --eval_steps 5 \
   --eval_num_generations 2 \
   --per_device_eval_batch_size 4 \
   --save_strategy steps \
@@ -50,8 +50,8 @@ accelerate launch \
   --filter_min_reward 1.5 \
   --replay_var_epsilon 1e-6 \
   --use_segmented_reward_weights \
-  --early_reward_weights 1.0 0.0 2.0 1.0 \
-  --late_reward_weights 2.5 0.0 0.5 1.0 \
+  --early_reward_weights 0.0 1.0 2.0 1.0 \
+  --late_reward_weights 0.0 2.5 0.5 1.0 \
   >> training_logs/$TS/train.log 2>&1
 
     # --use_vllm \

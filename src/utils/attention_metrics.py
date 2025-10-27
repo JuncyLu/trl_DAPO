@@ -193,8 +193,11 @@ def _build_modality_masks(
             continue
         s = max(0, int(start))
         e = min(seq_len, int(end))
-        if e > s:
-            vision_mask[s:e] = True
+        # 仅保留视觉patch内部区域，不包含 <|vision_start|> 与 <|vision_end|>
+        inner_start = s + 1
+        inner_end = e - 1
+        if inner_end > inner_start:
+            vision_mask[inner_start:inner_end] = True
 
     instruction_mask = torch.ones(seq_len, dtype=torch.bool, device=device)
     instruction_mask &= ~vision_mask
@@ -205,6 +208,26 @@ def _build_modality_masks(
         for idx, token_id in enumerate(input_list):
             if token_id in specials:
                 instruction_mask[idx] = False
+
+    # 从文本池剔除第一个 system 段（<|im_start|> ... <|im_end|> 之间）
+    if special_token_ids is not None:
+        im_start_id = special_token_ids.get("im_start")
+        im_end_id = special_token_ids.get("im_end")
+        if im_start_id is not None and im_end_id is not None:
+            ids_list = input_ids.tolist()
+            try:
+                start_idx = ids_list.index(im_start_id)
+                # 寻找 start_idx 之后的第一个 im_end
+                try:
+                    end_rel = ids_list[start_idx + 1 :].index(im_end_id)
+                    end_idx = start_idx + 1 + end_rel
+                    if 0 <= start_idx < end_idx <= seq_len - 1:
+                        # 剔除系统段（包含起止，特殊符号已在上面剔除，这里包含也无妨）
+                        instruction_mask[start_idx : end_idx + 1] = False
+                except ValueError:
+                    pass
+            except ValueError:
+                pass
 
     return instruction_mask, vision_mask
 
@@ -262,16 +285,27 @@ def _compute_segment_metrics(
 
         gen_attn = attn[gen_row_start:, :actual_prompt_length]
 
+        # 对齐到 prompt 长度
         if vision_mask.shape[0] != actual_prompt_length:
             if vision_mask.shape[0] < actual_prompt_length:
-                pad = torch.zeros(actual_prompt_length - vision_mask.shape[0], dtype=vision_mask.dtype)
-                vision_mask_prompt = torch.cat([vision_mask, pad], dim=0)
+                pad_v = torch.zeros(actual_prompt_length - vision_mask.shape[0], dtype=vision_mask.dtype)
+                vision_mask_prompt = torch.cat([vision_mask, pad_v], dim=0)
             else:
                 vision_mask_prompt = vision_mask[:actual_prompt_length]
         else:
             vision_mask_prompt = vision_mask
 
-        text_keys_mask = (~vision_mask_prompt).to(gen_attn.device)
+        if instruction_mask.shape[0] != actual_prompt_length:
+            if instruction_mask.shape[0] < actual_prompt_length:
+                pad_i = torch.zeros(actual_prompt_length - instruction_mask.shape[0], dtype=instruction_mask.dtype)
+                instruction_mask_prompt = torch.cat([instruction_mask, pad_i], dim=0)
+            else:
+                instruction_mask_prompt = instruction_mask[:actual_prompt_length]
+        else:
+            instruction_mask_prompt = instruction_mask
+
+        # 文本keys严格使用 instruction_mask（已剔除special、system等），视觉keys使用 vision_mask
+        text_keys_mask = instruction_mask_prompt.to(gen_attn.device)
         vision_keys_mask = vision_mask_prompt.to(gen_attn.device)
 
         gen_attn_sum = gen_attn.sum(dim=1, keepdim=True)

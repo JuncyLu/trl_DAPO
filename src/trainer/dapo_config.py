@@ -310,6 +310,13 @@ class DAPOConfig(TrainingArguments):
             "* gradient_accumulation_steps) must be evenly divisible by this value."
         },
     )
+    eval_num_generations: Optional[int] = field(
+        default=2,
+        metadata={
+            "help": "Number of generations per sample during evaluation. Defaults to 2. If not set, uses this default "
+            "without affecting training `num_generations`."
+        },
+    )
     max_completion_length: Optional[int] = field(
         default=256,
         metadata={"help": "Maximum length of the generated completion."},

@@ -532,11 +532,14 @@ class DAPOTrainer(BaseTrainer):
         self.log_completions = args.log_completions
         self.wandb_log_unique_prompts = args.wandb_log_unique_prompts
         self.num_completions_to_print = args.num_completions_to_print
+        # Evaluation can use a different number of generations per sample
+        self.eval_num_generations = getattr(args, "eval_num_generations", 2) or 2
         # Keep logs sized to the generation batch to record only outputs from the latest model update.
         self._logs = {
             "images": deque(maxlen=args.generation_batch_size),
             "prompt": deque(maxlen=args.generation_batch_size),
             "completion": deque(maxlen=args.generation_batch_size),
+            "prompt_chatml": deque(maxlen=args.generation_batch_size),
             "rewards": defaultdict(lambda: deque(maxlen=args.generation_batch_size)),
             "advantages": deque(maxlen=args.generation_batch_size),
         }
@@ -765,7 +768,7 @@ class DAPOTrainer(BaseTrainer):
         # See _get_train_sampler for an explanation of the sampler.
         return RepeatSampler(
             data_source=eval_dataset,
-            mini_repeat_count=self.num_generations,
+            mini_repeat_count=self.eval_num_generations,
             seed=self.args.seed,
         )
 
@@ -1165,6 +1168,8 @@ class DAPOTrainer(BaseTrainer):
 
     def _generate_single_turn(self, prompts: list, images: Optional[list] = None):
         device = self.accelerator.device
+        # Use eval-specific generations when not training
+        ng = self.num_generations if self.model.training else self.eval_num_generations
 
         # Generate completions using either vLLM or regular generation
         if self.use_vllm:
@@ -1183,16 +1188,22 @@ class DAPOTrainer(BaseTrainer):
 
             # Generate completions using vLLM: gather all prompts and use them in a single call in the main process
             if self.vllm_mode == "server":
+                # Ensure grouping alignment when requesting n>1 generations per unique prompt
+                if ng > 1 and len(prompts) % ng != 0:
+                    prompts = prompts[: len(prompts) - (len(prompts) % ng)]
                 all_prompts = gather_object(prompts)
 
                 if self.accelerator.is_main_process:
                     # Since 'prompts' contains 'num_generations' duplicates, we first take unique prompts, and generate
                     # num_generations outputs for each one. This is faster than generating outputs for each duplicate
                     # prompt individually.
-                    ordered_set_of_prompts = all_prompts[:: self.num_generations]
+                    # Drop any trailing incomplete group to keep alignment across processes
+                    total = len(all_prompts)
+                    num_unique = total // ng if ng > 0 else total
+                    ordered_set_of_prompts = [all_prompts[i * ng] for i in range(num_unique)]
 
                     sampling_params = {
-                        "n": self.num_generations,
+                        "n": ng,
                         "repetition_penalty": self.repetition_penalty,
                         "temperature": self.temperature,
                         "top_p": self.top_p,
@@ -1233,8 +1244,8 @@ class DAPOTrainer(BaseTrainer):
                 broadcast_object_list(obj_list, from_process=0)
                 all_prompt_ids, all_completion_ids, all_logprobs, all_extra_fields = obj_list[0]
 
-                # At this point, we only get 1 copy of each prompt, so we need to repeat them num_generations times
-                all_prompt_ids = [ids for ids in all_prompt_ids for _ in range(self.num_generations)]
+                # At this point, we only get 1 copy of each prompt, so we need to repeat them ng times
+                all_prompt_ids = [ids for ids in all_prompt_ids for _ in range(ng)]
 
                 process_slice = slice(
                     self.accelerator.process_index * len(prompts),
@@ -1501,6 +1512,8 @@ class DAPOTrainer(BaseTrainer):
     ) -> dict[str, Union[torch.Tensor, Any]]:
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
+        # Preferred generations per prompt for current mode
+        preferred_num_generations = self.num_generations if mode == "train" else self.eval_num_generations
         
         # 更新分段权重（仅在训练模式下）
         if mode == "train":
@@ -1642,7 +1655,8 @@ class DAPOTrainer(BaseTrainer):
 
         # Decode
         prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=False)
-        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=False)
+        # Model outputs kept as plain text (no special tokens)
+        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
         if is_conversational(inputs[0]):
             completions = []
             for prompt, completion in zip(prompts, completions_text):
@@ -1669,16 +1683,22 @@ class DAPOTrainer(BaseTrainer):
         rewards = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
 
         # Compute grouped-wise rewards
-        mean_grouped_rewards = rewards.view(-1, self.num_generations).mean(dim=1)
+        group_ng = preferred_num_generations
+        if group_ng is None or group_ng < 1:
+            group_ng = 1
+        # If the current batch size is not divisible by group_ng (can happen in eval), fall back to 1
+        if rewards.numel() % group_ng != 0:
+            group_ng = 1
+        mean_grouped_rewards = rewards.view(-1, group_ng).mean(dim=1)
 
         # Normalize the rewards to compute the advantages
-        mean_grouped_rewards = mean_grouped_rewards.repeat_interleave(self.num_generations, dim=0)
+        mean_grouped_rewards = mean_grouped_rewards.repeat_interleave(group_ng, dim=0)
         advantages = rewards - mean_grouped_rewards
 
         if self.scale_rewards in ["group", "none"]:
             # If self.scale_rewards = "none", we'll still log group level std
-            std_rewards = rewards.view(-1, self.num_generations).std(dim=1)
-            std_rewards = std_rewards.repeat_interleave(self.num_generations, dim=0)
+            std_rewards = rewards.view(-1, group_ng).std(dim=1)
+            std_rewards = std_rewards.repeat_interleave(group_ng, dim=0)
         elif self.scale_rewards == "batch":
             # Compute global std
             std_rewards = rewards.std().expand_as(rewards)
@@ -1707,9 +1727,21 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode]["reward_std"].append(std_rewards.mean().item())
         self._metrics[mode]["frac_reward_zero_std"].append(is_std_zero.float().mean().item())
 
-        # Log prompt and completion texts
+        # Build ChatML prompt strings for logging; keep completion as plain text
+        try:
+            if is_conversational(inputs[0]):
+                rendered_prompts = [
+                    apply_chat_template({"prompt": p}, self.processing_class)["prompt"] for p in prompts
+                ]
+            else:
+                rendered_prompts = prompts_text
+        except Exception:
+            rendered_prompts = prompts_text
+
+        # Log prompt and completion texts (ChatML prompt, plain completion)
         self._logs["prompt"].extend(gather_object(prompts_text))
         self._logs["completion"].extend(gather_object(completions_text))
+        self._logs["prompt_chatml"].extend(gather_object(rendered_prompts))
         for i, name in enumerate(self.reward_func_names):
             self._logs["rewards"][name].extend(rewards_per_func[:, i].tolist())
         self._logs["rewards"]["total"].extend(rewards.tolist())
@@ -1935,11 +1967,20 @@ class DAPOTrainer(BaseTrainer):
                 
                 # Get solutions if available
                 solutions = [inp.get("solution", "") for inp in inputs]
+
+                # For logs: ChatML prompt + plain completion
+                if is_conversational(inputs[0]):
+                    log_prompts_text = [
+                        apply_chat_template({"prompt": p}, self.processing_class)["prompt"] for p in prompts
+                    ]
+                else:
+                    log_prompts_text = prompts_text
+                log_completions_text = completions_text
                 
                 # Call rollout logging
                 emit_rollout_logs(
-                    prompts_text=prompts_text,
-                    completions_text=completions_text,
+                    prompts_text=log_prompts_text,
+                    completions_text=log_completions_text,
                     solutions=solutions,
                     rewards_per_func_local=rewards_per_func[process_slice],
                     total_rewards_local=rewards[process_slice],
@@ -2214,6 +2255,50 @@ class DAPOTrainer(BaseTrainer):
                 if a_all is not None: attn_line.append(f"all={a_all:.3f}")
                 if attn_line:
                     print("MDI:     " + ", ".join(attn_line))
+
+                # Emit evaluation markdown logs: ChatML prompt + plain completion
+                if mode == "eval":
+                    try:
+                        prompts_cm = list(self._logs.get("prompt_chatml", []))
+                        completions_cm = list(self._logs.get("completion", []))
+                        total_rewards = list(self._logs["rewards"].get("total", [])) if isinstance(self._logs.get("rewards"), dict) else []
+                        reward_names = self.reward_func_names
+                        reward_lists = {name: list(self._logs["rewards"].get(name, [])) for name in reward_names}
+                        sample_count = min(len(prompts_cm), len(completions_cm))
+                        eval_samples = []
+                        for i in range(sample_count):
+                            rewards_map = {}
+                            for name in reward_names:
+                                vals = reward_lists.get(name, [])
+                                if i < len(vals):
+                                    try:
+                                        rewards_map[name] = float(vals[i])
+                                    except Exception:
+                                        pass
+                            total_val = 0.0
+                            if i < len(total_rewards):
+                                try:
+                                    total_val = float(total_rewards[i])
+                                except Exception:
+                                    total_val = 0.0
+                            eval_samples.append(
+                                {
+                                    "prompt": prompts_cm[i],
+                                    "completion": completions_cm[i],
+                                    "rewards": rewards_map,
+                                    "total_reward": total_val,
+                                }
+                            )
+                        emit_eval_logs(
+                            metrics=metrics,
+                            logs=logs,
+                            eval_samples=eval_samples,
+                            log_path=getattr(self.args, "eval_log_path", None),
+                            step=self.state.global_step,
+                            epoch=self.state.epoch,
+                        )
+                    except Exception as e:
+                        logger.warning(f"Failed to emit eval logs: {e}")
             except Exception:
                 pass
 
@@ -2235,19 +2320,34 @@ class DAPOTrainer(BaseTrainer):
             if self.args.report_to and "wandb" in self.args.report_to and wandb.run is not None:
                 import pandas as pd
 
+                # Wandb: ChatML prompt + plain completion
+                prompts_wb = list(self._logs.get("prompt_chatml", [])) or list(self._logs.get("prompt", []))
+                completions_wb = list(self._logs.get("completion", []))
+
+                n_rows = min(len(prompts_wb), len(completions_wb))
+                prompts_wb = prompts_wb[:n_rows]
+                completions_wb = completions_wb[:n_rows]
+
                 table = {
-                    "step": [str(self.state.global_step)] * len(self._logs["prompt"]),
-                    "prompt": self._logs["prompt"],
-                    "completion": self._logs["completion"],
-                    **self._logs["rewards"],
-                    "advantage": self._logs["advantages"],
+                    "step": [str(self.state.global_step)] * n_rows,
+                    "prompt": prompts_wb,
+                    "completion": completions_wb,
                 }
 
+                # Add rewards columns, sliced to n_rows for consistency
+                for k, v in self._logs["rewards"].items():
+                    vals = list(v)
+                    table[k] = vals[:n_rows]
+
+                # Add advantages, sliced
+                table["advantage"] = list(self._logs["advantages"])[:n_rows]
+
+                # Add images if present, sliced
                 if self._logs["images"]:
-                    table["images"] = []
-                    for image_list in self._logs["images"]:
-                        # Convert images to wandb Image objects for proper visualization
-                        table["images"].append([wandb.Image(image) for image in image_list])
+                    images_col = []
+                    for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
+                        images_col.append([wandb.Image(image) for image in image_list])
+                    table["images"] = images_col
 
                 df = pd.DataFrame(table)
                 if self.wandb_log_unique_prompts:
