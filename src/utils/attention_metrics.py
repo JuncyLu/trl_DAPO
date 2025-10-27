@@ -53,6 +53,7 @@ def _collect_llm_attention_for_sample(
         return {}
 
     outputs_attentions = list(outputs_attentions)
+    
     if len(outputs_attentions) == 0:
         return {}
 
@@ -66,10 +67,12 @@ def _collect_llm_attention_for_sample(
             continue
         attn = layer_attn[sample_idx]  # [num_heads, tgt_len, src_len]
         attn_avg = attn.mean(dim=0)  # [tgt_len, src_len]
+        
         if attn_avg.shape[0] > 0:
             cur = attn_avg[:-1].clone()
         else:
             cur = attn_avg.clone()
+            
         if cur.numel() == 0:
             continue
         if zero_bos and cur.shape[1] >= 1 and cur.shape[0] >= 2:
@@ -326,6 +329,7 @@ def compute_qwen_attention_metrics_for_batch(
             continue
 
         input_ids_sample = input_ids[batch_idx].detach().cpu()
+        
         spans = extract_vision_token_spans_qwen(
             _model,
             processor,
@@ -342,6 +346,7 @@ def compute_qwen_attention_metrics_for_batch(
         num_text_tokens = int(instruction_mask.sum().item())
         num_vision_tokens = int(vision_mask.sum().item())
         actual_prompt_length = instruction_mask.numel()
+        
         num_prompt_queries = max(actual_prompt_length - 1, 0)
 
         total_queries = 0
@@ -429,10 +434,12 @@ def extract_vision_token_spans_qwen(
     special_ids = get_qwen_special_token_ids(processor)
     vision_start_id = special_ids.get("vision_start")
     vision_end_id = special_ids.get("vision_end")
+    
     if vision_start_id is None or vision_end_id is None:
         return []
 
     positions = (input_ids == vision_start_id).nonzero(as_tuple=False).flatten().tolist()
+    
     if not positions:
         return []
 
@@ -444,5 +451,7 @@ def extract_vision_token_spans_qwen(
         if len(relative) == 0:
             continue
         end_pos = search_start + relative[0].item()
-        spans.append((pos, end_pos + 1))
+        span = (pos, end_pos + 1)
+        spans.append(span)
+    
     return spans

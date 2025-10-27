@@ -1099,18 +1099,22 @@ class DAPOTrainer(BaseTrainer):
         # Add attention data for reward functions if available
         if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
             att_list = list(self._logs['attention'])
+            
             if att_list:
                 # Get the most recent attention results for this batch
                 sample_results = att_list[-len(prompts):]
+                
                 # Align skip reasons with the same recent slice
                 if hasattr(self, '_attention_skip_reasons'):
                     skips = list(self._attention_skip_reasons)
                     skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
                 else:
                     skip_slice = [None] * len(sample_results)
+                    
                 mdi_metrics = compute_real_mdi_metrics(sample_results, skip_slice)
                 
                 # Extract attention data for reward functions
+                # Use raw attention values (attention_text/attention_vision) not AEI values
                 reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in mdi_metrics]
                 reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in mdi_metrics]
                 reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in mdi_metrics]
@@ -1384,7 +1388,20 @@ class DAPOTrainer(BaseTrainer):
                 # Collect attention data if enabled
                 attention_context = None
                 if self.compute_attention_metrics:
-                    with self._temporary_attn_impl("eager"):
+                    # Store original values
+                    cfg = getattr(unwrapped_model, "config", None)
+                    lm_cfg = getattr(unwrapped_model.language_model, "config", None) if hasattr(unwrapped_model, "language_model") else None
+                    
+                    prev_main = getattr(cfg, "_attn_implementation", None) if cfg else None
+                    prev_lm = getattr(lm_cfg, "_attn_implementation", None) if lm_cfg else None
+                    
+                    try:
+                        # Set to eager
+                        if cfg:
+                            setattr(cfg, "_attn_implementation", "eager")
+                        if lm_cfg:
+                            setattr(lm_cfg, "_attn_implementation", "eager")
+                        
                         attention_outputs = unwrapped_model.generate(
                             **generate_inputs,
                             generation_config=self.generation_config,
@@ -1392,6 +1409,25 @@ class DAPOTrainer(BaseTrainer):
                             return_dict_in_generate=True,
                             output_attentions=True,
                         )
+                    finally:
+                        # Restore original values
+                        if cfg:
+                            if prev_main is None:
+                                try:
+                                    delattr(cfg, "_attn_implementation")
+                                except Exception:
+                                    pass
+                            else:
+                                setattr(cfg, "_attn_implementation", prev_main)
+                        if lm_cfg:
+                            if prev_lm is None:
+                                try:
+                                    delattr(lm_cfg, "_attn_implementation")
+                                except Exception:
+                                    pass
+                            else:
+                                setattr(lm_cfg, "_attn_implementation", prev_lm)
+                    
                     prompt_completion_ids = attention_outputs.sequences
                     attention_context = {"outputs": attention_outputs, "inputs": generate_inputs}
                 else:
@@ -1477,13 +1513,14 @@ class DAPOTrainer(BaseTrainer):
                 self._metrics[mode][key].append(value)
 
         prompts = [x["prompt"] for x in inputs]
-
+        
         if "images" in inputs[0]:
             images = [example.get("images") for example in inputs]
         elif "image" in inputs[0]:
             images = [[example.get("image")] if example.get("image") is not None else None for example in inputs]
         else:
             images = None
+            
         # Transformers requires at least one image in the batch, otherwise it throws an error
         if images is not None and all(img_list == [] for img_list in images):
             images = None
@@ -1493,7 +1530,7 @@ class DAPOTrainer(BaseTrainer):
         # [{"role": "user", "content": [{"type": "image", "image": <Image>}, {"type": "text", "text": "What color is the sky?"}]}]
         if images is not None:
             prompts = [prepare_multimodal_messages(prompt, image_list) for prompt, image_list in zip(prompts, images)]
-
+        
         prompt_ids_list, completion_ids_list, num_items_in_batch, sampling_per_token_logps_list, extra_fields = (
             self._generate(prompts, images)
         )
@@ -1909,7 +1946,6 @@ class DAPOTrainer(BaseTrainer):
                     reward_names=self.reward_func_names,
                     mdi_info=mdi_info,
                     log_path=getattr(self.args, "rollout_log_path", None),
-                    attention_diag_log_path=getattr(self.args, "attention_diag_log_path", None),
                     prompt_preview_chars=getattr(self.args, "prompt_preview_chars", 2000),
                     completion_preview_chars=getattr(self.args, "completion_preview_chars", 2000),
                     mdi_as_coefficient=getattr(self.args, "mdi_as_coefficient", 0),
@@ -2106,7 +2142,15 @@ class DAPOTrainer(BaseTrainer):
 
     def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys: Optional[list[str]] = None):
         inputs = self._prepare_inputs(inputs)
-        with torch.no_grad():
+        # For DeepSpeed ZeRO-3, we need to gather parameters during evaluation
+        # Use the same ds3_gather_for_generation setting as in generation
+        gather_params = self.args.ds3_gather_for_generation if self.is_deepspeed_enabled else False
+        with (
+            torch.no_grad(),
+            unwrap_model_for_generation(
+                self.model_wrapped, self.accelerator, gather_deepspeed3_params=gather_params
+            ) if gather_params else nullcontext(),
+        ):
             with self.compute_loss_context_manager():
                 loss = self.compute_loss(model, inputs)
             loss = loss.mean().detach()
@@ -2122,6 +2166,57 @@ class DAPOTrainer(BaseTrainer):
             metrics = {f"eval_{key}": val for key, val in metrics.items()}
 
         logs = {**logs, **metrics}
+
+        # Pretty print compact grouped logs to terminal
+        if self.accelerator.is_main_process:
+            try:
+                # Rewards line
+                r_acc = logs.get("rewards/accuracy_reward/mean", logs.get("eval_rewards/accuracy_reward/mean"))
+                r_fmt = logs.get("rewards/think_format_reward/mean", logs.get("eval_rewards/think_format_reward/mean"))
+                r_mdi = logs.get("rewards/mdi_reward_as_additive/mean", logs.get("eval_rewards/mdi_reward_as_additive/mean"))
+                r_len = logs.get("rewards/soft_overlong_punishment_reward/mean", logs.get("eval_rewards/soft_overlong_punishment_reward/mean"))
+                r_total = logs.get("reward", logs.get("eval_reward"))
+                rewards_line = []
+                if r_acc is not None: rewards_line.append(f"acc={r_acc:.3f}")
+                if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
+                if r_mdi is not None: rewards_line.append(f"mdi_add={r_mdi:.3f}")
+                if r_len is not None: rewards_line.append(f"len={r_len:.3f}")
+                if r_total is not None: rewards_line.append(f"total={r_total:.3f}")
+                if rewards_line:
+                    print("Rewards: " + ", ".join(rewards_line))
+
+                # Loss/optim line
+                loss = logs.get("loss", logs.get("eval_loss"))
+                ent = logs.get("entropy", logs.get("eval_entropy"))
+                lr = logs.get("learning_rate")
+                grad = logs.get("grad_norm", logs.get("eval_grad_norm"))
+                clip_low = logs.get("clip_ratio/low_mean", logs.get("eval_clip_ratio/low_mean"))
+                clip_high = logs.get("clip_ratio/high_mean", logs.get("eval_clip_ratio/high_mean"))
+                loss_line = []
+                if loss is not None: loss_line.append(f"loss={loss:.4f}")
+                if ent is not None: loss_line.append(f"entropy={ent:.4f}")
+                if lr is not None: loss_line.append(f"lr={lr:.2e}")
+                if grad is not None: loss_line.append(f"grad={grad:.3f}")
+                if clip_low is not None: loss_line.append(f"clip_low={clip_low:.3f}")
+                if clip_high is not None: loss_line.append(f"clip_high={clip_high:.3f}")
+                if loss_line:
+                    print("Optim:   " + ", ".join(loss_line))
+
+                # Attention line
+                a_early = logs.get("attention/early/mdi", logs.get("eval_attention/early/mdi"))
+                a_mid = logs.get("attention/middle/mdi", logs.get("eval_attention/middle/mdi"))
+                a_late = logs.get("attention/late/mdi", logs.get("eval_attention/late/mdi"))
+                a_all = logs.get("attention/all/mdi", logs.get("eval_attention/all/mdi"))
+                attn_line = []
+                if a_early is not None: attn_line.append(f"early={a_early:.3f}")
+                if a_mid is not None: attn_line.append(f"middle={a_mid:.3f}")
+                if a_late is not None: attn_line.append(f"late={a_late:.3f}")
+                if a_all is not None: attn_line.append(f"all={a_all:.3f}")
+                if attn_line:
+                    print("MDI:     " + ", ".join(attn_line))
+            except Exception:
+                pass
+
         super().log(logs, start_time)
         self._metrics[mode].clear()
 
@@ -2178,8 +2273,7 @@ class DAPOTrainer(BaseTrainer):
     def _temporary_attn_impl(self, attn_impl: str = "eager"):
         """
         Temporarily switch attention implementation on the base model config.
-        Mirrors old repo behavior: toggle config on the unwrapped base model
-        and do not yield a model (call generate on the existing unwrapped model).
+        For vision-language models like Qwen2VL, also set on language_model submodule.
         """
         if not self.compute_attention_metrics:
             yield
@@ -2190,18 +2284,42 @@ class DAPOTrainer(BaseTrainer):
         if cfg is None:
             yield
             return
-        prev = getattr(cfg, "_attn_implementation", None)
+        
+        # Store previous values
+        prev_main = getattr(cfg, "_attn_implementation", None)
+        prev_lm = None
+        lm_cfg = None
+        
+        # For vision-language models, also set on language_model
+        if hasattr(base, "language_model"):
+            lm_cfg = getattr(base.language_model, "config", None)
+            if lm_cfg is not None:
+                prev_lm = getattr(lm_cfg, "_attn_implementation", None)
+        
         try:
             setattr(cfg, "_attn_implementation", attn_impl)
+            if lm_cfg is not None:
+                setattr(lm_cfg, "_attn_implementation", attn_impl)
             yield
         finally:
-            if prev is None:
+            # Restore main config
+            if prev_main is None:
                 try:
                     delattr(cfg, "_attn_implementation")
                 except Exception:
                     pass
             else:
-                setattr(cfg, "_attn_implementation", prev)
+                setattr(cfg, "_attn_implementation", prev_main)
+            
+            # Restore language_model config
+            if lm_cfg is not None:
+                if prev_lm is None:
+                    try:
+                        delattr(lm_cfg, "_attn_implementation")
+                    except Exception:
+                        pass
+                else:
+                    setattr(lm_cfg, "_attn_implementation", prev_lm)
 
     def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> None:
         """Process attention outputs and compute metrics (aligned with old repo logic)."""
@@ -2210,6 +2328,7 @@ class DAPOTrainer(BaseTrainer):
         try:
             outputs = attention_context.get("outputs")
             generate_inputs = attention_context.get("inputs")
+            
             if outputs is None or getattr(outputs, "attentions", None) is None:
                 return
             if generate_inputs is None or "input_ids" not in generate_inputs:
@@ -2219,6 +2338,7 @@ class DAPOTrainer(BaseTrainer):
             input_ids = generate_inputs["input_ids"].detach().cpu()
             sequences = outputs.sequences.detach().cpu()
             image_grid_thw = generate_inputs.get("image_grid_thw")
+            
             if isinstance(image_grid_thw, torch.Tensor):
                 image_grid_thw_cpu = image_grid_thw.detach().cpu()
             else:

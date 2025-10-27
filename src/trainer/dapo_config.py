@@ -694,18 +694,14 @@ class DAPOConfig(TrainingArguments):
     )
 
     rollout_log_path: Optional[str] = field(
-        default="./training_logs/rollout_results.md",
-        metadata={"help": "Path to save rollout logs (markdown format)."}
+        default=None,
+        metadata={"help": "Path to save rollout logs (markdown). If None, training code should pass it via CLI."}
     )
 
-    attention_diag_log_path: Optional[str] = field(
-        default="./training_logs/attention_diagnostics.md",
-        metadata={"help": "Path to save attention diagnostic logs."}
-    )
 
     eval_log_path: Optional[str] = field(
-        default="./training_logs/eval_results.md",
-        metadata={"help": "Path to save evaluation logs."}
+        default=None,
+        metadata={"help": "Path to save evaluation logs (markdown). If None, training code should pass it via CLI."}
     )
 
     prompt_preview_chars: int = field(

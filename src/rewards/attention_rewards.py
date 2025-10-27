@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import List, Optional
+from typing import List
 
 
 def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
@@ -111,21 +111,7 @@ def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
 
 
 def aei_reward(completions: List[List[dict]], modality: str = "text", **kwargs) -> List[float]:
-    """
-    基于AEI (Attention Efficiency Index) 计算奖励。
-    
-    Args:
-        completions (`List[List[dict]]`):
-            List of completions to be evaluated.
-        modality (`str`):
-            Modality to compute AEI for. Must be "text" or "vision".
-        **kwargs:
-            Additional keyword arguments. Must include 'trainer' key for AEI scores.
-            
-    Returns:
-        `List[float]`:
-            A list of rewards based on AEI scores.
-    """
+    """基于 AEI 指标的简单归一化奖励（0-1）。需要从 trainer 读取 AEI 分数。"""
     if modality not in {"text", "vision"}:
         raise ValueError("modality must be 'text' or 'vision'")
     
@@ -195,7 +181,6 @@ def mdi_reward_legacy(completions: List[List[dict]], **kwargs) -> List[float]:
     epsilon = math.log(0.5)  # ln(0.5) ≈ -0.693
     coefs: List[float] = []
 
-    # 新系数表映射函数
     def map_mdi_to_coef(mdi_value: float) -> float:
         """
         根据新的系数表映射MDI值到系数：
@@ -351,6 +336,7 @@ def mdi_reward_as_additive(completions: List[List[dict]], **kwargs) -> List[floa
             else:
                 # MDI >= 30: 最低分 (不可接受)
                 normalized = 0.0
+            
             rewards.append(float(normalized))
 
         except Exception:

@@ -1,17 +1,14 @@
-"""
-DAPO 日志记录模块
-
-提供 rollout 日志、evaluation 日志和注意力诊断日志的记录功能。
-"""
+"""DAPO 日志：rollout、evaluation 与注意力诊断输出。"""
 
 import json
 import math
 import os
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import torch
+
 
 
 def emit_rollout_logs(
@@ -23,54 +20,41 @@ def emit_rollout_logs(
     reward_names: List[str],
     mdi_info: List[Dict[str, Any]],
     log_path: Optional[str] = None,
-    attention_diag_log_path: Optional[str] = None,
     prompt_preview_chars: int = 2000,
     completion_preview_chars: int = 2000,
     mdi_as_coefficient: int = 0,
     step: int = 0,
     epoch: float = 0.0,
 ) -> None:
+    """将 rollout 信息写入 markdown。
+
+    仅保留必要字段说明：rewards_per_func_local 与 reward_names 一一对应；mdi_info
+    为 compute_real_mdi_metrics 输出，用于展示分段与汇总 MDI。
     """
-    记录 rollout 日志到 markdown 文件
+    # If caller provides a path, respect it; else fallback to default
+    if not log_path:
+        log_path = os.path.join("training_logs", "rollout_results.md")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
     
-    Args:
-        prompts_text: 提示词文本列表
-        completions_text: 完成文本列表
-        solutions: 解决方案列表
-        rewards_per_func_local: 各奖励函数的本地奖励值
-        total_rewards_local: 总奖励值
-        reward_names: 奖励函数名称列表
-        mdi_info: MDI 信息列表
-        log_path: rollout 日志文件路径
-        attention_diag_log_path: 注意力诊断日志文件路径
-        prompt_preview_chars: 提示词预览字符数
-        completion_preview_chars: 完成文本预览字符数
-        mdi_as_coefficient: MDI 是否作为系数使用
-        step: 当前步数
-        epoch: 当前轮次
-    """
-    if not log_path and not attention_diag_log_path:
-        return
-    
-    # 构建 header
+    # Header
     header = f"=== Rollout Step {step} ==="
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # 准备数据
+    # 数据行组装
     rows = []
     for idx, (prompt, completion, solution) in enumerate(zip(prompts_text, completions_text, solutions)):
         # 预览文本
         preview_p = prompt[:prompt_preview_chars] + "..." if len(prompt) > prompt_preview_chars else prompt
         preview_c = completion[:completion_preview_chars] + "..." if len(completion) > completion_preview_chars else completion
         
-        # 获取奖励值
+        # 奖励值
         acc = 0.0
         fmt = 0.0
         length_val = 0.0
         mdi_val = 0.0
         
         if rewards_per_func_local.numel() > 0:
-            # 尝试从奖励函数名称中获取各个组件（兼容不同命名）
+            # 名称到索引映射（兼容不同命名）
             name_to_idx = {name: i for i, name in enumerate(reward_names)}
 
             def any_index(*candidates):
@@ -98,20 +82,20 @@ def emit_rollout_logs(
         tot = float(total_rewards_local[idx].item()) if total_rewards_local.numel() > 0 else 0.0
         rows.append((idx + 1, preview_p, preview_c, solution or "", acc, fmt, length_val, mdi_val, tot))
     
-    # 记录 rollout 日志
+    # 写入 rollout 日志
     if log_path:
         try:
             os.makedirs(os.path.dirname(log_path), exist_ok=True)
             with open(log_path, "a", encoding="utf-8") as f:
                 f.write(f"\n## {header} | {ts}\n\n")
                 
-                # 添加总体统计信息
+                # 总体统计
                 if rows:
                     f.write("### Overall Statistics\n\n")
                     f.write("| Metric | Value |\n")
                     f.write("|--------|-------|\n")
                     
-                    # 计算各种统计信息
+                    # 计算统计
                     accuracy_scores = [r[4] for r in rows]
                     format_scores = [r[5] for r in rows]
                     length_scores = [r[6] for r in rows]
@@ -127,7 +111,7 @@ def emit_rollout_logs(
                     f.write(f"| Format Rate | {np.mean([1 if s > 0 else 0 for s in format_scores]):.3f} |\n")
                     f.write(f"| Success Rate | {np.mean([1 if s > 0 else 0 for s in total_scores]):.3f} |\n\n")
                     
-                    # 添加MDI统计信息
+                    # 分段 MDI 统计
                     if mdi_info:
                         f.write("### MDI Statistics\n\n")
                         f.write("| Stage | MDI Mean | MDI Std | AEI Text | AEI Vision |\n")
@@ -152,14 +136,14 @@ def emit_rollout_logs(
                         f.write(f"| Late | {np.mean(late_mdi):.3f} | {np.std(late_mdi):.3f} | {np.mean(late_aei_text):.3f} | {np.mean(late_aei_vision):.3f} |\n")
                         f.write(f"| All | {np.mean(all_mdi):.3f} | {np.std(all_mdi):.3f} | {np.mean(all_aei_text):.3f} | {np.mean(all_aei_vision):.3f} |\n\n")
                 
-                # 详细的样本信息
+                # 样本明细
                 for i, (r, info) in enumerate(zip(rows, mdi_info), start=1):
                     f.write(f"### Sample {i}\n\n")
                     f.write(f"**Prompt:** {r[1]}\n\n")
                     f.write(f"**Completion:** {r[2]}\n\n")
                     f.write(f"**Solution:** {r[3]}\n\n")
                     
-                    # 根据MDI使用方式显示不同的标签
+                    # 按 MDI 使用方式显示标签
                     true_mdi = info.get("mdi", 0.0) if info else 0.0
                     
                     if mdi_as_coefficient == 1:
@@ -169,7 +153,7 @@ def emit_rollout_logs(
                         # MDI作为加法项
                         f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, mdi_add={r[7]:.3f}, mdi={true_mdi:.3f}, total={r[8]:.3f}\n\n")
                     
-                    # 添加详细的metrics信息
+                    # 详细 metrics
                     if info:
                         f.write("**Detailed Metrics:**\n\n")
                         f.write("```json\n")
@@ -227,106 +211,6 @@ def emit_rollout_logs(
                     f.write("---\n\n")
         except Exception as e:
             print(f"⚠️  Warning: Failed to write to rollout log file: {e}")
-    
-    # 记录注意力诊断日志
-    if attention_diag_log_path:
-        try:
-            os.makedirs(os.path.dirname(attention_diag_log_path), exist_ok=True)
-            with open(attention_diag_log_path, "a", encoding="utf-8") as f:
-                f.write(f"\n## {header} | {ts}\n\n")
-                f.write("### Enhanced MDI Attention Diagnostics\n\n")
-                
-                # 添加总体统计信息
-                if mdi_info:
-                    f.write("#### Overall Statistics\n\n")
-                    f.write("| Metric | Early | Middle | Late | All |\n")
-                    f.write("|--------|-------|--------|------|-----|\n")
-                    
-                    # 计算各阶段的统计信息
-                    early_mdi = [info.get("early_mdi", 0) for info in mdi_info if info.get("early_mdi") is not None]
-                    middle_mdi = [info.get("middle_mdi", 0) for info in mdi_info if info.get("middle_mdi") is not None]
-                    late_mdi = [info.get("late_mdi", 0) for info in mdi_info if info.get("late_mdi") is not None]
-                    all_mdi = [info.get("all_mdi", 0) for info in mdi_info if info.get("all_mdi") is not None]
-                    
-                    f.write(f"| MDI Mean | {np.mean(early_mdi):.3f} | {np.mean(middle_mdi):.3f} | {np.mean(late_mdi):.3f} | {np.mean(all_mdi):.3f} |\n")
-                    f.write(f"| MDI Std | {np.std(early_mdi):.3f} | {np.std(middle_mdi):.3f} | {np.std(late_mdi):.3f} | {np.std(all_mdi):.3f} |\n")
-                    
-                    # Vision/Text Token统计
-                    vision_tokens = [info.get("num_vision_tokens", 0) for info in mdi_info]
-                    text_tokens = [info.get("num_text_tokens", 0) for info in mdi_info]
-                    total_tokens = [v + t for v, t in zip(vision_tokens, text_tokens)]
-                    
-                    f.write(f"| Vision Tokens | {np.mean(vision_tokens):.1f} ± {np.std(vision_tokens):.1f} |\n")
-                    f.write(f"| Text Tokens | {np.mean(text_tokens):.1f} ± {np.std(text_tokens):.1f} |\n")
-                    f.write(f"| Total Tokens | {np.mean(total_tokens):.1f} ± {np.std(total_tokens):.1f} |\n")
-                    # Ratios are computed against total tokens per sample
-                    f.write(
-                        f"| Vision Ratio | {np.mean([v/tt if tt > 0 else 0 for v, tt in zip(vision_tokens, total_tokens)]):.3f} |\n"
-                    )
-                    f.write(
-                        f"| Text Ratio | {np.mean([(tt - v)/tt if tt > 0 else 0 for v, tt in zip(vision_tokens, total_tokens)]):.3f} |\n\n"
-                    )
-                
-                # 详细的样本信息
-                for i, info in enumerate(mdi_info, start=1):
-                    f.write(f"#### Sample {i}\n\n")
-                    f.write(f"```json\n")
-                    
-                    # 构建完整的诊断信息
-                    sample_data = {
-                        "sample": i,
-                        "token_counts": {
-                            "vision_tokens": float(info.get("num_vision_tokens", 0) or 0),
-                            "text_tokens": float(info.get("num_text_tokens", 0) or 0),
-                            "total_tokens": float((info.get("num_vision_tokens", 0) or 0) + (info.get("num_text_tokens", 0) or 0)),
-                        },
-                        "attention_metrics": {
-                            "early": {
-                                "mdi": info.get("early_mdi"),
-                                "aei_text": info.get("early_aei_text"),
-                                "aei_vision": info.get("early_aei_vision"),
-                                "text_ratio": info.get("early_text_ratio"),
-                                "vision_ratio": info.get("early_vision_ratio")
-                            },
-                            "middle": {
-                                "mdi": info.get("middle_mdi"),
-                                "aei_text": info.get("middle_aei_text"),
-                                "aei_vision": info.get("middle_aei_vision"),
-                                "text_ratio": info.get("middle_text_ratio"),
-                                "vision_ratio": info.get("middle_vision_ratio")
-                            },
-                            "late": {
-                                "mdi": info.get("late_mdi"),
-                                "aei_text": info.get("late_aei_text"),
-                                "aei_vision": info.get("late_aei_vision"),
-                                "text_ratio": info.get("late_text_ratio"),
-                                "vision_ratio": info.get("late_vision_ratio")
-                            },
-                            "all": {
-                                "mdi": info.get("all_mdi"),
-                                "aei_text": info.get("all_aei_text"),
-                                "aei_vision": info.get("all_aei_vision"),
-                                "text_ratio": info.get("all_text_ratio"),
-                                "vision_ratio": info.get("all_vision_ratio")
-                            }
-                        },
-                        "overall": {
-                            "attention_distribution": info.get("attention_distribution"),
-                            "text_vision_ratio": f"{info.get('text_ratio', 0):.6f}:{info.get('vision_ratio', 0):.6f}",
-                            "skip_reason": info.get("skip_reason"),
-                        },
-                    }
-                    
-                    f.write(
-                        json.dumps(
-                            sample_data,
-                            ensure_ascii=False,
-                            indent=2
-                        )
-                    )
-                    f.write(f"\n```\n\n")
-        except Exception as e:
-            print(f"⚠️  Warning: Failed to write to attention diagnostic log file: {e}")
 
 
 def emit_eval_logs(
@@ -348,8 +232,10 @@ def emit_eval_logs(
         step: 当前步数
         epoch: 当前轮次
     """
+    # If caller provides a path, respect it; else fallback to default
     if not log_path:
-        return
+        log_path = os.path.join("training_logs", "eval_results.md")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
     
     try:
         ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -470,6 +356,8 @@ def compute_real_mdi_metrics(
                 "attention_distribution": [0.5, 0.5],
                 "num_vision_tokens": 0,
                 "num_text_tokens": 0,
+                "attention_text": 0.0,
+                "attention_vision": 0.0,
                 "early_mdi": 1.0,
                 "middle_mdi": 1.0,
                 "late_mdi": 1.0,
@@ -510,6 +398,8 @@ def compute_real_mdi_metrics(
                     "mdi": 1.0,
                     "aei_text": 0.0,
                     "aei_vision": 0.0,
+                    "attention_text": 0.0,
+                    "attention_vision": 0.0,
                     "text_ratio": 0.5,
                     "vision_ratio": 0.5,
                 }
@@ -520,12 +410,16 @@ def compute_real_mdi_metrics(
                     "mdi": 1.0,
                     "aei_text": 0.0,
                     "aei_vision": 0.0,
+                    "attention_text": 0.0,
+                    "attention_vision": 0.0,
                     "text_ratio": 0.5,
                     "vision_ratio": 0.5,
                 }
 
             aei_text = float(getattr(segment, "aei_text", 0.0))
             aei_vision = float(getattr(segment, "aei_vision", 0.0))
+            attention_text = float(getattr(segment, "attention_text", 0.0))
+            attention_vision = float(getattr(segment, "attention_vision", 0.0))
             text_ratio = mdi / (1.0 + mdi)
             vision_ratio = 1.0 / (1.0 + mdi)
 
@@ -533,6 +427,8 @@ def compute_real_mdi_metrics(
                 "mdi": round(float(mdi), 6),
                 "aei_text": round(float(aei_text), 6),
                 "aei_vision": round(float(aei_vision), 6),
+                "attention_text": round(float(attention_text), 6),
+                "attention_vision": round(float(attention_vision), 6),
                 "text_ratio": round(float(text_ratio), 6),
                 "vision_ratio": round(float(vision_ratio), 6),
             }
@@ -559,6 +455,9 @@ def compute_real_mdi_metrics(
             "attention_distribution": [text_ratio, vision_ratio],
             "num_vision_tokens": int(num_vision_tokens),
             "num_text_tokens": int(num_text_tokens),
+            # Use late segment's attention values, fallback to all segment
+            "attention_text": main_segment["attention_text"],
+            "attention_vision": main_segment["attention_vision"],
             "early_mdi": early_data["mdi"],
             "middle_mdi": middle_data["mdi"],
             "late_mdi": late_data["mdi"],

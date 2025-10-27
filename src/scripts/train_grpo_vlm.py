@@ -65,7 +65,7 @@ accelerate launch \
     --num_generations 2
 
 """
-
+import sys
 import os
 
 import torch
@@ -79,8 +79,7 @@ from trl import (
     get_peft_config,
     get_quantization_config,
 )
-import sys
-import os
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.trainer import DAPOConfig, DAPOTrainer
@@ -169,6 +168,9 @@ if __name__ == "__main__":
         eval_dataset=eval_dataset,
         peft_config=get_peft_config(model_args),
     )
+
+    # Respect external log paths if provided via args (dapo_config.py defaults already set)
+    # No internal timestamping here; the shell script should pass fully qualified paths
 
     trainer.train()
 
