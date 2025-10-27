@@ -65,8 +65,11 @@ def _collect_llm_attention_for_sample(
     for layer_idx, layer_attn in enumerate(first_step_layers):
         if layer_attn is None:
             continue
-        attn = layer_attn[sample_idx]  # [num_heads, tgt_len, src_len]
-        attn_avg = attn.mean(dim=0)  # [tgt_len, src_len]
+        # 提前搬到 CPU 再做 mean，避免在 GPU 上保留大矩阵 (B, H, T, S)
+        attn_cpu = layer_attn[sample_idx].detach().cpu()  # [num_heads, tgt_len, src_len]
+        attn_avg = attn_cpu.mean(dim=0)  # [tgt_len, src_len] on CPU
+        # 及时释放 GPU/CPU 临时变量
+        del attn_cpu
         
         if attn_avg.shape[0] > 0:
             cur = attn_avg[:-1].clone()
@@ -79,18 +82,20 @@ def _collect_llm_attention_for_sample(
             cur[1:, 0] = 0.0
         if normalize_rows:
             cur = _row_normalize(cur)
-        cur_cpu = cur.detach().cpu()
-        for row in cur_cpu:
+        # cur 已经在 CPU 上，不需要再次 .cpu()
+        for row in cur:
             per_layer_rows[layer_idx].append(row)
-        del attn, attn_avg, cur
+        del attn_avg, cur
 
     # Process subsequent steps
     for step_layers in outputs_attentions[1:]:
         for layer_idx, layer_attn in enumerate(step_layers):
             if layer_attn is None:
                 continue
-            attn = layer_attn[sample_idx]  # [num_heads, tgt_len, src_len]
-            attn_avg = attn.mean(dim=0)  # [tgt_len, src_len]
+            # 同样先搬 CPU，再求 mean
+            attn_cpu = layer_attn[sample_idx].detach().cpu()
+            attn_avg = attn_cpu.mean(dim=0)
+            del attn_cpu
             if attn_avg.shape[0] == 0:
                 continue
             row = attn_avg[-1].clone()
@@ -98,10 +103,10 @@ def _collect_llm_attention_for_sample(
                 row[0] = 0.0
             if normalize_rows:
                 row = _row_normalize(row)
-            row_cpu = row.detach().cpu()
-            row_cpu = torch.cat([row_cpu, torch.zeros(1, dtype=row_cpu.dtype)])
-            per_layer_rows[layer_idx].append(row_cpu)
-            del attn, attn_avg, row
+            # row 已经在 CPU 上，不需要再次 .cpu()
+            row = torch.cat([row, torch.zeros(1, dtype=row.dtype)])
+            per_layer_rows[layer_idx].append(row)
+            del attn_avg, row
 
     result: Dict[int, torch.Tensor] = {}
     for layer_idx, rows in per_layer_rows.items():

@@ -132,10 +132,10 @@ if __name__ == "__main__":
 
     dataset = dataset.map(make_conversation)
 
-    # Filter have big images
+    # Filter overly large images (allow up to 1024x1024 inclusive)
     def filter_big_images(example):
         image = example["image"]
-        return image.size[0] < 512 and image.size[1] < 512
+        return image.size[0] <= 1024 and image.size[1] <= 1024
 
     dataset = dataset.filter(filter_big_images)
 

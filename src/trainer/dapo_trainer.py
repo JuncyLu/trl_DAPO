@@ -452,7 +452,7 @@ class DAPOTrainer(BaseTrainer):
             optimizers=optimizers,
             # In Trainer, `training_step` scales the loss by `gradient_accumulation_steps` only if `compute_loss_func`
             # is None. For DAPO, loss scaling instead depends on the total number of completions tokens across the
-            # global accumulated batch. To control scaling ourselves, we must disable Trainer’s built-in scaling. The
+            # global accumulated batch. To control scaling ourselves, we must disable Trainer's built-in scaling. The
             # simplest (though a bit hacky) way is to set `compute_loss_func` to any non-None value, which bypasses
             # that behavior without rewriting `training_step`.
             compute_loss_func="non-None value to disable scaling",
@@ -1641,8 +1641,8 @@ class DAPOTrainer(BaseTrainer):
                 ref_per_token_logps = None
 
         # Decode
-        prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=True)
-        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
+        prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=False)
+        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=False)
         if is_conversational(inputs[0]):
             completions = []
             for prompt, completion in zip(prompts, completions_text):
@@ -2369,9 +2369,11 @@ class DAPOTrainer(BaseTrainer):
 
             # Log and store metrics
             self._log_attention_metrics(sample_results, mode, skip_reasons)
-        except Exception:
-            # Do not fail training on diagnostics
-            pass
+        except Exception as e:
+            # Do not fail training on diagnostics, but log the error
+            logger.warning(f"Failed to compute attention metrics: {e}")
+            import traceback
+            logger.debug(f"Attention metrics error traceback:\n{traceback.format_exc()}")
 
     def _log_attention_metrics(
         self,
