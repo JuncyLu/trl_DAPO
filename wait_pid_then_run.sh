@@ -1,6 +1,6 @@
 #!/bin/bash
 # 用法: bash wait_pid_then_run.sh <PID> "<命令>"
-# 示例: bash ./wait_pid_then_run.sh 510977 "bash mdi_dapo_train.sh"
+# 示例: bash ./wait_pid_then_run.sh 517545 "bash mdi_dapo_train.sh"
 PID=$1
 NEXT_CMD=$2
 

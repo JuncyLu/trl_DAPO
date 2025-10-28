@@ -28,9 +28,9 @@ accelerate launch \
   --max_prompt_length 1024 \
   --max_completion_length 256 \
   --per_device_train_batch_size 4 \
-  --gradient_accumulation_steps 8 \
+  --gradient_accumulation_steps 4 \
   --num_generations 4 \
-  --num_train_epochs 2 \
+  --num_train_epochs 1 \
   --report_to wandb \
   --log_completions \
   --logging_steps 1.0 \
