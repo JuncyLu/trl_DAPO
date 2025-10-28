@@ -12,337 +12,143 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import math
 from typing import List
 
 
 def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     """
-    MDI 系数版（与 accuracy 相乘）- 旧版本备份：
-      - 仅使用原始注意力参数：A_T, A_O, |T|, |O|
-      - MDI 公式保持不变：MDI = (A_T/|T|) / (A_O/|O|)
-      - 将 MDI 映射为分段线性系数 c ∈ [0.40, 1.00]（区间内线性插值，避免突变）
-      - 返回系数列表，与 completions 等长
+    基于组内分位数归一化的 MDI 奖励函数。
+    - MDI 越小表示注意力越平衡，映射到更高的奖励
+    - 在同一 prompt 的多次采样内进行分位数归一化
+    - 分位差不足时返回中性奖励 0.5
+    
     需要 kwargs:
       - attention_text: List[float]   # A_T（所有输出 token 对文本 token 的总注意力）
       - attention_vision: List[float] # A_O（所有输出 token 对非文本 token 的总注意力）
       - num_text_tokens: List[int]    # |T|
       - num_vision_tokens: List[int]  # |O|
-    外层聚合建议：
-      R_i = (4.0 * acc[i]) * c[i] + 1.0 * format[i]
+      - num_generations: int          # 每个 prompt 的采样数
     """
-    n = len(completions) if isinstance(completions, list) else 0
+    n = len(completions)
     if n == 0:
         return []
-
+    
+    # 从 kwargs 获取注意力数据和分组信息
     A_T = kwargs.get("attention_text", [])
     A_O = kwargs.get("attention_vision", [])
     N_T = kwargs.get("num_text_tokens", [])
     N_O = kwargs.get("num_vision_tokens", [])
-
-    # 基本校验
-    if not (isinstance(A_T, list) and isinstance(A_O, list) and isinstance(N_T, list) and isinstance(N_O, list)):
-        return [0.70] * n
-
+    num_generations = kwargs.get("num_generations", 1)
+    
+    # 数据验证
+    if not all([isinstance(x, list) for x in [A_T, A_O, N_T, N_O]]):
+        return [0.5] * n
+    
     m = min(len(A_T), len(A_O), len(N_T), len(N_O), n)
     if m == 0:
-        return [0.70] * n
-
+        return [0.5] * n
+    
+    # 计算每个样本的 MDI 值
     eps = 1e-6
-    coefs: List[float] = []
-
-    # 分段线性映射（根据 rollout 中的 MDI 分布定标）：
-    #   区间        -> 系数范围（线性插值）
-    #   MDI <= 5    -> 1.30
-    #   5–10        -> 1.30 -> 1.20
-    #   10–20       -> 1.20 -> 1.00
-    #   20–30       -> 1.00 -> 0.90
-    #   30–40       -> 0.90 -> 0.80
-    #   40–60       -> 0.80 -> 0.70
-    #   > 60        -> 0.70
-    def map_mdi_to_coef(x: float) -> float:
-        if x <= 5.0:
-            return 1.30
-        elif x <= 10.0:
-            # [5,10] -> [1.30,1.20]
-            return 1.30 - (x - 5.0) * (1.30 - 1.20) / 5.0
-        elif x <= 20.0:
-            # [10,20] -> [1.20,1.00]
-            return 1.20 - (x - 10.0) * (1.20 - 1.00) / 10.0
-        elif x <= 30.0:
-            # [20,30] -> [1.00,0.90]
-            return 1.00 - (x - 20.0) * (1.00 - 0.90) / 10.0
-        elif x <= 40.0:
-            # [30,40] -> [0.90,0.80]
-            return 0.90 - (x - 30.0) * (0.90 - 0.80) / 10.0
-        elif x <= 60.0:
-            # [40,60] -> [0.80,0.70]
-            return 0.80 - (x - 40.0) * (0.80 - 0.70) / 20.0
-        else:
-            return 0.70
-
+    mdi_values = []
     for i in range(m):
         try:
-            a_t = float(A_T[i]); a_o = float(A_O[i])
-            t   = int(N_T[i]);   o   = int(N_O[i])
-
-            # 计算 MDI（保持原公式；加极小值防 0）
-            text_density   = a_t / max(1, t)
-            vision_density = a_o / max(1, o)
-            mdi = text_density / max(vision_density, eps)
-
-            # 分段线性映射到系数
-            c = map_mdi_to_coef(mdi)
-
-            # 安全裁剪
-            if c < 0.70: c = 0.70
-            if c > 1.30: c = 1.30
-            coefs.append(float(c))
-        except Exception:
-            coefs.append(0.70)
-
-    # 对齐长度
-    if len(coefs) < n:
-        coefs.extend([0.70] * (n - len(coefs)))
-    elif len(coefs) > n:
-        coefs = coefs[:n]
-
-    return coefs
-
-
-def aei_reward(completions: List[List[dict]], modality: str = "text", **kwargs) -> List[float]:
-    """基于 AEI 指标的简单归一化奖励（0-1）。需要从 trainer 读取 AEI 分数。"""
-    if modality not in {"text", "vision"}:
-        raise ValueError("modality must be 'text' or 'vision'")
-    
-    trainer = kwargs.get("trainer")
-    if trainer is None:
-        return [0.0] * len(completions)
-    
-    # Get AEI scores from trainer metrics
-    aei_scores = getattr(trainer, f"_aei_{modality}_scores_current_batch", None)
-    if not aei_scores:
-        return [0.0] * len(completions)
-    
-    try:
-        aei_scores = list(aei_scores)
-    except TypeError:
-        aei_scores = [aei_scores]
-    
-    if len(aei_scores) < len(completions):
-        repeats = (len(completions) + len(aei_scores) - 1) // len(aei_scores)
-        aei_scores = (aei_scores * repeats)[: len(completions)]
-    elif len(aei_scores) > len(completions):
-        aei_scores = aei_scores[: len(completions)]
-    
-    # Simple reward: normalize AEI score to [0, 1] range
-    rewards = []
-    for score in aei_scores:
-        try:
-            # Normalize AEI score (assuming typical range 0-2, normalize to 0-1)
-            normalized = min(1.0, max(0.0, float(score) / 2.0))
-            rewards.append(normalized)
-        except Exception:
-            rewards.append(0.0)
-    
-    return rewards
-
-
-def mdi_reward_legacy(completions: List[List[dict]], **kwargs) -> List[float]:
-    """
-    新版MDI奖励函数，使用新公式和系数表：
-      - 新MDI公式：MDI = exp(-|log(A_T/|T| / A_O/|O|) + ε|)
-      - 其中 ε = ln(2) ≈ 0.693
-      - 使用新的系数表映射MDI值到奖励系数
-    需要 kwargs:
-      - attention_text: List[float]   # A_T（所有输出 token 对文本 token 的总注意力）
-      - attention_vision: List[float] # A_O（所有输出 token 对非文本 token 的总注意力）
-      - num_text_tokens: List[int]    # |T|
-      - num_vision_tokens: List[int]  # |O|
-    """
-    n = len(completions) if isinstance(completions, list) else 0
-    if n == 0:
-        return []
-
-    A_T = kwargs.get("attention_text", [])
-    A_O = kwargs.get("attention_vision", [])
-    N_T = kwargs.get("num_text_tokens", [])
-    N_O = kwargs.get("num_vision_tokens", [])
-
-    # 基本校验
-    if not (isinstance(A_T, list) and isinstance(A_O, list) and isinstance(N_T, list) and isinstance(N_O, list)):
-        return [0.70] * n
-
-    m = min(len(A_T), len(A_O), len(N_T), len(N_O), n)
-    if m == 0:
-        return [0.70] * n
-
-    eps = 1e-6
-    epsilon = math.log(0.5)  # ln(0.5) ≈ -0.693
-    coefs: List[float] = []
-
-    def map_mdi_to_coef(mdi_value: float) -> float:
-        """
-        根据新的系数表映射MDI值到系数：
-        MDI 范围        系数    说明
-        ≥ 0.95         1.00    最佳平衡
-        0.90 – 0.95    0.97    轻微惩罚
-        0.80 – 0.90    0.90    中等偏轻
-        0.70 – 0.80    0.80    中等惩罚
-        0.60 – 0.70    0.70    较强惩罚
-        0.45 – 0.60    0.55    强惩罚
-        < 0.45         0.40    最强惩罚（下限）
-        """
-        if mdi_value >= 0.95:
-            return 1.00
-        elif mdi_value >= 0.90:
-            # [0.90, 0.95] -> [0.97, 1.00]
-            return 0.97 + (mdi_value - 0.90) * (1.00 - 0.97) / (0.95 - 0.90)
-        elif mdi_value >= 0.80:
-            # [0.80, 0.90] -> [0.90, 0.97]
-            return 0.90 + (mdi_value - 0.80) * (0.97 - 0.90) / (0.90 - 0.80)
-        elif mdi_value >= 0.70:
-            # [0.70, 0.80] -> [0.80, 0.90]
-            return 0.80 + (mdi_value - 0.70) * (0.90 - 0.80) / (0.80 - 0.70)
-        elif mdi_value >= 0.60:
-            # [0.60, 0.70] -> [0.70, 0.80]
-            return 0.70 + (mdi_value - 0.60) * (0.80 - 0.70) / (0.70 - 0.60)
-        elif mdi_value >= 0.45:
-            # [0.45, 0.60] -> [0.55, 0.70]
-            return 0.55 + (mdi_value - 0.45) * (0.70 - 0.55) / (0.60 - 0.45)
-        else:
-            return 0.40
-
-    for i in range(m):
-        try:
-            a_t = float(A_T[i])
-            a_o = float(A_O[i])
-            t = int(N_T[i])
-            o = int(N_O[i])
-
-            # 计算新的MDI公式：MDI = exp(-|log(A_T/|T| / A_O/|O|) + ε|)
+            a_t, a_o = float(A_T[i]), float(A_O[i])
+            t, o = int(N_T[i]), int(N_O[i])
+            
             if t <= 0 or o <= 0:
-                coefs.append(0.40)
+                mdi_values.append(None)
                 continue
-                
+            
             text_density = a_t / t
             vision_density = a_o / o
             
             if vision_density <= eps:
-                coefs.append(0.40)
+                mdi_values.append(None)
                 continue
-                
-            # 计算 log(A_T/|T| / A_O/|O|) + ε
-            log_ratio = math.log(text_density / vision_density)
-            mdi = math.exp(-abs(log_ratio + epsilon))
-
-            # 映射到系数
-            c = map_mdi_to_coef(mdi)
-
-            # 安全裁剪
-            c = max(0.40, min(1.00, c))
-            coefs.append(float(c))
             
-        except Exception:
-            coefs.append(0.40)
-
-    # 对齐长度
-    if len(coefs) < n:
-        coefs.extend([0.70] * (n - len(coefs)))
-    elif len(coefs) > n:
-        coefs = coefs[:n]
-
-    return coefs
-
-
-def mdi_reward_as_additive(completions: List[List[dict]], **kwargs) -> List[float]:
-    """
-    MDI作为加法项的奖励函数，映射到0-1范围
-    自定义映射规则：
-    - 1 < MDI < 15: reward = 1.0 (满分)
-    - 15 <= MDI <= 60: 线性映射 1.0 -> 0.0
-    - MDI > 60: reward = 0.0
-    
-    需要 kwargs:
-      - attention_text: List[float]   # A_T（所有输出 token 对文本 token 的总注意力）
-      - attention_vision: List[float] # A_O（所有输出 token 对非文本 token 的总注意力）
-      - num_text_tokens: List[int]    # |T|
-      - num_vision_tokens: List[int]  # |O|
-    """
-    n = len(completions) if isinstance(completions, list) else 0
-    if n == 0:
-        return []
-
-    A_T = kwargs.get("attention_text", [])
-    A_O = kwargs.get("attention_vision", [])
-    N_T = kwargs.get("num_text_tokens", [])
-    N_O = kwargs.get("num_vision_tokens", [])
-
-    # 基本校验
-    if not (isinstance(A_T, list) and isinstance(A_O, list) and isinstance(N_T, list) and isinstance(N_O, list)):
-        return [0.5] * n
-
-    m = min(len(A_T), len(A_O), len(N_T), len(N_O), n)
-    if m == 0:
-        return [0.5] * n
-
-    eps = 1e-6
-    rewards = []
-
-    for i in range(m):
-        try:
-            a_t = float(A_T[i])
-            a_o = float(A_O[i])
-            t = int(N_T[i])
-            o = int(N_O[i])
-
-            # 计算MDI
-            if t <= 0 or o <= 0:
-                rewards.append(0.5)
-                continue
-
-            text_density = a_t / t
-            vision_density = a_o / o
-
-            if vision_density <= eps:
-                rewards.append(0.5)
-                continue
-
-            # 计算MDI = (A_T/|T|) / (A_O/|O|)
             mdi = text_density / vision_density
-
-            # 将MDI映射到0-1范围 - 收紧映射：提高低MDI的门槛并加重中高MDI惩罚
-            # 区间与目标分值：
-            #   MDI <= 3        -> 1.00
-            #   3 < MDI <= 5    -> 0.90 -> 0.60（线性下降）
-            #   5 < MDI <= 7    -> 0.60 -> 0.20（线性下降）
-            #   7 < MDI <= 10   -> 0.20 -> 0.05（线性下降）
-            #   MDI > 10        -> 0.00
-            if mdi <= 3.0:
-                normalized = 1.00
-            elif mdi <= 5.0:
-                # 3–5: 0.90 -> 0.60
-                normalized = 0.90 - (mdi - 3.0) * (0.30 / 2.0)
-            elif mdi <= 7.0:
-                # 5–7: 0.60 -> 0.20
-                normalized = 0.60 - (mdi - 5.0) * (0.40 / 2.0)
-            elif mdi <= 10.0:
-                # 7–10: 0.20 -> 0.05
-                normalized = 0.20 - (mdi - 7.0) * (0.15 / 3.0)
-            else:
-                normalized = 0.00
-            
-            # 确保奖励值在 [0.00, 1.00] 之间
-            normalized = max(0.00, min(1.00, normalized))
-            rewards.append(float(normalized))
-
+            mdi_values.append(mdi)
         except Exception:
-            rewards.append(0.5)
-
+            mdi_values.append(None)
+    
+    # 按 num_generations 分组
+    if num_generations <= 1:
+        # 单采样，直接返回 0.5
+        return [0.5] * n
+    
+    num_groups = m // num_generations
+    rewards = []
+    
+    alpha_abs = 5.0  # 绝对阈值
+    beta_rel = 0.10  # 相对阈值 10%
+    
+    for group_idx in range(num_groups):
+        start_idx = group_idx * num_generations
+        end_idx = start_idx + num_generations
+        group_mdis = mdi_values[start_idx:end_idx]
+        
+        # 过滤掉 None 值
+        valid_mdis = [x for x in group_mdis if x is not None]
+        group_size = len(valid_mdis)
+        
+        # 判断分位差是否充足
+        if group_size < 3:
+            # 样本太少，返回 0.5
+            rewards.extend([0.5] * len(group_mdis))
+            continue
+        
+        # 计算 IQR 和中位数，确定分位数位置
+        sorted_mdis = sorted(valid_mdis)
+        
+        if group_size < 10:
+            # 样本少，用 Q75-Q25
+            q_lo_idx = int(group_size * 0.25)
+            q_hi_idx = int(group_size * 0.75)
+        else:
+            # 样本多，用 Q90-Q10
+            q_lo_idx = int(group_size * 0.10)
+            q_hi_idx = int(group_size * 0.90)
+        
+        q_lo = sorted_mdis[q_lo_idx]
+        q_hi = sorted_mdis[q_hi_idx]
+        iqr = q_hi - q_lo
+        median = sorted_mdis[group_size // 2]
+        
+        # 判断分位差是否充足
+        threshold = max(alpha_abs, beta_rel * median)
+        if iqr < threshold:
+            # 分位差不足
+            rewards.extend([0.5] * len(group_mdis))
+            continue
+        
+        # 分位差充足，使用分位数进行归一化
+        # 检查分母是否过小（兜底保护）
+        if iqr <= eps:
+            # 即使通过了阈值判定，分母仍可能为0，统一返回0.5
+            rewards.extend([0.5] * len(group_mdis))
+            continue
+        
+        # 使用分位数映射：s = clip((Q_hi - MDI) / (Q_hi - Q_lo), 0, 1)
+        # MDI 越小 -> (Q_hi - MDI) 越大 -> s 越大（奖励越高）
+        for mdi in group_mdis:
+            if mdi is None:
+                rewards.append(0.5)
+            else:
+                normalized = (q_hi - mdi) / iqr
+                # clip 到 [0, 1]
+                normalized = max(0.0, min(1.0, normalized))
+                rewards.append(float(normalized))
+    
+    # 处理剩余样本（不足一组的）
+    remaining = m % num_generations
+    if remaining > 0:
+        rewards.extend([0.5] * remaining)
+    
     # 对齐长度
     if len(rewards) < n:
         rewards.extend([0.5] * (n - len(rewards)))
     elif len(rewards) > n:
         rewards = rewards[:n]
-
+    
     return rewards

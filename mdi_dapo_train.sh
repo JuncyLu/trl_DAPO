@@ -49,9 +49,8 @@ accelerate launch \
   --soft_punish_cache 50 \
   --filter_min_reward 1.5 \
   --replay_var_epsilon 1e-6 \
-  --use_segmented_reward_weights \
+  --reward_weights 0.0 2.5 0.5 1.0 \
   --early_reward_weights 0.0 1.0 2.0 1.0 \
-  --late_reward_weights 0.0 2.5 0.5 1.0 \
   >> training_logs/$TS/train.log 2>&1
 
     # --use_vllm \

@@ -334,10 +334,9 @@ class DAPOTrainer(BaseTrainer):
 
         # Initialize reward weight manager
         self.reward_weight_manager = create_reward_weight_manager(
-            use_segmented_weights=args.use_segmented_reward_weights,
+            reward_weights=args.reward_weights,
             early_weights=args.early_reward_weights,
-            late_weights=args.late_reward_weights,
-            static_weights=args.reward_weights,
+            warmup_ratio=args.warmup_ratio,
             reward_func_names=self.reward_func_names
         )
 
@@ -1098,6 +1097,9 @@ class DAPOTrainer(BaseTrainer):
 
         # This allows for dynamic reward shaping based on training progress.
         reward_kwargs["trainer_state"] = self.state
+
+        # Add num_generations for group-wise reward calculation
+        reward_kwargs["num_generations"] = self.num_generations if self.model.training else self.eval_num_generations
 
         # Add attention data for reward functions if available
         if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
@@ -2214,13 +2216,16 @@ class DAPOTrainer(BaseTrainer):
                 # Rewards line
                 r_acc = logs.get("rewards/accuracy_reward/mean", logs.get("eval_rewards/accuracy_reward/mean"))
                 r_fmt = logs.get("rewards/think_format_reward/mean", logs.get("eval_rewards/think_format_reward/mean"))
-                r_mdi = logs.get("rewards/mdi_reward_as_additive/mean", logs.get("eval_rewards/mdi_reward_as_additive/mean"))
+                # Prefer new MDI reward key; fall back to legacy additive key if present
+                r_mdi = logs.get("rewards/mdi_reward/mean", logs.get("eval_rewards/mdi_reward/mean"))
+                if r_mdi is None:
+                    r_mdi = logs.get("rewards/mdi_reward_as_additive/mean", logs.get("eval_rewards/mdi_reward_as_additive/mean"))
                 r_len = logs.get("rewards/soft_overlong_punishment_reward/mean", logs.get("eval_rewards/soft_overlong_punishment_reward/mean"))
                 r_total = logs.get("reward", logs.get("eval_reward"))
                 rewards_line = []
                 if r_acc is not None: rewards_line.append(f"acc={r_acc:.3f}")
                 if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
-                if r_mdi is not None: rewards_line.append(f"mdi_add={r_mdi:.3f}")
+                if r_mdi is not None: rewards_line.append(f"mdi={r_mdi:.3f}")
                 if r_len is not None: rewards_line.append(f"len={r_len:.3f}")
                 if r_total is not None: rewards_line.append(f"total={r_total:.3f}")
                 if rewards_line:

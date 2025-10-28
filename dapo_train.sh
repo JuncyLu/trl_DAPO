@@ -26,10 +26,10 @@ accelerate launch \
   --dtype bfloat16 \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
-  --max_completion_length 256 \
+  --max_completion_length 384 \
   --per_device_train_batch_size 4 \
-  --gradient_accumulation_steps 4 \
-  --num_generations 4 \
+  --gradient_accumulation_steps 8 \
+  --num_generations 8 \
   --num_train_epochs 1 \
   --report_to wandb \
   --log_completions \
@@ -49,9 +49,8 @@ accelerate launch \
   --soft_punish_cache 50 \
   --filter_min_reward 1.5 \
   --replay_var_epsilon 1e-6 \
-  --use_segmented_reward_weights \
+  --reward_weights 2.5 0.0 0.5 1.0 \
   --early_reward_weights 1.0 0.0 2.0 1.0 \
-  --late_reward_weights 2.5 0.0 0.5 1.0 \
   --use_peft \
   --lora_target_modules "q_proj", "v_proj" \
   >> training_logs/$TS/train.log 2>&1

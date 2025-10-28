@@ -11,10 +11,9 @@ from dataclasses import dataclass
 @dataclass
 class RewardWeightConfig:
     """Configuration for reward weights."""
-    use_segmented_weights: bool = False
+    reward_weights: Optional[List[float]] = None
     early_weights: Optional[List[float]] = None
-    late_weights: Optional[List[float]] = None
-    static_weights: Optional[List[float]] = None
+    warmup_ratio: float = 0.0
     reward_func_names: Optional[List[str]] = None
 
 
@@ -30,27 +29,25 @@ class RewardWeightManager:
         
     def _init_weights(self):
         """Initialize reward weights based on configuration."""
-        if self.config.use_segmented_weights:
-            # 设置分段权重的默认值
-            self.early_weights = torch.tensor(
-                self.config.early_weights or [2.5, 1.0, 0.5], 
-                dtype=torch.float32
-            )
-            self.late_weights = torch.tensor(
-                self.config.late_weights or [0.5, 1.0, 2.5], 
-                dtype=torch.float32
-            )
-            # 初始使用early weights
-            self.current_weights = self.early_weights.clone()
-        elif self.config.static_weights is not None:
-            self.current_weights = torch.tensor(
-                self.config.static_weights, 
+        num_funcs = len(self.reward_func_names)
+        
+        if self.config.reward_weights is not None:
+            self.default_weights = torch.tensor(
+                self.config.reward_weights, 
                 dtype=torch.float32
             )
         else:
-            # 默认等权重
-            num_funcs = len(self.reward_func_names)
-            self.current_weights = torch.ones(num_funcs, dtype=torch.float32)
+            self.default_weights = torch.ones(num_funcs, dtype=torch.float32)
+        
+        if self.config.early_weights is not None:
+            self.early_weights = torch.tensor(
+                self.config.early_weights, 
+                dtype=torch.float32
+            )
+            self.current_weights = self.early_weights.clone()
+        else:
+            self.early_weights = None
+            self.current_weights = self.default_weights.clone()
     
     def update_weights(self, global_step: int, max_steps: int) -> Dict[str, float]:
         """
@@ -63,19 +60,21 @@ class RewardWeightManager:
         Returns:
             Dictionary mapping reward function names to their current weights
         """
-        if not self.config.use_segmented_weights:
+        if self.early_weights is None:
             return self._get_weight_dict()
-            
-        # 计算训练进度 (0.0 到 1.0)
-        progress = global_step / max_steps if max_steps > 0 else 0.0
         
-        # 在10%处切换权重
-        if progress <= 0.1:
-            # 前10%使用early weights
-            self.current_weights = self.early_weights.to(self.current_weights.device)
+        if self.config.warmup_ratio > 0:
+            warmup_steps = int(max_steps * self.config.warmup_ratio)
+            if global_step < warmup_steps:
+                self.current_weights = self.early_weights.to(self.current_weights.device)
+            else:
+                self.current_weights = self.default_weights.to(self.current_weights.device)
         else:
-            # 后90%使用late weights
-            self.current_weights = self.late_weights.to(self.current_weights.device)
+            threshold_steps = int(max_steps * 0.1)
+            if global_step < threshold_steps:
+                self.current_weights = self.early_weights.to(self.current_weights.device)
+            else:
+                self.current_weights = self.default_weights.to(self.current_weights.device)
             
         return self._get_weight_dict()
     
@@ -117,30 +116,27 @@ class RewardWeightManager:
 
 
 def create_reward_weight_manager(
-    use_segmented_weights: bool = False,
+    reward_weights: Optional[List[float]] = None,
     early_weights: Optional[List[float]] = None,
-    late_weights: Optional[List[float]] = None,
-    static_weights: Optional[List[float]] = None,
+    warmup_ratio: float = 0.0,
     reward_func_names: Optional[List[str]] = None
 ) -> RewardWeightManager:
     """
     Create a RewardWeightManager instance.
     
     Args:
-        use_segmented_weights: Whether to use segmented weights
-        early_weights: Weights for first 10% of training
-        late_weights: Weights for last 90% of training
-        static_weights: Static weights (used when not segmented)
+        reward_weights: Default weights used throughout training
+        early_weights: Optional weights for early training phase
+        warmup_ratio: Warmup ratio to determine early phase duration
         reward_func_names: Names of reward functions
         
     Returns:
         RewardWeightManager instance
     """
     config = RewardWeightConfig(
-        use_segmented_weights=use_segmented_weights,
+        reward_weights=reward_weights,
         early_weights=early_weights,
-        late_weights=late_weights,
-        static_weights=static_weights,
+        warmup_ratio=warmup_ratio,
         reward_func_names=reward_func_names
     )
     return RewardWeightManager(config)

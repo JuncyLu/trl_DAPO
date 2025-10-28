@@ -526,26 +526,18 @@ class DAPOConfig(TrainingArguments):
     reward_weights: Optional[list[float]] = field(
         default=None,
         metadata={
-            "help": "Weights for each reward function. Must match the number of reward functions. If `None`, all "
-            "rewards are weighted equally with weight `1.0`."
-        },
-    )
-    use_segmented_reward_weights: bool = field(
-        default=False,
-        metadata={
-            "help": "Whether to use segmented reward weights. If True, uses different weights for first 10% and last 90% of training steps."
+            "help": "Default reward weights for each reward function. Must match the number of reward functions. "
+            "If `None`, all rewards are weighted equally with weight `1.0`. These weights are used throughout "
+            "training, except during the early phase if `early_reward_weights` is specified."
         },
     )
     early_reward_weights: Optional[list[float]] = field(
         default=None,
         metadata={
-            "help": "Reward weights for the first 10% of training steps. Format: [w_fmt, w_len, w_acc]. Default: [2.5, 1.0, 0.5]"
-        },
-    )
-    late_reward_weights: Optional[list[float]] = field(
-        default=None,
-        metadata={
-            "help": "Reward weights for the last 90% of training steps. Format: [w_fmt, w_len, w_acc]. Default: [0.5, 1.0, 2.5]"
+            "help": "Optional reward weights for the early training phase. If specified, these weights will be used "
+            "during the warmup period (if `warmup_ratio > 0`), or during the first 10%% of training steps "
+            "(if `warmup_ratio == 0`). After the early phase, training switches to `reward_weights`. "
+            "If not specified, `reward_weights` is used throughout training."
         },
     )
     soft_punish_cache: int = field(
