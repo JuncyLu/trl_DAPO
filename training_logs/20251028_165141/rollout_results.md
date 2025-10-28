@@ -130581,3 +130581,2127 @@ K
 
 ---
 
+
+## === Rollout Step 187 === | 2025-10-28 11:52:39
+
+### Overall Statistics
+
+| Metric | Value |
+|--------|-------|
+| Accuracy Mean | 0.875 ± 0.331 |
+| Format Mean | 0.875 ± 0.331 |
+| Length Mean | 0.000 ± 0.000 |
+| MDI Mean | 0.000 ± 0.000 |
+| Total Reward Mean | 2.625 ± 0.992 |
+| Accuracy Rate | 0.875 |
+| Format Rate | 0.875 |
+| Success Rate | 0.875 |
+
+### MDI Statistics
+
+| Stage | MDI Mean | MDI Std | AEI Text | AEI Vision |
+|-------|----------|---------|----------|------------|
+| Early | 41.106 | 7.752 | 9.551 | 0.239 |
+| Middle | 28.454 | 2.885 | 8.760 | 0.310 |
+| Late | 16.062 | 2.767 | 7.155 | 0.453 |
+| All | 25.606 | 2.706 | 8.488 | 0.334 |
+
+### Sample 1
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What part of town is this car in based on the sign?
+A: east
+B: south
+C: west
+D: north<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The signs indicate "E Howe St" and "Broadway E". The prefix "E" stands for "east", indicating that the car is located in the eastern part of the town.
+</think>
+<answer>A</answer>
+
+**Solution:** A
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=15.512, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 34.918038,
+      "aei_text": 9.403144,
+      "aei_vision": 0.269292,
+      "text_ratio": 0.972159,
+      "vision_ratio": 0.027841
+    },
+    "middle": {
+      "mdi": 26.620877,
+      "aei_text": 8.7291,
+      "aei_vision": 0.327904,
+      "text_ratio": 0.963796,
+      "vision_ratio": 0.036204
+    },
+    "late": {
+      "mdi": 15.51209,
+      "aei_text": 7.178309,
+      "aei_vision": 0.462756,
+      "text_ratio": 0.939438,
+      "vision_ratio": 0.060562
+    },
+    "all": {
+      "mdi": 24.021832,
+      "aei_text": 8.453193,
+      "aei_vision": 0.351896,
+      "text_ratio": 0.960035,
+      "vision_ratio": 0.039965
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 34.0,
+    "total_tokens": 425.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9394383145925198,
+      0.06056168540748021
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 2
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What part of town is this car in based on the sign?
+A: east
+B: south
+C: west
+D: north<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The street sign indicates "E Howe St" which stands for East Howe Street. This means the car is located in the east part of town.
+</think>
+<answer>A</answer>
+
+**Solution:** A
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=17.832, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 34.285009,
+      "aei_text": 9.360326,
+      "aei_vision": 0.273015,
+      "text_ratio": 0.971659,
+      "vision_ratio": 0.028341
+    },
+    "middle": {
+      "mdi": 30.089606,
+      "aei_text": 9.043608,
+      "aei_vision": 0.300556,
+      "text_ratio": 0.967835,
+      "vision_ratio": 0.032165
+    },
+    "late": {
+      "mdi": 17.832036,
+      "aei_text": 7.599215,
+      "aei_vision": 0.426155,
+      "text_ratio": 0.946899,
+      "vision_ratio": 0.053101
+    },
+    "all": {
+      "mdi": 26.374466,
+      "aei_text": 8.704567,
+      "aei_vision": 0.330038,
+      "text_ratio": 0.96347,
+      "vision_ratio": 0.03653
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 34.0,
+    "total_tokens": 425.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9468989970070151,
+      0.05310100299298494
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 3
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What part of town is this car in based on the sign?
+A: east
+B: south
+C: west
+D: north<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The sign indicates "E Howe St" which suggests that this is the eastern section of town where "How
+ addCriterion
+D</answer>
+
+**Solution:** A
+
+**Rewards:** accuracy=0.000, format=0.000, length=0.000, mdi_add=0.000, mdi=15.300, total=0.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 0.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 31.996035,
+      "aei_text": 9.195101,
+      "aei_vision": 0.287383,
+      "text_ratio": 0.969693,
+      "vision_ratio": 0.030307
+    },
+    "middle": {
+      "mdi": 30.394269,
+      "aei_text": 9.068743,
+      "aei_vision": 0.29837,
+      "text_ratio": 0.968147,
+      "vision_ratio": 0.031853
+    },
+    "late": {
+      "mdi": 15.30009,
+      "aei_text": 7.136212,
+      "aei_vision": 0.466416,
+      "text_ratio": 0.938651,
+      "vision_ratio": 0.061349
+    },
+    "all": {
+      "mdi": 24.540061,
+      "aei_text": 8.511383,
+      "aei_vision": 0.346836,
+      "text_ratio": 0.960846,
+      "vision_ratio": 0.039154
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 34.0,
+    "total_tokens": 425.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9386506454872335,
+      0.06134935451276649
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 4
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What part of town is this car in based on the sign?
+A: east
+B: south
+C: west
+D: north<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The street signs display "E Howe St" and "Broadway St". Since the prefix "E" (East) is used for the street name, the location indicates the part of town is the East part.
+</think>
+<answer>A</answer>
+
+**Solution:** A
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=14.289, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 36.404421,
+      "aei_text": 9.499233,
+      "aei_vision": 0.260936,
+      "text_ratio": 0.973265,
+      "vision_ratio": 0.026735
+    },
+    "middle": {
+      "mdi": 26.382142,
+      "aei_text": 8.705336,
+      "aei_vision": 0.329971,
+      "text_ratio": 0.96348,
+      "vision_ratio": 0.03652
+    },
+    "late": {
+      "mdi": 14.289212,
+      "aei_text": 6.925964,
+      "aei_vision": 0.484699,
+      "text_ratio": 0.934594,
+      "vision_ratio": 0.065406
+    },
+    "all": {
+      "mdi": 23.362469,
+      "aei_text": 8.376655,
+      "aei_vision": 0.358552,
+      "text_ratio": 0.958953,
+      "vision_ratio": 0.041047
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 34.0,
+    "total_tokens": 425.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.934594405519395,
+      0.06540559448060503
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 5
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What situation occurred here for the red and yellow tape to be taped up?
+A: graduation event
+B: religious ceremony
+C: emergency
+D: construction<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The street is blocked off by yellow and red caution tape, and there is a parked fire truck visible, indicating a potential emergency response to a traffic accident, crime, or other health incident.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=13.719, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 41.94039,
+      "aei_text": 9.50663,
+      "aei_vision": 0.22667,
+      "text_ratio": 0.976712,
+      "vision_ratio": 0.023288
+    },
+    "middle": {
+      "mdi": 27.166667,
+      "aei_text": 8.541485,
+      "aei_vision": 0.31441,
+      "text_ratio": 0.964497,
+      "vision_ratio": 0.035503
+    },
+    "late": {
+      "mdi": 13.718789,
+      "aei_text": 6.659933,
+      "aei_vision": 0.485461,
+      "text_ratio": 0.93206,
+      "vision_ratio": 0.06794
+    },
+    "all": {
+      "mdi": 24.703181,
+      "aei_text": 8.30285,
+      "aei_vision": 0.336105,
+      "text_ratio": 0.961094,
+      "vision_ratio": 0.038906
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 418.0,
+    "text_tokens": 38.0,
+    "total_tokens": 456.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9320596280033636,
+      0.06794037199663641
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 6
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What situation occurred here for the red and yellow tape to be taped up?
+A: graduation event
+B: religious ceremony
+C: emergency
+D: construction<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a street scene with a "ONE WAY" sign, a "Pacific Thai Cuisine" business, and a barricade with red and yellow tape, which is commonly associated with emergency zones. The red and yellow tape is typically used to c restrict access to a scene where there has been some type of incident that is being being inspected by authorities. The tape is not for gradations, ceremonies, or construction.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=12.860, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 54.283224,
+      "aei_text": 9.978041,
+      "aei_vision": 0.183814,
+      "text_ratio": 0.981911,
+      "vision_ratio": 0.018089
+    },
+    "middle": {
+      "mdi": 23.484318,
+      "aei_text": 8.172173,
+      "aei_vision": 0.347984,
+      "text_ratio": 0.959158,
+      "vision_ratio": 0.040842
+    },
+    "late": {
+      "mdi": 12.860444,
+      "aei_text": 6.467831,
+      "aei_vision": 0.502924,
+      "text_ratio": 0.927852,
+      "vision_ratio": 0.072148
+    },
+    "all": {
+      "mdi": 22.631702,
+      "aei_text": 8.075132,
+      "aei_vision": 0.356806,
+      "text_ratio": 0.957684,
+      "vision_ratio": 0.042316
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 418.0,
+    "text_tokens": 38.0,
+    "total_tokens": 456.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9278522390769012,
+      0.07214776092309887
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 7
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What situation occurred here for the red and yellow tape to be taped up?
+A: graduation event
+B: religious ceremony
+C: emergency
+D: construction<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a street with police tape and a pedestrian crossing sign, indicating the presence of emergency personnel or authorities. Additionally, construction is unlikely since there is nothing indicating of construction being happening or evident. Therefore, consider that a disaster, such as an accident, is what the tape indicates.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=16.773, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 51.666234,
+      "aei_text": 9.893602,
+      "aei_vision": 0.191491,
+      "text_ratio": 0.981013,
+      "vision_ratio": 0.018987
+    },
+    "middle": {
+      "mdi": 30.263547,
+      "aei_text": 8.801051,
+      "aei_vision": 0.290814,
+      "text_ratio": 0.968014,
+      "vision_ratio": 0.031986
+    },
+    "late": {
+      "mdi": 16.772944,
+      "aei_text": 7.247173,
+      "aei_vision": 0.432075,
+      "text_ratio": 0.943735,
+      "vision_ratio": 0.056265
+    },
+    "all": {
+      "mdi": 27.653298,
+      "aei_text": 8.585026,
+      "aei_vision": 0.310452,
+      "text_ratio": 0.9651,
+      "vision_ratio": 0.0349
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 418.0,
+    "text_tokens": 38.0,
+    "total_tokens": 456.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9437347014653285,
+      0.05626529853467158
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 8
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What situation occurred here for the red and yellow tape to be taped up?
+A: graduation event
+B: religious ceremony
+C: emergency
+D: construction<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a closed off road with red and yellow caution tape. caution tape typically indicates a potential danger or hazard that measures are put in place. which are the options are emergency</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=22.213, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 43.351464,
+      "aei_text": 9.571363,
+      "aei_vision": 0.220785,
+      "text_ratio": 0.977453,
+      "vision_ratio": 0.022547
+    },
+    "middle": {
+      "mdi": 33.233591,
+      "aei_text": 9.015843,
+      "aei_vision": 0.271287,
+      "text_ratio": 0.970789,
+      "vision_ratio": 0.029211
+    },
+    "late": {
+      "mdi": 22.212903,
+      "aei_text": 8.025641,
+      "aei_vision": 0.361305,
+      "text_ratio": 0.956921,
+      "vision_ratio": 0.043079
+    },
+    "all": {
+      "mdi": 31.559217,
+      "aei_text": 8.898439,
+      "aei_vision": 0.28196,
+      "text_ratio": 0.969287,
+      "vision_ratio": 0.030713
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 418.0,
+    "text_tokens": 38.0,
+    "total_tokens": 456.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9569205109761584,
+      0.04307948902384161
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+
+## === Rollout Step 188 === | 2025-10-28 11:53:25
+
+### Overall Statistics
+
+| Metric | Value |
+|--------|-------|
+| Accuracy Mean | 0.250 ± 0.433 |
+| Format Mean | 0.875 ± 0.331 |
+| Length Mean | -0.125 ± 0.331 |
+| MDI Mean | 0.000 ± 0.000 |
+| Total Reward Mean | 0.938 ± 1.285 |
+| Accuracy Rate | 0.250 |
+| Format Rate | 0.875 |
+| Success Rate | 0.875 |
+
+### MDI Statistics
+
+| Stage | MDI Mean | MDI Std | AEI Text | AEI Vision |
+|-------|----------|---------|----------|------------|
+| Early | 25.205 | 2.961 | 7.052 | 0.282 |
+| Middle | 32.910 | 13.875 | 7.305 | 0.256 |
+| Late | 25.370 | 10.518 | 6.876 | 0.307 |
+| All | 25.020 | 5.913 | 6.998 | 0.290 |
+
+### Sample 1
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is located behind the plane?
+A: nothing
+B: desert
+C: airport
+D: tropical island<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a group of people standing on a sandy area near a large plane. The natural surroundings appear to be a beach or sandy terrain, which could be part of a tropical island. The options indicating behind the plane is not visible, so it can can A
+<think>
+The possible correct answer is D, as it is the most reasonable option given the images.
+</think>
+<answer>D
+<think>
+The given image does not provide enough information to draw a conclusion about the whole tropical island being behind.</think>
+<answer>D
+<think>
+In the image, there we can I see D: as the conclusion drawn here points out to A
+<think>
+The image description is sufficient to conclude that there the tropical island is predominantly visible at D: behind the plane because of the beach environment and the plane's shadow falling on the ground.</think>
+<answer>D
+<think>
+The answer D is the correct interpretation if seeing the tropical island is a prominent feature behind the plane in this image.</think>
+<answer>D
+<think>
+Givenes
+<think>
+the image it can show a beach environment with a plane looming overhead, which strongly points towards a tropical island, meaning the answer is D: tropical island.</think
+
+**Solution:** C
+
+**Rewards:** accuracy=0.000, format=0.000, length=-1.000, mdi_add=0.000, mdi=15.967, total=-1.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 0.0,
+    "length": -1.0,
+    "mdi": 0.0,
+    "total": -1.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 30.605346,
+      "aei_text": 7.176827,
+      "aei_vision": 0.234496,
+      "text_ratio": 0.96836,
+      "vision_ratio": 0.03164
+    },
+    "middle": {
+      "mdi": 18.036059,
+      "aei_text": 6.265782,
+      "aei_vision": 0.347403,
+      "text_ratio": 0.947468,
+      "vision_ratio": 0.052532
+    },
+    "late": {
+      "mdi": 15.967497,
+      "aei_text": 6.024542,
+      "aei_vision": 0.3773,
+      "text_ratio": 0.941064,
+      "vision_ratio": 0.058936
+    },
+    "all": {
+      "mdi": 19.593099,
+      "aei_text": 6.423567,
+      "aei_vision": 0.327848,
+      "text_ratio": 0.95144,
+      "vision_ratio": 0.04856
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 234.0,
+    "text_tokens": 29.0,
+    "total_tokens": 263.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9410637880177611,
+      0.058936211982238744
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 2
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is located behind the plane?
+A: nothing
+B: desert
+C: airport
+D: tropical island<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a group of people on a sandy beach with the underside of an airplane visible, not an airport.airport), desert, or a tropical island in the background. The only option that indicates's these elements could not be present is "nothing.
+</think>
+<answer>A</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=0.000, format=1.000, length=0.000, mdi_add=0.000, mdi=15.295, total=0.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.691747,
+      "aei_text": 6.610114,
+      "aei_vision": 0.304729,
+      "text_ratio": 0.955931,
+      "vision_ratio": 0.044069
+    },
+    "middle": {
+      "mdi": 18.700405,
+      "aei_text": 6.33535,
+      "aei_vision": 0.338781,
+      "text_ratio": 0.94924,
+      "vision_ratio": 0.05076
+    },
+    "late": {
+      "mdi": 15.295441,
+      "aei_text": 5.936972,
+      "aei_vision": 0.388153,
+      "text_ratio": 0.938633,
+      "vision_ratio": 0.061367
+    },
+    "all": {
+      "mdi": 18.710345,
+      "aei_text": 6.336365,
+      "aei_vision": 0.338656,
+      "text_ratio": 0.949265,
+      "vision_ratio": 0.050735
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 234.0,
+    "text_tokens": 29.0,
+    "total_tokens": 263.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9386331428526543,
+      0.06136685714734569
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 3
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is located behind the plane?
+A: nothing
+B: desert
+C: airport
+D: tropical island<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows an airplane near a beach with people gathered underneath it. There is no indication of a desert, airport, or tropical island behind the plane. The plane is not in a desert or an airport, and it is not in a tropical island either. There is no background mentioned, so thus the correct answer might be A.
+</think>
+<answer>A</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=0.000, format=1.000, length=0.000, mdi_add=0.000, mdi=19.254, total=0.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 23.672538,
+      "aei_text": 6.763556,
+      "aei_vision": 0.285713,
+      "text_ratio": 0.959469,
+      "vision_ratio": 0.040531
+    },
+    "middle": {
+      "mdi": 23.998473,
+      "aei_text": 6.786988,
+      "aei_vision": 0.282809,
+      "text_ratio": 0.959998,
+      "vision_ratio": 0.040002
+    },
+    "late": {
+      "mdi": 19.253602,
+      "aei_text": 6.390697,
+      "aei_vision": 0.331922,
+      "text_ratio": 0.950626,
+      "vision_ratio": 0.049374
+    },
+    "all": {
+      "mdi": 22.204922,
+      "aei_text": 6.651794,
+      "aei_vision": 0.299564,
+      "text_ratio": 0.956906,
+      "vision_ratio": 0.043094
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 234.0,
+    "text_tokens": 29.0,
+    "total_tokens": 263.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.950626066415248,
+      0.049373933584751985
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 4
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is located behind the plane?
+A: nothing
+B: desert
+C: airport
+D: tropical island<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a group of people standing on a sandy surface, which appears to be a beach, and there behind the plane, there there is a clear blue sky with no visible structures behind the plane. The correct answer is B.
+</think>
+<answer>B</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=0.000, format=1.000, length=0.000, mdi_add=0.000, mdi=11.967, total=0.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 21.249364,
+      "aei_text": 6.573013,
+      "aei_vision": 0.309327,
+      "text_ratio": 0.955055,
+      "vision_ratio": 0.044945
+    },
+    "middle": {
+      "mdi": 16.974585,
+      "aei_text": 6.146969,
+      "aei_vision": 0.362128,
+      "text_ratio": 0.944366,
+      "vision_ratio": 0.055634
+    },
+    "late": {
+      "mdi": 11.966761,
+      "aei_text": 5.416631,
+      "aei_vision": 0.45264,
+      "text_ratio": 0.92288,
+      "vision_ratio": 0.07712
+    },
+    "all": {
+      "mdi": 16.760077,
+      "aei_text": 6.121725,
+      "aei_vision": 0.365256,
+      "text_ratio": 0.943694,
+      "vision_ratio": 0.056306
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 234.0,
+    "text_tokens": 29.0,
+    "total_tokens": 263.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9228797384327513,
+      0.07712026156724876
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 5
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is the sand on the beach made of?
+A: rock chips
+B: coarse mud
+C: calcium carbonate
+D: unknown<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The sand on a beach is typically made of rock chips, which are are
+</think>
+<answer>A</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=0.000, format=1.000, length=0.000, mdi_add=0.000, mdi=36.225, total=0.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 24.193658,
+      "aei_text": 7.183132,
+      "aei_vision": 0.296901,
+      "text_ratio": 0.960307,
+      "vision_ratio": 0.039693
+    },
+    "middle": {
+      "mdi": 48.62302,
+      "aei_text": 8.294032,
+      "aei_vision": 0.170578,
+      "text_ratio": 0.979848,
+      "vision_ratio": 0.020152
+    },
+    "late": {
+      "mdi": 36.225471,
+      "aei_text": 7.880937,
+      "aei_vision": 0.217552,
+      "text_ratio": 0.973137,
+      "vision_ratio": 0.026863
+    },
+    "all": {
+      "mdi": 29.103469,
+      "aei_text": 7.521397,
+      "aei_vision": 0.258436,
+      "text_ratio": 0.966781,
+      "vision_ratio": 0.033219
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 299.0,
+    "text_tokens": 34.0,
+    "total_tokens": 333.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9731366730054268,
+      0.026863326994573153
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 6
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is the sand on the beach made of?
+A: rock chips
+B: coarse mud
+C: calcium carbonate
+D: unknown<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The sand on the beach in the image appears light in color, which is a characteristic of calcium carbonate. Therefore, option C is more likely the correct answer since calcium carbonate is a common constituent in many types of sand.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=31.008, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.373926,
+      "aei_text": 7.412716,
+      "aei_vision": 0.270795,
+      "text_ratio": 0.964756,
+      "vision_ratio": 0.035244
+    },
+    "middle": {
+      "mdi": 43.763025,
+      "aei_text": 8.155318,
+      "aei_vision": 0.186352,
+      "text_ratio": 0.97766,
+      "vision_ratio": 0.02234
+    },
+    "late": {
+      "mdi": 31.007633,
+      "aei_text": 7.630127,
+      "aei_vision": 0.246073,
+      "text_ratio": 0.968757,
+      "vision_ratio": 0.031243
+    },
+    "all": {
+      "mdi": 31.101699,
+      "aei_text": 7.635229,
+      "aei_vision": 0.245492,
+      "text_ratio": 0.968849,
+      "vision_ratio": 0.031151
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 299.0,
+    "text_tokens": 34.0,
+    "total_tokens": 333.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9687574523239504,
+      0.03124254767604965
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 7
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is the sand on the beach made of?
+A: rock chips
+B: coarse mud
+C: calcium carbonate
+D: unknown<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The sand on the beach in the image appears to be a light, beige color which is consistent with sand typically found formed
+ addCriterion of calcium carbonate, which is mostly what beach sand is made of. The answer is C.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=30.488, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 27.410278,
+      "aei_text": 7.415108,
+      "aei_vision": 0.270523,
+      "text_ratio": 0.964801,
+      "vision_ratio": 0.035199
+    },
+    "middle": {
+      "mdi": 41.878709,
+      "aei_text": 8.094378,
+      "aei_vision": 0.193281,
+      "text_ratio": 0.976678,
+      "vision_ratio": 0.023322
+    },
+    "late": {
+      "mdi": 30.488253,
+      "aei_text": 7.601515,
+      "aei_vision": 0.249326,
+      "text_ratio": 0.968242,
+      "vision_ratio": 0.031758
+    },
+    "all": {
+      "mdi": 30.755093,
+      "aei_text": 7.616309,
+      "aei_vision": 0.247644,
+      "text_ratio": 0.968509,
+      "vision_ratio": 0.031491
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 299.0,
+    "text_tokens": 34.0,
+    "total_tokens": 333.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.968242125087092,
+      0.031757874912908
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 8
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What is the sand on the beach made of?
+A: rock chips
+B: coarse mud
+C: calcium carbonate
+D: unknown<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The sand on a beach is generally composed of tiny,磨损的 pieces of rock. Therefore, the answer is likely A rock chips.
+</think>
+<answer>A</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=0.000, format=1.000, length=0.000, mdi_add=0.000, mdi=42.756, total=0.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 25.444039,
+      "aei_text": 7.278485,
+      "aei_vision": 0.286059,
+      "text_ratio": 0.962184,
+      "vision_ratio": 0.037816
+    },
+    "middle": {
+      "mdi": 51.305849,
+      "aei_text": 8.360995,
+      "aei_vision": 0.162964,
+      "text_ratio": 0.980882,
+      "vision_ratio": 0.019118
+    },
+    "late": {
+      "mdi": 42.755653,
+      "aei_text": 8.123293,
+      "aei_vision": 0.189993,
+      "text_ratio": 0.977146,
+      "vision_ratio": 0.022854
+    },
+    "all": {
+      "mdi": 31.9285,
+      "aei_text": 7.679061,
+      "aei_vision": 0.240508,
+      "text_ratio": 0.969631,
+      "vision_ratio": 0.030369
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 299.0,
+    "text_tokens": 34.0,
+    "total_tokens": 333.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9771458101653745,
+      0.02285418983462548
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+
+## === Rollout Step 189 === | 2025-10-28 11:53:52
+
+### Overall Statistics
+
+| Metric | Value |
+|--------|-------|
+| Accuracy Mean | 0.750 ± 0.433 |
+| Format Mean | 0.375 ± 0.484 |
+| Length Mean | 0.000 ± 0.000 |
+| MDI Mean | 0.000 ± 0.000 |
+| Total Reward Mean | 2.062 ± 1.073 |
+| Accuracy Rate | 0.750 |
+| Format Rate | 0.375 |
+| Success Rate | 0.875 |
+
+### MDI Statistics
+
+| Stage | MDI Mean | MDI Std | AEI Text | AEI Vision |
+|-------|----------|---------|----------|------------|
+| Early | 46.304 | 7.243 | 9.847 | 0.218 |
+| Middle | 41.750 | 12.992 | 9.580 | 0.246 |
+| Late | 23.535 | 6.122 | 8.240 | 0.364 |
+| All | 33.421 | 6.406 | 9.171 | 0.281 |
+
+### Sample 1
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What are the elephants showing to the camera?
+A: horns
+B: mouths
+C: trunks
+D: backsides<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The elephants are the camera from behind, showing their their
+<think>
+their backsides. Therefore, the answer is D.
+</think>
+<answer>D
+ addCriterion
+</answer>
+
+**Solution:** D
+
+**Rewards:** accuracy=0.000, format=0.000, length=0.000, mdi_add=0.000, mdi=33.387, total=0.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 0.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 43.279239,
+      "aei_text": 10.308436,
+      "aei_vision": 0.238184,
+      "text_ratio": 0.977416,
+      "vision_ratio": 0.022584
+    },
+    "middle": {
+      "mdi": 60.146783,
+      "aei_text": 10.986795,
+      "aei_vision": 0.182666,
+      "text_ratio": 0.983646,
+      "vision_ratio": 0.016354
+    },
+    "late": {
+      "mdi": 33.387402,
+      "aei_text": 9.677197,
+      "aei_vision": 0.289846,
+      "text_ratio": 0.97092,
+      "vision_ratio": 0.02908
+    },
+    "all": {
+      "mdi": 42.989459,
+      "aei_text": 10.29316,
+      "aei_vision": 0.239435,
+      "text_ratio": 0.977267,
+      "vision_ratio": 0.022733
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 32.0,
+    "total_tokens": 423.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9709195827006646,
+      0.029080417299335377
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 2
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What are the elephants showing to the camera?
+A: horns
+B: mouths
+C: trunks
+D: backsides<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The elephants in the image are the camera are showing their their tails are. put d
+<think>
+
+The answer is D.
+
+**Solution:** D
+
+**Rewards:** accuracy=1.000, format=0.000, length=0.000, mdi_add=0.000, mdi=29.107, total=2.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 0.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 2.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 40.684691,
+      "aei_text": 10.165705,
+      "aei_vision": 0.249866,
+      "text_ratio": 0.97601,
+      "vision_ratio": 0.02399
+    },
+    "middle": {
+      "mdi": 57.09083,
+      "aei_text": 10.888385,
+      "aei_vision": 0.19072,
+      "text_ratio": 0.982786,
+      "vision_ratio": 0.017214
+    },
+    "late": {
+      "mdi": 29.106787,
+      "aei_text": 9.310353,
+      "aei_vision": 0.319869,
+      "text_ratio": 0.966785,
+      "vision_ratio": 0.033215
+    },
+    "all": {
+      "mdi": 39.045644,
+      "aei_text": 10.068091,
+      "aei_vision": 0.257854,
+      "text_ratio": 0.975028,
+      "vision_ratio": 0.024972
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 32.0,
+    "total_tokens": 423.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9667848980364461,
+      0.033215101963553935
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 3
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What are the elephants showing to the camera?
+A: horns
+B: mouths
+C: trunks
+D: backsides<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a group of elephants from behind, and they are all facing away from the camera, showing their their
+<think>
+their backsides to the camera. Therefore, the answer is D: backsides.
+</think>
+<answer>D
+
+textTheme
+<>
+
+</presentation>
+
+**Solution:** D
+
+**Rewards:** accuracy=1.000, format=0.000, length=0.000, mdi_add=0.000, mdi=25.019, total=2.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 0.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 2.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 48.683846,
+      "aei_text": 10.566702,
+      "aei_vision": 0.217047,
+      "text_ratio": 0.979873,
+      "vision_ratio": 0.020127
+    },
+    "middle": {
+      "mdi": 38.776325,
+      "aei_text": 10.051452,
+      "aei_vision": 0.259216,
+      "text_ratio": 0.974859,
+      "vision_ratio": 0.025141
+    },
+    "late": {
+      "mdi": 25.018999,
+      "aei_text": 8.881307,
+      "aei_vision": 0.354983,
+      "text_ratio": 0.961567,
+      "vision_ratio": 0.038433
+    },
+    "all": {
+      "mdi": 36.022258,
+      "aei_text": 9.870632,
+      "aei_vision": 0.274015,
+      "text_ratio": 0.972989,
+      "vision_ratio": 0.027011
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 32.0,
+    "total_tokens": 423.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9615665460458337,
+      0.038433453954166336
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 4
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>What are the elephants showing to the camera?
+A: horns
+B: mouths
+C: trunks
+D: backsides<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The elephants are the camera are showing their their round parts
+
+قبال
+D
+
+**Solution:** D
+
+**Rewards:** accuracy=1.000, format=0.000, length=0.000, mdi_add=0.000, mdi=27.402, total=2.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 0.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 2.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 37.307073,
+      "aei_text": 9.95749,
+      "aei_vision": 0.266906,
+      "text_ratio": 0.973895,
+      "vision_ratio": 0.026105
+    },
+    "middle": {
+      "mdi": 53.619515,
+      "aei_text": 10.765517,
+      "aei_vision": 0.200776,
+      "text_ratio": 0.981692,
+      "vision_ratio": 0.018308
+    },
+    "late": {
+      "mdi": 27.402073,
+      "aei_text": 9.142192,
+      "aei_vision": 0.333631,
+      "text_ratio": 0.964791,
+      "vision_ratio": 0.035209
+    },
+    "all": {
+      "mdi": 36.439754,
+      "aei_text": 9.899359,
+      "aei_vision": 0.271664,
+      "text_ratio": 0.97329,
+      "vision_ratio": 0.02671
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 391.0,
+    "text_tokens": 32.0,
+    "total_tokens": 423.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9647913023813438,
+      0.035208697618656214
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 5
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>From which wind does the air blow here?
+A: nowhere
+B: from inland
+C: from seaward
+D: upward<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a kite flying in the sky above the beach. There is a person on the beach with the kite tug line attached to it. The kite's tail is dragged on the ground suggesting
+<think>
+ The question is about the direction of the wind. The kite has a tail that is dragging on the beach, meaning with the wind interesse wind tend to blow seawards thus the wind comes from the sea direction therefore the correct answer is C.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=0.000, length=0.000, mdi_add=0.000, mdi=12.451, total=2.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 0.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 2.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 57.618657,
+      "aei_text": 9.695379,
+      "aei_vision": 0.168268,
+      "text_ratio": 0.982941,
+      "vision_ratio": 0.017059
+    },
+    "middle": {
+      "mdi": 20.404259,
+      "aei_text": 7.5739,
+      "aei_vision": 0.371192,
+      "text_ratio": 0.95328,
+      "vision_ratio": 0.04672
+    },
+    "late": {
+      "mdi": 12.450935,
+      "aei_text": 6.226449,
+      "aei_vision": 0.500079,
+      "text_ratio": 0.925656,
+      "vision_ratio": 0.074344
+    },
+    "all": {
+      "mdi": 20.458847,
+      "aei_text": 7.580753,
+      "aei_vision": 0.370537,
+      "text_ratio": 0.953399,
+      "vision_ratio": 0.046601
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 345.0,
+    "text_tokens": 33.0,
+    "total_tokens": 378.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9256557257915528,
+      0.07434427420844722
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 6
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>From which wind does the air blow here?
+A: nowhere
+B: from inland
+C: from seaward
+D: upward<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a person flying a kite at the beach near the water. Generally,风 tends to blow from areas of higher pressure to lower pressure. Given the location near a body of water, it is more likely the wind will blow from the higher pressure inland to the lower pressure near the water, not vice versa. Therefore, the wind most likely blows from inland.
+</think>
+  
+<answer>B</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=0.000, format=1.000, length=0.000, mdi_add=0.000, mdi=19.894, total=0.500
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 0.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 0.5
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 57.779725,
+      "aei_text": 9.699532,
+      "aei_vision": 0.167871,
+      "text_ratio": 0.982987,
+      "vision_ratio": 0.017013
+    },
+    "middle": {
+      "mdi": 33.384578,
+      "aei_text": 8.72292,
+      "aei_vision": 0.261286,
+      "text_ratio": 0.970917,
+      "vision_ratio": 0.029083
+    },
+    "late": {
+      "mdi": 19.893655,
+      "aei_text": 7.508609,
+      "aei_vision": 0.377437,
+      "text_ratio": 0.952139,
+      "vision_ratio": 0.047861
+    },
+    "all": {
+      "mdi": 30.828056,
+      "aei_text": 8.553758,
+      "aei_vision": 0.277467,
+      "text_ratio": 0.968581,
+      "vision_ratio": 0.031419
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 345.0,
+    "text_tokens": 33.0,
+    "total_tokens": 378.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9521385798703004,
+      0.04786142012969966
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 7
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>From which wind does the air blow here?
+A: nowhere
+B: from inland
+C: from seaward
+D: upward<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a person flying a kite on a beach. Flying kites on a beach generally requires a flowing wind, which typically comes from seaward. Therefore, the wind blow here is from seaward.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=20.755, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 44.009773,
+      "aei_text": 9.25582,
+      "aei_vision": 0.210313,
+      "text_ratio": 0.977783,
+      "vision_ratio": 0.022217
+    },
+    "middle": {
+      "mdi": 32.319456,
+      "aei_text": 8.654899,
+      "aei_vision": 0.267792,
+      "text_ratio": 0.969988,
+      "vision_ratio": 0.030012
+    },
+    "late": {
+      "mdi": 20.75474,
+      "aei_text": 7.61748,
+      "aei_vision": 0.367024,
+      "text_ratio": 0.954033,
+      "vision_ratio": 0.045967
+    },
+    "all": {
+      "mdi": 30.225974,
+      "aei_text": 8.510825,
+      "aei_vision": 0.281573,
+      "text_ratio": 0.967975,
+      "vision_ratio": 0.032025
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 345.0,
+    "text_tokens": 33.0,
+    "total_tokens": 378.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9540330061402711,
+      0.04596699385972896
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
+### Sample 8
+
+**Prompt:** <|im_start|>system
+A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. The response must end immediately after the closing </answer> tag. For example:
+<think>
+This is my reasoning.
+</think>
+<answer>C</answer><|im_end|>
+<|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>From which wind does the air blow here?
+A: nowhere
+B: from inland
+C: from seaward
+D: upward<|im_end|>
+<|im_start|>assistant
+
+
+**Completion:** <think>
+The image shows a kite flying in the sky, indicating the presence wind blowing from seaward. The correct answer should be C.
+</think>
+<answer>C</answer>
+
+**Solution:** C
+
+**Rewards:** accuracy=1.000, format=1.000, length=0.000, mdi_add=0.000, mdi=20.268, total=3.000
+
+**Detailed Metrics:**
+
+```json
+{
+  "rewards": {
+    "accuracy": 1.0,
+    "format": 1.0,
+    "length": 0.0,
+    "mdi": 0.0,
+    "total": 3.0
+  },
+  "attention_metrics": {
+    "early": {
+      "mdi": 41.067648,
+      "aei_text": 9.130264,
+      "aei_vision": 0.222323,
+      "text_ratio": 0.976229,
+      "vision_ratio": 0.023771
+    },
+    "middle": {
+      "mdi": 38.256743,
+      "aei_text": 8.996141,
+      "aei_vision": 0.235152,
+      "text_ratio": 0.974527,
+      "vision_ratio": 0.025473
+    },
+    "late": {
+      "mdi": 20.268485,
+      "aei_text": 7.556751,
+      "aei_vision": 0.372833,
+      "text_ratio": 0.952982,
+      "vision_ratio": 0.047018
+    },
+    "all": {
+      "mdi": 31.360388,
+      "aei_text": 8.590687,
+      "aei_vision": 0.273934,
+      "text_ratio": 0.969098,
+      "vision_ratio": 0.030902
+    }
+  },
+  "token_counts": {
+    "vision_tokens": 345.0,
+    "text_tokens": 33.0,
+    "total_tokens": 378.0
+  },
+  "overall": {
+    "attention_distribution": [
+      0.9529820765324846,
+      0.04701792346751544
+    ],
+    "skip_reason": null
+  }
+}
+```
+
+---
+
