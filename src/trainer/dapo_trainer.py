@@ -1875,6 +1875,14 @@ class DAPOTrainer(BaseTrainer):
             if num_to_replace > 0:
                 sampled = self.replay_buffer.sample(num_to_replace)
                 if sampled:
+                    # Log replacement on main process
+                    if self.accelerator.is_main_process:
+                        replaced_indices = groups_without_variance.nonzero(as_tuple=True)[0].tolist()
+                        print(
+                            f"[ReplayBuffer] Replacing {num_to_replace} group(s) with zero/low variance "
+                            f"(group indices: {replaced_indices}) using replay buffer samples",
+                            flush=True,
+                        )
                     # For shape alignment, compute target lengths
                     cur_p_len = prompt_ids.size(1)
                     cur_c_len = completion_ids.size(1)

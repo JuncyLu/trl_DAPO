@@ -19,24 +19,24 @@ export CUDA_LAUNCH_BLOCKING=1
 accelerate launch \
   --config_file src/configs/deepspeed_zero2.yaml \
   src/scripts/train_grpo_vlm.py \
-  --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-  --output_dir training_logs/$TS/runs/dapo-Qwen2.5-VL-3B-Instruct \
+  --model_name_or_path Qwen/Qwen2.5-VL-7B-Instruct \
+  --output_dir training_logs/$TS/runs/dapo-Qwen2.5-VL-7B-Instruct \
   --rollout_log_path training_logs/$TS/rollout_results.md \
   --eval_log_path training_logs/$TS/eval_results.md \
   --dtype bfloat16 \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
-  --max_completion_length 256 \
+  --max_completion_length 384 \
   --per_device_train_batch_size 4 \
   --gradient_accumulation_steps 4 \
-  --num_generations 4 \
+  --num_generations 8 \
   --num_train_epochs 1 \
   --report_to wandb \
   --log_completions \
   --logging_steps 1.0 \
   --do_eval \
   --eval_strategy steps \
-  --eval_steps 5 \
+  --eval_steps 10 \
   --eval_num_generations 2 \
   --per_device_eval_batch_size 4 \
   --save_strategy steps \
@@ -49,12 +49,12 @@ accelerate launch \
   --soft_punish_cache 50 \
   --filter_min_reward 1.5 \
   --replay_var_epsilon 1e-6 \
-  --reward_weights 0.0 2.5 0.5 1.0 \
-  --early_reward_weights 0.0 1.0 2.0 1.0 \
+  --reward_weights 1.5 1.0 0.5 1.0 \
+  --early_reward_weights 0.5 0.5 2.0 1.0 \
+  --use_peft \
+  --lora_target_modules "q_proj", "v_proj" \
   >> training_logs/$TS/train.log 2>&1
 
     # --use_vllm \
     # --vllm_mode colocate \
     # --vllm_gpu_memory_utilization 0.5
-    # --use_peft \
-    # --lora_target_modules "q_proj", "v_proj" \
