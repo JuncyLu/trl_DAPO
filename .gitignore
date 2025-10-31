@@ -2,6 +2,7 @@ aokvqa_images_small/
 aokvqa_openr1_small/
 archive/
 runs/
+backup
 *.bak
 .gitattributes
 .last_checked

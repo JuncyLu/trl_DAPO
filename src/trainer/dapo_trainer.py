@@ -68,6 +68,7 @@ from ..utils.attention_metrics import (
     compute_qwen_attention_metrics_for_batch,
     AttentionSampleResult,
 )
+from ..rewards.accuracy_rewards import accuracy_reward
 from ..utils.dapo_logging import emit_rollout_logs, emit_eval_logs, compute_real_mdi_metrics
 from contextlib import contextmanager
 from trl.trainer.utils import (
@@ -1124,6 +1125,24 @@ class DAPOTrainer(BaseTrainer):
                 reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in mdi_metrics]
                 reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in mdi_metrics]
                 reward_kwargs["num_vision_tokens"] = [m.get("num_vision_tokens", 0) for m in mdi_metrics]
+
+        # 计算逐样本准确率，并传递给奖励函数（供 mdi_accuracy_reward 使用）
+        try:
+            solutions_for_batch = reward_kwargs.get("solution", None)
+            if solutions_for_batch is None:
+                # 有些数据集中可能使用 "solutions" 作为字段名
+                solutions_for_batch = reward_kwargs.get("solutions", None)
+
+            if solutions_for_batch is not None:
+                acc_scores = accuracy_reward(
+                    completions=completions,
+                    solution=solutions_for_batch,
+                )
+                # 将 None 安全转为 0.0
+                reward_kwargs["accuracies"] = [float(x) if x is not None else 0.0 for x in acc_scores]
+        except Exception:
+            # 若准确率计算失败，则跳过传递（保持兼容）
+            pass
 
         for i, (reward_func, reward_processing_class, reward_func_name) in enumerate(
             zip(self.reward_funcs, self.reward_processing_classes, self.reward_func_names)
