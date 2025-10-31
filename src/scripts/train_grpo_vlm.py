@@ -83,7 +83,7 @@ from trl import (
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.trainer import DAPOConfig, DAPOTrainer
-from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_punishment, mdi_reward
+from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_punishment, mdi_reward, mdi_hard_negative
 
 
 # Enable logging in a Hugging Face Space
@@ -160,10 +160,13 @@ if __name__ == "__main__":
         soft_punish_cache=training_args.soft_punish_cache
     )
     
+    # 选择使用哪一种 MDI 奖励
+    mdi_func = mdi_hard_negative if getattr(training_args, "mdi_hard_negative", False) else mdi_reward
+
     trainer = DAPOTrainer(
         model=model_args.model_name_or_path,
         args=training_args,
-        reward_funcs=[accuracy_reward, mdi_reward, think_format_reward, length_reward_func],
+        reward_funcs=[accuracy_reward, mdi_func, think_format_reward, length_reward_func],
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         peft_config=get_peft_config(model_args),

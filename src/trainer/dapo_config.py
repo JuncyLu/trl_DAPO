@@ -687,6 +687,12 @@ class DAPOConfig(TrainingArguments):
         metadata={"help": "Whether to compute attention metrics during generation."}
     )
 
+    # --- Reward toggles ---
+    mdi_hard_negative: bool = field(
+        default=False,
+        metadata={"help": "Enable MDI hard-negative reward: groupwise MDI mapping applied only to acc=1 samples."}
+    )
+
     realtime_rollout_logging: bool = field(
         default=True,
         metadata={"help": "Enable real-time rollout logging to markdown files."}

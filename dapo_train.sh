@@ -49,6 +49,7 @@ accelerate launch \
   --soft_punish_cache 50 \
   --filter_min_reward 1.5 \
   --replay_var_epsilon 1e-6 \
+  --mdi_hard_negative \
   --reward_weights 2.5 1.0 0.5 1.0 \
   --early_reward_weights 1.0 1.0 2.0 1.0 \
   --use_peft \
