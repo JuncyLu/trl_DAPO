@@ -719,6 +719,40 @@ class DAPOConfig(TrainingArguments):
         metadata={"help": "Number of characters to preview for completions in logs."}
     )
 
+    # --- Token-level MDI weighting & logging ---
+    token_mdi_weighting: bool = field(
+        default=True,
+        metadata={"help": "Enable token-level MDI weighting for policy gradient term only."}
+    )
+    token_mdi_topk_ratio: float = field(
+        default=0.4,
+        metadata={"help": "Top-k ratio within each sequence to keep amplified weights (e.g., 0.4 => top 40%)."}
+    )
+    token_mdi_clip: tuple[float, float] = field(
+        default=(0.2, 3.0),
+        metadata={"help": "Clip range for per-token MDI weights as (min, max)."}
+    )
+    token_mdi_smooth_sigma: float = field(
+        default=0.0,
+        metadata={"help": "Optional 1D smoothing sigma for token weights (0 disables)."}
+    )
+    token_mdi_exclude_special: bool = field(
+        default=True,
+        metadata={"help": "Exclude BOS/system/role/special tokens from MDI computation pools."}
+    )
+    mdi_token_log_enable: bool = field(
+        default=True,
+        metadata={"help": "Enable writing per-token MDI weight highlights to markdown log."}
+    )
+    mdi_token_log_path: Optional[str] = field(
+        default="training_logs/mdi_token_weights.md",
+        metadata={"help": "Markdown file path to save token-level MDI weight logs."}
+    )
+    mdi_token_log_samples: int = field(
+        default=2,
+        metadata={"help": "Max number of samples to log per step in the token-weight MD file."}
+    )
+
     def __post_init__(self):
         self.bf16 = not (self.fp16) if self.bf16 is None else self.bf16
 

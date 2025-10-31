@@ -69,7 +69,8 @@ from ..utils.attention_metrics import (
     AttentionSampleResult,
 )
 from ..rewards.accuracy_rewards import accuracy_reward
-from ..utils.dapo_logging import emit_rollout_logs, emit_eval_logs, compute_real_mdi_metrics
+from ..utils.dapo_logging import emit_rollout_logs, emit_eval_logs, compute_real_mdi_metrics, emit_mdi_token_weight_logs
+from ..utils.attention_token_weights import build_token_mdi_weights_for_batch
 from contextlib import contextmanager
 from trl.trainer.utils import (
     RepeatSampler,
@@ -1482,6 +1483,29 @@ class DAPOTrainer(BaseTrainer):
             logprobs = None  # not used in this case
             extra_fields = {}  # No extra fields for non-rollout_func paths
 
+            # Build token-level MDI weights if attentions available
+            if attention_context is not None and getattr(self.args, "token_mdi_weighting", False):
+                try:
+                    weights_list, _dbg = build_token_mdi_weights_for_batch(
+                        outputs_attentions=attention_outputs.attentions,
+                        input_ids=generate_inputs["input_ids"],
+                        sequences=prompt_completion_ids,
+                        processor=self.processing_class,
+                        image_grid_thw=generate_inputs.get("image_grid_thw"),
+                        exclude_special=self.args.token_mdi_exclude_special,
+                        smooth_sigma=float(getattr(self.args, "token_mdi_smooth_sigma", 0.0)),
+                        clip_range=tuple(getattr(self.args, "token_mdi_clip", (0.2, 3.0))),
+                    )
+                    # Truncate weights according to completion_mask per sample
+                    trimmed_weights: list[list[float]] = []
+                    for i, w in enumerate(weights_list):
+                        # Apply same EOS truncation used for completion_ids
+                        valid_len = int(completion_mask[i].sum().item())
+                        trimmed_weights.append(w[:valid_len])
+                    extra_fields["token_weights"] = trimmed_weights
+                except Exception:
+                    pass
+
         return prompt_ids, completion_ids, logprobs, extra_fields, attention_context
 
     def _generate(self, prompts: list, images: Optional[list] = None):
@@ -1583,6 +1607,22 @@ class DAPOTrainer(BaseTrainer):
             sampling_per_token_logps = pad(sampling_per_token_logps, padding_value=0.0, padding_side="right")
         else:
             sampling_per_token_logps = None
+
+        # Convert token weights (if provided) to padded tensor aligned with completion_ids
+        token_weights_tensor = None
+        if isinstance(extra_fields, dict) and "token_weights" in extra_fields:
+            try:
+                token_weights_list = extra_fields.get("token_weights") or []
+                tw = [
+                    torch.tensor(w, device=device, dtype=torch.float32) if isinstance(w, list) else torch.tensor([], device=device, dtype=torch.float32)
+                    for w in token_weights_list
+                ]
+                # Pad to completion width with 1.0 (neutral weight)
+                token_weights_tensor = pad(tw, padding_value=1.0, padding_side="right")
+                # Mask invalid positions to neutral weight 1.0
+                token_weights_tensor = token_weights_tensor * completion_mask.float() + (1.0 - completion_mask.float())
+            except Exception:
+                token_weights_tensor = None
 
         # If mask_truncated_completions is enabled, zero out truncated completions in completion_mask
         if self.mask_truncated_completions:
@@ -1811,6 +1851,8 @@ class DAPOTrainer(BaseTrainer):
             "advantages": advantages,
             "num_items_in_batch": num_items_in_batch,
         }
+        if token_weights_tensor is not None:
+            output["token_weights"] = token_weights_tensor
         if old_per_token_logps is not None:
             output["old_per_token_logps"] = old_per_token_logps
         if self.use_vllm and self.vllm_importance_sampling_correction:
@@ -2022,6 +2064,29 @@ class DAPOTrainer(BaseTrainer):
                     step=self.state.global_step,
                     epoch=self.state.epoch,
                 )
+
+                # Emit token-level MDI weight logs (markdown), not to wandb
+                try:
+                    if getattr(self.args, "mdi_token_log_enable", True):
+                        token_weights_list = extra_fields.get("token_weights") if isinstance(extra_fields, dict) else None
+                        if token_weights_list:
+                            tokenizer = getattr(self.processing_class, "tokenizer", None)
+                            if tokenizer is not None:
+                                emit_mdi_token_weight_logs(
+                                    tokenizer=tokenizer,
+                                    completion_ids_list=completion_ids_list,
+                                    token_weights_list=token_weights_list,
+                                    advantages_list=advantages.tolist(),
+                                    topk_ratio=float(getattr(self.args, "token_mdi_topk_ratio", 0.4)),
+                                    clip_min=float(getattr(self.args, "token_mdi_clip", (0.2, 3.0))[0]),
+                                    clip_max=float(getattr(self.args, "token_mdi_clip", (0.2, 3.0))[1]),
+                                    log_path=getattr(self.args, "mdi_token_log_path", None),
+                                    step=self.state.global_step,
+                                    epoch=self.state.epoch,
+                                    max_samples=int(getattr(self.args, "mdi_token_log_samples", 2)),
+                                )
+                except Exception:
+                    pass
             except Exception as e:
                 logger.warning(f"Failed to emit rollout logs: {e}")
 
@@ -2146,8 +2211,42 @@ class DAPOTrainer(BaseTrainer):
         if self.args.delta is not None:
             coef_1 = torch.clamp(coef_1, max=self.args.delta)
 
-        per_token_loss1 = coef_1 * advantages.unsqueeze(1)
-        per_token_loss2 = coef_2 * advantages.unsqueeze(1)
+        # Token-level MDI weighting: only affect policy gradient term, not KL/entropy
+        adv_matrix = advantages.unsqueeze(1)
+        if getattr(self.args, "token_mdi_weighting", False) and "token_weights" in inputs:
+            try:
+                token_weights = inputs["token_weights"].to(adv_matrix.device)
+                # Only amplify for non-negative advantages
+                nonneg_mask = (advantages >= 0).unsqueeze(1).to(token_weights.dtype)
+                # Top-k within each sequence
+                topk_ratio = float(getattr(self.args, "token_mdi_topk_ratio", 0.4))
+                B, T = token_weights.shape
+                # Build top-k mask per row using completion_mask
+                topk_mask = torch.zeros_like(token_weights, dtype=torch.bool)
+                for i in range(B):
+                    valid_len = int(completion_mask[i].sum().item())
+                    if valid_len <= 0:
+                        continue
+                    k = max(1, int(math.ceil(topk_ratio * valid_len)))
+                    scores = token_weights[i, :valid_len]
+                    if k >= valid_len:
+                        sel = torch.arange(valid_len, device=scores.device)
+                    else:
+                        sel = torch.topk(scores, k=k, dim=0).indices
+                    top = torch.zeros(valid_len, dtype=torch.bool, device=scores.device)
+                    top[sel] = True
+                    topk_mask[i, :valid_len] = top
+                # Fold back non-top tokens to <=1 (no amplification)
+                neutral_one = torch.ones_like(token_weights)
+                folded_weights = torch.where(topk_mask, token_weights, torch.minimum(token_weights, neutral_one))
+                # Do not amplify negative-adv sequences
+                folded_weights = neutral_one * (1 - nonneg_mask) + folded_weights * nonneg_mask
+                adv_matrix = adv_matrix * folded_weights
+            except Exception:
+                pass
+
+        per_token_loss1 = coef_1 * adv_matrix
+        per_token_loss2 = coef_2 * adv_matrix
         per_token_loss = -torch.min(per_token_loss1, per_token_loss2)
         if entropy_mask is not None:
             per_token_loss = per_token_loss * entropy_mask

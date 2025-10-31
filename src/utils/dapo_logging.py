@@ -328,6 +328,86 @@ def emit_eval_logs(
         print(f"⚠️  Warning: Failed to write to eval log file: {e}")
 
 
+def _decode_tokens(tokenizer, token_ids: List[int]) -> List[str]:
+    try:
+        # Decode token by token to preserve boundaries
+        return [tokenizer.decode([tid], skip_special_tokens=False) for tid in token_ids]
+    except Exception:
+        return [str(t) for t in token_ids]
+
+
+def emit_mdi_token_weight_logs(
+    tokenizer,
+    completion_ids_list: List[List[int]],
+    token_weights_list: List[List[float]],
+    advantages_list: List[float],
+    topk_ratio: float,
+    clip_min: float,
+    clip_max: float,
+    log_path: Optional[str] = None,
+    step: int = 0,
+    epoch: float = 0.0,
+    max_samples: int = 2,
+) -> None:
+    """将 token-level MDI 权重以自然语言高亮形式写入 markdown。
+
+    仅用于调试与可视化：高亮 Top-k 权重 token，记录优势 A_i、均值/方差、clip 比例等。
+    不依赖 wandb。
+    """
+    if not log_path:
+        log_path = os.path.join("training_logs", "mdi_token_weights.md")
+    os.makedirs(os.path.dirname(log_path), exist_ok=True)
+
+    try:
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        header = f"=== Token MDI Weights Step {step} ==="
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(f"\n## {header} | {ts}\n\n")
+
+            total = min(len(completion_ids_list), max_samples)
+            for i in range(total):
+                ids = completion_ids_list[i] if i < len(completion_ids_list) else []
+                weights = token_weights_list[i] if i < len(token_weights_list) else []
+                A_i = float(advantages_list[i]) if i < len(advantages_list) else 0.0
+
+                decoded = _decode_tokens(tokenizer, ids)
+                T = len(decoded)
+                if T == 0 or len(weights) == 0:
+                    f.write(f"### Sample {i+1}\n\n")
+                    f.write("No tokens or weights.\n\n---\n\n")
+                    continue
+
+                # 统计信息
+                import numpy as _np
+                w_arr = _np.array(weights, dtype=_np.float32)
+                mean_w = float(_np.mean(w_arr))
+                std_w = float(_np.std(w_arr))
+                clip_frac = float(_np.mean((w_arr <= clip_min) | (w_arr >= clip_max)))
+
+                k = max(1, int(_np.ceil(topk_ratio * T)))
+                topk_idx = _np.argsort(-w_arr)[:k]
+                topk_mask = _np.zeros(T, dtype=bool)
+                topk_mask[topk_idx] = True
+
+                # 高亮文本行：Top-k 用 **token**(w=..)
+                parts = []
+                for j, tok in enumerate(decoded):
+                    wv = float(weights[j]) if j < len(weights) else 1.0
+                    if A_i >= 0 and topk_mask[j]:
+                        parts.append(f"**{tok}**(w={wv:.2f})")
+                    else:
+                        parts.append(tok)
+                highlighted = "".join(parts)
+
+                f.write(f"### Sample {i+1}\n\n")
+                f.write(f"A_i = {A_i:.4f}, topk_ratio = {topk_ratio:.2f}, k = {k}, len = {T}\n\n")
+                f.write(f"weights: mean={mean_w:.3f}, std={std_w:.3f}, clip_frac={clip_frac:.3f} (clip=[{clip_min:.2f},{clip_max:.2f}])\n\n")
+                f.write("Completion (top-k highlighted):\n\n")
+                f.write(highlighted + "\n\n")
+                f.write("---\n\n")
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to write token MDI weight log file: {e}")
+
 def compute_real_mdi_metrics(
     sample_results: List[Any],
     skip_reasons: Optional[List[Optional[str]]] = None,
