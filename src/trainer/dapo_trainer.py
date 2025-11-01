@@ -2376,15 +2376,33 @@ class DAPOTrainer(BaseTrainer):
 
                 # Add images if present, sliced
                 if self._logs["images"]:
-                    images_col = []
-                    for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
-                        images_col.append([wandb.Image(image) for image in image_list])
-                    table["images"] = images_col
+                    try:
+                        images_col = []
+                        for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
+                            try:
+                                # Convert each image to wandb.Image, handling potential errors
+                                wandb_images = []
+                                for image in image_list:
+                                    try:
+                                        wandb_images.append(wandb.Image(image))
+                                    except Exception as e:
+                                        logger.warning(f"Failed to convert image to wandb.Image: {e}")
+                                images_col.append(wandb_images)
+                            except Exception as e:
+                                logger.warning(f"Failed to process image list at index {idx}: {e}")
+                                images_col.append([])
+                        table["images"] = images_col
+                    except Exception as e:
+                        logger.warning(f"Failed to add images to wandb table: {e}")
 
                 df = pd.DataFrame(table)
                 if self.wandb_log_unique_prompts:
                     df = df.drop_duplicates(subset=["prompt"])
-                wandb.log({"completions": wandb.Table(dataframe=df)})
+                
+                try:
+                    wandb.log({"completions": wandb.Table(dataframe=df)})
+                except Exception as e:
+                    logger.warning(f"Failed to log completions table to wandb: {e}")
 
     # Ensure the model card is saved along with the checkpoint
     def _save_checkpoint(self, model, trial):
