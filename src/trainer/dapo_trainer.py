@@ -301,7 +301,11 @@ class DAPOTrainer(BaseTrainer):
 
         # Processing class
         if processing_class is None:
-            processing_class = AutoProcessor.from_pretrained(get_config_model_id(model.config), truncation_side="left")
+            processing_class = AutoProcessor.from_pretrained(
+                get_config_model_id(model.config), 
+                truncation_side="left",
+                use_fast=False  # 强制使用 slow processor，避免图像 token 计算不一致
+            )
 
         # Handle pad token for processors or tokenizers
         if isinstance(processing_class, ProcessorMixin):
@@ -1677,7 +1681,25 @@ class DAPOTrainer(BaseTrainer):
         # Decode
         prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=False)
         # Model outputs kept as plain text (no special tokens)
-        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
+        # Filter out invalid token IDs that are out of vocabulary range
+        vocab_size = len(self.processing_class.tokenizer)
+        completion_ids_filtered = []
+        has_invalid_tokens = False
+        for batch_idx, ids in enumerate(completion_ids):
+            # Convert to list and filter out invalid token IDs
+            ids_list = ids.cpu().tolist() if torch.is_tensor(ids) else ids
+            invalid_ids = [id for id in ids_list if not (0 <= id < vocab_size)]
+            if invalid_ids:
+                has_invalid_tokens = True
+                if self.accelerator.is_main_process:
+                    print(f"[Warning] Found {len(invalid_ids)} invalid token IDs in batch {batch_idx}: {invalid_ids[:10]}")  # Show first 10
+            filtered_ids = [id for id in ids_list if 0 <= id < vocab_size]
+            completion_ids_filtered.append(filtered_ids)
+        
+        if has_invalid_tokens and self.accelerator.is_main_process:
+            print(f"[Warning] Vocabulary size: {vocab_size}, filtered invalid tokens before decoding")
+        
+        completions_text = self.processing_class.batch_decode(completion_ids_filtered, skip_special_tokens=True)
         if is_conversational(inputs[0]):
             completions = []
             for prompt, completion in zip(prompts, completions_text):
@@ -2376,33 +2398,15 @@ class DAPOTrainer(BaseTrainer):
 
                 # Add images if present, sliced
                 if self._logs["images"]:
-                    try:
-                        images_col = []
-                        for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
-                            try:
-                                # Convert each image to wandb.Image, handling potential errors
-                                wandb_images = []
-                                for image in image_list:
-                                    try:
-                                        wandb_images.append(wandb.Image(image))
-                                    except Exception as e:
-                                        logger.warning(f"Failed to convert image to wandb.Image: {e}")
-                                images_col.append(wandb_images)
-                            except Exception as e:
-                                logger.warning(f"Failed to process image list at index {idx}: {e}")
-                                images_col.append([])
-                        table["images"] = images_col
-                    except Exception as e:
-                        logger.warning(f"Failed to add images to wandb table: {e}")
+                    images_col = []
+                    for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
+                        images_col.append([wandb.Image(image) for image in image_list])
+                    table["images"] = images_col
 
                 df = pd.DataFrame(table)
                 if self.wandb_log_unique_prompts:
                     df = df.drop_duplicates(subset=["prompt"])
-                
-                try:
-                    wandb.log({"completions": wandb.Table(dataframe=df)})
-                except Exception as e:
-                    logger.warning(f"Failed to log completions table to wandb: {e}")
+                wandb.log({"completions": wandb.Table(dataframe=df)})
 
     # Ensure the model card is saved along with the checkpoint
     def _save_checkpoint(self, model, trial):
