@@ -70,6 +70,7 @@ import os
 
 import torch
 from datasets import load_dataset
+from PIL import Image
 
 from trl import (
     ModelConfig,
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     ################
     # Dataset
     ################
-    dataset = load_dataset("./DDM", split="train")
+    dataset = load_dataset("lujunxi57/DDM", split="train")
     dataset = dataset.train_test_split(test_size=0.1, seed=42)
 
     SYSTEM_PROMPT = (
@@ -130,14 +131,20 @@ if __name__ == "__main__":
         ]
         return {"prompt": prompt}
 
-    dataset = dataset.map(make_conversation)
+    dataset = dataset.map(make_conversation, num_proc=24)
 
-    # Filter overly large images (allow up to 1024x1024 inclusive)
-    def filter_big_images(example):
+    # Resize overly large images to fit within 1024x1024 (maintain aspect ratio)
+    def resize_large_images(example):
         image = example["image"]
-        return image.size[0] <= 1024 and image.size[1] <= 1024
+        width, height = image.size
+        # If either dimension exceeds 1024, resize to fit within 1024x1024
+        if width > 1024 or height > 1024:
+            # Use thumbnail to maintain aspect ratio, max size is 1024x1024
+            image.thumbnail((1024, 1024), resample=Image.LANCZOS)
+        example["image"] = image
+        return example
 
-    dataset = dataset.filter(filter_big_images)
+    dataset = dataset.map(resize_large_images)
 
     def convert_to_rgb(example):
         image = example["image"]
