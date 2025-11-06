@@ -9,7 +9,7 @@ import torch
 @dataclass
 class AttentionSegmentResult:
     """Attention metrics for a specific layer segment."""
-    mdi: float
+    vgr: float
     aei_text: float
     aei_vision: float
     attention_text: float
@@ -127,8 +127,10 @@ def _collect_llm_attention_for_sample(
     return result
 
 
-def _compute_mdi(attn_text: float, attn_vision: float, tokens_text: int, tokens_vision: int) -> float:
-    """Compute Modality Dominance Index: (attn_text/tokens_text) / (attn_vision/tokens_vision)."""
+# ----------------- 核心指标计算 -----------------
+
+def _compute_vgr(attn_text: float, attn_vision: float, tokens_text: int, tokens_vision: int) -> float:
+    """Compute Vision-Text Gain Ratio (VGR): (attn_text/tokens_text) / (attn_vision/tokens_vision)."""
     assert tokens_text > 0, "tokens_text must be > 0"
     assert tokens_vision >= 0, "tokens_vision must be >= 0"
     
@@ -137,12 +139,12 @@ def _compute_mdi(attn_text: float, attn_vision: float, tokens_text: int, tokens_
     
     text_ratio = attn_text / tokens_text
     vision_ratio = attn_vision / tokens_vision
-    mdi = text_ratio / vision_ratio
+    vgr = text_ratio / vision_ratio
     
-    if not (mdi > 0) or not (mdi < float("inf")):
+    if not (vgr > 0) or not (vgr < float("inf")):
         return float("nan")
     
-    return mdi
+    return vgr
 
 
 def _compute_aei(
@@ -327,11 +329,11 @@ def _compute_segment_metrics(
     num_instruction = int(instruction_mask.sum().item())
     num_vision = int(vision_mask.sum().item())
 
-    mdi = _compute_mdi(attn_text_avg, attn_vision_avg, max(num_instruction, 1), max(num_vision, 0))
+    vgr = _compute_vgr(attn_text_avg, attn_vision_avg, max(num_instruction, 1), max(num_vision, 0))
     aei_text = _compute_aei(attn_text_avg, attn_vision_avg, max(num_instruction, 0), max(num_vision, 0), "text")
     aei_vision = _compute_aei(attn_text_avg, attn_vision_avg, max(num_instruction, 0), max(num_vision, 0), "vision")
 
-    return AttentionSegmentResult(mdi, aei_text, aei_vision, attn_text_avg, attn_vision_avg)
+    return AttentionSegmentResult(vgr, aei_text, aei_vision, attn_text_avg, attn_vision_avg)
 
 
 def compute_qwen_attention_metrics_for_batch(

@@ -8,8 +8,9 @@ from .attention_metrics import (
 from .dapo_logging import (
     emit_rollout_logs,
     emit_eval_logs,
-    compute_real_mdi_metrics,
+    compute_real_vgr_metrics,
 )
+from .attention_token_weights import build_token_vgr_weights_for_batch
 
 __all__ = [
     # Attention metrics
@@ -21,5 +22,7 @@ __all__ = [
     # Logging
     "emit_rollout_logs",
     "emit_eval_logs", 
-    "compute_real_mdi_metrics",
+    "compute_real_vgr_metrics",
+    # Token weights
+    "build_token_vgr_weights_for_batch",
 ]

@@ -1,70 +1,3 @@
-# Copyright 2020-2025 The HuggingFace Team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-# /// script
-# dependencies = [
-#     "trl",
-#     "Pillow",
-#     "peft",
-#     "math-verify",
-#     "latex2sympy2_extended",
-#     "torchvision",
-#     "trackio",
-#     "kernels",
-# ]
-# ///
-
-"""
-pip install math_verify
-
-# For Qwen/Qwen2.5-VL-3B-Instruct
-accelerate launch \
-    --config_file examples/accelerate_configs/deepspeed_zero3.yaml \
-    examples/scripts/grpo_vlm.py \
-    --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-    --output_dir grpo-Qwen2.5-VL-3B-Instruct \
-    --learning_rate 1e-5 \
-    --gradient_checkpointing \
-    --dtype bfloat16 \
-    --max_prompt_length 2048 \
-    --max_completion_length 1024 \
-    --use_vllm \
-    --vllm_mode colocate \
-    --use_peft \
-    --lora_target_modules "q_proj", "v_proj" \
-    --log_completions
-
-# For HuggingFaceTB/SmolVLM2-2.2B-Instruct
-pip install num2words==0.5.14
-
-accelerate launch \
-    --config_file examples/accelerate_configs/deepspeed_zero3.yaml \
-    examples/scripts/grpo_vlm.py \
-    --model_name_or_path HuggingFaceTB/SmolVLM2-2.2B-Instruct \
-    --output_dir grpo-SmolVLM2-2.2B-Instruct \
-    --learning_rate 1e-5 \
-    --dtype bfloat16 \
-    --max_prompt_length 2048 \
-    --max_completion_length 1024 \
-    --use_peft \
-    --lora_target_modules "q_proj", "v_proj" \
-    --log_completions \
-    --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 2 \
-    --num_generations 2
-
-"""
 import sys
 import os
 
@@ -84,7 +17,7 @@ from trl import (
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.trainer import DAPOConfig, DAPOTrainer
-from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_punishment, mdi_reward, mdi_hard_negative
+from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_punishment, vgr_reward, vgr_hard_negative
 
 
 # Enable logging in a Hugging Face Space
@@ -112,7 +45,8 @@ if __name__ == "__main__":
     ################
     # Dataset
     ################
-    dataset = load_dataset("lujunxi57/DDM", split="train")
+    # dataset = load_dataset("lujunxi57/DDM", split="train")
+    dataset = load_dataset("./dataset/aokvqa_openr1", split="train")
     dataset = dataset.train_test_split(test_size=0.1, seed=42)
 
     SYSTEM_PROMPT = (
@@ -131,7 +65,7 @@ if __name__ == "__main__":
         ]
         return {"prompt": prompt}
 
-    dataset = dataset.map(make_conversation, num_proc=24)
+    dataset = dataset.map(make_conversation)
 
     # Resize overly large images to fit within 1024x1024 (maintain aspect ratio)
     def resize_large_images(example):
@@ -161,19 +95,17 @@ if __name__ == "__main__":
     ################
     # Training
     ################
-    # 创建length reward函数
     length_reward_func = get_soft_overlong_punishment(
         max_completion_len=training_args.max_completion_length,
         soft_punish_cache=training_args.soft_punish_cache
     )
     
-    # 选择使用哪一种 MDI 奖励
-    mdi_func = mdi_hard_negative if getattr(training_args, "mdi_hard_negative", False) else mdi_reward
+    vgr_func = vgr_hard_negative if getattr(training_args, "vgr_hard_negative", False) else vgr_reward
 
     trainer = DAPOTrainer(
         model=model_args.model_name_or_path,
         args=training_args,
-        reward_funcs=[accuracy_reward, mdi_func, think_format_reward, length_reward_func],
+        reward_funcs=[accuracy_reward, vgr_func, think_format_reward, length_reward_func],
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         peft_config=get_peft_config(model_args),

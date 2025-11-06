@@ -688,9 +688,9 @@ class DAPOConfig(TrainingArguments):
     )
 
     # --- Reward toggles ---
-    mdi_hard_negative: bool = field(
+    vgr_hard_negative: bool = field(
         default=False,
-        metadata={"help": "Enable MDI hard-negative reward: groupwise MDI mapping applied only to acc=1 samples."}
+        metadata={"help": "Enable VGR hard-negative reward: groupwise VGR mapping applied only to acc=1 samples."}
     )
 
     realtime_rollout_logging: bool = field(
@@ -717,6 +717,25 @@ class DAPOConfig(TrainingArguments):
     completion_preview_chars: int = field(
         default=2000,
         metadata={"help": "Number of characters to preview for completions in logs."}
+    )
+
+    # (Removed) per-step rollout files to avoid heavy I/O
+
+    token_weights: bool = field(
+        default=False,
+        metadata={"help": "启用 token 级 VGR 权重"},
+    )
+    token_weights_topk_ratio: float = field(
+        default=0.4,
+        metadata={"help": "token 权重放大时每序列 top-k 比例"},
+    )
+    token_weights_clip: tuple[float, float] = field(
+        default=(0.2, 3.0),
+        metadata={"help": "token 权重裁剪范围 (min,max)"},
+    )
+    token_weights_smooth_sigma: float = field(
+        default=0.0,
+        metadata={"help": "token 权重高斯平滑 sigma=0 关闭"},
     )
 
     def __post_init__(self):

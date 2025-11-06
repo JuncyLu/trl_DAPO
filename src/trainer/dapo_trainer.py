@@ -68,8 +68,9 @@ from ..utils.attention_metrics import (
     compute_qwen_attention_metrics_for_batch,
     AttentionSampleResult,
 )
+from ..utils import build_token_vgr_weights_for_batch
 from ..rewards.accuracy_rewards import accuracy_reward
-from ..utils.dapo_logging import emit_rollout_logs, emit_eval_logs, compute_real_mdi_metrics
+from ..utils.dapo_logging import emit_rollout_logs, emit_eval_logs, compute_real_vgr_metrics
 from contextlib import contextmanager
 from trl.trainer.utils import (
     RepeatSampler,
@@ -553,6 +554,9 @@ class DAPOTrainer(BaseTrainer):
         if self.compute_attention_metrics:
             self._logs["attention"] = deque(maxlen=1000)
             self._attention_skip_reasons = deque(maxlen=1000)
+        # Initialize token weights tracking (optional)
+        if getattr(args, "token_weights", False):
+            self._logs["token_weights"] = deque(maxlen=1000)
 
         # Ensure each process receives a unique seed to prevent duplicate completions when generating with
         # transformers if num_generations exceeds per_device_train_batch_size. We could skip it if we use vLLM, but
@@ -1121,16 +1125,16 @@ class DAPOTrainer(BaseTrainer):
                 else:
                     skip_slice = [None] * len(sample_results)
                     
-                mdi_metrics = compute_real_mdi_metrics(sample_results, skip_slice)
+                vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
                 
                 # Extract attention data for reward functions
                 # Use raw attention values (attention_text/attention_vision) not AEI values
-                reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in mdi_metrics]
-                reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in mdi_metrics]
-                reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in mdi_metrics]
-                reward_kwargs["num_vision_tokens"] = [m.get("num_vision_tokens", 0) for m in mdi_metrics]
+                reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in vgr_metrics]
+                reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in vgr_metrics]
+                reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in vgr_metrics]
+                reward_kwargs["num_vision_tokens"] = [m.get("num_vision_tokens", 0) for m in vgr_metrics]
 
-        # 计算逐样本准确率，并传递给奖励函数（供 mdi_accuracy_reward 使用）
+        # 计算逐样本准确率，并传递给奖励函数（供 vgr_accuracy_reward 使用）
         try:
             solutions_for_batch = reward_kwargs.get("solution", None)
             if solutions_for_batch is None:
@@ -1367,6 +1371,16 @@ class DAPOTrainer(BaseTrainer):
             else:
                 generate_inputs = self.processing_class(text=prompts, **processor_kwargs)
             generate_inputs["inputs"] = generate_inputs.pop("input_ids")
+
+            # 打印 prompt token 数统计，帮助排查 OOM
+            try:
+                _lens = [len(ids) for ids in generate_inputs["input_ids"]]
+                if _lens:
+                    _min, _max = min(_lens), max(_lens)
+                    _mean = sum(_lens) / len(_lens)
+                    print(f"[PromptToken] batch_size={len(_lens)} min/mean/max={_min}/{_mean:.1f}/{_max}")
+            except Exception:
+                pass
 
             with (
                 profiling_context(self, "transformers.generate_batch"),
@@ -1722,24 +1736,8 @@ class DAPOTrainer(BaseTrainer):
         # rewards_per_func to extract each process's subset.
         rewards_per_func = self._calculate_rewards(inputs, prompts, completions, completion_ids_list)
 
-        # 🔍 Debug: Print rewards_per_func before applying weights
-        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
-            print(f"\n🔍 [Reward计算] Step {self.state.global_step} - 各Reward函数的原始输出:")
-            for i, name in enumerate(self.reward_func_names):
-                print(f"   {name}: Mean={rewards_per_func[:, i].mean().item():.4f}, "
-                      f"Std={rewards_per_func[:, i].std().item():.4f}, "
-                      f"Min={rewards_per_func[:, i].min().item():.4f}, "
-                      f"Max={rewards_per_func[:, i].max().item():.4f}")
-
         # Apply weights to each reward function's output and sum using reward weight manager
         rewards = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
-        
-        # 🔍 Debug: Print weighted total rewards
-        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
-            print(f"\n🔍 [Reward加权] Step {self.state.global_step} - 加权后的总Reward:")
-            print(f"   Mean={rewards.mean().item():.4f}, Std={rewards.std().item():.4f}")
-            print(f"   Min={rewards.min().item():.4f}, Max={rewards.max().item():.4f}")
-            print(f"   前5个值: {rewards[:5].tolist()}")
 
         # Compute grouped-wise rewards
         group_ng = preferred_num_generations
@@ -1753,12 +1751,6 @@ class DAPOTrainer(BaseTrainer):
         # Normalize the rewards to compute the advantages
         mean_grouped_rewards = mean_grouped_rewards.repeat_interleave(group_ng, dim=0)
         advantages = rewards - mean_grouped_rewards
-        
-        # 🔍 Debug: Print advantages before scaling
-        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
-            print(f"\n🔍 [Advantage计算] Step {self.state.global_step} - 未归一化的Advantages (rewards - mean):")
-            print(f"   Mean={advantages.mean().item():.6f}, Std={advantages.std().item():.6f}")
-            print(f"   Min={advantages.min().item():.6f}, Max={advantages.max().item():.6f}")
 
         if self.scale_rewards in ["group", "none"]:
             # If self.scale_rewards = "none", we'll still log group level std
@@ -1775,130 +1767,8 @@ class DAPOTrainer(BaseTrainer):
         is_std_zero = torch.isclose(std_rewards, torch.zeros_like(std_rewards))
         if self.scale_rewards != "none":
             advantages = advantages / (std_rewards + 1e-4)
-        
-        # 🔍 Debug: Print advantages after scaling
-        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
-            print(f"\n🔍 [Advantage归一化] Step {self.state.global_step} - 归一化后的Advantages (除以std):")
-            print(f"   Mean={advantages.mean().item():.6f}, Std={advantages.std().item():.6f}")
-            print(f"   Min={advantages.min().item():.6f}, Max={advantages.max().item():.6f}")
-        
-        # Print detailed advantage information for debugging
-        if self.accelerator.is_main_process and mode == "train":
-            print("\n" + "="*80)
-            print(f"🎯 Advantage 分析 (Step {self.state.global_step})")
-            print("="*80)
-            
-            # Group-wise analysis
-            rewards_grouped = rewards.view(-1, group_ng)
-            advantages_grouped = advantages.view(-1, group_ng)
-            mean_rewards_grouped = mean_grouped_rewards.view(-1, group_ng)
-            
-            for group_idx in range(min(3, rewards_grouped.size(0))):  # Show first 3 groups
-                print(f"\n📦 Group {group_idx}:")
-                print(f"  Group Mean Reward: {mean_rewards_grouped[group_idx, 0].item():.4f}")
-                print(f"  Group Reward Std: {rewards_grouped[group_idx].std().item():.4f}")
-                
-                # Get sorted indices by reward for ranking
-                group_rewards = rewards_grouped[group_idx]
-                sorted_indices = torch.argsort(group_rewards, descending=True)
-                rank_map = {sorted_indices[i].item(): i+1 for i in range(len(sorted_indices))}
-                
-                for comp_idx in range(group_ng):
-                    idx = group_idx * group_ng + comp_idx
-                    reward_val = rewards[idx].item()
-                    adv_val = advantages[idx].item()
-                    label = "✅ 加分" if adv_val > 0 else "❌ 减分" if adv_val < 0 else "⚪ 中性"
-                    rank = rank_map.get(comp_idx, "?")
-                    
-                    # Show completion preview if available
-                    comp_preview = ""
-                    try:
-                        if idx < len(completions_text):
-                            comp_text = completions_text[idx]
-                            if isinstance(comp_text, list) and len(comp_text) > 0:
-                                comp_text = comp_text[0].get("content", "") if isinstance(comp_text[0], dict) else str(comp_text[0])
-                            comp_str = str(comp_text).strip()
-                            # Shorten preview, replace newlines with spaces
-                            comp_str = comp_str.replace('\n', ' ')
-                            comp_preview = f" | Preview: {comp_str[:80]}..." if len(comp_str) > 80 else f" | Preview: {comp_str}"
-                        else:
-                            comp_preview = f" | Preview: [索引{idx}超出范围，总长度{len(completions_text)}]"
-                    except Exception as e:
-                        comp_preview = f" | Preview: [错误: {str(e)[:30]}]"
-                    print(f"    Completion {comp_idx} [排名{rank}/{group_ng}]: Reward={reward_val:.4f}, Adv={adv_val:.4f} {label}{comp_preview}")
-            
-            # Overall statistics
-            positive_advs = (advantages > 0).sum().item()
-            negative_advs = (advantages < 0).sum().item()
-            zero_advs = (advantages == 0).sum().item()
-            total_advs = advantages.numel()
-            
-            print(f"\n📊 总体统计:")
-            print(f"  ✅ 加分样例: {positive_advs}/{total_advs} ({100*positive_advs/total_advs:.1f}%)")
-            print(f"  ❌ 减分样例: {negative_advs}/{total_advs} ({100*negative_advs/total_advs:.1f}%)")
-            print(f"  ⚪ 中性样例: {zero_advs}/{total_advs} ({100*zero_advs/total_advs:.1f}%)")
-            print(f"  Advantage 范围: [{advantages.min().item():.4f}, {advantages.max().item():.4f}]")
-            print(f"  平均 Advantage: {advantages.mean().item():.4f}")
-            print("="*80 + "\n")
-            
-            # Save detailed rollout results to a markdown file
-            try:
-                import os
-                rollout_dir = os.path.join(self.args.output_dir, "rollout_logs")
-                os.makedirs(rollout_dir, exist_ok=True)
-                rollout_file = os.path.join(rollout_dir, f"rollout_step_{self.state.global_step}.md")
-                
-                with open(rollout_file, "w", encoding="utf-8") as f:
-                    f.write(f"# Rollout Results - Step {self.state.global_step}\n\n")
-                    f.write(f"## Overall Statistics\n\n")
-                    f.write(f"- ✅ 加分样例: {positive_advs}/{total_advs} ({100*positive_advs/total_advs:.1f}%)\n")
-                    f.write(f"- ❌ 减分样例: {negative_advs}/{total_advs} ({100*negative_advs/total_advs:.1f}%)\n")
-                    f.write(f"- ⚪ 中性样例: {zero_advs}/{total_advs} ({100*zero_advs/total_advs:.1f}%)\n")
-                    f.write(f"- Advantage 范围: [{advantages.min().item():.4f}, {advantages.max().item():.4f}]\n")
-                    f.write(f"- 平均 Advantage: {advantages.mean().item():.4f}\n\n")
-                    
-                    f.write(f"## Detailed Completions\n\n")
-                    
-                    # Write all groups
-                    for group_idx in range(rewards_grouped.size(0)):
-                        f.write(f"### Group {group_idx}\n\n")
-                        f.write(f"**Group Mean Reward:** {mean_rewards_grouped[group_idx, 0].item():.4f}\n\n")
-                        f.write(f"**Group Reward Std:** {rewards_grouped[group_idx].std().item():.4f}\n\n")
-                        
-                        # Get sorted indices by reward for ranking
-                        group_rewards = rewards_grouped[group_idx]
-                        sorted_indices = torch.argsort(group_rewards, descending=True)
-                        rank_map = {sorted_indices[i].item(): i+1 for i in range(len(sorted_indices))}
-                        
-                        for comp_idx in range(group_ng):
-                            idx = group_idx * group_ng + comp_idx
-                            reward_val = rewards[idx].item()
-                            adv_val = advantages[idx].item()
-                            label = "✅ 加分" if adv_val > 0 else "❌ 减分" if adv_val < 0 else "⚪ 中性"
-                            rank = rank_map.get(comp_idx, "?")
-                            
-                            f.write(f"#### {label} Completion {comp_idx} [排名 {rank}/{group_ng}]\n\n")
-                            f.write(f"- **Reward:** {reward_val:.4f}\n")
-                            f.write(f"- **Advantage:** {adv_val:.4f}\n")
-                            f.write(f"- **组内排名:** {rank}/{group_ng}\n")
-                            
-                            # Write completion text
-                            if idx < len(completions_text):
-                                comp_text = completions_text[idx]
-                                if isinstance(comp_text, list) and len(comp_text) > 0:
-                                    comp_text = comp_text[0].get("content", "") if isinstance(comp_text[0], dict) else str(comp_text[0])
-                                f.write(f"- **Completion:**\n```\n{comp_text}\n```\n\n")
-                            
-                            # Write prompt for first completion in group
-                            if comp_idx == 0 and idx < len(prompts):
-                                prompt_text = prompts[idx] if isinstance(prompts[idx], str) else str(prompts[idx])
-                                f.write(f"- **Prompt:**\n```\n{prompt_text}\n```\n\n")
-                        
-                        f.write("\n---\n\n")
-                
-                print(f"💾 Rollout结果已保存到: {rollout_file}")
-            except Exception as e:
-                print(f"⚠️ 保存rollout结果时出错: {e}")
+
+        # Removed detailed per-step rollout file writing to avoid heavy I/O and potential blocking.
 
         # Slice to keep only the local part of the data
         process_slice = slice(
@@ -1975,17 +1845,26 @@ class DAPOTrainer(BaseTrainer):
                 nanmax(self.accelerator.gather(max_importance_sampling_ratio)).item()
             )
 
-        # 🔍 Debug: Print advantages after computation (before passing to loss)
-        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
-            print(f"\n🔍 [Advantage生成] Step {self.state.global_step} - 计算完成后的Advantages:")
-            print(f"   Shape: {advantages.shape}")
-            print(f"   Mean: {advantages.mean().item():.6f}")
-            print(f"   Std: {advantages.std().item():.6f}")
-            print(f"   Min: {advantages.min().item():.6f}, Max: {advantages.max().item():.6f}")
-            print(f"   前5个值: {advantages[:5].tolist()}")
-            print(f"   正值数量: {(advantages > 0).sum().item()}/{advantages.numel()}")
-            print(f"   对应的Rewards - Mean: {rewards[process_slice].mean().item():.4f}")
-            print(f"   对应的Group Mean Rewards - Mean: {mean_grouped_rewards[process_slice].mean().item():.4f}\n")
+        # Optional: fetch token_weights for this batch and shape to (B, T)
+        token_weights_tensor = None
+        try:
+            if getattr(self.args, "token_weights", False) and self.compute_attention_metrics and "token_weights" in self._logs:
+                tw_all = list(self._logs["token_weights"]) if isinstance(self._logs.get("token_weights"), deque) else []
+                if tw_all:
+                    last_tw = tw_all[-len(prompts):] if len(tw_all) >= len(prompts) else []
+                    if last_tw and len(last_tw) == len(prompts):
+                        T = completion_ids.size(1)
+                        tw_tensors = []
+                        for w in last_tw:
+                            w = w or []
+                            t = torch.ones(T, dtype=torch.float32, device=device)
+                            n = min(len(w), T)
+                            if n > 0:
+                                t[:n] = torch.tensor(w[:n], dtype=torch.float32, device=device)
+                            tw_tensors.append(t)
+                        token_weights_tensor = torch.stack(tw_tensors, dim=0)
+        except Exception:
+            token_weights_tensor = None
 
         output = {
             "prompt_ids": prompt_ids,
@@ -2013,6 +1892,8 @@ class DAPOTrainer(BaseTrainer):
             output["token_type_ids"] = forward_kwargs["token_type_ids"]
         if images is not None:
             output["num_images"] = num_images
+        if token_weights_tensor is not None:
+            output["token_weights"] = token_weights_tensor
 
         # --- Dynamic sampling replay buffer integration ---
         # Only apply during training; evaluation may generate a different number of completions per prompt
@@ -2157,14 +2038,19 @@ class DAPOTrainer(BaseTrainer):
                         output["old_per_token_logps"] = old_per_token_logps
                     if ref_per_token_logps is not None:
                         output["ref_per_token_logps"] = ref_per_token_logps
+                    
+                    # Clear token_weights after replay buffer replacement to avoid shape mismatch
+                    # Replay samples may have different completion lengths than the original batch
+                    if "token_weights" in output:
+                        output["token_weights"] = None
 
         # Emit rollout logs if enabled
         if (self.accelerator.is_main_process and 
             getattr(self.args, "realtime_rollout_logging", False) and 
             mode == "train"):
             try:
-                # Get MDI info for logging
-                mdi_info = []
+                # Get VGR info for logging
+                vgr_info = []
                 if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
                     att_list = list(self._logs['attention'])
                     if att_list:
@@ -2176,7 +2062,7 @@ class DAPOTrainer(BaseTrainer):
                             )
                         else:
                             skip_slice = [None] * len(sample_results)
-                        mdi_info = compute_real_mdi_metrics(sample_results, skip_slice)
+                        vgr_info = compute_real_vgr_metrics(sample_results, skip_slice)
                 
                 # Get solutions if available
                 solutions = [inp.get("solution", "") for inp in inputs]
@@ -2190,6 +2076,22 @@ class DAPOTrainer(BaseTrainer):
                     log_prompts_text = prompts_text
                 log_completions_text = completions_text
                 
+                # Prepare advantages for summary log
+                advantages_for_log = None
+                adv_local = advantages  # already sliced earlier to local process
+                # Compute token-weighted advantage proxy if token weights available
+                try:
+                    if getattr(self.args, "token_weights", False) and token_weights_tensor is not None:
+                        tw_local = token_weights_tensor[process_slice]
+                        cm_local = completion_mask[process_slice].float()
+                        valid = cm_local.sum(dim=1).clamp(min=1.0)
+                        mean_w = (tw_local * cm_local).sum(dim=1) / valid
+                        advantages_for_log = (adv_local * mean_w).detach().cpu().tolist()
+                    else:
+                        advantages_for_log = adv_local.detach().cpu().tolist()
+                except Exception:
+                    advantages_for_log = None
+
                 # Call rollout logging
                 emit_rollout_logs(
                     prompts_text=log_prompts_text,
@@ -2198,14 +2100,61 @@ class DAPOTrainer(BaseTrainer):
                     rewards_per_func_local=rewards_per_func[process_slice],
                     total_rewards_local=rewards[process_slice],
                     reward_names=self.reward_func_names,
-                    mdi_info=mdi_info,
+                    vgr_info=vgr_info,
                     log_path=getattr(self.args, "rollout_log_path", None),
                     prompt_preview_chars=getattr(self.args, "prompt_preview_chars", 2000),
                     completion_preview_chars=getattr(self.args, "completion_preview_chars", 2000),
-                    mdi_as_coefficient=getattr(self.args, "mdi_as_coefficient", 0),
+                    vgr_as_coefficient=getattr(self.args, "vgr_as_coefficient", 0),
                     step=self.state.global_step,
                     epoch=self.state.epoch,
+                    advantages_local=advantages_for_log,
                 )
+                # Append token weights section to the same rollout log file
+                if getattr(self.args, "token_weights", False) and token_weights_tensor is not None:
+                    from ..utils.dapo_logging import emit_token_weights_logs
+                    emit_token_weights_logs(
+                        token_weights=token_weights_tensor,
+                        log_path=getattr(self.args, "rollout_log_path", None),
+                        step=self.state.global_step,
+                        epoch=self.state.epoch,
+                    )
+                    # Also emit per-token annotation for a small preview set
+                    try:
+                        tokenizer = getattr(self.processing_class, "tokenizer", None)
+                        if tokenizer is not None:
+                            # Use local tensors directly (do NOT slice by global process_slice)
+                            local_ids = completion_ids
+                            local_mask = completion_mask
+                            local_w = token_weights_tensor
+                            token_strs: list[list[str]] = []
+                            token_wts: list[list[float]] = []
+                            for i in range(local_ids.size(0)):
+                                valid_len = int(local_mask[i].sum().item())
+                                if valid_len <= 0:
+                                    token_strs.append([])
+                                    token_wts.append([])
+                                    continue
+                                ids_i = local_ids[i, :valid_len].detach().cpu().tolist()
+                                toks = tokenizer.convert_ids_to_tokens(ids_i, skip_special_tokens=False)
+                                token_strs.append([str(t) for t in toks])
+                                token_wts.append(local_w[i, :valid_len].detach().cpu().tolist())
+                            from ..utils.dapo_logging import emit_tokenwise_weights
+                            # 单独的 token 权重文件：与 rollout 同目录，文件名 token_weights.md
+                            rollout_path = getattr(self.args, "rollout_log_path", None)
+                            if rollout_path:
+                                import os as _os
+                                token_log_path = _os.path.join(_os.path.dirname(rollout_path), "token_weights.md")
+                            else:
+                                token_log_path = None  # 由 emit_tokenwise_weights 内部默认到 training_logs/token_weights.md
+                            emit_tokenwise_weights(
+                                token_strings=token_strs,
+                                token_weights=token_wts,
+                                log_path=token_log_path,
+                                step=self.state.global_step,
+                                epoch=self.state.epoch,
+                            )
+                    except Exception:
+                        pass
             except Exception as e:
                 logger.warning(f"Failed to emit rollout logs: {e}")
 
@@ -2302,16 +2251,6 @@ class DAPOTrainer(BaseTrainer):
         # Compute the loss
         advantages = inputs["advantages"]
         
-        # 🔍 Debug: Print advantages used in loss computation
-        if self.accelerator.is_main_process and self.state.global_step % 10 == 0:
-            print(f"\n🔍 [Loss计算] Step {self.state.global_step} - 使用的Advantages:")
-            print(f"   Shape: {advantages.shape}")
-            print(f"   Mean: {advantages.mean().item():.6f}")
-            print(f"   Std: {advantages.std().item():.6f}")
-            print(f"   Min: {advantages.min().item():.6f}, Max: {advantages.max().item():.6f}")
-            print(f"   前5个值: {advantages[:5].tolist()}")
-            print(f"   正值数量: {(advantages > 0).sum().item()}/{advantages.numel()}")
-        
         # When num_iterations == 1 and steps_per_generation <= gradient_accumulation_steps,
         # old_per_token_logps == per_token_logps. In this case we can skip its computation
         # (see _generate_and_score_completions) and instead use per_token_logps.detach().
@@ -2341,8 +2280,18 @@ class DAPOTrainer(BaseTrainer):
         if self.args.delta is not None:
             coef_1 = torch.clamp(coef_1, max=self.args.delta)
 
-        per_token_loss1 = coef_1 * advantages.unsqueeze(1)
-        per_token_loss2 = coef_2 * advantages.unsqueeze(1)
+        # Integrate token-level weighting into advantages (apply to all tokens)
+        if getattr(self.args, "token_weights", False) and ("token_weights" in inputs) and (inputs["token_weights"] is not None):
+            try:
+                token_weights_tensor = inputs["token_weights"].to(coef_1.device)
+                adv_matrix = advantages.unsqueeze(1) * token_weights_tensor
+            except Exception:
+                adv_matrix = advantages.unsqueeze(1)
+        else:
+            adv_matrix = advantages.unsqueeze(1)
+
+        per_token_loss1 = coef_1 * adv_matrix
+        per_token_loss2 = coef_2 * adv_matrix
         per_token_loss = -torch.min(per_token_loss1, per_token_loss2)
         if entropy_mask is not None:
             per_token_loss = per_token_loss * entropy_mask
@@ -2403,6 +2352,7 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode]["clip_ratio/high_max"].append(nanmax(gathered_high_clip).item())
         gathered_clip_ratio = self.accelerator.gather(clip_ratio)
         self._metrics[mode]["clip_ratio/region_mean"].append(gathered_clip_ratio.nanmean().item())
+
         return loss
 
     def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys: Optional[list[str]] = None):
@@ -2438,16 +2388,16 @@ class DAPOTrainer(BaseTrainer):
                 # Rewards line
                 r_acc = logs.get("rewards/accuracy_reward/mean", logs.get("eval_rewards/accuracy_reward/mean"))
                 r_fmt = logs.get("rewards/think_format_reward/mean", logs.get("eval_rewards/think_format_reward/mean"))
-                # Prefer new MDI reward key; fall back to legacy additive key if present
-                r_mdi = logs.get("rewards/mdi_reward/mean", logs.get("eval_rewards/mdi_reward/mean"))
-                if r_mdi is None:
-                    r_mdi = logs.get("rewards/mdi_reward_as_additive/mean", logs.get("eval_rewards/mdi_reward_as_additive/mean"))
+                # Prefer new VGR reward key; fall back to legacy additive key if present
+                r_vgr = logs.get("rewards/vgr_reward/mean", logs.get("eval_rewards/vgr_reward/mean"))
+                if r_vgr is None:
+                    r_vgr = logs.get("rewards/vgr_reward_as_additive/mean", logs.get("eval_rewards/vgr_reward_as_additive/mean"))
                 r_len = logs.get("rewards/soft_overlong_punishment_reward/mean", logs.get("eval_rewards/soft_overlong_punishment_reward/mean"))
                 r_total = logs.get("reward", logs.get("eval_reward"))
                 rewards_line = []
                 if r_acc is not None: rewards_line.append(f"acc={r_acc:.3f}")
                 if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
-                if r_mdi is not None: rewards_line.append(f"mdi={r_mdi:.3f}")
+                if r_vgr is not None: rewards_line.append(f"vgr={r_vgr:.3f}")
                 if r_len is not None: rewards_line.append(f"len={r_len:.3f}")
                 if r_total is not None: rewards_line.append(f"total={r_total:.3f}")
                 if rewards_line:
@@ -2471,17 +2421,17 @@ class DAPOTrainer(BaseTrainer):
                     print("Optim:   " + ", ".join(loss_line))
 
                 # Attention line
-                a_early = logs.get("attention/early/mdi", logs.get("eval_attention/early/mdi"))
-                a_mid = logs.get("attention/middle/mdi", logs.get("eval_attention/middle/mdi"))
-                a_late = logs.get("attention/late/mdi", logs.get("eval_attention/late/mdi"))
-                a_all = logs.get("attention/all/mdi", logs.get("eval_attention/all/mdi"))
+                a_early = logs.get("attention/early/vgr", logs.get("eval_attention/early/vgr"))
+                a_mid = logs.get("attention/middle/vgr", logs.get("eval_attention/middle/vgr"))
+                a_late = logs.get("attention/late/vgr", logs.get("eval_attention/late/vgr"))
+                a_all = logs.get("attention/all/vgr", logs.get("eval_attention/all/vgr"))
                 attn_line = []
                 if a_early is not None: attn_line.append(f"early={a_early:.3f}")
                 if a_mid is not None: attn_line.append(f"middle={a_mid:.3f}")
                 if a_late is not None: attn_line.append(f"late={a_late:.3f}")
                 if a_all is not None: attn_line.append(f"all={a_all:.3f}")
                 if attn_line:
-                    print("MDI:     " + ", ".join(attn_line))
+                    print("VGR:     " + ", ".join(attn_line))
 
                 # Emit evaluation markdown logs: ChatML prompt + plain completion
                 if mode == "eval":
@@ -2703,6 +2653,25 @@ class DAPOTrainer(BaseTrainer):
                 sample_results = sample_results_tuple
                 skip_reasons = [None] * len(sample_results)
 
+            # Optional: build token-level weights from attention (for loss weighting)
+            try:
+                if getattr(self.args, "token_weights", False):
+                    tw_list, _tw_debug = build_token_vgr_weights_for_batch(
+                        outputs_attentions=outputs.attentions,
+                        input_ids=input_ids,
+                        sequences=sequences,
+                        processor=self.processing_class,
+                        image_grid_thw=image_grid_thw_cpu,
+                        exclude_special=True,
+                        smooth_sigma=float(getattr(self.args, "token_weights_smooth_sigma", 0.0)),
+                        clip_range=tuple(getattr(self.args, "token_weights_clip", (0.2, 3.0))),
+                    )
+                    if isinstance(self._logs.get("token_weights"), deque) and tw_list:
+                        # Extend per-sample to keep alignment with later slicing by latest B items
+                        self._logs["token_weights"].extend(tw_list)
+            except Exception:
+                pass
+
             # Free attention tensors quickly to avoid memory bloat
             outputs.attentions = None
             attention_context["outputs"] = None
@@ -2742,22 +2711,22 @@ class DAPOTrainer(BaseTrainer):
             return
 
         for segment in segments:
-            mdi_vals = []
+            vgr_vals = []
             aei_text_vals = []
             aei_vision_vals = []
             for _, result in valid_results:
                 seg = result.segments.get(segment)
                 if seg is None:
                     continue
-                mdi_vals.append(seg.mdi)
+                vgr_vals.append(seg.vgr)
                 aei_text_vals.append(seg.aei_text)
                 aei_vision_vals.append(seg.aei_vision)
 
-            if mdi_vals:
-                mdi_tensor = torch.tensor(mdi_vals, device=device, dtype=torch.float32)
-                mdi_tensor = torch.where(torch.isfinite(mdi_tensor), mdi_tensor, torch.full_like(mdi_tensor, float("nan")))
-                gathered_mdi = self.accelerator.gather(mdi_tensor)
-                self._metrics[mode][f"attention/{segment}/mdi"].append(torch.nanmean(gathered_mdi).item())
+            if vgr_vals:
+                vgr_tensor = torch.tensor(vgr_vals, device=device, dtype=torch.float32)
+                vgr_tensor = torch.where(torch.isfinite(vgr_tensor), vgr_tensor, torch.full_like(vgr_tensor, float("nan")))
+                gathered_vgr = self.accelerator.gather(vgr_tensor)
+                self._metrics[mode][f"attention/{segment}/vgr"].append(torch.nanmean(gathered_vgr).item())
 
             if aei_text_vals:
                 aei_text_tensor = torch.tensor(aei_text_vals, device=device, dtype=torch.float32)

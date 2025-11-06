@@ -15,10 +15,10 @@
 from typing import List
 
 
-def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
+def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     """
-    基于组内分位数归一化的 MDI 奖励函数。
-    - MDI 越小表示注意力越平衡，映射到更高的奖励
+    基于组内分位数归一化的 VGR (Vision-Text Gain Ratio) 奖励函数。
+    - VGR 越小表示注意力越平衡，映射到更高的奖励
     - 在同一 prompt 的多次采样内进行分位数归一化
     - 分位差不足时返回中性奖励 0.5
     
@@ -48,29 +48,29 @@ def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     if m == 0:
         return [0.5] * n
     
-    # 计算每个样本的 MDI 值
+    # 计算每个样本的 VGR 值
     eps = 1e-6
-    mdi_values = []
+    vgr_values = []
     for i in range(m):
         try:
             a_t, a_o = float(A_T[i]), float(A_O[i])
             t, o = int(N_T[i]), int(N_O[i])
             
             if t <= 0 or o <= 0:
-                mdi_values.append(None)
+                vgr_values.append(None)
                 continue
             
             text_density = a_t / t
             vision_density = a_o / o
             
             if vision_density <= eps:
-                mdi_values.append(None)
+                vgr_values.append(None)
                 continue
             
-            mdi = text_density / vision_density
-            mdi_values.append(mdi)
+            vgr = text_density / vision_density
+            vgr_values.append(vgr)
         except Exception:
-            mdi_values.append(None)
+            vgr_values.append(None)
     
     # 按 num_generations 分组
     if num_generations <= 1:
@@ -86,20 +86,20 @@ def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     for group_idx in range(num_groups):
         start_idx = group_idx * num_generations
         end_idx = start_idx + num_generations
-        group_mdis = mdi_values[start_idx:end_idx]
+        group_vgrs = vgr_values[start_idx:end_idx]
         
         # 过滤掉 None 值
-        valid_mdis = [x for x in group_mdis if x is not None]
-        group_size = len(valid_mdis)
+        valid_vgrs = [x for x in group_vgrs if x is not None]
+        group_size = len(valid_vgrs)
         
         # 判断分位差是否充足
         if group_size < 3:
             # 样本太少，返回 0.5
-            rewards.extend([0.5] * len(group_mdis))
+            rewards.extend([0.5] * len(group_vgrs))
             continue
         
         # 计算 IQR 和中位数，确定分位数位置
-        sorted_mdis = sorted(valid_mdis)
+        sorted_vgrs = sorted(valid_vgrs)
         
         if group_size < 10:
             # 样本少，用 Q75-Q25
@@ -110,32 +110,32 @@ def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
             q_lo_idx = int(group_size * 0.10)
             q_hi_idx = int(group_size * 0.90)
         
-        q_lo = sorted_mdis[q_lo_idx]
-        q_hi = sorted_mdis[q_hi_idx]
+        q_lo = sorted_vgrs[q_lo_idx]
+        q_hi = sorted_vgrs[q_hi_idx]
         iqr = q_hi - q_lo
-        median = sorted_mdis[group_size // 2]
+        median = sorted_vgrs[group_size // 2]
         
         # 判断分位差是否充足
         threshold = max(alpha_abs, beta_rel * median)
         if iqr < threshold:
             # 分位差不足
-            rewards.extend([0.5] * len(group_mdis))
+            rewards.extend([0.5] * len(group_vgrs))
             continue
         
         # 分位差充足，使用分位数进行归一化
         # 检查分母是否过小（兜底保护）
         if iqr <= eps:
             # 即使通过了阈值判定，分母仍可能为0，统一返回0.5
-            rewards.extend([0.5] * len(group_mdis))
+            rewards.extend([0.5] * len(group_vgrs))
             continue
         
-        # 使用分位数映射：s = clip((Q_hi - MDI) / (Q_hi - Q_lo), 0, 1)
-        # MDI 越小 -> (Q_hi - MDI) 越大 -> s 越大（奖励越高）
-        for mdi in group_mdis:
-            if mdi is None:
+        # 使用分位数映射：s = clip((Q_hi - VGR) / (Q_hi - Q_lo), 0, 1)
+        # VGR 越小 -> (Q_hi - VGR) 越大 -> s 越大（奖励越高）
+        for vgr in group_vgrs:
+            if vgr is None:
                 rewards.append(0.5)
             else:
-                normalized = (q_hi - mdi) / iqr
+                normalized = (q_hi - vgr) / iqr
                 # clip 到 [0, 1]
                 normalized = max(0.0, min(1.0, normalized))
                 rewards.append(float(normalized))
@@ -154,10 +154,10 @@ def mdi_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     return rewards
 
 
-def mdi_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
+def vgr_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
     """
-    基于组内分位数归一化的 MDI 奖惩（第二版）：
-    - 组内分位数映射仍基于「所有样本」的 MDI（与 mdi_reward 一致）
+    基于组内分位数归一化的 VGR 奖惩（第二版）：
+    - 组内分位数映射仍基于「所有样本」的 VGR（与 vgr_reward 一致）
     - 但最终只对 acc=1 的样本应用该映射，acc=0 的样本返回 0（中性）
     - 将 [0, 1] 线性平移为 [-0.5, 0.5] 作为奖惩值
 
@@ -192,29 +192,29 @@ def mdi_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
     if m == 0:
         return [0.0] * n
 
-    # 计算每个样本的 MDI 值
+    # 计算每个样本的 VGR 值
     eps = 1e-6
-    mdi_values: List[float] = []
+    vgr_values: List[float] = []
     for i in range(m):
         try:
             a_t, a_o = float(A_T[i]), float(A_O[i])
             t, o = int(N_T[i]), int(N_O[i])
 
             if t <= 0 or o <= 0:
-                mdi_values.append(None)  # type: ignore
+                vgr_values.append(None)  # type: ignore
                 continue
 
             text_density = a_t / t
             vision_density = a_o / o
 
             if vision_density <= eps:
-                mdi_values.append(None)  # type: ignore
+                vgr_values.append(None)  # type: ignore
                 continue
 
-            mdi = text_density / vision_density
-            mdi_values.append(mdi)
+            vgr = text_density / vision_density
+            vgr_values.append(vgr)
         except Exception:
-            mdi_values.append(None)  # type: ignore
+            vgr_values.append(None)  # type: ignore
 
     # 按 num_generations 分组
     if num_generations <= 1:
@@ -230,21 +230,21 @@ def mdi_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
     for group_idx in range(num_groups):
         start_idx = group_idx * num_generations
         end_idx = start_idx + num_generations
-        group_mdis = mdi_values[start_idx:end_idx]
+        group_vgrs = vgr_values[start_idx:end_idx]
         group_accs = accuracies[start_idx:end_idx]
 
-        # 先基于「所有样本的有效 MDI」做分位统计
-        valid_mdis_all = [x for x in group_mdis if x is not None]
-        group_size_all = len(valid_mdis_all)
+        # 先基于「所有样本的有效 VGR」做分位统计
+        valid_vgrs_all = [x for x in group_vgrs if x is not None]
+        group_size_all = len(valid_vgrs_all)
 
-        group_rewards = [0.0] * len(group_mdis)  # 默认中性 0
+        group_rewards = [0.0] * len(group_vgrs)  # 默认中性 0
 
         if group_size_all < 3:
             # 样本太少，无法稳定分位归一化：acc=1 也返回 0；acc=0 本就为 0
             rewards.extend(group_rewards)
             continue
 
-        sorted_mdis = sorted(valid_mdis_all)
+        sorted_vgrs = sorted(valid_vgrs_all)
         if group_size_all < 10:
             q_lo_idx = int(group_size_all * 0.25)
             q_hi_idx = int(group_size_all * 0.75)
@@ -252,10 +252,10 @@ def mdi_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
             q_lo_idx = int(group_size_all * 0.10)
             q_hi_idx = int(group_size_all * 0.90)
 
-        q_lo = sorted_mdis[q_lo_idx]
-        q_hi = sorted_mdis[q_hi_idx]
+        q_lo = sorted_vgrs[q_lo_idx]
+        q_hi = sorted_vgrs[q_hi_idx]
         iqr = q_hi - q_lo
-        median = sorted_mdis[group_size_all // 2]
+        median = sorted_vgrs[group_size_all // 2]
 
         threshold = max(alpha_abs, beta_rel * median)
         if iqr < threshold or iqr <= eps:
@@ -263,13 +263,13 @@ def mdi_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
             rewards.extend(group_rewards)
             continue
 
-        # 组内对所有样本先计算映射值（基于所有样本的 MDI），但只赋给 acc=1
+        # 组内对所有样本先计算映射值（基于所有样本的 VGR），但只赋给 acc=1
         mapped_values = []
-        for mdi in group_mdis:
-            if mdi is None:
+        for vgr in group_vgrs:
+            if vgr is None:
                 mapped_values.append(None)
             else:
-                normalized = (q_hi - mdi) / iqr  # 映射到 [0, 1]
+                normalized = (q_hi - vgr) / iqr  # 映射到 [0, 1]
                 normalized = max(0.0, min(1.0, float(normalized)))
                 mapped = normalized - 0.5  # 平移到 [-0.5, 0.5]
                 # clip 到 [-0.5, 0.5]
