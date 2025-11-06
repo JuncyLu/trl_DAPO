@@ -1722,8 +1722,24 @@ class DAPOTrainer(BaseTrainer):
         # rewards_per_func to extract each process's subset.
         rewards_per_func = self._calculate_rewards(inputs, prompts, completions, completion_ids_list)
 
+        # 🔍 Debug: Print rewards_per_func before applying weights
+        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
+            print(f"\n🔍 [Reward计算] Step {self.state.global_step} - 各Reward函数的原始输出:")
+            for i, name in enumerate(self.reward_func_names):
+                print(f"   {name}: Mean={rewards_per_func[:, i].mean().item():.4f}, "
+                      f"Std={rewards_per_func[:, i].std().item():.4f}, "
+                      f"Min={rewards_per_func[:, i].min().item():.4f}, "
+                      f"Max={rewards_per_func[:, i].max().item():.4f}")
+
         # Apply weights to each reward function's output and sum using reward weight manager
         rewards = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
+        
+        # 🔍 Debug: Print weighted total rewards
+        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
+            print(f"\n🔍 [Reward加权] Step {self.state.global_step} - 加权后的总Reward:")
+            print(f"   Mean={rewards.mean().item():.4f}, Std={rewards.std().item():.4f}")
+            print(f"   Min={rewards.min().item():.4f}, Max={rewards.max().item():.4f}")
+            print(f"   前5个值: {rewards[:5].tolist()}")
 
         # Compute grouped-wise rewards
         group_ng = preferred_num_generations
@@ -1737,6 +1753,12 @@ class DAPOTrainer(BaseTrainer):
         # Normalize the rewards to compute the advantages
         mean_grouped_rewards = mean_grouped_rewards.repeat_interleave(group_ng, dim=0)
         advantages = rewards - mean_grouped_rewards
+        
+        # 🔍 Debug: Print advantages before scaling
+        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
+            print(f"\n🔍 [Advantage计算] Step {self.state.global_step} - 未归一化的Advantages (rewards - mean):")
+            print(f"   Mean={advantages.mean().item():.6f}, Std={advantages.std().item():.6f}")
+            print(f"   Min={advantages.min().item():.6f}, Max={advantages.max().item():.6f}")
 
         if self.scale_rewards in ["group", "none"]:
             # If self.scale_rewards = "none", we'll still log group level std
@@ -1753,6 +1775,130 @@ class DAPOTrainer(BaseTrainer):
         is_std_zero = torch.isclose(std_rewards, torch.zeros_like(std_rewards))
         if self.scale_rewards != "none":
             advantages = advantages / (std_rewards + 1e-4)
+        
+        # 🔍 Debug: Print advantages after scaling
+        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
+            print(f"\n🔍 [Advantage归一化] Step {self.state.global_step} - 归一化后的Advantages (除以std):")
+            print(f"   Mean={advantages.mean().item():.6f}, Std={advantages.std().item():.6f}")
+            print(f"   Min={advantages.min().item():.6f}, Max={advantages.max().item():.6f}")
+        
+        # Print detailed advantage information for debugging
+        if self.accelerator.is_main_process and mode == "train":
+            print("\n" + "="*80)
+            print(f"🎯 Advantage 分析 (Step {self.state.global_step})")
+            print("="*80)
+            
+            # Group-wise analysis
+            rewards_grouped = rewards.view(-1, group_ng)
+            advantages_grouped = advantages.view(-1, group_ng)
+            mean_rewards_grouped = mean_grouped_rewards.view(-1, group_ng)
+            
+            for group_idx in range(min(3, rewards_grouped.size(0))):  # Show first 3 groups
+                print(f"\n📦 Group {group_idx}:")
+                print(f"  Group Mean Reward: {mean_rewards_grouped[group_idx, 0].item():.4f}")
+                print(f"  Group Reward Std: {rewards_grouped[group_idx].std().item():.4f}")
+                
+                # Get sorted indices by reward for ranking
+                group_rewards = rewards_grouped[group_idx]
+                sorted_indices = torch.argsort(group_rewards, descending=True)
+                rank_map = {sorted_indices[i].item(): i+1 for i in range(len(sorted_indices))}
+                
+                for comp_idx in range(group_ng):
+                    idx = group_idx * group_ng + comp_idx
+                    reward_val = rewards[idx].item()
+                    adv_val = advantages[idx].item()
+                    label = "✅ 加分" if adv_val > 0 else "❌ 减分" if adv_val < 0 else "⚪ 中性"
+                    rank = rank_map.get(comp_idx, "?")
+                    
+                    # Show completion preview if available
+                    comp_preview = ""
+                    try:
+                        if idx < len(completions_text):
+                            comp_text = completions_text[idx]
+                            if isinstance(comp_text, list) and len(comp_text) > 0:
+                                comp_text = comp_text[0].get("content", "") if isinstance(comp_text[0], dict) else str(comp_text[0])
+                            comp_str = str(comp_text).strip()
+                            # Shorten preview, replace newlines with spaces
+                            comp_str = comp_str.replace('\n', ' ')
+                            comp_preview = f" | Preview: {comp_str[:80]}..." if len(comp_str) > 80 else f" | Preview: {comp_str}"
+                        else:
+                            comp_preview = f" | Preview: [索引{idx}超出范围，总长度{len(completions_text)}]"
+                    except Exception as e:
+                        comp_preview = f" | Preview: [错误: {str(e)[:30]}]"
+                    print(f"    Completion {comp_idx} [排名{rank}/{group_ng}]: Reward={reward_val:.4f}, Adv={adv_val:.4f} {label}{comp_preview}")
+            
+            # Overall statistics
+            positive_advs = (advantages > 0).sum().item()
+            negative_advs = (advantages < 0).sum().item()
+            zero_advs = (advantages == 0).sum().item()
+            total_advs = advantages.numel()
+            
+            print(f"\n📊 总体统计:")
+            print(f"  ✅ 加分样例: {positive_advs}/{total_advs} ({100*positive_advs/total_advs:.1f}%)")
+            print(f"  ❌ 减分样例: {negative_advs}/{total_advs} ({100*negative_advs/total_advs:.1f}%)")
+            print(f"  ⚪ 中性样例: {zero_advs}/{total_advs} ({100*zero_advs/total_advs:.1f}%)")
+            print(f"  Advantage 范围: [{advantages.min().item():.4f}, {advantages.max().item():.4f}]")
+            print(f"  平均 Advantage: {advantages.mean().item():.4f}")
+            print("="*80 + "\n")
+            
+            # Save detailed rollout results to a markdown file
+            try:
+                import os
+                rollout_dir = os.path.join(self.args.output_dir, "rollout_logs")
+                os.makedirs(rollout_dir, exist_ok=True)
+                rollout_file = os.path.join(rollout_dir, f"rollout_step_{self.state.global_step}.md")
+                
+                with open(rollout_file, "w", encoding="utf-8") as f:
+                    f.write(f"# Rollout Results - Step {self.state.global_step}\n\n")
+                    f.write(f"## Overall Statistics\n\n")
+                    f.write(f"- ✅ 加分样例: {positive_advs}/{total_advs} ({100*positive_advs/total_advs:.1f}%)\n")
+                    f.write(f"- ❌ 减分样例: {negative_advs}/{total_advs} ({100*negative_advs/total_advs:.1f}%)\n")
+                    f.write(f"- ⚪ 中性样例: {zero_advs}/{total_advs} ({100*zero_advs/total_advs:.1f}%)\n")
+                    f.write(f"- Advantage 范围: [{advantages.min().item():.4f}, {advantages.max().item():.4f}]\n")
+                    f.write(f"- 平均 Advantage: {advantages.mean().item():.4f}\n\n")
+                    
+                    f.write(f"## Detailed Completions\n\n")
+                    
+                    # Write all groups
+                    for group_idx in range(rewards_grouped.size(0)):
+                        f.write(f"### Group {group_idx}\n\n")
+                        f.write(f"**Group Mean Reward:** {mean_rewards_grouped[group_idx, 0].item():.4f}\n\n")
+                        f.write(f"**Group Reward Std:** {rewards_grouped[group_idx].std().item():.4f}\n\n")
+                        
+                        # Get sorted indices by reward for ranking
+                        group_rewards = rewards_grouped[group_idx]
+                        sorted_indices = torch.argsort(group_rewards, descending=True)
+                        rank_map = {sorted_indices[i].item(): i+1 for i in range(len(sorted_indices))}
+                        
+                        for comp_idx in range(group_ng):
+                            idx = group_idx * group_ng + comp_idx
+                            reward_val = rewards[idx].item()
+                            adv_val = advantages[idx].item()
+                            label = "✅ 加分" if adv_val > 0 else "❌ 减分" if adv_val < 0 else "⚪ 中性"
+                            rank = rank_map.get(comp_idx, "?")
+                            
+                            f.write(f"#### {label} Completion {comp_idx} [排名 {rank}/{group_ng}]\n\n")
+                            f.write(f"- **Reward:** {reward_val:.4f}\n")
+                            f.write(f"- **Advantage:** {adv_val:.4f}\n")
+                            f.write(f"- **组内排名:** {rank}/{group_ng}\n")
+                            
+                            # Write completion text
+                            if idx < len(completions_text):
+                                comp_text = completions_text[idx]
+                                if isinstance(comp_text, list) and len(comp_text) > 0:
+                                    comp_text = comp_text[0].get("content", "") if isinstance(comp_text[0], dict) else str(comp_text[0])
+                                f.write(f"- **Completion:**\n```\n{comp_text}\n```\n\n")
+                            
+                            # Write prompt for first completion in group
+                            if comp_idx == 0 and idx < len(prompts):
+                                prompt_text = prompts[idx] if isinstance(prompts[idx], str) else str(prompts[idx])
+                                f.write(f"- **Prompt:**\n```\n{prompt_text}\n```\n\n")
+                        
+                        f.write("\n---\n\n")
+                
+                print(f"💾 Rollout结果已保存到: {rollout_file}")
+            except Exception as e:
+                print(f"⚠️ 保存rollout结果时出错: {e}")
 
         # Slice to keep only the local part of the data
         process_slice = slice(
@@ -1789,6 +1935,10 @@ class DAPOTrainer(BaseTrainer):
             self._logs["rewards"][name].extend(rewards_per_func[:, i].tolist())
         self._logs["rewards"]["total"].extend(rewards.tolist())
         self._logs["advantages"].extend(all_process_advantages.tolist())
+        # Also log mean rewards for each group (for better understanding of advantages)
+        if "mean_reward" not in self._logs:
+            self._logs["mean_reward"] = deque(maxlen=self.args.generation_batch_size)
+        self._logs["mean_reward"].extend(mean_grouped_rewards.tolist())
 
         if images is not None:
             self._logs["images"].extend(gather_object(images))
@@ -1824,6 +1974,18 @@ class DAPOTrainer(BaseTrainer):
             self._metrics[mode]["sampling/importance_sampling_ratio/max"].append(
                 nanmax(self.accelerator.gather(max_importance_sampling_ratio)).item()
             )
+
+        # 🔍 Debug: Print advantages after computation (before passing to loss)
+        if self.accelerator.is_main_process and mode == "train" and self.state.global_step % 10 == 0:
+            print(f"\n🔍 [Advantage生成] Step {self.state.global_step} - 计算完成后的Advantages:")
+            print(f"   Shape: {advantages.shape}")
+            print(f"   Mean: {advantages.mean().item():.6f}")
+            print(f"   Std: {advantages.std().item():.6f}")
+            print(f"   Min: {advantages.min().item():.6f}, Max: {advantages.max().item():.6f}")
+            print(f"   前5个值: {advantages[:5].tolist()}")
+            print(f"   正值数量: {(advantages > 0).sum().item()}/{advantages.numel()}")
+            print(f"   对应的Rewards - Mean: {rewards[process_slice].mean().item():.4f}")
+            print(f"   对应的Group Mean Rewards - Mean: {mean_grouped_rewards[process_slice].mean().item():.4f}\n")
 
         output = {
             "prompt_ids": prompt_ids,
@@ -2139,6 +2301,17 @@ class DAPOTrainer(BaseTrainer):
 
         # Compute the loss
         advantages = inputs["advantages"]
+        
+        # 🔍 Debug: Print advantages used in loss computation
+        if self.accelerator.is_main_process and self.state.global_step % 10 == 0:
+            print(f"\n🔍 [Loss计算] Step {self.state.global_step} - 使用的Advantages:")
+            print(f"   Shape: {advantages.shape}")
+            print(f"   Mean: {advantages.mean().item():.6f}")
+            print(f"   Std: {advantages.std().item():.6f}")
+            print(f"   Min: {advantages.min().item():.6f}, Max: {advantages.max().item():.6f}")
+            print(f"   前5个值: {advantages[:5].tolist()}")
+            print(f"   正值数量: {(advantages > 0).sum().item()}/{advantages.numel()}")
+        
         # When num_iterations == 1 and steps_per_generation <= gradient_accumulation_steps,
         # old_per_token_logps == per_token_logps. In this case we can skip its computation
         # (see _generate_and_score_completions) and instead use per_token_logps.detach().
@@ -2394,7 +2567,24 @@ class DAPOTrainer(BaseTrainer):
                     table[k] = vals[:n_rows]
 
                 # Add advantages, sliced
-                table["advantage"] = list(self._logs["advantages"])[:n_rows]
+                advantages_list = list(self._logs["advantages"])[:n_rows]
+                table["advantage"] = advantages_list
+                
+                # Add mean rewards for context
+                if "mean_reward" in self._logs:
+                    mean_rewards_list = list(self._logs["mean_reward"])[:n_rows]
+                    table["mean_reward"] = mean_rewards_list
+                
+                # Add advantage labels for easy identification
+                advantage_labels = []
+                for adv in advantages_list:
+                    if adv > 0:
+                        advantage_labels.append("✅ 加分")
+                    elif adv < 0:
+                        advantage_labels.append("❌ 减分")
+                    else:
+                        advantage_labels.append("⚪ 中性")
+                table["advantage_label"] = advantage_labels
 
                 # Add images if present, sliced
                 if self._logs["images"]:

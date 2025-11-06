@@ -111,8 +111,8 @@ if __name__ == "__main__":
     ################
     # Dataset
     ################
-    dataset = load_dataset("./aokvqa_openr1_small", split="train")
-    dataset = dataset.train_test_split(test_size=100, seed=42)
+    dataset = load_dataset("./DDM", split="train")
+    dataset = dataset.train_test_split(test_size=0.1, seed=42)
 
     SYSTEM_PROMPT = (
         "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the "

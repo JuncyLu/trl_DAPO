@@ -27,20 +27,20 @@ accelerate launch \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
   --max_completion_length 384 \
-  --per_device_train_batch_size 4 \
+  --per_device_train_batch_size 8 \
   --gradient_accumulation_steps 4 \
   --num_generations 8 \
-  --num_train_epochs 1 \
+  --num_train_epochs 2 \
   --report_to wandb \
   --log_completions \
   --logging_steps 1.0 \
   --do_eval \
   --eval_strategy steps \
   --eval_steps 10 \
-  --eval_num_generations 2 \
-  --per_device_eval_batch_size 4 \
+  --eval_num_generations 4 \
+  --per_device_eval_batch_size 8 \
   --save_strategy steps \
-  --save_steps 500 \
+  --save_steps 400 \
   --learning_rate 1e-5 \
   --lr_scheduler_type cosine \
   --warmup_ratio 0.05 \
@@ -51,8 +51,6 @@ accelerate launch \
   --replay_var_epsilon 1e-6 \
   --reward_weights 2.5 1.0 0.5 1.0 \
   --early_reward_weights 1.0 1.0 2.0 1.0 \
-  --use_peft \
-  --lora_target_modules "q_proj", "v_proj" \
   >> training_logs/$TS/train.log 2>&1
 
     # --use_vllm \
