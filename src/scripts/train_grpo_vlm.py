@@ -22,6 +22,7 @@ from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_
 
 # Enable logging in a Hugging Face Space
 os.environ.setdefault("TRACKIO_SPACE_ID", "trl-trackio")
+os.environ.setdefault("WANDB_HTTP_TIMEOUT", "60")
 
 
 if __name__ == "__main__":

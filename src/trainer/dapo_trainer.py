@@ -2483,7 +2483,10 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode].clear()
 
         if self.accelerator.is_main_process and self.log_completions:
-            # 注释掉终端打印，只保留wandb记录
+            # 注释掉 wandb table 记录，避免网络超时和数据量过大问题
+            # 只保留 metrics 曲线图记录（通过 super().log() 自动记录）
+            pass
+            # 注释掉终端打印
             # if is_rich_available():
             #     print_prompt_completions_sample(
             #         self._logs["prompt"],
@@ -2494,59 +2497,60 @@ class DAPOTrainer(BaseTrainer):
             #         self.num_completions_to_print,
             #     )
 
-            if self.args.report_to and "wandb" in self.args.report_to and wandb.run is not None:
-                import pandas as pd
+            # 注释掉详细的 wandb table 记录
+            # if self.args.report_to and "wandb" in self.args.report_to and wandb.run is not None:
+            #     import pandas as pd
 
-                # Wandb: ChatML prompt + plain completion
-                prompts_wb = list(self._logs.get("prompt_chatml", [])) or list(self._logs.get("prompt", []))
-                completions_wb = list(self._logs.get("completion", []))
+            #     # Wandb: ChatML prompt + plain completion
+            #     prompts_wb = list(self._logs.get("prompt_chatml", [])) or list(self._logs.get("prompt", []))
+            #     completions_wb = list(self._logs.get("completion", []))
 
-                n_rows = min(len(prompts_wb), len(completions_wb))
-                prompts_wb = prompts_wb[:n_rows]
-                completions_wb = completions_wb[:n_rows]
+            #     n_rows = min(len(prompts_wb), len(completions_wb))
+            #     prompts_wb = prompts_wb[:n_rows]
+            #     completions_wb = completions_wb[:n_rows]
 
-                table = {
-                    "step": [str(self.state.global_step)] * n_rows,
-                    "prompt": prompts_wb,
-                    "completion": completions_wb,
-                }
+            #     table = {
+            #         "step": [str(self.state.global_step)] * n_rows,
+            #         "prompt": prompts_wb,
+            #         "completion": completions_wb,
+            #     }
 
-                # Add rewards columns, sliced to n_rows for consistency
-                for k, v in self._logs["rewards"].items():
-                    vals = list(v)
-                    table[k] = vals[:n_rows]
+            #     # Add rewards columns, sliced to n_rows for consistency
+            #     for k, v in self._logs["rewards"].items():
+            #         vals = list(v)
+            #         table[k] = vals[:n_rows]
 
-                # Add advantages, sliced
-                advantages_list = list(self._logs["advantages"])[:n_rows]
-                table["advantage"] = advantages_list
+            #     # Add advantages, sliced
+            #     advantages_list = list(self._logs["advantages"])[:n_rows]
+            #     table["advantage"] = advantages_list
                 
-                # Add mean rewards for context
-                if "mean_reward" in self._logs:
-                    mean_rewards_list = list(self._logs["mean_reward"])[:n_rows]
-                    table["mean_reward"] = mean_rewards_list
+            #     # Add mean rewards for context
+            #     if "mean_reward" in self._logs:
+            #         mean_rewards_list = list(self._logs["mean_reward"])[:n_rows]
+            #         table["mean_reward"] = mean_rewards_list
                 
-                # Add advantage labels for easy identification
-                advantage_labels = []
-                for adv in advantages_list:
-                    if adv > 0:
-                        advantage_labels.append("✅ 加分")
-                    elif adv < 0:
-                        advantage_labels.append("❌ 减分")
-                    else:
-                        advantage_labels.append("⚪ 中性")
-                table["advantage_label"] = advantage_labels
+            #     # Add advantage labels for easy identification
+            #     advantage_labels = []
+            #     for adv in advantages_list:
+            #         if adv > 0:
+            #             advantage_labels.append("✅ 加分")
+            #         elif adv < 0:
+            #             advantage_labels.append("❌ 减分")
+            #         else:
+            #             advantage_labels.append("⚪ 中性")
+            #     table["advantage_label"] = advantage_labels
 
-                # Add images if present, sliced
-                if self._logs["images"]:
-                    images_col = []
-                    for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
-                        images_col.append([wandb.Image(image) for image in image_list])
-                    table["images"] = images_col
+            #     # Add images if present, sliced
+            #     if self._logs["images"]:
+            #         images_col = []
+            #         for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
+            #             images_col.append([wandb.Image(image) for image in image_list])
+            #         table["images"] = images_col
 
-                df = pd.DataFrame(table)
-                if self.wandb_log_unique_prompts:
-                    df = df.drop_duplicates(subset=["prompt"])
-                wandb.log({"completions": wandb.Table(dataframe=df)})
+            #     df = pd.DataFrame(table)
+            #     if self.wandb_log_unique_prompts:
+            #         df = df.drop_duplicates(subset=["prompt"])
+            #     wandb.log({"completions": wandb.Table(dataframe=df)})
 
     # Ensure the model card is saved along with the checkpoint
     def _save_checkpoint(self, model, trial):
