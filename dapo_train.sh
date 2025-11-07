@@ -19,8 +19,8 @@ export CUDA_LAUNCH_BLOCKING=1
 accelerate launch \
   --config_file src/configs/deepspeed_zero2.yaml \
   src/scripts/train_grpo_vlm.py \
-  --model_name_or_path Qwen/Qwen2.5-VL-7B-Instruct \
-  --output_dir training_logs/$TS/runs/dapo-Qwen2.5-VL-7B-Instruct \
+  --model_name_or_path OpenGVLab/InternVL2-7B \
+  --output_dir training_logs/$TS/runs/dapo-InternVL2-7B \
   --rollout_log_path training_logs/$TS/rollout_results.md \
   --eval_log_path training_logs/$TS/eval_results.md \
   --dtype bfloat16 \

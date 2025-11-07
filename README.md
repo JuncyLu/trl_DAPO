@@ -1,10 +1,15 @@
-# DAPO VLM Training
+# DAPO‑VLM：多模态强化学习训练（含注意力度量与 Token 权重）
 
-This repository has been refactored to provide a minimal, focused implementation for DAPO (Data-Augmented Policy Optimization) VLM training. The following structure is optimized for training vision-language models with DAPO.
+一个专注于视觉‑语言模型（VLM）的 DAPO（Data‑Augmented Policy Optimization）训练实现，内置注意力度量（VGR/AEI）与基于注意力的 token 级加权，支持多选题对话数据的 GRPO/DAPO 训练与清晰日志。
 
-## Quick Start
+## 安装与快速开始
 
-### Directory Structure
+### 安装
+
+- 开发安装：`pip install -e .[dev]`
+- 可选日志后端：`pip install wandb`
+
+### 目录结构（简）
 
 ```
 .
@@ -47,80 +52,62 @@ This repository has been refactored to provide a minimal, focused implementation
 └── README.md                         # This file
 ```
 
-### Training Command
+### 训练命令
 
 ```bash
-# Activate conda environment
-conda activate trl
-
-# Run training
-./dapo_train.sh
+# 一键脚本
+bash dapo_train.sh
 ```
 
-Or manually:
+或自定义：
 
 ```bash
 accelerate launch \
     --config_file src/configs/deepspeed_zero2.yaml \
     src/scripts/train_grpo_vlm.py \
-    --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-    --output_dir runs/dapo-Qwen2.5-VL-3B-Instruct-$(date +%Y%m%d_%H%M%S) \
-    --learning_rate 5e-5 \
+    --model_name_or_path Qwen/Qwen2.5-VL-7B-Instruct \
+    --output_dir training_logs/$(date +%Y%m%d_%H%M%S)/runs/dapo \
+    --learning_rate 1e-5 \
     --gradient_checkpointing \
     --dtype bfloat16 \
-    --max_prompt_length 2048 \
-    --max_completion_length 512 \
+    --max_prompt_length 1024 \
+    --max_completion_length 384 \
     --report_to wandb \
     --do_eval \
     --log_completions \
     --logging_steps 1.0 \
     --eval_strategy steps \
     --eval_steps 10 \
-    --per_device_eval_batch_size 4 \
+    --per_device_eval_batch_size 8 \
     --gradient_accumulation_steps 8 \
-    --num_generations 4
+    --num_generations 8
 ```
 
-## Refactoring Summary
+## 项目优势（简要）
 
-This minimal version removes:
-- All unused trainer implementations (DPO, PPO, SFT, etc.)
-- Example scripts and notebooks
-- Test files
-- Experimental features
-- Unused reward functions
-- Documentation and templates
+- Token 级注意力加权（无 Top‑K、全 token 覆盖）
+  - 损失函数在 token 级直接乘以注意力导出的权重（VGR→1/(VGR+eps)→均值归一→裁剪/可选平滑），更精细地强化关键 token。
+- 注意力度量与对齐
+  - 计算 VGR/AEI 与 early/middle/late/all 分段指标，支持 Qwen‑VL 特殊符号解析；日志清晰可读。
+- DAPO/GRPO 系列损失健壮
+  - 默认 DAPO 归一化消除长度偏置，支持 GRPO/BNPO/DR‑GRPO；截断样本可屏蔽计入损失。
+- 动态采样与稳定性
+  - 可选重放缓冲，按“方差与均值阈值”替换低信息组；奖励权重支持“早期/常规”两阶段切换。
+- 日志可解释性强
+  - rollout 总览 + token_weights 独立文件；逐 token 权重按“词(权重)”直观串联，便于人工审阅。
 
-**File count reduction**: ~200+ files → ~168 files (16% reduction)
+## 日志与数据
 
-All removed files are preserved in the `archive/` directory for easy rollback.
+- 日志文件：
+  - 总览：`training_logs/<TS>/rollout_results.md`
+  - 逐 token：`training_logs/<TS>/token_weights.md`
+- 数据：默认从 `lujunxi57/DDM` 读取（已标准化为 image/problem/solution）
+- 消融：`experiment1.sh` ~ `experiment5.sh`（第 5 个仅启用 token 权重、关闭 VGR 奖励）
 
-## Key Changes
+## 注意事项
 
-- **DAPO Focus**: Renamed GRPO to DAPO (Data-Augmented Policy Optimization) and moved to `src/dapo/`
-- **Centralized Source**: All main code moved to `src/` directory for better organization
-- **Minimal TRL**: Kept only essential TRL components needed for DAPO training
-- **Clean Separation**: Clear separation between DAPO-specific code and TRL utilities
-
-## Requirements
-
-- Python 3.11+
-- PyTorch 2.0+
-- Transformers 4.49+
-- Accelerate
-- DeepSpeed
-- Wandb (for logging)
-
-## Installation
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd trl
-
-# Install in development mode
-pip install -e .
-```
+- 需注意力输出的功能（VGR/Token 权重）必须走常规 `transformers.generate` 路径；vLLM/paged 不产出 attentions，将自动回退未加权、VGR 奖励置中性。
+- 为避免 I/O 阻塞，已移除逐步明细大日志，仅保留总览与逐 token 文件。
 
 ## License
 
