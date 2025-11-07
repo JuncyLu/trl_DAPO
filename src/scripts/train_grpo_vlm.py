@@ -24,6 +24,9 @@ from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_
 os.environ.setdefault("TRACKIO_SPACE_ID", "trl-trackio")
 os.environ.setdefault("WANDB_HTTP_TIMEOUT", "60")
 
+# Set wandb to offline mode (no network requests)
+# os.environ["WANDB_MODE"] = "offline"  # Uncomment to enable offline mode
+
 
 if __name__ == "__main__":
     parser = TrlParser((ScriptArguments, DAPOConfig, ModelConfig))
@@ -46,9 +49,9 @@ if __name__ == "__main__":
     ################
     # Dataset
     ################
-    # dataset = load_dataset("lujunxi57/DDM", split="train")
+    # dataset = load_dataset("lujunxi57/DMD", split="train")
     dataset = load_dataset("./dataset/aokvqa_openr1", split="train")
-    dataset = dataset.train_test_split(test_size=0.1, seed=42)
+    dataset = dataset.train_test_split(test_size=100, seed=42)
 
     SYSTEM_PROMPT = (
         "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the "

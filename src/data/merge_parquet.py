@@ -8,7 +8,7 @@ python src/data/merge_parquet.py \
   --inputs dataset/aokvqa_openr1/train/train-00000-of-00001.parquet \
            dataset/visrag_arxivqa_openr1/train/train-00000-of-00001.parquet \
            dataset/mmmu_pro_4opt_openr1/train/standard_4_options_test-00000-of-00001.parquet \
-  --output DDM/train/train-00000-of-00001.parquet
+  --output DMD/train/train-00000-of-00001.parquet
 """
 
 import os

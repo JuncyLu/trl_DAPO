@@ -16,6 +16,7 @@ import ast
 from typing import Any, List
 
 from datasets import load_dataset, Dataset, Features, Value, Image
+from PIL import Image as PILImage
 from tqdm import tqdm
 
 DS_NAME = "MMMU/MMMU_Pro"
@@ -66,6 +67,26 @@ def pick_solution(answer: str, choices: List[str]) -> str:
             return chr(65 + i)
     return answer.strip()
 
+def resize_image(img, max_size=1024):
+    if img is None:
+        return None
+    if isinstance(img, PILImage.Image):
+        pil_img = img
+    elif hasattr(img, 'convert'):
+        pil_img = img.convert('RGB')
+    else:
+        return None
+    width, height = pil_img.size
+    if max(width, height) <= max_size:
+        return pil_img
+    if width > height:
+        new_width = max_size
+        new_height = int(height * max_size / width)
+    else:
+        new_height = max_size
+        new_width = int(width * max_size / height)
+    return pil_img.resize((new_width, new_height), PILImage.Resampling.LANCZOS)
+
 def convert_split(subset: str, split: str, out_dir: str) -> int:
     print(f"[INFO] Loading {DS_NAME} (subset={subset}, split={split})")
     ds = load_dataset(DS_NAME, subset, split=split)
@@ -77,11 +98,15 @@ def convert_split(subset: str, split: str, out_dir: str) -> int:
     written = 0
 
     for ex in tqdm(ds, desc=f"Converting {subset}/{split}"):
-        img = None
+        images = []
         for k in [f"image_{i}" for i in range(1, 8)] + ["image"]:
             if k in ex and ex[k] is not None:
-                img = ex[k]
-                break
+                images.append(ex[k])
+        
+        if len(images) != 1:
+            continue
+        
+        img = resize_image(images[0])
         if img is None:
             continue
 
@@ -90,6 +115,9 @@ def convert_split(subset: str, split: str, out_dir: str) -> int:
         answer = ex.get("answer", "")
 
         problem = format_problem(question, options)
+        if len(problem) > 700:
+            continue
+        
         solution = pick_solution(answer, options)
 
         records.append({

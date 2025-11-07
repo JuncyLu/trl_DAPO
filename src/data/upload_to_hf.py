@@ -5,8 +5,8 @@
 Upload Parquet dataset to Hugging Face Hub.
 
 python src/data/upload_to_hf.py \
-  --dataset_path DDM/train/train-00000-of-00001.parquet \
-  --repo_id lujunxi57/DDM \
+  --dataset_path DMD/train/train-00000-of-00001.parquet \
+  --repo_id lujunxi57/DMD \
   --split train
 """
 

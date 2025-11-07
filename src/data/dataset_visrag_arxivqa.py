@@ -6,15 +6,17 @@ Convert openbmb/VisRAG-Ret-Test-ArxivQA to parquet with embedded images.
 Output columns: image, problem, solution.
 
 python src/data/dataset_visrag_arxivqa.py \
-  --out_dir ./visrag_arxivqa_openr1 \
+  --out_dir ./dataset/visrag_arxivqa_openr1 \
   --split train
 """
 
 import os
 import argparse
+import re
 from typing import Any, List
 
 from datasets import load_dataset, Dataset, Features, Value, Image
+from PIL import Image as PILImage
 from tqdm import tqdm
 
 DS_NAME = "openbmb/VisRAG-Ret-Test-ArxivQA"
@@ -28,6 +30,20 @@ def to_list(x: Any) -> List[str]:
     if isinstance(x, list):
         return [str(i) for i in x]
     return [str(x)]
+
+def clean_choices(choices: List[str]) -> List[str]:
+    cleaned = []
+    for c in choices:
+        s = str(c).strip()
+        if not s or s == "-" or s.startswith("##"):
+            continue
+        s = re.sub(r'^[A-Z][\)\.]\s+', '', s)
+        s = re.sub(r'^[A-Z]\s+', '', s)
+        s = s.strip()
+        if not s or s == "-" or s.startswith("##"):
+            continue
+        cleaned.append(s)
+    return cleaned
 
 def format_problem(question: str, choices: List[str]) -> str:
     if not choices:
@@ -47,6 +63,26 @@ def pick_solution(answer: str, choices: List[str]) -> str:
         if ans_lower == c.lower().strip():
             return chr(65 + i)
     return answer.strip()
+
+def resize_image(img, max_size=1024):
+    if img is None:
+        return None
+    if isinstance(img, PILImage.Image):
+        pil_img = img
+    elif hasattr(img, 'convert'):
+        pil_img = img.convert('RGB')
+    else:
+        return None
+    width, height = pil_img.size
+    if max(width, height) <= max_size:
+        return pil_img
+    if width > height:
+        new_width = max_size
+        new_height = int(height * max_size / width)
+    else:
+        new_height = max_size
+        new_width = int(width * max_size / height)
+    return pil_img.resize((new_width, new_height), PILImage.Resampling.LANCZOS)
 
 def convert_split(split: str, out_dir: str) -> int:
     print(f"[INFO] Loading {DS_NAME} (split={split})")
@@ -77,17 +113,24 @@ def convert_split(split: str, out_dir: str) -> int:
     for ex in tqdm(queries, desc=f"Converting {split}"):
         qid = str(ex.get("query-id", ""))
         pos_pids = qid2pids.get(qid, [])
-        if not pos_pids:
+        if not pos_pids or len(pos_pids) > 1:
             continue
         img = pid2img.get(pos_pids[0], None)
+        if img is None:
+            continue
+        
+        img = resize_image(img)
         if img is None:
             continue
 
         question = ex.get("query", "")
         answer = ex.get("answer", "")
-        choices = to_list(ex.get("options", []))
+        choices = clean_choices(to_list(ex.get("options", [])))
 
         problem = format_problem(question, choices)
+        if len(problem) > 700:
+            continue
+        
         solution = pick_solution(answer, choices)
 
         records.append({
