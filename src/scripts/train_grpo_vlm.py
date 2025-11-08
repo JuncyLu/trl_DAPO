@@ -23,8 +23,6 @@ from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_
 # Enable logging in a Hugging Face Space
 os.environ.setdefault("TRACKIO_SPACE_ID", "trl-trackio")
 os.environ.setdefault("WANDB_HTTP_TIMEOUT", "60")
-
-# Set wandb to offline mode (no network requests)
 # os.environ["WANDB_MODE"] = "offline"  # Uncomment to enable offline mode
 
 
@@ -75,9 +73,7 @@ if __name__ == "__main__":
     def resize_large_images(example):
         image = example["image"]
         width, height = image.size
-        # If either dimension exceeds 1024, resize to fit within 1024x1024
         if width > 1024 or height > 1024:
-            # Use thumbnail to maintain aspect ratio, max size is 1024x1024
             image.thumbnail((1024, 1024), resample=Image.LANCZOS)
         example["image"] = image
         return example

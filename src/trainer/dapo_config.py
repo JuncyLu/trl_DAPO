@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass, field
-from typing import Optional, Union
+from typing import Optional, Union, List, Tuple
 
 from transformers import TrainingArguments
 
@@ -507,7 +507,7 @@ class DAPOConfig(TrainingArguments):
         },
     )
     epsilon_high: Optional[float] = field(
-        default=None,
+        default=0.28,
         metadata={
             "help": "Upper-bound epsilon value for clipping. If not specified, it defaults to the same value as the "
             "lower-bound specified in argument `epsilon`. Paper DAPO recommends `0.28`."
@@ -600,7 +600,7 @@ class DAPOConfig(TrainingArguments):
         },
     )
     mask_truncated_completions: bool = field(
-        default=False,
+        default=True,
         metadata={
             "help": "When enabled, truncated completions are excluded from the loss calculation, preventing them from "
             "being incorrectly penalized and introducing noise during training. According to the DAPO paper, this is "
@@ -719,15 +719,9 @@ class DAPOConfig(TrainingArguments):
         metadata={"help": "Number of characters to preview for completions in logs."}
     )
 
-    # (Removed) per-step rollout files to avoid heavy I/O
-
     token_weights: bool = field(
         default=False,
         metadata={"help": "启用 token 级 VGR 权重"},
-    )
-    token_weights_topk_ratio: float = field(
-        default=0.4,
-        metadata={"help": "token 权重放大时每序列 top-k 比例"},
     )
     token_weights_clip: tuple[float, float] = field(
         default=(0.2, 3.0),
@@ -736,6 +730,39 @@ class DAPOConfig(TrainingArguments):
     token_weights_smooth_sigma: float = field(
         default=0.0,
         metadata={"help": "token 权重高斯平滑 sigma=0 关闭"},
+    )
+
+    decoupled_clip: bool = field(
+        default=False,
+        metadata={"help": "启用正/负优势分路的解耦剪裁（Clip-Higher 变体）。默认 False 使用标准 -min(r*A, r_clip*A)。"},
+    )
+    kl_beta_schedule: str = field(
+        default="off",
+        metadata={"help": "轻量 KL 调度：'off' 或 'linear10'（前10%步线性从0.02降至0）。"},
+    )
+
+    replay_recompute_adv: bool = field(
+        default=True,
+        metadata={"help": "重放替换后是否就地重算该组 rewards/advantages。"},
+    )
+
+    token_weight_quantile: float = field(
+        default=0.95,
+        metadata={"help": "对每序列 token 权重按该分位数做上截断（0~1）。仅 token_weights=True 时生效。"},
+    )
+    neg_adv_token_scale: float = field(
+        default=0.5,
+        metadata={"help": "对负优势样本的 token 权重缩放系数（0~1）。仅 token_weights=True 时生效。"},
+    )
+
+    oom_backoff_enable: bool = field(
+        default=False,
+        metadata={"help": "捕获 OOM 时自动将 steps_per_generation 减半并重试一次。"},
+    )
+
+    reward_weight_schedule: Optional[List[Tuple[float, List[float]]]] = field(
+        default=None,
+        metadata={"help": "奖励权重表驱动调度，按 step_ratio 选择阶段；提供则覆盖 early/normal 逻辑。"},
     )
 
     def __post_init__(self):
@@ -763,6 +790,7 @@ class DAPOConfig(TrainingArguments):
         elif self.generation_batch_size is None and self.steps_per_generation is not None:
             self.generation_batch_size = self.per_device_train_batch_size * num_processes * self.steps_per_generation
         else:
+            # Both are set - this is not allowed
             raise ValueError(
                 "'generation_batch_size' and 'steps_per_generation' can not be both configured at the same time"
             )

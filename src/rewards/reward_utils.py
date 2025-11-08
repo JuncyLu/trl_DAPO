@@ -15,6 +15,8 @@ class RewardWeightConfig:
     early_weights: Optional[List[float]] = None
     warmup_ratio: float = 0.0
     reward_func_names: Optional[List[str]] = None
+    # 表驱动阶段调度：[(ratio阈值, [w...]), ...]，按 step/max_steps 的比例选择阶段
+    reward_weight_schedule: Optional[List[Tuple[float, List[float]]]] = None
 
 
 class RewardWeightManager:
@@ -26,6 +28,15 @@ class RewardWeightManager:
         
         # Initialize weights
         self._init_weights()
+        # 预处理阶段调度里程碑（若提供）
+        self._schedule = None
+        if config.reward_weight_schedule:
+            # 按 ratio 升序排序
+            try:
+                sched = sorted(config.reward_weight_schedule, key=lambda x: float(x[0]))
+                self._schedule = [(float(r), torch.tensor(ws, dtype=torch.float32)) for r, ws in sched]
+            except Exception:
+                self._schedule = None
         
     def _init_weights(self):
         """Initialize reward weights based on configuration."""
@@ -60,6 +71,19 @@ class RewardWeightManager:
         Returns:
             Dictionary mapping reward function names to their current weights
         """
+        # 若提供表驱动调度，则优先使用
+        if self._schedule:
+            # 选择“<= 当前 ratio 的最大里程碑”
+            step_ratio = (global_step / max(1, max_steps)) if max_steps > 0 else 0.0
+            chosen = self._schedule[0][1]
+            for ratio, vec in self._schedule:
+                if step_ratio >= ratio:
+                    chosen = vec
+                else:
+                    break
+            self.current_weights = chosen.to(self.current_weights.device)
+            return self._get_weight_dict()
+
         if self.early_weights is None:
             return self._get_weight_dict()
         
@@ -119,7 +143,8 @@ def create_reward_weight_manager(
     reward_weights: Optional[List[float]] = None,
     early_weights: Optional[List[float]] = None,
     warmup_ratio: float = 0.0,
-    reward_func_names: Optional[List[str]] = None
+    reward_func_names: Optional[List[str]] = None,
+    reward_weight_schedule: Optional[List[Tuple[float, List[float]]]] = None,
 ) -> RewardWeightManager:
     """
     Create a RewardWeightManager instance.
@@ -137,7 +162,8 @@ def create_reward_weight_manager(
         reward_weights=reward_weights,
         early_weights=early_weights,
         warmup_ratio=warmup_ratio,
-        reward_func_names=reward_func_names
+        reward_func_names=reward_func_names,
+        reward_weight_schedule=reward_weight_schedule,
     )
     return RewardWeightManager(config)
 
