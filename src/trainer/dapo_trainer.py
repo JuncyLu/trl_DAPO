@@ -1992,6 +1992,7 @@ class DAPOTrainer(BaseTrainer):
         # --- Dynamic sampling replay buffer integration ---
         # Only apply during training; evaluation may generate a different number of completions per prompt
         # which can cause shape mismatches (e.g., len(completions) < num_generations).
+        recompute_spans: list[tuple[int, int]] = []  # Initialize to avoid UnboundLocalError in eval mode
         if mode == "train" and self.replay_buffer is not None:
             # Per-group views (use local process rewards to match local batch size)
             num_groups = completion_ids.size(0) // self.num_generations
@@ -2050,7 +2051,6 @@ class DAPOTrainer(BaseTrainer):
             # Replace groups with zero variance using buffer samples
             groups_without_variance = (~groups_with_variance)
             num_to_replace = int(groups_without_variance.sum().item())
-            recompute_spans: list[tuple[int,int]] = []
             if num_to_replace > 0:
                 sampled = self.replay_buffer.sample(num_to_replace)
                 if sampled:
@@ -2085,7 +2085,6 @@ class DAPOTrainer(BaseTrainer):
 
                     # Assign replacements
                     replace_groups = groups_without_variance.nonzero(as_tuple=True)[0].tolist()
-                    recompute_spans: list[tuple[int,int]] = []
                     for s, gidx in zip(sampled, replace_groups):
                         start = gidx * self.num_generations
                         end = (gidx + 1) * self.num_generations
