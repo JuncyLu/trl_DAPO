@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Split DMD dataset into SFT and RL training sets.
+Split DMD dataset into SFT and RL training sets and store them as Parquet files.
 
 This script loads the lujunxi57/DMD dataset from HuggingFace and splits it into:
 - 30% for SFT (supervised fine-tuning)
 - 70% for RL (reinforcement learning) training
 
-python src/scripts/split_dmd_dataset.py \
+python split_dmd_dataset.py \
   --dataset_name lujunxi57/DMD \
   --sft_ratio 0.3 \
   --output_dir ./dataset/dmd_split \
@@ -15,7 +15,8 @@ python src/scripts/split_dmd_dataset.py \
 """
 
 import argparse
-from datasets import load_dataset, load_from_disk
+import shutil
+from datasets import load_dataset
 from pathlib import Path
 
 
@@ -112,15 +113,23 @@ def main():
     print(f"  SFT set: {len(sft_dataset)} samples")
     print(f"  RL set: {len(rl_dataset)} samples")
     
-    # Save datasets
-    sft_path = output_dir / "dmd_sft"
-    rl_path = output_dir / "dmd_rl"
+    # Save datasets as parquet for downstream consumption
+    sft_path = output_dir / "dmd_sft.parquet"
+    rl_path = output_dir / "dmd_rl.parquet"
     
-    print(f"\nSaving datasets...")
-    sft_dataset.save_to_disk(str(sft_path))
+    # Remove old Arrow directories if they exist to avoid confusion
+    for path in (sft_path, rl_path):
+        if path.exists():
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+    
+    print(f"\nSaving datasets as Parquet...")
+    sft_dataset.to_parquet(str(sft_path))
     print(f"  SFT dataset saved to: {sft_path}")
     
-    rl_dataset.save_to_disk(str(rl_path))
+    rl_dataset.to_parquet(str(rl_path))
     print(f"  RL dataset saved to: {rl_path}")
     
     # Print dataset info
@@ -139,11 +148,10 @@ def main():
     print("Dataset splitting completed successfully!")
     print("=" * 60)
     print(f"\nTo use the datasets in Python:")
-    print(f"  from datasets import load_from_disk")
-    print(f"  sft_dataset = load_from_disk('{sft_path}')")
-    print(f"  rl_dataset = load_from_disk('{rl_path}')")
+    print(f"  from datasets import Dataset")
+    print(f"  sft_dataset = Dataset.from_parquet('{sft_path}')")
+    print(f"  rl_dataset = Dataset.from_parquet('{rl_path}')")
 
 
 if __name__ == "__main__":
     main()
-

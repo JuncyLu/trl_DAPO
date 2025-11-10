@@ -17,7 +17,13 @@ from trl import (
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from src.trainer import DAPOConfig, DAPOTrainer
-from src.rewards import accuracy_reward, think_format_reward, get_soft_overlong_punishment, vgr_reward, vgr_hard_negative
+from src.rewards import (
+    accuracy_reward,
+    think_format_reward,
+    get_accuracy_conditioned_length_reward,
+    vgr_reward,
+    vgr_hard_negative,
+)
 
 
 # Enable logging in a Hugging Face Space
@@ -95,9 +101,11 @@ if __name__ == "__main__":
     ################
     # Training
     ################
-    length_reward_func = get_soft_overlong_punishment(
+    length_reward_func = get_accuracy_conditioned_length_reward(
         max_completion_len=training_args.max_completion_length,
-        soft_punish_cache=training_args.soft_punish_cache
+        lower_ratio=0.2,
+        upper_ratio=0.5,
+        alpha=0.5,
     )
     
     vgr_func = vgr_hard_negative if getattr(training_args, "vgr_hard_negative", False) else vgr_reward

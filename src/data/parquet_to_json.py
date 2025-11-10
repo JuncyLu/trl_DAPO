@@ -6,7 +6,7 @@ Convert parquet file to JSON for viewing prompts.
 
 Usage:
     python src/data/parquet_to_json.py \
-        --input ./dataset/visrag_arxivqa_openr1/train/train-00000-of-00001.parquet \
+        --input ./dataset/dmd_split/dmd_rl.parquet \
         --output ./visrag_arxivqa_prompts.json
 """
 

@@ -19,16 +19,16 @@ export CUDA_LAUNCH_BLOCKING=1
 accelerate launch \
   --config_file src/configs/deepspeed_zero2.yaml \
   src/scripts/train_grpo_vlm.py \
-  --model_name_or_path OpenGVLab/InternVL2-7B \
-  --output_dir training_logs/$TS/runs/dapo-InternVL2-7B \
+  --model_name_or_path Qwen/Qwen2.5-7B-Instruct \
+  --output_dir training_logs/$TS/runs/dapo-Qwen2.5-7B-Instruct \
   --rollout_log_path training_logs/$TS/rollout_results.md \
   --eval_log_path training_logs/$TS/eval_results.md \
   --dtype bfloat16 \
   --gradient_checkpointing \
   --max_prompt_length 2048 \
   --max_completion_length 512 \
-  --per_device_train_batch_size 1 \
-  --gradient_accumulation_steps 8 \
+  --per_device_train_batch_size 2 \
+  --gradient_accumulation_steps 4 \
   --num_generations 8 \
   --num_train_epochs 1 \
   --report_to wandb \
@@ -54,6 +54,7 @@ accelerate launch \
   --early_reward_weights 1.0 1.0 2.0 1.0 \
   --use_peft \
   --lora_target_modules "q_proj", "v_proj" \
+  --max_steps 20 \
   >> training_logs/$TS/train.log 2>&1
 
     # --use_vllm \

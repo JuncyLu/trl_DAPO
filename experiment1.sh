@@ -16,8 +16,34 @@ export PYTORCH_ALLOC_CONF=expandable_segments:True
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export CUDA_LAUNCH_BLOCKING=1
 
+# -------- 多机多卡相关参数（在每台机器上按需覆盖） --------
+NUM_MACHINES=${NUM_MACHINES:-1}          # 机器总数
+GPUS_PER_MACHINE=${GPUS_PER_MACHINE:-4}  # 每台机器使用的 GPU 数
+NUM_PROCESSES=${NUM_PROCESSES:-$((NUM_MACHINES * GPUS_PER_MACHINE))}
+MACHINE_RANK=${MACHINE_RANK:-0}          # 当前机器的 rank
+MASTER_ADDR=${MASTER_ADDR:-127.0.0.1}
+MASTER_PORT=${MASTER_PORT:-29500}
+SAME_NETWORK=${SAME_NETWORK:-true}
+
+ACCELERATE_DISTRIBUTED_ARGS=(
+  --config_file src/configs/deepspeed_zero2.yaml
+  --num_processes "${NUM_PROCESSES}"
+  --num_machines "${NUM_MACHINES}"
+)
+
+if (( NUM_MACHINES > 1 )); then
+  ACCELERATE_DISTRIBUTED_ARGS+=(
+    --machine_rank "${MACHINE_RANK}"
+    --main_process_ip "${MASTER_ADDR}"
+    --main_process_port "${MASTER_PORT}"
+  )
+  if [[ "${SAME_NETWORK}" == "true" ]]; then
+    ACCELERATE_DISTRIBUTED_ARGS+=(--same_network)
+  fi
+fi
+
 accelerate launch \
-  --config_file src/configs/deepspeed_zero2.yaml \
+  "${ACCELERATE_DISTRIBUTED_ARGS[@]}" \
   src/scripts/train_grpo_vlm.py \
   --model_name_or_path Qwen/Qwen2.5-VL-7B-Instruct \
   --output_dir training_logs/$TS/runs/dapo-Qwen2.5-VL-7B-Instruct \
@@ -47,14 +73,13 @@ accelerate launch \
   --max_grad_norm 1.0 \
   --replay_buffer_size 64 \
   --soft_punish_cache 50 \
-  --filter_min_reward 1.5 \
+  --filter_min_reward 1.0 \
   --replay_var_epsilon 1e-6 \
   --reward_weights 2.5 0.0 0.5 1.0 \
   --early_reward_weights 1.0 0.0 2.0 1.0 \
   --use_peft \
   --lora_target_modules "q_proj", "v_proj" \
   >> training_logs/$TS/train.log 2>&1
-
     # --use_vllm \
     # --vllm_mode colocate \
     # --vllm_gpu_memory_utilization 0.5
