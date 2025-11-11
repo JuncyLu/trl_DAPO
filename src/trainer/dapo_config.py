@@ -687,6 +687,13 @@ class DAPOConfig(TrainingArguments):
         metadata={"help": "Whether to compute attention metrics during generation."}
     )
 
+    attention_last_k_layers: Optional[int] = field(
+        default=6,
+        metadata={
+            "help": "限制注意力度量仅使用最后 K 层（默认 None 表示使用全部层）。"
+        },
+    )
+
     # --- Reward toggles ---
     vgr_hard_negative: bool = field(
         default=False,
@@ -702,7 +709,6 @@ class DAPOConfig(TrainingArguments):
         default=None,
         metadata={"help": "Path to save rollout logs (markdown). If None, training code should pass it via CLI."}
     )
-
 
     eval_log_path: Optional[str] = field(
         default=None,
@@ -796,11 +802,14 @@ class DAPOConfig(TrainingArguments):
             )
 
         if self.do_eval and self.eval_strategy != "no":
-            # Just ensure the value is divisible by the global batch size
-            if (self.per_device_eval_batch_size * num_processes) % self.num_generations != 0:
+            # Ensure global eval batch size is divisible by eval_num_generations (not training num_generations)
+            ng_eval = self.eval_num_generations if self.eval_num_generations is not None else self.num_generations
+            if ng_eval is None or int(ng_eval) <= 0:
+                ng_eval = 1
+            if (self.per_device_eval_batch_size * num_processes) % int(ng_eval) != 0:
                 raise ValueError(
                     f"The global eval batch size ({self.per_device_eval_batch_size} * {num_processes}) must be "
-                    f"divisible by num_generations ({self.num_generations})."
+                    f"divisible by eval_num_generations ({int(ng_eval)})."
                 )
 
         # The generation batch must contain full prompt groups (no partials), so it must be divisible by

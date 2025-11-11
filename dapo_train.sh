@@ -46,7 +46,6 @@ accelerate launch \
   --warmup_ratio 0.05 \
   --max_grad_norm 1.0 \
   --replay_buffer_size 64 \
-  --soft_punish_cache 50 \
   --filter_min_reward 1.5 \
   --replay_var_epsilon 1e-6 \
   --vgr_hard_negative \

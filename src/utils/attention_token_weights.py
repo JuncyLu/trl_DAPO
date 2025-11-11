@@ -39,6 +39,7 @@ def build_token_vgr_weights_for_batch(
     exclude_special: bool = True,
     smooth_sigma: float = 0.0,
     clip_range: Tuple[float, float] = (0.2, 3.0),
+    last_k_layers: Optional[int] = None,
 ) -> Tuple[List[List[float]], Dict[str, List[List[float]]]]:
     """
     Compute per-token weights for each generated token in the batch using VGR logic.
@@ -66,7 +67,7 @@ def build_token_vgr_weights_for_batch(
     eps = 1e-6
 
     for b in range(batch_size):
-        per_layer = _collect_llm_attention_for_sample(outputs_attentions, b)
+        per_layer = _collect_llm_attention_for_sample(outputs_attentions, b, last_k_layers=last_k_layers)
         if not per_layer:
             results.append([])
             debug["vgr_token"].append([])
@@ -101,7 +102,13 @@ def build_token_vgr_weights_for_batch(
         attn_vision = torch.zeros(num_generated_tokens, dtype=torch.float32, device=device)
         layers_with_data = 0
 
-        for layer_idx, attn in per_layer.items():
+        # Decide which layer indices to use (preserve numeric order)
+        layer_indices_sorted = sorted(list(per_layer.keys()))
+        if last_k_layers is not None and last_k_layers > 0:
+            layer_indices_sorted = layer_indices_sorted[-min(last_k_layers, len(layer_indices_sorted)) :]
+
+        for layer_idx in layer_indices_sorted:
+            attn = per_layer.get(layer_idx)
             if attn is None or attn.shape[0] == 0:
                 continue
             prompt_cols = min(actual_prompt_length, attn.shape[1])

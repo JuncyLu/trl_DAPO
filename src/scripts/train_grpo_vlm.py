@@ -53,7 +53,7 @@ if __name__ == "__main__":
     ################
     # Dataset
     ################
-    # dataset = load_dataset("lujunxi57/DMD", split="train")
+    # dataset = load_dataset("/home/lujunxi57/trl/dataset/dmd_split", split="train")
     dataset = load_dataset("./dataset/aokvqa_openr1", split="train")
     dataset = dataset.train_test_split(test_size=100, seed=42)
 

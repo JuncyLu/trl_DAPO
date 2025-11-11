@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 import torch
+from trl.data_utils import is_conversational, apply_chat_template
 
 
 
@@ -74,11 +75,11 @@ def emit_rollout_logs(
             if fmt_idx is not None and idx < rewards_per_func_local.shape[0]:
                 fmt = float(rewards_per_func_local[idx, fmt_idx].item())
 
-            length_idx = any_index("length_reward", "soft_overlong_punishment_reward")
+            length_idx = any_index("length_reward")
             if length_idx is not None and idx < rewards_per_func_local.shape[0]:
                 length_val = float(rewards_per_func_local[idx, length_idx].item())
 
-            vgr_idx = any_index("vgr_reward", "vgr_reward_as_additive")
+            vgr_idx = any_index("vgr_hard_negative", "vgr_reward", "vgr_reward_as_additive")
             if vgr_idx is not None and idx < rewards_per_func_local.shape[0]:
                 vgr_val = float(rewards_per_func_local[idx, vgr_idx].item())
         
@@ -108,14 +109,20 @@ def emit_rollout_logs(
                     accuracy_scores = [r[4] for r in rows]
                     format_scores = [r[5] for r in rows]
                     length_scores = [r[6] for r in rows]
-                    vgr_scores = [r[7] for r in rows]
                     total_scores = [r[8] for r in rows]
                     adv_scores = [r[9] for r in rows if r[9] is not None]
+                    # 来自 attention 的 VGR 原始指标（若可用）
+                    vgr_raw_list = []
+                    if vgr_info:
+                        for info in vgr_info:
+                            try:
+                                vgr_raw_list.append(float(info.get("vgr", float("nan"))))
+                            except Exception:
+                                pass
                     
                     f.write(f"| Accuracy Mean | {np.mean(accuracy_scores):.3f} ± {np.std(accuracy_scores):.3f} |\n")
                     f.write(f"| Format Mean | {np.mean(format_scores):.3f} ± {np.std(format_scores):.3f} |\n")
                     f.write(f"| Length Mean | {np.mean(length_scores):.3f} ± {np.std(length_scores):.3f} |\n")
-                    f.write(f"| VGR Mean | {np.mean(vgr_scores):.3f} ± {np.std(vgr_scores):.3f} |\n")
                     f.write(f"| Total Reward Mean | {np.mean(total_scores):.3f} ± {np.std(total_scores):.3f} |\n")
                     f.write(f"| Accuracy Rate | {np.mean([1 if s > 0 else 0 for s in accuracy_scores]):.3f} |\n")
                     f.write(f"| Format Rate | {np.mean([1 if s > 0 else 0 for s in format_scores]):.3f} |\n")
@@ -123,31 +130,16 @@ def emit_rollout_logs(
                     if adv_scores:
                         f.write(f"| Advantage ({adv_desc}) Mean | {np.mean(adv_scores):.3f} ± {np.std(adv_scores):.3f} |\n")
                         f.write("\n")
+                    # 汇总 VGR 原始指标
+                    if vgr_raw_list:
+                        try:
+                            vgr_mean = float(np.nanmean(vgr_raw_list))
+                            vgr_std = float(np.nanstd(vgr_raw_list))
+                            f.write(f"| VGR (raw) Mean | {vgr_mean:.3f} ± {vgr_std:.3f} |\n\n")
+                        except Exception:
+                            pass
                     
-                    # 分段 VGR 统计
-                    if vgr_info:
-                        f.write("### VGR Statistics\n\n")
-                        f.write("| Stage | VGR Mean | VGR Std | AEI Text | AEI Vision |\n")
-                        f.write("|-------|----------|---------|----------|------------|\n")
-                        
-                        early_vgr = [info.get("early_vgr", 0) for info in vgr_info if info.get("early_vgr") is not None]
-                        middle_vgr = [info.get("middle_vgr", 0) for info in vgr_info if info.get("middle_vgr") is not None]
-                        late_vgr = [info.get("late_vgr", 0) for info in vgr_info if info.get("late_vgr") is not None]
-                        all_vgr = [info.get("all_vgr", 0) for info in vgr_info if info.get("all_vgr") is not None]
-                        
-                        early_aei_text = [info.get("early_aei_text", 0) for info in vgr_info]
-                        early_aei_vision = [info.get("early_aei_vision", 0) for info in vgr_info]
-                        middle_aei_text = [info.get("middle_aei_text", 0) for info in vgr_info]
-                        middle_aei_vision = [info.get("middle_aei_vision", 0) for info in vgr_info]
-                        late_aei_text = [info.get("late_aei_text", 0) for info in vgr_info]
-                        late_aei_vision = [info.get("late_aei_vision", 0) for info in vgr_info]
-                        all_aei_text = [info.get("all_aei_text", 0) for info in vgr_info]
-                        all_aei_vision = [info.get("all_aei_vision", 0) for info in vgr_info]
-                        
-                        f.write(f"| Early | {np.mean(early_vgr):.3f} | {np.std(early_vgr):.3f} | {np.mean(early_aei_text):.3f} | {np.mean(early_aei_vision):.3f} |\n")
-                        f.write(f"| Middle | {np.mean(middle_vgr):.3f} | {np.std(middle_vgr):.3f} | {np.mean(middle_aei_text):.3f} | {np.mean(middle_aei_vision):.3f} |\n")
-                        f.write(f"| Late | {np.mean(late_vgr):.3f} | {np.std(late_vgr):.3f} | {np.mean(late_aei_text):.3f} | {np.mean(late_aei_vision):.3f} |\n")
-                        f.write(f"| All | {np.mean(all_vgr):.3f} | {np.std(all_vgr):.3f} | {np.mean(all_aei_text):.3f} | {np.mean(all_aei_vision):.3f} |\n\n")
+                    # Attention statistics removed (AEI unused)
                 
                 # 样本明细
                 for i, (r, info) in enumerate(zip(rows, vgr_info), start=1):
@@ -170,10 +162,30 @@ def emit_rollout_logs(
                     if r[9] is not None:
                         f.write(f"**Advantage ({adv_desc}):** {float(r[9]):.4f}\n\n")
                     
-                    # 详细 metrics
+                    # 详细 metrics：补充 VGR 原始指标
                     if info:
                         f.write("**Detailed Metrics:**\n\n")
                         f.write("```json\n")
+                        # 计算更直观的密度/比例
+                        try:
+                            _attn_text = float(info.get("attention_text", 0.0) or 0.0)
+                            _attn_vision = float(info.get("attention_vision", 0.0) or 0.0)
+                            _t = int(info.get("num_text_tokens", 0) or 0)
+                            _o = int(info.get("num_vision_tokens", 0) or 0)
+                        except Exception:
+                            _attn_text, _attn_vision, _t, _o = 0.0, 0.0, 0, 0
+                        density_text = (_attn_text / _t) if _t > 0 else None
+                        density_vision = (_attn_vision / _o) if _o > 0 else None
+                        text_ratio = None
+                        vision_ratio = None
+                        try:
+                            # 与 compute_real_vgr_metrics 一致的分配比例
+                            _vgr_val = float(info.get("vgr", 1.0))
+                            text_ratio = _vgr_val / (1.0 + _vgr_val)
+                            vision_ratio = 1.0 / (1.0 + _vgr_val)
+                        except Exception:
+                            pass
+
                         detailed_metrics = {
                             "rewards": {
                                 "accuracy": float(r[4]),
@@ -183,40 +195,19 @@ def emit_rollout_logs(
                                 "total": float(r[8])
                             },
                             "advantage": float(r[9]) if r[9] is not None else None,
-                            "attention_metrics": {
-                                "early": {
-                                    "vgr": info.get("early_vgr"),
-                                    "aei_text": info.get("early_aei_text"),
-                                    "aei_vision": info.get("early_aei_vision"),
-                                    "text_ratio": info.get("early_text_ratio"),
-                                    "vision_ratio": info.get("early_vision_ratio")
-                                },
-                                "middle": {
-                                    "vgr": info.get("middle_vgr"),
-                                    "aei_text": info.get("middle_aei_text"),
-                                    "aei_vision": info.get("middle_aei_vision"),
-                                    "text_ratio": info.get("middle_text_ratio"),
-                                    "vision_ratio": info.get("middle_vision_ratio")
-                                },
-                                "late": {
-                                    "vgr": info.get("late_vgr"),
-                                    "aei_text": info.get("late_aei_text"),
-                                    "aei_vision": info.get("late_aei_vision"),
-                                    "text_ratio": info.get("late_text_ratio"),
-                                    "vision_ratio": info.get("late_vision_ratio")
-                                },
-                                "all": {
-                                    "vgr": info.get("all_vgr"),
-                                    "aei_text": info.get("all_aei_text"),
-                                    "aei_vision": info.get("all_aei_vision"),
-                                    "text_ratio": info.get("all_text_ratio"),
-                                    "vision_ratio": info.get("all_vision_ratio")
-                                }
-                            },
                             "token_counts": {
                                 "vision_tokens": float(info.get("num_vision_tokens", 0) or 0),
                                 "text_tokens": float(info.get("num_text_tokens", 0) or 0),
                                 "total_tokens": float((info.get("num_vision_tokens", 0) or 0) + (info.get("num_text_tokens", 0) or 0)),
+                            },
+                            "vgr_metrics": {
+                                "vgr_raw": float(info.get("vgr", 0.0) or 0.0),
+                                "attention_text": _attn_text,
+                                "attention_vision": _attn_vision,
+                                "density_text": density_text,
+                                "density_vision": density_vision,
+                                "text_ratio": text_ratio,
+                                "vision_ratio": vision_ratio,
                             },
                             "overall": {
                                 "attention_distribution": info.get("attention_distribution"),
@@ -282,31 +273,24 @@ def emit_eval_logs(
             for key, value in core_metrics.items():
                 if value is not None:
                     f.write(f"| {key} | {value:.4f} |\n")
+
+            # 若样本包含 vgr 原始指标，则补充聚合值
+            try:
+                vgr_vals = []
+                for sample in (eval_samples or []):
+                    dm = sample.get("detailed_metrics", {}) if isinstance(sample, dict) else {}
+                    vm = dm.get("vgr_metrics", {}) if isinstance(dm, dict) else {}
+                    v = vm.get("vgr_raw", None)
+                    if isinstance(v, (int, float)):
+                        vgr_vals.append(float(v))
+                if vgr_vals:
+                    vgr_mean = float(np.nanmean(vgr_vals))
+                    vgr_std = float(np.nanstd(vgr_vals))
+                    f.write(f"| eval_vgr_raw | {vgr_mean:.4f} ± {vgr_std:.4f} |\n")
+            except Exception:
+                pass
             
-            # 注意力指标
-            attention_metrics = {
-                "eval_attention/early/vgr": logs.get("eval_attention/early/vgr"),
-                "eval_attention/middle/vgr": logs.get("eval_attention/middle/vgr"),
-                "eval_attention/late/vgr": logs.get("eval_attention/late/vgr"),
-                "eval_attention/all/vgr": logs.get("eval_attention/all/vgr"),
-            }
-            
-            if any(v is not None for v in attention_metrics.values()):
-                f.write("\n### Attention Statistics\n\n")
-                f.write("| Stage | VGR | AEI Text | AEI Vision |\n")
-                f.write("|-------|-----|----------|------------|\n")
-                
-                stages = ["early", "middle", "late", "all"]
-                for stage in stages:
-                    vgr_key = f"eval_attention/{stage}/vgr"
-                    aei_text_key = f"eval_attention/{stage}/aei_text"
-                    aei_vision_key = f"eval_attention/{stage}/aei_vision"
-                    
-                    vgr_val = logs.get(vgr_key, 0.0)
-                    aei_text_val = logs.get(aei_text_key, 0.0)
-                    aei_vision_val = logs.get(aei_vision_key, 0.0)
-                    
-                    f.write(f"| {stage.title()} | {vgr_val:.3f} | {aei_text_val:.3f} | {aei_vision_val:.3f} |\n")
+            # 注意力指标（AEI 移除）
             
             # 样本数据
             if eval_samples:
@@ -350,157 +334,73 @@ def compute_real_vgr_metrics(
     sample_results: List[Any],
     skip_reasons: Optional[List[Optional[str]]] = None,
 ) -> List[Dict[str, Any]]:
+    """Compute minimal per-sample VGR metrics for logging and rewards.
+
+    Returns a list of dicts with keys:
+      - vgr, attention_distribution [text_ratio, vision_ratio]
+      - attention_text, attention_vision
+      - num_text_tokens, num_vision_tokens
+      - skip_reason
     """
-    计算真实的 VGR 指标用于日志记录
-    
-    Args:
-        sample_results: 注意力样本结果列表
-        skip_reasons: 跳过原因列表
-        
-    Returns:
-        VGR 指标字典列表
-    """
-    results = []
+    results: List[Dict[str, Any]] = []
     if skip_reasons is None:
         skip_reasons = [None] * len(sample_results)
 
     for idx, res in enumerate(sample_results):
         if res is None:
-            reason = skip_reasons[idx] if idx < len(skip_reasons) else None
-            default_result = {
+            results.append({
                 "vgr": 1.0,
-                "text_ratio": 0.5,
-                "vision_ratio": 0.5,
                 "attention_distribution": [0.5, 0.5],
                 "num_vision_tokens": 0,
                 "num_text_tokens": 0,
                 "attention_text": 0.0,
                 "attention_vision": 0.0,
-                "early_vgr": 1.0,
-                "middle_vgr": 1.0,
-                "late_vgr": 1.0,
-                "all_vgr": 1.0,
-                "early_aei_text": 0.0,
-                "early_aei_vision": 0.0,
-                "middle_aei_text": 0.0,
-                "middle_aei_vision": 0.0,
-                "late_aei_text": 0.0,
-                "late_aei_vision": 0.0,
-                "all_aei_text": 0.0,
-                "all_aei_vision": 0.0,
-                "early_text_ratio": 0.5,
-                "early_vision_ratio": 0.5,
-                "middle_text_ratio": 0.5,
-                "middle_vision_ratio": 0.5,
-                "late_text_ratio": 0.5,
-                "late_vision_ratio": 0.5,
-                "all_text_ratio": 0.5,
-                "all_vision_ratio": 0.5,
-                "aei_text": 0.0,
-                "aei_vision": 0.0,
-                "skip_reason": reason,
-            }
-            results.append(default_result)
+                "skip_reason": skip_reasons[idx] if idx < len(skip_reasons) else None,
+            })
             continue
 
-        segments = getattr(res, "segments", {}) if res is not None else {}
-        # Align with attention_metrics.AttentionSampleResult fields:
-        # text tokens are stored as `num_instruction_tokens` in the result.
-        num_vision_tokens = getattr(res, "num_vision_tokens", 0)
-        num_text_tokens = getattr(res, "num_instruction_tokens", getattr(res, "num_text_tokens", 0))
+        segments = getattr(res, "segments", {}) or {}
+        seg = segments.get("all")
+        num_vision_tokens = int(getattr(res, "num_vision_tokens", 0) or 0)
+        num_text_tokens = int(getattr(res, "num_instruction_tokens", getattr(res, "num_text_tokens", 0)) or 0)
 
-        def process_segment(segment_name):
-            segment = segments.get(segment_name)
-            if segment is None or not hasattr(segment, "vgr") or segment.vgr is None:
-                return {
-                    "vgr": 1.0,
-                    "aei_text": 0.0,
-                    "aei_vision": 0.0,
-                    "attention_text": 0.0,
-                    "attention_vision": 0.0,
-                    "text_ratio": 0.5,
-                    "vision_ratio": 0.5,
-                }
+        if seg is None or not hasattr(seg, "attention_text"):
+            results.append({
+                "vgr": 1.0,
+                "attention_distribution": [0.5, 0.5],
+                "num_vision_tokens": num_vision_tokens,
+                "num_text_tokens": num_text_tokens,
+                "attention_text": 0.0,
+                "attention_vision": 0.0,
+                "skip_reason": None,
+            })
+            continue
 
-            vgr = float(segment.vgr)
-            if not (vgr > 0) or not math.isfinite(vgr):
-                return {
-                    "vgr": 1.0,
-                    "aei_text": 0.0,
-                    "aei_vision": 0.0,
-                    "attention_text": 0.0,
-                    "attention_vision": 0.0,
-                    "text_ratio": 0.5,
-                    "vision_ratio": 0.5,
-                }
-
-            aei_text = float(getattr(segment, "aei_text", 0.0))
-            aei_vision = float(getattr(segment, "aei_vision", 0.0))
-            attention_text = float(getattr(segment, "attention_text", 0.0))
-            attention_vision = float(getattr(segment, "attention_vision", 0.0))
-            text_ratio = vgr / (1.0 + vgr)
-            vision_ratio = 1.0 / (1.0 + vgr)
-
-            return {
-                "vgr": round(float(vgr), 6),
-                "aei_text": round(float(aei_text), 6),
-                "aei_vision": round(float(aei_vision), 6),
-                "attention_text": round(float(attention_text), 6),
-                "attention_vision": round(float(attention_vision), 6),
-                "text_ratio": round(float(text_ratio), 6),
-                "vision_ratio": round(float(vision_ratio), 6),
-            }
-
-        early_data = process_segment("early")
-        middle_data = process_segment("middle")
-        late_data = process_segment("late")
-        all_data = process_segment("all")
-
-        # 修复VGR选择逻辑：优先使用late段，如果无效则使用all段
-        if late_data["vgr"] != 1.0:
-            main_segment = late_data
+        attn_text = float(getattr(seg, "attention_text", 0.0) or 0.0)
+        attn_vision = float(getattr(seg, "attention_vision", 0.0) or 0.0)
+        # Compute VGR safely
+        t = max(1, int(num_text_tokens))
+        o = int(num_vision_tokens)
+        if o <= 0:
+            vgr = float("inf")
         else:
-            main_segment = all_data
-        vgr = main_segment["vgr"]
-
+            text_density = attn_text / t
+            vision_density = attn_vision / max(1, o)
+            vgr = text_density / (vision_density if vision_density > 0 else float("inf"))
+        if not (vgr > 0) or not math.isfinite(vgr):
+            vgr = 1.0
         text_ratio = vgr / (1.0 + vgr)
         vision_ratio = 1.0 / (1.0 + vgr)
 
-        result = {
+        results.append({
             "vgr": round(float(vgr), 6),
-            "text_ratio": round(float(text_ratio), 6),
-            "vision_ratio": round(float(vision_ratio), 6),
-            "attention_distribution": [text_ratio, vision_ratio],
-            "num_vision_tokens": int(num_vision_tokens),
-            "num_text_tokens": int(num_text_tokens),
-            # Use late segment's attention values, fallback to all segment
-            "attention_text": main_segment["attention_text"],
-            "attention_vision": main_segment["attention_vision"],
-            "early_vgr": early_data["vgr"],
-            "middle_vgr": middle_data["vgr"],
-            "late_vgr": late_data["vgr"],
-            "all_vgr": all_data["vgr"],
-            "early_aei_text": early_data["aei_text"],
-            "early_aei_vision": early_data["aei_vision"],
-            "middle_aei_text": middle_data["aei_text"],
-            "middle_aei_vision": middle_data["aei_vision"],
-            "late_aei_text": late_data["aei_text"],
-            "late_aei_vision": late_data["aei_vision"],
-            "all_aei_text": all_data["aei_text"],
-            "all_aei_vision": all_data["aei_vision"],
-            "early_text_ratio": early_data["text_ratio"],
-            "early_vision_ratio": early_data["vision_ratio"],
-            "middle_text_ratio": middle_data["text_ratio"],
-            "middle_vision_ratio": middle_data["vision_ratio"],
-            "late_text_ratio": late_data["text_ratio"],
-            "late_vision_ratio": late_data["vision_ratio"],
-            "all_text_ratio": all_data["text_ratio"],
-            "all_vision_ratio": all_data["vision_ratio"],
-            "aei_text": all_data["aei_text"],
-            "aei_vision": all_data["aei_vision"],
+            "attention_distribution": [round(float(text_ratio), 6), round(float(vision_ratio), 6)],
+            "num_vision_tokens": num_vision_tokens,
+            "num_text_tokens": num_text_tokens,
+            "attention_text": round(float(attn_text), 6),
+            "attention_vision": round(float(attn_vision), 6),
             "skip_reason": None,
-        }
-        results.append(result)
+        })
 
     return results
 
@@ -620,3 +520,295 @@ def emit_tokenwise_weights(
                 f.write(f"Sample {i+1}: {line}\n")
     except Exception as e:
         print(f"⚠️  Warning: Failed to write tokenwise weights: {e}")
+
+
+def perform_realtime_rollout_logging(
+    *,
+    is_main_process: bool,
+    mode: str,
+    args: Any,
+    state_step: int,
+    state_epoch: float,
+    compute_attention_metrics: bool,
+    attention_logs: Any,
+    attention_skip_reasons: Any,
+    processing_class: Any,
+    prompts: List[Any],
+    inputs: List[Dict[str, Any]],
+    prompts_text: List[str],
+    completions_text: List[str],
+    rewards_per_func_local: torch.Tensor,
+    total_rewards_local: torch.Tensor,
+    reward_names: List[str],
+    token_weights_tensor: Optional[torch.Tensor],
+    completion_ids: torch.Tensor,
+    completion_mask: torch.Tensor,
+    process_slice: slice,
+) -> None:
+    """Unified realtime rollout logging pipeline moved out of the trainer."""
+    try:
+        if not is_main_process:
+            return
+        if not getattr(args, "realtime_rollout_logging", False):
+            return
+        if mode != "train":
+            return
+
+        # Build VGR info for logging (no AEI usage downstream)
+        vgr_info: List[Dict[str, Any]] = []
+        if compute_attention_metrics and attention_logs is not None:
+            try:
+                att_list = list(attention_logs)
+                if att_list:
+                    from .dapo_logging import compute_real_vgr_metrics as _compute_real_vgr_metrics
+                    sample_results = att_list[-len(prompts):]
+                    if attention_skip_reasons is not None:
+                        skips = list(attention_skip_reasons)
+                        skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
+                    else:
+                        skip_slice = [None] * len(sample_results)
+                    vgr_info = _compute_real_vgr_metrics(sample_results, skip_slice)
+            except Exception:
+                vgr_info = []
+
+        # Solutions (if present)
+        solutions = [inp.get("solution", "") for inp in inputs]
+
+        # Compose prompts text with chat template if needed
+        if is_conversational(inputs[0]):
+            log_prompts_text = [apply_chat_template({"prompt": p}, processing_class)["prompt"] for p in prompts]
+        else:
+            log_prompts_text = prompts_text
+
+        # Prepare advantage values for table
+        advantages_for_log = None
+        try:
+            # `advantages` is not passed; instead consume per-row from total_rewards? keep None for simplicity
+            if getattr(args, "token_weights", False) and token_weights_tensor is not None:
+                tw_local = token_weights_tensor[process_slice]
+                cm_local = completion_mask[process_slice].float()
+                valid = cm_local.sum(dim=1).clamp(min=1.0)
+                mean_w = (tw_local * cm_local).sum(dim=1) / valid
+                advantages_for_log = mean_w.detach().cpu().tolist()
+        except Exception:
+            advantages_for_log = None
+
+        # Emit markdown rollout log
+        emit_rollout_logs(
+            prompts_text=log_prompts_text,
+            completions_text=completions_text,
+            solutions=solutions,
+            rewards_per_func_local=rewards_per_func_local,
+            total_rewards_local=total_rewards_local,
+            reward_names=reward_names,
+            vgr_info=vgr_info,
+            log_path=getattr(args, "rollout_log_path", None),
+            prompt_preview_chars=getattr(args, "prompt_preview_chars", 2000),
+            completion_preview_chars=getattr(args, "completion_preview_chars", 2000),
+            vgr_as_coefficient=getattr(args, "vgr_as_coefficient", 0),
+            step=state_step,
+            epoch=state_epoch,
+            advantages_local=advantages_for_log,
+        )
+
+        # Token weight logs (coarse stats)
+        if getattr(args, "token_weights", False) and token_weights_tensor is not None:
+            emit_token_weights_logs(
+                token_weights=token_weights_tensor,
+                log_path=getattr(args, "rollout_log_path", None),
+                step=state_step,
+                epoch=state_epoch,
+            )
+
+            # Tokenwise preview with decoded tokens
+            try:
+                tokenizer = getattr(processing_class, "tokenizer", None)
+                if tokenizer is not None:
+                    token_strs: list[list[str]] = []
+                    token_wts: list[list[float]] = []
+                    local_ids = completion_ids
+                    local_mask = completion_mask
+                    local_w = token_weights_tensor
+                    for i in range(local_ids.size(0)):
+                        valid_len = int(local_mask[i].sum().item())
+                        if valid_len <= 0:
+                            token_strs.append([])
+                            token_wts.append([])
+                            continue
+                        ids_i = local_ids[i, :valid_len].detach().cpu().tolist()
+                        toks = tokenizer.convert_ids_to_tokens(ids_i, skip_special_tokens=False)
+                        token_strs.append([str(t) for t in toks])
+                        token_wts.append(local_w[i, :valid_len].detach().cpu().tolist())
+                    import os as _os
+                    rollout_path = getattr(args, "rollout_log_path", None)
+                    token_log_path = _os.path.join(_os.path.dirname(rollout_path), "token_weights.md") if rollout_path else None
+                    emit_tokenwise_weights(
+                        token_strings=token_strs,
+                        token_weights=token_wts,
+                        log_path=token_log_path,
+                        step=state_step,
+                        epoch=state_epoch,
+                    )
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"⚠️  Warning: realtime rollout logging failed: {e}")
+
+
+def print_compact_logs(logs: Dict[str, float], mode: str, use_hard_negative: bool = False) -> None:
+    """Pretty-print compact grouped logs to terminal (moved out of trainer)."""
+    try:
+        # Rewards line
+        r_acc = logs.get("rewards/accuracy_reward/mean", logs.get("eval_rewards/accuracy_reward/mean"))
+        r_fmt = logs.get("rewards/think_format_reward/mean", logs.get("eval_rewards/think_format_reward/mean"))
+        # Prefer new VGR reward key; fall back to legacy additive key if present
+        if use_hard_negative:
+            r_vgr = logs.get("rewards/vgr_hard_negative/mean", logs.get("eval_rewards/vgr_hard_negative/mean"))
+        else:
+            r_vgr = logs.get("rewards/vgr_reward/mean", logs.get("eval_rewards/vgr_reward/mean"))
+            if r_vgr is None:
+                r_vgr = logs.get("rewards/vgr_reward_as_additive/mean", logs.get("eval_rewards/vgr_reward_as_additive/mean"))
+        r_len = logs.get("rewards/length_reward/mean", logs.get("eval_rewards/length_reward/mean"))
+        r_total = logs.get("reward", logs.get("eval_reward"))
+        rewards_line = []
+        if r_acc is not None: rewards_line.append(f"acc={r_acc:.3f}")
+        if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
+        if r_vgr is not None: rewards_line.append(f"vgr={r_vgr:.3f}")
+        if r_len is not None: rewards_line.append(f"len={r_len:.3f}")
+        if r_total is not None: rewards_line.append(f"total={r_total:.3f}")
+        if rewards_line:
+            print("Rewards: " + ", ".join(rewards_line))
+
+        # Loss/optim line
+        loss = logs.get("loss", logs.get("eval_loss"))
+        ent = logs.get("entropy", logs.get("eval_entropy"))
+        lr = logs.get("learning_rate")
+        grad = logs.get("grad_norm", logs.get("eval_grad_norm"))
+        clip_low = logs.get("clip_ratio/low_mean", logs.get("eval_clip_ratio/low_mean"))
+        clip_high = logs.get("clip_ratio/high_mean", logs.get("eval_clip_ratio/high_mean"))
+        loss_line = []
+        if loss is not None: loss_line.append(f"loss={loss:.4f}")
+        if ent is not None: loss_line.append(f"entropy={ent:.4f}")
+        if lr is not None: loss_line.append(f"lr={lr:.2e}")
+        if grad is not None: loss_line.append(f"grad={grad:.3f}")
+        if clip_low is not None: loss_line.append(f"clip_low={clip_low:.3f}")
+        if clip_high is not None: loss_line.append(f"clip_high={clip_high:.3f}")
+        if loss_line:
+            print("Optim:   " + ", ".join(loss_line))
+    except Exception:
+        pass
+
+
+def perform_eval_logging(
+    *,
+    is_main_process: bool,
+    mode: str,
+    args: Any,
+    state_step: int,
+    state_epoch: float,
+    metrics: Dict[str, float],
+    logs: Dict[str, float],
+    internal_logs: Dict[str, Any],
+    reward_names: List[str],
+) -> None:
+    """Assemble and emit evaluation logs to markdown (moved out of trainer)."""
+    if not is_main_process or mode != "eval":
+        return
+    try:
+        prompts_cm = list(internal_logs.get("prompt_chatml", []))
+        completions_cm = list(internal_logs.get("completion", []))
+        rewards_log = internal_logs.get("rewards", {}) if isinstance(internal_logs, dict) else {}
+        total_rewards = list(rewards_log.get("total", [])) if isinstance(rewards_log, dict) else []
+        reward_lists = {name: list(rewards_log.get(name, [])) for name in reward_names}
+
+        # 准备 VGR 原始指标（若 attention 可用）
+        vgr_info: List[Dict[str, Any]] = []
+        try:
+            att_list = list(internal_logs.get("attention", [])) if isinstance(internal_logs, dict) else []
+            if att_list:
+                sample_results = att_list[-len(prompts_cm):]
+                skip_slice = [None] * len(sample_results)
+                vgr_info = compute_real_vgr_metrics(sample_results, skip_slice)
+        except Exception:
+            vgr_info = []
+
+        sample_count = min(len(prompts_cm), len(completions_cm))
+        # 对齐 vgr_info 长度
+        if vgr_info:
+            vgr_info = vgr_info[:sample_count]
+        eval_samples: List[Dict[str, Any]] = []
+        for i in range(sample_count):
+            rewards_map: Dict[str, float] = {}
+            for name in reward_names:
+                vals = reward_lists.get(name, [])
+                if i < len(vals):
+                    try:
+                        rewards_map[name] = float(vals[i])
+                    except Exception:
+                        pass
+            total_val = 0.0
+            if i < len(total_rewards):
+                try:
+                    total_val = float(total_rewards[i])
+                except Exception:
+                    total_val = 0.0
+
+            sample_obj: Dict[str, Any] = {
+                "prompt": prompts_cm[i],
+                "completion": completions_cm[i],
+                "rewards": rewards_map,
+                "total_reward": total_val,
+            }
+            # 注入详细 VGR 原始指标（若可用）
+            if vgr_info and i < len(vgr_info) and vgr_info[i]:
+                info = vgr_info[i]
+                try:
+                    attn_text = float(info.get("attention_text", 0.0) or 0.0)
+                    attn_vision = float(info.get("attention_vision", 0.0) or 0.0)
+                    t = int(info.get("num_text_tokens", 0) or 0)
+                    o = int(info.get("num_vision_tokens", 0) or 0)
+                except Exception:
+                    attn_text, attn_vision, t, o = 0.0, 0.0, 0, 0
+                density_text = (attn_text / t) if t > 0 else None
+                density_vision = (attn_vision / o) if o > 0 else None
+                vgr_raw = float(info.get("vgr", 0.0) or 0.0)
+                text_ratio = None
+                vision_ratio = None
+                try:
+                    text_ratio = vgr_raw / (1.0 + vgr_raw)
+                    vision_ratio = 1.0 / (1.0 + vgr_raw)
+                except Exception:
+                    pass
+
+                sample_obj["detailed_metrics"] = {
+                    "vgr_metrics": {
+                        "vgr_raw": vgr_raw,
+                        "attention_text": attn_text,
+                        "attention_vision": attn_vision,
+                        "density_text": density_text,
+                        "density_vision": density_vision,
+                        "text_ratio": text_ratio,
+                        "vision_ratio": vision_ratio,
+                    },
+                    "token_counts": {
+                        "vision_tokens": float(o),
+                        "text_tokens": float(t),
+                        "total_tokens": float(t + o),
+                    },
+                    "overall": {
+                        "attention_distribution": info.get("attention_distribution"),
+                        "skip_reason": info.get("skip_reason"),
+                    },
+                }
+            eval_samples.append(sample_obj)
+
+        emit_eval_logs(
+            metrics=metrics,
+            logs=logs,
+            eval_samples=eval_samples,
+            log_path=getattr(args, "eval_log_path", None),
+            step=state_step,
+            epoch=state_epoch,
+        )
+    except Exception as e:
+        print(f"⚠️  Warning: Failed to emit eval logs: {e}")

@@ -15,7 +15,6 @@ class RewardWeightConfig:
     early_weights: Optional[List[float]] = None
     warmup_ratio: float = 0.0
     reward_func_names: Optional[List[str]] = None
-    # 表驱动阶段调度：[(ratio阈值, [w...]), ...]，按 step/max_steps 的比例选择阶段
     reward_weight_schedule: Optional[List[Tuple[float, List[float]]]] = None
 
 

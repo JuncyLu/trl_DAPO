@@ -22,7 +22,7 @@ from ..import_utils import _LazyModule
 _import_structure = {
     "accuracy_rewards": ["accuracy_reward"],
     "format_rewards": ["think_format_reward"],
-    "length_rewards": ["get_soft_overlong_punishment", "get_accuracy_conditioned_length_reward"],
+    "length_rewards": ["get_accuracy_conditioned_length_reward"],
     "attention_rewards": ["vgr_reward", "vgr_hard_negative"],
     "reward_utils": [
         "RewardWeightManager", 
@@ -36,7 +36,7 @@ _import_structure = {
 if TYPE_CHECKING:
     from .accuracy_rewards import accuracy_reward
     from .format_rewards import think_format_reward
-    from .length_rewards import get_soft_overlong_punishment, get_accuracy_conditioned_length_reward
+    from .length_rewards import get_accuracy_conditioned_length_reward
     from .attention_rewards import vgr_reward, vgr_hard_negative
     from .reward_utils import (
         RewardWeightManager, 

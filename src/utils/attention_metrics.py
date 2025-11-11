@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple, Any
 
 import torch
 
@@ -10,8 +10,6 @@ import torch
 class AttentionSegmentResult:
     """Attention metrics for a specific layer segment."""
     vgr: float
-    aei_text: float
-    aei_vision: float
     attention_text: float
     attention_vision: float
 
@@ -47,6 +45,7 @@ def _collect_llm_attention_for_sample(
     sample_idx: int,
     normalize_rows: bool = True,
     zero_bos: bool = True,
+    last_k_layers: Optional[int] = None,
 ) -> Dict[int, torch.Tensor]:
     """Extract and process attention weights for a single sample."""
     if outputs_attentions is None:
@@ -59,10 +58,19 @@ def _collect_llm_attention_for_sample(
 
     first_step_layers = outputs_attentions[0]
     num_layers = len(first_step_layers)
-    per_layer_rows: Dict[int, List[torch.Tensor]] = {i: [] for i in range(num_layers)}
+    # Select layer indices: all or only last-K
+    if last_k_layers is not None and last_k_layers > 0:
+        last = min(last_k_layers, num_layers)
+        selected_indices = list(range(num_layers))[-last:]
+    else:
+        selected_indices = list(range(num_layers))
+    selected_set = set(selected_indices)
+    per_layer_rows: Dict[int, List[torch.Tensor]] = {i: [] for i in selected_indices}
 
     # Process first step attention
     for layer_idx, layer_attn in enumerate(first_step_layers):
+        if layer_idx not in selected_set:
+            continue
         if layer_attn is None:
             continue
         # 提前搬到 CPU 再做 mean，避免在 GPU 上保留大矩阵 (B, H, T, S)
@@ -90,6 +98,8 @@ def _collect_llm_attention_for_sample(
     # Process subsequent steps
     for step_layers in outputs_attentions[1:]:
         for layer_idx, layer_attn in enumerate(step_layers):
+            if layer_idx not in selected_set:
+                continue
             if layer_attn is None:
                 continue
             # 同样先搬 CPU，再求 mean
@@ -235,16 +245,14 @@ def _build_modality_masks(
 
 
 def _split_layers_to_segments(num_layers: int) -> Dict[str, List[int]]:
-    """Split model layers into early, middle, late, and all segments."""
+    """Return only a single 'all' segment over all layers (0..num_layers-1)."""
     if num_layers < 0:
         raise ValueError("num_layers must be >= 0")
-    k = num_layers // 3 if num_layers > 0 else 0
-    return {
-        "early": list(range(0, k)),
-        "middle": list(range(k, 2 * k)),
-        "late": list(range(2 * k, num_layers)),
-        "all": list(range(num_layers)),
-    }
+    return {"all": list(range(num_layers))}
+
+def _split_indices_to_segments(layer_indices: List[int]) -> Dict[str, List[int]]:
+    """Return only a single 'all' segment over the provided layer indices."""
+    return {"all": list(layer_indices)}
 
 
 def _compute_segment_metrics(
@@ -257,7 +265,7 @@ def _compute_segment_metrics(
 ) -> AttentionSegmentResult:
     """Compute attention metrics for a specific layer segment using generation queries."""
     if not layer_indices:
-        return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
+        return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
     total_queries = 0
     for layer_idx in layer_indices:
@@ -266,15 +274,15 @@ def _compute_segment_metrics(
             total_queries = attn.shape[0]
             break
     if total_queries == 0:
-        return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
+        return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
     gen_row_start = max(num_prompt_queries, 0)
     if gen_row_start >= total_queries:
-        return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
+        return AttentionSegmentResult(float("nan"), 0.0, 0.0)
     
     generated_tokens = total_queries - num_prompt_queries
     if generated_tokens <= 0:
-        return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
+        return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
     attn_text_total = 0.0
     attn_vision_total = 0.0
@@ -321,7 +329,7 @@ def _compute_segment_metrics(
         del gen_attn, gen_attn_norm, text_keys_mask, vision_keys_mask
 
     if num_layers_with_data == 0:
-        return AttentionSegmentResult(float("nan"), float("nan"), float("nan"), 0.0, 0.0)
+        return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
     attn_text_avg = attn_text_total / num_layers_with_data
     attn_vision_avg = attn_vision_total / num_layers_with_data
@@ -330,10 +338,7 @@ def _compute_segment_metrics(
     num_vision = int(vision_mask.sum().item())
 
     vgr = _compute_vgr(attn_text_avg, attn_vision_avg, max(num_instruction, 1), max(num_vision, 0))
-    aei_text = _compute_aei(attn_text_avg, attn_vision_avg, max(num_instruction, 0), max(num_vision, 0), "text")
-    aei_vision = _compute_aei(attn_text_avg, attn_vision_avg, max(num_instruction, 0), max(num_vision, 0), "vision")
-
-    return AttentionSegmentResult(vgr, aei_text, aei_vision, attn_text_avg, attn_vision_avg)
+    return AttentionSegmentResult(vgr, attn_text_avg, attn_vision_avg)
 
 
 def compute_qwen_attention_metrics_for_batch(
@@ -343,6 +348,7 @@ def compute_qwen_attention_metrics_for_batch(
     input_ids: torch.Tensor,
     sequences: torch.Tensor,
     image_grid_thw: Optional[torch.Tensor] = None,
+    last_k_layers: Optional[int] = None,
 ) -> Tuple[List[Optional[AttentionSampleResult]], List[Optional[str]]]:
     """Compute Qwen attention metrics for a batch of samples."""
     batch_size = input_ids.size(0)
@@ -352,7 +358,17 @@ def compute_qwen_attention_metrics_for_batch(
     if outputs_attentions is None or len(outputs_attentions) == 0:
         return results, skip_reasons
 
-    segments = _split_layers_to_segments(len(outputs_attentions[0]))
+    # Determine which layers to use: either all, or only the last-k layers
+    total_layers = len(outputs_attentions[0])
+    if last_k_layers is not None:
+        if last_k_layers <= 0:
+            selected = list(range(total_layers))
+        else:
+            last = min(last_k_layers, total_layers)
+            selected = list(range(total_layers))[-last:]
+        segments = _split_indices_to_segments(selected)
+    else:
+        segments = _split_layers_to_segments(total_layers)
     special_token_ids = get_qwen_special_token_ids(processor)
 
     if image_grid_thw is not None and image_grid_thw.dim() == 3:
@@ -363,7 +379,7 @@ def compute_qwen_attention_metrics_for_batch(
         grid_items = [None] * batch_size
 
     for batch_idx in range(batch_size):
-        per_layer_attn = _collect_llm_attention_for_sample(outputs_attentions, batch_idx)
+        per_layer_attn = _collect_llm_attention_for_sample(outputs_attentions, batch_idx, last_k_layers=last_k_layers)
         if not per_layer_attn:
             results.append(None)
             skip_reasons.append("no_attention")
@@ -432,6 +448,84 @@ def compute_qwen_attention_metrics_for_batch(
         del per_layer_attn, input_ids_sample, spans, instruction_mask, vision_mask
 
     return results, skip_reasons
+
+
+def process_attention_context(
+    attention_context: Optional[dict],
+    model: Any,
+    processor: Any,
+    args: Any,
+    attention_deque: Optional[Any] = None,
+    attention_skip_reasons_deque: Optional[Any] = None,
+    token_weights_deque: Optional[Any] = None,
+) -> None:
+    """Process attention outputs: compute per-sample metrics and optional token weights, update deques.
+
+    This function mutates the passed deques in-place (if provided) and clears heavy attention tensors in the context.
+    """
+    if attention_context is None:
+        return
+    try:
+        outputs = attention_context.get("outputs")
+        generate_inputs = attention_context.get("inputs")
+        if outputs is None or getattr(outputs, "attentions", None) is None:
+            return
+        if generate_inputs is None or "input_ids" not in generate_inputs:
+            return
+
+        input_ids = generate_inputs["input_ids"].detach().cpu()
+        sequences = outputs.sequences.detach().cpu()
+        image_grid_thw = generate_inputs.get("image_grid_thw")
+        image_grid_thw_cpu = image_grid_thw.detach().cpu() if isinstance(image_grid_thw, torch.Tensor) else None
+
+        last_k = getattr(args, "attention_last_k_layers", None)
+        samples_tuple = compute_qwen_attention_metrics_for_batch(
+            model,
+            processor,
+            outputs.attentions,
+            input_ids,
+            sequences,
+            image_grid_thw=image_grid_thw_cpu,
+            last_k_layers=last_k,
+        )
+        if isinstance(samples_tuple, tuple):
+            sample_results, skip_reasons = samples_tuple
+        else:
+            sample_results = samples_tuple
+            skip_reasons = [None] * len(sample_results)
+
+        # Optional token weights
+        try:
+            if getattr(args, "token_weights", False):
+                from .attention_token_weights import build_token_vgr_weights_for_batch
+                tw_list, _tw_debug = build_token_vgr_weights_for_batch(
+                    outputs_attentions=outputs.attentions,
+                    input_ids=input_ids,
+                    sequences=sequences,
+                    processor=processor,
+                    image_grid_thw=image_grid_thw_cpu,
+                    exclude_special=True,
+                    smooth_sigma=float(getattr(args, "token_weights_smooth_sigma", 0.0)),
+                    clip_range=tuple(getattr(args, "token_weights_clip", (0.2, 3.0))),
+                    last_k_layers=last_k,
+                )
+                if token_weights_deque is not None and hasattr(token_weights_deque, "extend") and tw_list:
+                    token_weights_deque.extend(tw_list)
+        except Exception:
+            pass
+
+        # Free heavy tensors promptly
+        outputs.attentions = None
+        attention_context["outputs"] = None
+        attention_context["inputs"] = None
+
+        if sample_results and attention_deque is not None and hasattr(attention_deque, "extend"):
+            attention_deque.extend(sample_results)
+        if skip_reasons and attention_skip_reasons_deque is not None and hasattr(attention_skip_reasons_deque, "extend"):
+            attention_skip_reasons_deque.extend(skip_reasons)
+    except Exception:
+        # Swallow diagnostics exceptions to avoid training failure
+        pass
 
 
 def get_qwen_special_token_ids(processor) -> Dict[str, int]:

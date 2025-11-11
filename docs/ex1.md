@@ -115,7 +115,7 @@ Answer:
           - 非 RGB 转换为 RGB
       - 最终 train_dataset、eval_dataset（test 切分）
   - 奖励函数装配（src/scripts/train_grpo_vlm.py:167）
-      - 生成长度惩罚函数：get_soft_overlong_punishment(max_completion_len, soft_punish_cache)
+ 
       - VGR 函数选择：若 --vgr_hard_negative 则用硬负模式，否则用 vgr_reward（本实验未开启硬负）
       - 最终 reward 列表顺序（重要！决定权重顺序映射）：
           1. accuracy_reward（src/rewards/accuracy_rewards.py:12）
@@ -175,7 +175,7 @@ Answer:
       - accuracy_reward：从 completion 文本解析 <answer> 或关键词行，匹配 solution → {0,1}
       - vgr_reward：组内分位数映射（VGR 越小越好，映射到 [0,1]），但本实验权重=0（不计入总奖励）
       - think_format_reward：输出格式规则（细节略）
-      - length_reward：soft_overlong_punishment（接近/超过上限的线性惩罚）
+      - length_reward：仅保留 accuracy_conditioned_length_reward 变体
       - 汇总：rewards_per_func 张量（BG, #funcs）→ gather（分布式）→ 由 RewardWeightManager 按当前权重线性加权求 rewards（BG,）
   - 优势与归一化（src/trainer/dapo_trainer.py:1739）
       - group_ng = num_generations，将 rewards reshape(B, G)：
@@ -719,4 +719,3 @@ A:
   ———
 
   以上 1–5 点均基于本地源码路径与控制流展开，结论与建议仅围绕实现一致性与健壮性，不涉及环境或数据外因。
-

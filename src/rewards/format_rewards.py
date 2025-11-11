@@ -85,12 +85,9 @@ def think_format_reward(completions: list[Any], **kwargs) -> list[float]:
             continue
         
         answer_content = answer_matches[0].group(1).strip().upper()
-        if answer_content in {"A", "B", "C", "D"}:
-            valid_answer = True
-        elif answer_content in {"[A]", "[B]", "[C]", "[D]"}:
-            valid_answer = True
-        else:
-            valid_answer = False
+        # 放宽到 A–J，允许不带或带方括号的单字母答案
+        # 合法示例："A"、"[A]"、...、"J"、"[J]"
+        valid_answer = bool(re.fullmatch(r"\[?[A-J]\]?", answer_content))
         if not valid_answer or not answer_content:
             rewards.append(0.0)
             continue

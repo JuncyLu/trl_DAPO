@@ -1,7 +1,3 @@
-TS=$(TZ='Asia/Shanghai' date +%Y%m%d_%H%M%S)
-mkdir -p training_logs/$TS
-export TRAINING_LOG_TS=$TS
-
 # 线程与并行
 export OMP_NUM_THREADS=6
 export MKL_NUM_THREADS=6
@@ -19,11 +15,15 @@ export CUDA_LAUNCH_BLOCKING=1
 # -------- 多机多卡相关参数（在每台机器上按需覆盖） --------
 NUM_MACHINES=${NUM_MACHINES:-1}          # 机器总数
 GPUS_PER_MACHINE=${GPUS_PER_MACHINE:-4}  # 每台机器使用的 GPU 数
-NUM_PROCESSES=${NUM_PROCESSES:-$((NUM_MACHINES * GPUS_PER_MACHINE))}
-MACHINE_RANK=${MACHINE_RANK:-0}          # 当前机器的 rank
+NUM_PROCESSES=${NUM_PROCESSES:-$GPUS_PER_MACHINE}
+MACHINE_RANK=${MACHINE_RANK:-0}          # 当前机器的 rank（0..NUM_MACHINES-1）
 MASTER_ADDR=${MASTER_ADDR:-127.0.0.1}
 MASTER_PORT=${MASTER_PORT:-29500}
 SAME_NETWORK=${SAME_NETWORK:-true}
+
+# 为避免多机写同一路径产生冲突，按机器 rank 划分输出目录
+RUN_ROOT="training_logs/ex1/r${MACHINE_RANK}"
+mkdir -p "$RUN_ROOT/runs"
 
 ACCELERATE_DISTRIBUTED_ARGS=(
   --config_file src/configs/deepspeed_zero2.yaml
@@ -46,13 +46,13 @@ accelerate launch \
   "${ACCELERATE_DISTRIBUTED_ARGS[@]}" \
   src/scripts/train_grpo_vlm.py \
   --model_name_or_path Qwen/Qwen2.5-VL-7B-Instruct \
-  --output_dir training_logs/$TS/runs/dapo-Qwen2.5-VL-7B-Instruct \
-  --rollout_log_path training_logs/$TS/rollout_results.md \
-  --eval_log_path training_logs/$TS/eval_results.md \
+  --output_dir "$RUN_ROOT/runs/dapo-Qwen2.5-VL-7B-Instruct" \
+  --rollout_log_path "$RUN_ROOT/rollout_results.md" \
+  --eval_log_path "$RUN_ROOT/eval_results.md" \
   --dtype bfloat16 \
   --gradient_checkpointing \
-  --max_prompt_length 1024 \
-  --max_completion_length 384 \
+  --max_prompt_length 4096 \
+  --max_completion_length 1024 \
   --per_device_train_batch_size 4 \
   --gradient_accumulation_steps 4 \
   --num_generations 8 \
@@ -72,14 +72,13 @@ accelerate launch \
   --warmup_ratio 0.05 \
   --max_grad_norm 1.0 \
   --replay_buffer_size 64 \
-  --soft_punish_cache 50 \
   --filter_min_reward 1.0 \
   --replay_var_epsilon 1e-6 \
   --reward_weights 2.5 0.0 0.5 1.0 \
   --early_reward_weights 1.0 0.0 2.0 1.0 \
   --use_peft \
-  --lora_target_modules "q_proj", "v_proj" \
-  >> training_logs/$TS/train.log 2>&1
+  --lora_target_modules "q_proj", "v_proj"
+#   >> "$RUN_ROOT/train.log" 2>&1
     # --use_vllm \
     # --vllm_mode colocate \
     # --vllm_gpu_memory_utilization 0.5

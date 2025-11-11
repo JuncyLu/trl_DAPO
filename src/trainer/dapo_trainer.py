@@ -67,10 +67,17 @@ from ..rewards.reward_utils import create_reward_weight_manager, calculate_rewar
 from ..utils.attention_metrics import (
     compute_qwen_attention_metrics_for_batch,
     AttentionSampleResult,
+    process_attention_context,
 )
 from ..utils import build_token_vgr_weights_for_batch
 from ..rewards.accuracy_rewards import accuracy_reward
-from ..utils.dapo_logging import emit_rollout_logs, emit_eval_logs, compute_real_vgr_metrics
+from ..utils.dapo_logging import (
+    emit_eval_logs,
+    compute_real_vgr_metrics,
+    perform_realtime_rollout_logging,
+    print_compact_logs,
+    perform_eval_logging,
+)
 from contextlib import contextmanager
 from trl.trainer.utils import (
     RepeatSampler,
@@ -1145,8 +1152,6 @@ class DAPOTrainer(BaseTrainer):
                     
                 vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
                 
-                # Extract attention data for reward functions
-                # Use raw attention values (attention_text/attention_vision) not AEI values
                 reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in vgr_metrics]
                 reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in vgr_metrics]
                 reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in vgr_metrics]
@@ -1156,7 +1161,6 @@ class DAPOTrainer(BaseTrainer):
         try:
             solutions_for_batch = reward_kwargs.get("solution", None)
             if solutions_for_batch is None:
-                # 有些数据集中可能使用 "solutions" 作为字段名
                 solutions_for_batch = reward_kwargs.get("solutions", None)
 
             if solutions_for_batch is not None:
@@ -1546,13 +1550,16 @@ class DAPOTrainer(BaseTrainer):
                         if lm_cfg:
                             setattr(lm_cfg, "_attn_implementation", "eager")
                         
-                        attention_outputs = unwrapped_model.generate(
-                            **generate_inputs,
-                            generation_config=self.generation_config,
-                            disable_compile=True,
-                            return_dict_in_generate=True,
-                            output_attentions=True,
-                        )
+                        with self._attn_last_k_layers_only(
+                            unwrapped_model, last_k_layers=getattr(self.args, "attention_last_k_layers", 6)
+                        ):
+                            attention_outputs = unwrapped_model.generate(
+                                **generate_inputs,
+                                generation_config=self.generation_config,
+                                disable_compile=True,
+                                return_dict_in_generate=True,
+                                output_attentions=True,
+                            )
                     finally:
                         # Restore original values
                         if cfg:
@@ -2156,119 +2163,29 @@ class DAPOTrainer(BaseTrainer):
             except Exception:
                 pass
 
-        # Emit rollout logs if enabled
-        if (self.accelerator.is_main_process and 
-            getattr(self.args, "realtime_rollout_logging", False) and 
-            mode == "train"):
-            try:
-                # Get VGR info for logging
-                vgr_info = []
-                if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
-                    att_list = list(self._logs['attention'])
-                    if att_list:
-                        sample_results = att_list[-len(prompts):]
-                        if hasattr(self, '_attention_skip_reasons'):
-                            skips = list(self._attention_skip_reasons)
-                            skip_slice = (
-                                skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
-                            )
-                        else:
-                            skip_slice = [None] * len(sample_results)
-                        vgr_info = compute_real_vgr_metrics(sample_results, skip_slice)
-                
-                # Get solutions if available
-                solutions = [inp.get("solution", "") for inp in inputs]
-
-                # For logs: ChatML prompt + plain completion
-                if is_conversational(inputs[0]):
-                    log_prompts_text = [
-                        apply_chat_template({"prompt": p}, self.processing_class)["prompt"] for p in prompts
-                    ]
-                else:
-                    log_prompts_text = prompts_text
-                log_completions_text = completions_text
-                
-                # Prepare advantages for summary log
-                advantages_for_log = None
-                adv_local = advantages  # already sliced earlier to local process
-                # Compute token-weighted advantage proxy if token weights available
-                try:
-                    if getattr(self.args, "token_weights", False) and token_weights_tensor is not None:
-                        tw_local = token_weights_tensor[process_slice]
-                        cm_local = completion_mask[process_slice].float()
-                        valid = cm_local.sum(dim=1).clamp(min=1.0)
-                        mean_w = (tw_local * cm_local).sum(dim=1) / valid
-                        advantages_for_log = (adv_local * mean_w).detach().cpu().tolist()
-                    else:
-                        advantages_for_log = adv_local.detach().cpu().tolist()
-                except Exception:
-                    advantages_for_log = None
-
-                # Call rollout logging
-                emit_rollout_logs(
-                    prompts_text=log_prompts_text,
-                    completions_text=log_completions_text,
-                    solutions=solutions,
-                    rewards_per_func_local=rewards_per_func[process_slice],
-                    total_rewards_local=rewards[process_slice],
-                    reward_names=self.reward_func_names,
-                    vgr_info=vgr_info,
-                    log_path=getattr(self.args, "rollout_log_path", None),
-                    prompt_preview_chars=getattr(self.args, "prompt_preview_chars", 2000),
-                    completion_preview_chars=getattr(self.args, "completion_preview_chars", 2000),
-                    vgr_as_coefficient=getattr(self.args, "vgr_as_coefficient", 0),
-                    step=self.state.global_step,
-                    epoch=self.state.epoch,
-                    advantages_local=advantages_for_log,
-                )
-                # Append token weights section to the same rollout log file
-                if getattr(self.args, "token_weights", False) and token_weights_tensor is not None:
-                    from ..utils.dapo_logging import emit_token_weights_logs
-                    emit_token_weights_logs(
-                        token_weights=token_weights_tensor,
-                        log_path=getattr(self.args, "rollout_log_path", None),
-                        step=self.state.global_step,
-                        epoch=self.state.epoch,
-                    )
-                    # Also emit per-token annotation for a small preview set
-                    try:
-                        tokenizer = getattr(self.processing_class, "tokenizer", None)
-                        if tokenizer is not None:
-                            # Use local tensors directly (do NOT slice by global process_slice)
-                            local_ids = completion_ids
-                            local_mask = completion_mask
-                            local_w = token_weights_tensor
-                            token_strs: list[list[str]] = []
-                            token_wts: list[list[float]] = []
-                            for i in range(local_ids.size(0)):
-                                valid_len = int(local_mask[i].sum().item())
-                                if valid_len <= 0:
-                                    token_strs.append([])
-                                    token_wts.append([])
-                                    continue
-                                ids_i = local_ids[i, :valid_len].detach().cpu().tolist()
-                                toks = tokenizer.convert_ids_to_tokens(ids_i, skip_special_tokens=False)
-                                token_strs.append([str(t) for t in toks])
-                                token_wts.append(local_w[i, :valid_len].detach().cpu().tolist())
-                            from ..utils.dapo_logging import emit_tokenwise_weights
-                            # 单独的 token 权重文件：与 rollout 同目录，文件名 token_weights.md
-                            rollout_path = getattr(self.args, "rollout_log_path", None)
-                            if rollout_path:
-                                import os as _os
-                                token_log_path = _os.path.join(_os.path.dirname(rollout_path), "token_weights.md")
-                            else:
-                                token_log_path = None  # 由 emit_tokenwise_weights 内部默认到 training_logs/token_weights.md
-                            emit_tokenwise_weights(
-                                token_strings=token_strs,
-                                token_weights=token_wts,
-                                log_path=token_log_path,
-                                step=self.state.global_step,
-                                epoch=self.state.epoch,
-                            )
-                    except Exception:
-                        pass
-            except Exception as e:
-                logger.warning(f"Failed to emit rollout logs: {e}")
+        # Emit rollout logs if enabled (moved to logging utils)
+        perform_realtime_rollout_logging(
+            is_main_process=self.accelerator.is_main_process,
+            mode=mode,
+            args=self.args,
+            state_step=self.state.global_step,
+            state_epoch=self.state.epoch,
+            compute_attention_metrics=self.compute_attention_metrics,
+            attention_logs=self._logs.get("attention") if hasattr(self, "_logs") else None,
+            attention_skip_reasons=getattr(self, "_attention_skip_reasons", None),
+            processing_class=self.processing_class,
+            prompts=prompts,
+            inputs=inputs,
+            prompts_text=prompts_text,
+            completions_text=completions_text,
+            rewards_per_func_local=rewards_per_func[process_slice],
+            total_rewards_local=rewards[process_slice],
+            reward_names=self.reward_func_names,
+            token_weights_tensor=token_weights_tensor,
+            completion_ids=completion_ids,
+            completion_mask=completion_mask,
+            process_slice=process_slice,
+        )
 
         return output
 
@@ -2490,9 +2407,6 @@ class DAPOTrainer(BaseTrainer):
         gathered_clip_ratio = self.accelerator.gather(clip_ratio)
         self._metrics[mode]["clip_ratio/region_mean"].append(gathered_clip_ratio.nanmean().item())
 
-        # Extra metrics for new switches
-        # 记录新增稳健性指标（键名与模式合成为 train/decoupled_clip, train/kl_beta_eff）
-        # 新旧命名同时记录，避免下游依赖冲突
         dec = 1.0 if getattr(self.args, "decoupled_clip", False) else 0.0
         self._metrics[mode]["decoupled_clip"].append(dec)
         self._metrics[mode]["kl_beta_eff"].append(self._beta_eff)
@@ -2527,100 +2441,22 @@ class DAPOTrainer(BaseTrainer):
 
         logs = {**logs, **metrics}
 
-        # Pretty print compact grouped logs to terminal
+        # Pretty print compact grouped logs to terminal (moved to logging utils)
         if self.accelerator.is_main_process:
             try:
-                # Rewards line
-                r_acc = logs.get("rewards/accuracy_reward/mean", logs.get("eval_rewards/accuracy_reward/mean"))
-                r_fmt = logs.get("rewards/think_format_reward/mean", logs.get("eval_rewards/think_format_reward/mean"))
-                # Prefer new VGR reward key; fall back to legacy additive key if present
-                r_vgr = logs.get("rewards/vgr_reward/mean", logs.get("eval_rewards/vgr_reward/mean"))
-                if r_vgr is None:
-                    r_vgr = logs.get("rewards/vgr_reward_as_additive/mean", logs.get("eval_rewards/vgr_reward_as_additive/mean"))
-                r_len = logs.get("rewards/soft_overlong_punishment_reward/mean", logs.get("eval_rewards/soft_overlong_punishment_reward/mean"))
-                r_total = logs.get("reward", logs.get("eval_reward"))
-                rewards_line = []
-                if r_acc is not None: rewards_line.append(f"acc={r_acc:.3f}")
-                if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
-                if r_vgr is not None: rewards_line.append(f"vgr={r_vgr:.3f}")
-                if r_len is not None: rewards_line.append(f"len={r_len:.3f}")
-                if r_total is not None: rewards_line.append(f"total={r_total:.3f}")
-                if rewards_line:
-                    print("Rewards: " + ", ".join(rewards_line))
-
-                # Loss/optim line
-                loss = logs.get("loss", logs.get("eval_loss"))
-                ent = logs.get("entropy", logs.get("eval_entropy"))
-                lr = logs.get("learning_rate")
-                grad = logs.get("grad_norm", logs.get("eval_grad_norm"))
-                clip_low = logs.get("clip_ratio/low_mean", logs.get("eval_clip_ratio/low_mean"))
-                clip_high = logs.get("clip_ratio/high_mean", logs.get("eval_clip_ratio/high_mean"))
-                loss_line = []
-                if loss is not None: loss_line.append(f"loss={loss:.4f}")
-                if ent is not None: loss_line.append(f"entropy={ent:.4f}")
-                if lr is not None: loss_line.append(f"lr={lr:.2e}")
-                if grad is not None: loss_line.append(f"grad={grad:.3f}")
-                if clip_low is not None: loss_line.append(f"clip_low={clip_low:.3f}")
-                if clip_high is not None: loss_line.append(f"clip_high={clip_high:.3f}")
-                if loss_line:
-                    print("Optim:   " + ", ".join(loss_line))
-
-                # Attention line
-                a_early = logs.get("attention/early/vgr", logs.get("eval_attention/early/vgr"))
-                a_mid = logs.get("attention/middle/vgr", logs.get("eval_attention/middle/vgr"))
-                a_late = logs.get("attention/late/vgr", logs.get("eval_attention/late/vgr"))
-                a_all = logs.get("attention/all/vgr", logs.get("eval_attention/all/vgr"))
-                attn_line = []
-                if a_early is not None: attn_line.append(f"early={a_early:.3f}")
-                if a_mid is not None: attn_line.append(f"middle={a_mid:.3f}")
-                if a_late is not None: attn_line.append(f"late={a_late:.3f}")
-                if a_all is not None: attn_line.append(f"all={a_all:.3f}")
-                if attn_line:
-                    print("VGR:     " + ", ".join(attn_line))
-
-                # Emit evaluation markdown logs: ChatML prompt + plain completion
-                if mode == "eval":
-                    try:
-                        prompts_cm = list(self._logs.get("prompt_chatml", []))
-                        completions_cm = list(self._logs.get("completion", []))
-                        total_rewards = list(self._logs["rewards"].get("total", [])) if isinstance(self._logs.get("rewards"), dict) else []
-                        reward_names = self.reward_func_names
-                        reward_lists = {name: list(self._logs["rewards"].get(name, [])) for name in reward_names}
-                        sample_count = min(len(prompts_cm), len(completions_cm))
-                        eval_samples = []
-                        for i in range(sample_count):
-                            rewards_map = {}
-                            for name in reward_names:
-                                vals = reward_lists.get(name, [])
-                                if i < len(vals):
-                                    try:
-                                        rewards_map[name] = float(vals[i])
-                                    except Exception:
-                                        pass
-                            total_val = 0.0
-                            if i < len(total_rewards):
-                                try:
-                                    total_val = float(total_rewards[i])
-                                except Exception:
-                                    total_val = 0.0
-                            eval_samples.append(
-                                {
-                                    "prompt": prompts_cm[i],
-                                    "completion": completions_cm[i],
-                                    "rewards": rewards_map,
-                                    "total_reward": total_val,
-                                }
-                            )
-                        emit_eval_logs(
-                            metrics=metrics,
-                            logs=logs,
-                            eval_samples=eval_samples,
-                            log_path=getattr(self.args, "eval_log_path", None),
-                            step=self.state.global_step,
-                            epoch=self.state.epoch,
-                        )
-                    except Exception as e:
-                        logger.warning(f"Failed to emit eval logs: {e}")
+                print_compact_logs(logs, mode, use_hard_negative=getattr(self.args, "vgr_hard_negative", False))
+                # Emit evaluation markdown logs: moved to logging utils
+                perform_eval_logging(
+                    is_main_process=self.accelerator.is_main_process,
+                    mode=mode,
+                    args=self.args,
+                    state_step=self.state.global_step,
+                    state_epoch=self.state.epoch,
+                    metrics=metrics,
+                    logs=logs,
+                    internal_logs=self._logs,
+                    reward_names=self.reward_func_names,
+                )
             except Exception:
                 pass
 
@@ -2764,137 +2600,116 @@ class DAPOTrainer(BaseTrainer):
                 else:
                     setattr(lm_cfg, "_attn_implementation", prev_lm)
 
+    @contextmanager
+    def _attn_last_k_layers_only(self, model: nn.Module, last_k_layers: Optional[int] = None):
+        """
+        Temporarily limit returned attentions to the last-K decoder layers by wrapping layer/attention forwards.
+        Does not alter computations; only prevents returning/storing attention weights for earlier layers.
+        """
+        if not self.compute_attention_metrics or not last_k_layers or last_k_layers <= 0:
+            yield
+            return
+
+        def _get_attr(obj, path: str):
+            cur = obj
+            for p in path.split('.'):
+                if not hasattr(cur, p):
+                    return None
+                cur = getattr(cur, p)
+            return cur
+
+        # Candidate decoder layer paths
+        candidates = [
+            "language_model.model.layers",
+            "model.layers",
+            "model.decoder.layers",
+            "gpt_neox.layers",
+            "transformer.h",
+        ]
+        layers = None
+        for cand in candidates:
+            lst = _get_attr(model, cand)
+            if lst is not None and hasattr(lst, "__len__") and len(lst) > 0:
+                layers = lst
+                break
+        if layers is None:
+            for _, module in model.named_modules():
+                if isinstance(module, torch.nn.ModuleList) and len(module) > 0:
+                    # Heuristic: treat as decoder layers only if majority of items look like decoder blocks
+                    hits = 0
+                    total = len(module)
+                    for item in module:
+                        for nm in ["self_attn", "attn", "attention", "mha", "self_attention"]:
+                            if hasattr(item, nm):
+                                hits += 1
+                                break
+                    if hits >= max(1, total // 2):
+                        layers = module
+                        break
+
+        if layers is None or len(layers) == 0:
+            yield
+            return
+
+        num_layers = len(layers)
+        keep = max(1, min(int(last_k_layers), num_layers))
+        keep_indices = set(range(num_layers - keep, num_layers))
+
+        attn_attr_names = ["self_attn", "attn", "attention", "mha", "self_attention"]
+        patched = []
+
+        try:
+            for idx, layer in enumerate(layers):
+                keep_flag = idx in keep_indices
+
+                # Patch attention submodule forward if present
+                for name in attn_attr_names:
+                    if hasattr(layer, name):
+                        attn_mod = getattr(layer, name)
+                        if hasattr(attn_mod, "forward"):
+                            orig = attn_mod.forward
+                            def make_attn_wrapper(ofn, kf):
+                                def _wrapped(*args, **kwargs):
+                                    if not kf and "output_attentions" in kwargs:
+                                        kwargs = dict(kwargs)
+                                        kwargs["output_attentions"] = False
+                                    return ofn(*args, **kwargs)
+                                return _wrapped
+                            attn_mod.forward = make_attn_wrapper(orig, keep_flag)
+                            patched.append((attn_mod, "forward", orig))
+                        break
+
+                # Also patch layer forward (force per-layer output_attentions=False for early layers)
+                if hasattr(layer, "forward"):
+                    orig_layer = layer.forward
+                    def make_layer_wrapper(ofn, kf):
+                        def _wrapped(*args, **kwargs):
+                            if not kf and "output_attentions" in kwargs:
+                                kwargs = dict(kwargs)
+                                kwargs["output_attentions"] = False
+                            return ofn(*args, **kwargs)
+                        return _wrapped
+                    layer.forward = make_layer_wrapper(orig_layer, keep_flag)
+                    patched.append((layer, "forward", orig_layer))
+
+            yield
+        finally:
+            for mod, attr, orig in patched:
+                try:
+                    setattr(mod, attr, orig)
+                except Exception:
+                    pass
+
+    # Attention metrics processing moved to utils (no AEI, only last-K aggregation)
     def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> None:
-        """Process attention outputs and compute metrics (aligned with old repo logic)."""
         if not self.compute_attention_metrics or attention_context is None:
             return
-        try:
-            outputs = attention_context.get("outputs")
-            generate_inputs = attention_context.get("inputs")
-            
-            if outputs is None or getattr(outputs, "attentions", None) is None:
-                return
-            if generate_inputs is None or "input_ids" not in generate_inputs:
-                return
-
-            # Move relevant tensors to CPU to reduce GPU pressure during analysis
-            input_ids = generate_inputs["input_ids"].detach().cpu()
-            sequences = outputs.sequences.detach().cpu()
-            image_grid_thw = generate_inputs.get("image_grid_thw")
-            
-            if isinstance(image_grid_thw, torch.Tensor):
-                image_grid_thw_cpu = image_grid_thw.detach().cpu()
-            else:
-                image_grid_thw_cpu = None
-
-            # Compute per-sample attention metrics
-            sample_results_tuple = compute_qwen_attention_metrics_for_batch(
-                self.model,
-                self.processing_class,
-                outputs.attentions,
-                input_ids,
-                sequences,
-                image_grid_thw=image_grid_thw_cpu,
-            )
-            if isinstance(sample_results_tuple, tuple):
-                sample_results, skip_reasons = sample_results_tuple
-            else:
-                sample_results = sample_results_tuple
-                skip_reasons = [None] * len(sample_results)
-
-            # Optional: build token-level weights from attention (for loss weighting)
-            try:
-                if getattr(self.args, "token_weights", False):
-                    tw_list, _tw_debug = build_token_vgr_weights_for_batch(
-                        outputs_attentions=outputs.attentions,
-                        input_ids=input_ids,
-                        sequences=sequences,
-                        processor=self.processing_class,
-                        image_grid_thw=image_grid_thw_cpu,
-                        exclude_special=True,
-                        smooth_sigma=float(getattr(self.args, "token_weights_smooth_sigma", 0.0)),
-                        clip_range=tuple(getattr(self.args, "token_weights_clip", (0.2, 3.0))),
-                    )
-                    if isinstance(self._logs.get("token_weights"), deque) and tw_list:
-                        # Extend per-sample to keep alignment with later slicing by latest B items
-                        self._logs["token_weights"].extend(tw_list)
-            except Exception:
-                pass
-
-            # Free attention tensors quickly to avoid memory bloat
-            outputs.attentions = None
-            attention_context["outputs"] = None
-            attention_context["inputs"] = None
-
-            if not sample_results:
-                return
-
-            # Log and store metrics
-            self._log_attention_metrics(sample_results, mode, skip_reasons)
-        except Exception as e:
-            # Do not fail training on diagnostics, but log the error
-            logger.warning(f"Failed to compute attention metrics: {e}")
-            import traceback
-            logger.debug(f"Attention metrics error traceback:\n{traceback.format_exc()}")
-
-    def _log_attention_metrics(
-        self,
-        sample_results: List[Optional[AttentionSampleResult]],
-        mode: str,
-        skip_reasons: List[Optional[str]],
-    ) -> None:
-        """Aggregate and log attention metrics (aligned with old repo logic)."""
-        device = self.accelerator.device
-        segments = ["early", "middle", "late", "all"]
-
-        if not sample_results:
-            return
-
-        valid_results = [(idx, res) for idx, res in enumerate(sample_results) if res is not None]
-        if not valid_results:
-            # still extend internal buffers for completeness
-            if isinstance(self._logs.get("attention"), deque):
-                self._logs["attention"].extend(sample_results)
-            if isinstance(self._attention_skip_reasons, deque):
-                self._attention_skip_reasons.extend(skip_reasons)
-            return
-
-        for segment in segments:
-            vgr_vals = []
-            aei_text_vals = []
-            aei_vision_vals = []
-            for _, result in valid_results:
-                seg = result.segments.get(segment)
-                if seg is None:
-                    continue
-                vgr_vals.append(seg.vgr)
-                aei_text_vals.append(seg.aei_text)
-                aei_vision_vals.append(seg.aei_vision)
-
-            if vgr_vals:
-                vgr_tensor = torch.tensor(vgr_vals, device=device, dtype=torch.float32)
-                vgr_tensor = torch.where(torch.isfinite(vgr_tensor), vgr_tensor, torch.full_like(vgr_tensor, float("nan")))
-                gathered_vgr = self.accelerator.gather(vgr_tensor)
-                self._metrics[mode][f"attention/{segment}/vgr"].append(torch.nanmean(gathered_vgr).item())
-
-            if aei_text_vals:
-                aei_text_tensor = torch.tensor(aei_text_vals, device=device, dtype=torch.float32)
-                aei_text_tensor = torch.where(
-                    torch.isfinite(aei_text_tensor), aei_text_tensor, torch.full_like(aei_text_tensor, float("nan"))
-                )
-                gathered_aei_text = self.accelerator.gather(aei_text_tensor)
-                self._metrics[mode][f"attention/{segment}/aei_text"].append(torch.nanmean(gathered_aei_text).item())
-
-            if aei_vision_vals:
-                aei_vision_tensor = torch.tensor(aei_vision_vals, device=device, dtype=torch.float32)
-                aei_vision_tensor = torch.where(
-                    torch.isfinite(aei_vision_tensor), aei_vision_tensor, torch.full_like(aei_vision_tensor, float("nan"))
-                )
-                gathered_aei_vision = self.accelerator.gather(aei_vision_tensor)
-                self._metrics[mode][f"attention/{segment}/aei_vision"].append(torch.nanmean(gathered_aei_vision).item())
-
-        # Persist sample-level results for downstream logging and rewards
-        if isinstance(self._logs.get("attention"), deque):
-            self._logs["attention"].extend(sample_results)
-        if isinstance(self._attention_skip_reasons, deque):
-            self._attention_skip_reasons.extend(skip_reasons)
+        process_attention_context(
+            attention_context=attention_context,
+            model=self.model,
+            processor=self.processing_class,
+            args=self.args,
+            attention_deque=self._logs.get("attention") if hasattr(self, "_logs") else None,
+            attention_skip_reasons_deque=getattr(self, "_attention_skip_reasons", None),
+            token_weights_deque=self._logs.get("token_weights") if hasattr(self, "_logs") else None,
+        )

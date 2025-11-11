@@ -25,20 +25,20 @@ accelerate launch \
   --eval_log_path training_logs/$TS/eval_results.md \
   --dtype bfloat16 \
   --gradient_checkpointing \
-  --max_prompt_length 1024 \
+  --max_prompt_length 4096 \
   --max_completion_length 384 \
-  --per_device_train_batch_size 4 \
-  --gradient_accumulation_steps 4 \
+  --per_device_train_batch_size 1 \
+  --gradient_accumulation_steps 8 \
   --num_generations 8 \
-  --num_train_epochs 2 \
+  --num_train_epochs 1 \
   --report_to wandb \
   --log_completions \
   --logging_steps 1.0 \
   --do_eval \
   --eval_strategy steps \
-  --eval_steps 10 \
-  --eval_num_generations 4 \
-  --per_device_eval_batch_size 8 \
+  --eval_steps 12 \
+  --eval_num_generations 1 \
+  --per_device_eval_batch_size 2 \
   --save_strategy steps \
   --save_steps 400 \
   --learning_rate 1e-5 \
@@ -48,13 +48,12 @@ accelerate launch \
   --replay_buffer_size 64 \
   --filter_min_reward 1.5 \
   --replay_var_epsilon 1e-6 \
-  --reward_weights 2.5 1.0 0.5 1.0 \
-  --early_reward_weights 1.0 1.0 2.0 1.0 \
-  --max_steps 20 \
+  --token_weights \
+  --token_weights_smooth_sigma 1.0 \
+  --vgr_hard_negative \
+  --reward_weights 3.5 2.0 0.5 1.0 \
+  --early_reward_weights 2.0 2.0 2.0 1.0 \
   --use_peft \
   --lora_target_modules "q_proj", "v_proj" \
   >> training_logs/$TS/train.log 2>&1
 
-    # --use_vllm \
-    # --vllm_mode colocate \
-    # --vllm_gpu_memory_utilization 0.5
