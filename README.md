@@ -91,8 +91,6 @@ accelerate launch \
   - 计算 VGR 与 early/middle/late/all 分段指标，支持 Qwen‑VL 特殊符号解析；日志清晰可读。
 - DAPO 损失健壮
   - 默认 DAPO 归一化消除长度偏置，截断样本可屏蔽计入损失。
-- 动态采样与稳定性
-  - 可选重放缓冲，按“方差与均值阈值”替换低信息组；奖励权重支持“早期/常规”两阶段切换。
 - 日志可解释性强
   - rollout 总览 + token_weights 独立文件；逐 token 权重按“词(权重)”直观串联，便于人工审阅。
 

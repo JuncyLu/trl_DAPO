@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import heapq
 import inspect
 import math
 import os
@@ -511,34 +510,6 @@ class DAPOTrainer(BaseTrainer):
                 max_completion_length=self.max_completion_length,
             )
 
-        # --- Dynamic sampling replay buffer (optional; no-op when size==0) ---
-        class _ReplayBuffer:
-            def __init__(self, max_size: int):
-                self.max_size = max_size
-                self.heap = []  # min-heap of (score, data)
-
-            def add(self, scores: list[float], data: list[dict]):
-                for score, datum in zip(scores, data):
-                    # Use id as unique identifier to avoid tensor comparison issues
-                    if len(self.heap) < self.max_size:
-                        heapq.heappush(self.heap, (float(score), id(datum), datum))
-                    else:
-                        if float(score) > float(self.heap[0][0]):
-                            heapq.heapreplace(self.heap, (float(score), id(datum), datum))
-
-            def sample(self, num_samples: int) -> list[dict]:
-                if not self.heap:
-                    return None
-                scores = torch.tensor([item[0] for item in self.heap], dtype=torch.float32)
-                probs = scores / scores.sum().clamp(min=1e-8)
-                replacement = num_samples > len(self.heap)
-                idxs = torch.multinomial(probs, num_samples, replacement=replacement).tolist()
-                return [self.heap[i][2] for i in idxs]  # datum is the 3rd element
-
-        self.replay_buffer = None
-        if getattr(args, "replay_buffer_size", 0) and args.replay_buffer_size > 0:
-            self.replay_buffer = _ReplayBuffer(args.replay_buffer_size)
-
         # Initialize the metrics
         self._metrics = {"train": defaultdict(list), "eval": defaultdict(list)}
         # Effective KL beta (with schedule if enabled)
@@ -890,7 +861,17 @@ class DAPOTrainer(BaseTrainer):
         token_type_ids=None,
     ) -> dict[str, Optional[torch.Tensor]]:
         """Compute log-probs and (optionally) entropies for each token."""
-        batch_size = batch_size or input_ids.size(0)  # Chunk inputs into smaller batches to reduce memory peak
+        # Handle empty batch early to avoid zero step in range() and downstream indexing
+        if input_ids.size(0) == 0:
+            empty = torch.empty((0, logits_to_keep), dtype=torch.float32, device=input_ids.device)
+            return empty, (empty if compute_entropy else None)
+
+        # Chunk inputs into smaller batches to reduce memory peak; ensure positive step
+        if batch_size is None or int(batch_size) <= 0:
+            # If caller didn't pass a valid batch_size, default to process all available rows
+            batch_size = int(max(1, input_ids.size(0)))
+        else:
+            batch_size = int(batch_size)
         all_logps = []
         all_entropies = []
         for start in range(0, input_ids.size(0), batch_size):
@@ -904,10 +885,11 @@ class DAPOTrainer(BaseTrainer):
                 rows_per_sample = torch.split(rows_per_image, num_images)
                 rows_per_sample = torch.stack([s.sum() for s in rows_per_sample])
                 cum_rows = torch.cat([torch.tensor([0], device=rows_per_sample.device), rows_per_sample.cumsum(0)])
-                row_start, row_end = cum_rows[start].item(), cum_rows[start + batch_size].item()
+                end_idx = min(start + batch_size, input_ids.size(0))
+                row_start, row_end = cum_rows[start].item(), cum_rows[end_idx].item()
                 model_inputs["pixel_values"] = pixel_values[row_start:row_end]
                 cum_imgs = torch.tensor([0] + num_images).cumsum(0)
-                img_start, img_end = cum_imgs[start], cum_imgs[start + batch_size]
+                img_start, img_end = cum_imgs[start], cum_imgs[end_idx]
                 model_inputs["image_grid_thw"] = image_grid_thw[img_start:img_end]
             elif pixel_values is not None:
                 model_inputs["pixel_values"] = pixel_values[start : start + batch_size]
@@ -1089,35 +1071,67 @@ class DAPOTrainer(BaseTrainer):
 
         mode = "train" if self.model.training else "eval"
         if mode == "train":
-            generate_every = self.args.steps_per_generation * self.num_iterations
-            if self._step % generate_every == 0 or self._buffered_inputs is None:
-                # self._buffered_inputs=None can occur when resuming from a checkpoint
-                try:
-                    generation_batch = self._generate_and_score_completions(generation_batch)
-                except RuntimeError as e:
-                    # OOM 退让（可选，默认关闭）
-                    if getattr(self.args, "oom_backoff_enable", False) and "out of memory" in str(e).lower():
-                        old_spg = int(self.args.steps_per_generation)
-                        new_spg = max(1, old_spg // 2)
-                        self.args.steps_per_generation = new_spg
-                        denom = max(1, self.args.per_device_train_batch_size * self.world_size)
-                        self.args.generation_batch_size = denom * new_spg
-                        if self.accelerator.is_main_process:
-                            print(f"[OOM backoff] steps_per_generation: {old_spg} -> {new_spg}")
-                        torch.cuda.empty_cache()
-                        generation_batch = self._generate_and_score_completions(generation_batch)
-                    else:
-                        raise
-                generation_batch = split_pixel_values_by_grid(generation_batch)
-                generation_batch = shuffle_sequence_dict(generation_batch)
-                generation_batches = split_tensor_dict(generation_batch, self.args.steps_per_generation)
-                self._buffered_inputs = [unsplit_pixel_values_by_grid(batch) for batch in generation_batches]
-            inputs = self._buffered_inputs[self._step % self.args.steps_per_generation]
+            assert isinstance(generation_batch, list), "GRPO expects identity-collated list of dicts."
+            B = int(self.args.per_device_train_batch_size)
+            if len(generation_batch) < B:
+                raise ValueError(
+                    f"Received {len(generation_batch)} samples but per_device_train_batch_size={B}; "
+                    "at least one full batch is required."
+                )
+
+            seg = generation_batch[:B]
+            try:
+                batch_out = self._generate_and_score_completions(seg)
+            except RuntimeError as e:
+                if getattr(self.args, "oom_backoff_enable", False) and "out of memory" in str(e).lower():
+                    if self.accelerator.is_main_process:
+                        print("[OOM backoff] Generation failed due to OOM; clearing cache and re-raising")
+                    torch.cuda.empty_cache()
+                raise
+
+            if "prompt_ids" not in batch_out or not isinstance(batch_out["prompt_ids"], torch.Tensor):
+                raise RuntimeError("Generation outputs must include tensor field 'prompt_ids'.")
+
+            cur_size = batch_out["prompt_ids"].size(0)
+            if cur_size == 0:
+                raise RuntimeError("Generation produced zero samples; cannot proceed without dynamic sampling.")
+
+            if cur_size < B:
+                deficit = B - cur_size
+                for k, v in batch_out.items():
+                    if isinstance(v, torch.Tensor) and v.ndim >= 1 and v.size(0) == cur_size:
+                        padding = v[-1:].repeat(deficit, *([1] * (v.ndim - 1)))
+                        batch_out[k] = torch.cat([v, padding], dim=0)
+                cur_size = B
+            elif cur_size > B:
+                for k, v in batch_out.items():
+                    if isinstance(v, torch.Tensor) and v.ndim >= 1 and v.size(0) == cur_size:
+                        batch_out[k] = v[:B]
+                cur_size = B
+
+            inputs = batch_out
             self._step += 1
         else:
             # In evaluation, there is neither batch grouping for generation, nor multiple iterations, hence
             # local generation batch == local eval batch
             inputs = self._generate_and_score_completions(generation_batch)
+
+        # Recompute num_items_in_batch to reflect filtered batch: use global completion token count
+        # CRITICAL: This gather must execute unconditionally on ALL ranks
+        completion_mask = inputs.get("completion_mask")
+        if completion_mask is None or not isinstance(completion_mask, torch.Tensor):
+            # Create dummy tensor for gather synchronization
+            local_tokens = torch.tensor(0, dtype=torch.long, device=self.accelerator.device)
+        else:
+            local_tokens = completion_mask.sum().to(self.accelerator.device)
+        
+        # Unconditional gather - all ranks must participate
+        try:
+            global_tokens = self.accelerator.gather(local_tokens).sum()
+        except Exception:
+            global_tokens = local_tokens * self.world_size
+        inputs["num_items_in_batch"] = global_tokens
+
         return inputs
 
     @profiling_decorator
@@ -1793,6 +1807,30 @@ class DAPOTrainer(BaseTrainer):
             else:
                 ref_per_token_logps = None
 
+        # Optionally compute sequence-level KL for filtering (seq_final_reward)
+        seq_kl = None
+        want_final = getattr(self.args, "filter_metric", "seq_reward") == "seq_final_reward"
+        if want_final and self.beta != 0.0 and ref_per_token_logps is not None:
+            # Use current model per-token logps; if we already computed old_per_token_logps, reuse it when aligned
+            try:
+                model_logps_for_filter = old_per_token_logps
+                if model_logps_for_filter is None:
+                    model_logps_for_filter, _ = self._get_per_token_logps_and_entropies(
+                        self.model,
+                        prompt_completion_ids,
+                        attention_mask,
+                        logits_to_keep,
+                        batch_size=batch_size,
+                        num_images=num_images,
+                        **forward_kwargs,
+                    )
+                per_token_kl = torch.exp(ref_per_token_logps - model_logps_for_filter) - (
+                    ref_per_token_logps - model_logps_for_filter
+                ) - 1.0
+                seq_kl = (per_token_kl * completion_mask).sum(dim=1)
+            except Exception:
+                seq_kl = None
+
         # Decode
         prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=False)
         # Model outputs kept as plain text (no special tokens)
@@ -1869,8 +1907,6 @@ class DAPOTrainer(BaseTrainer):
         if self.scale_rewards != "none":
             advantages = advantages / (std_rewards + 1e-4)
 
-        # Removed detailed per-step rollout file writing to avoid heavy I/O and potential blocking.
-
         # Slice to keep only the local part of the data
         process_slice = slice(
             self.accelerator.process_index * len(prompts),
@@ -1886,6 +1922,28 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode]["reward"].append(mean_grouped_rewards.mean().item())
         self._metrics[mode]["reward_std"].append(std_rewards.mean().item())
         self._metrics[mode]["frac_reward_zero_std"].append(is_std_zero.float().mean().item())
+
+        # 追加统一的 VGR 奖励别名（用于 W&B 指标统一显示）
+        try:
+            vgr_mean_alias = None
+            vgr_std_alias = None
+            # prefer the unified key produced by calculate_reward_metrics; else fallback
+            vgr_mean_alias = reward_metrics.get("rewards/vgr/mean")
+            vgr_std_alias = reward_metrics.get("rewards/vgr/std")
+            if vgr_mean_alias is None:
+                # fallback to underlying keys
+                if getattr(self.args, "vgr_hard_negative", False):
+                    vgr_mean_alias = reward_metrics.get("rewards/vgr_hard_negative/mean")
+                    vgr_std_alias = reward_metrics.get("rewards/vgr_hard_negative/std")
+                else:
+                    vgr_mean_alias = reward_metrics.get("rewards/vgr_reward/mean", reward_metrics.get("rewards/vgr_reward_as_additive/mean"))
+                    vgr_std_alias = reward_metrics.get("rewards/vgr_reward/std", reward_metrics.get("rewards/vgr_reward_as_additive/std"))
+            if vgr_mean_alias is not None:
+                self._metrics[mode]["rewards/vgr/mean"].append(float(vgr_mean_alias))
+            if vgr_std_alias is not None:
+                self._metrics[mode]["rewards/vgr/std"].append(float(vgr_std_alias))
+        except Exception:
+            pass
 
         # Build ChatML prompt strings for logging; keep completion as plain text
         try:
@@ -1975,6 +2033,10 @@ class DAPOTrainer(BaseTrainer):
             "advantages": advantages,
             "num_items_in_batch": num_items_in_batch,
         }
+        # Expose per-sequence reward for local process to enable filtering
+        output["seq_reward"] = rewards[process_slice]
+        if seq_kl is not None:
+            output["seq_kl"] = seq_kl[process_slice]
         if old_per_token_logps is not None:
             output["old_per_token_logps"] = old_per_token_logps
         if self.use_vllm and self.vllm_importance_sampling_correction:
@@ -1996,172 +2058,22 @@ class DAPOTrainer(BaseTrainer):
         if token_weights_tensor is not None:
             output["token_weights"] = token_weights_tensor
 
-        # --- Dynamic sampling replay buffer integration ---
-        # Only apply during training; evaluation may generate a different number of completions per prompt
-        # which can cause shape mismatches (e.g., len(completions) < num_generations).
-        recompute_spans: list[tuple[int, int]] = []  # Initialize to avoid UnboundLocalError in eval mode
-        if mode == "train" and self.replay_buffer is not None:
-            # Per-group views (use local process rewards to match local batch size)
-            num_groups = completion_ids.size(0) // self.num_generations
-            group_adv = advantages.view(num_groups, self.num_generations)
-            local_rewards = rewards[process_slice]
-            group_rewards = local_rewards.view(num_groups, self.num_generations)
-            group_std = group_rewards.std(dim=1)
-            eps_var = float(getattr(self.args, "replay_var_epsilon", 1e-6))
-            groups_with_variance = group_std > eps_var
-
-            # Only enqueue groups passing mean reward threshold
-            filter_min = getattr(self.args, "filter_min_reward", None)
-            if filter_min is not None:
-                group_mean = group_rewards.mean(dim=1)
-                groups_with_variance = groups_with_variance & (group_mean > float(filter_min))
-
-            # Buffer add: score = sum(|adv|) * std
-            if groups_with_variance.any():
-                scores = (group_adv.abs().sum(dim=1) * group_std)
-
-                # Build buffered outputs per selected group (trim to max valid length within group)
-                buffered_items = []
-                for group_idx in groups_with_variance.nonzero(as_tuple=True)[0].tolist():
-                    start = group_idx * self.num_generations
-                    end = (group_idx + 1) * self.num_generations
-
-                    # Determine max valid completion length in this group
-                    group_completion_mask = completion_mask[start:end]
-                    group_max_len = group_completion_mask.sum(dim=1).max().item()
-                    
-                    # Safety check: ensure group_max_len is at least 1 to avoid tensor size mismatch
-                    if group_max_len == 0:
-                        group_max_len = 1
-
-                    # Safety check for prompt length
-                    prompt_max_len = prompt_mask[start:end].sum(dim=1).max().item()
-                    if prompt_max_len == 0:
-                        prompt_max_len = 1
-                    
-                    item = {
-                        "prompt_ids": prompt_ids[start:end, :prompt_max_len],
-                        "prompt_mask": prompt_mask[start:end, :prompt_max_len],
-                        "completion_ids": completion_ids[start:end, :group_max_len],
-                        "completion_mask": completion_mask[start:end, :group_max_len],
-                        "advantages": group_adv[group_idx].detach().cpu().tolist(),
-                    }
-                    if old_per_token_logps is not None:
-                        item["old_per_token_logps"] = old_per_token_logps[start:end, :group_max_len]
-                    if ref_per_token_logps is not None:
-                        item["ref_per_token_logps"] = ref_per_token_logps[start:end, :group_max_len]
-                    # Do not store vision fields in buffer to avoid inconsistency across packed tensors
-                    buffered_items.append(item)
-
-                self.replay_buffer.add(scores[groups_with_variance].detach().cpu().tolist(), buffered_items)
-
-            # Replace groups with zero variance using buffer samples
-            groups_without_variance = (~groups_with_variance)
-            num_to_replace = int(groups_without_variance.sum().item())
-            if num_to_replace > 0:
-                sampled = self.replay_buffer.sample(num_to_replace)
-                if sampled:
-                    # Log replacement on main process
-                    if self.accelerator.is_main_process:
-                        replaced_indices = groups_without_variance.nonzero(as_tuple=True)[0].tolist()
-                        print(
-                            f"[ReplayBuffer] Replacing {num_to_replace} group(s) with zero/low variance "
-                            f"(group indices: {replaced_indices}) using replay buffer samples",
-                            flush=True,
-                        )
-                    # For shape alignment, compute target lengths
-                    cur_p_len = prompt_ids.size(1)
-                    cur_c_len = completion_ids.size(1)
-                    tgt_p_len = cur_p_len
-                    tgt_c_len = cur_c_len
-                    for s in sampled:
-                        tgt_p_len = max(tgt_p_len, s["prompt_ids"].size(1))
-                        tgt_c_len = max(tgt_c_len, s["completion_ids"].size(1))
-
-                    # If sampled longer, pad whole batch once
-                    if tgt_p_len > cur_p_len:
-                        prompt_ids = pad(list(prompt_ids.unbind(0)), padding_value=self.pad_token_id, pad_to_multiple_of=tgt_p_len, padding_side="left")
-                        prompt_mask = pad(list(prompt_mask.unbind(0)), padding_value=0, pad_to_multiple_of=tgt_p_len, padding_side="left")
-                    if tgt_c_len > cur_c_len:
-                        completion_ids = pad(list(completion_ids.unbind(0)), padding_value=self.pad_token_id, pad_to_multiple_of=tgt_c_len, padding_side="right")
-                        completion_mask = pad(list(completion_mask.unbind(0)), padding_value=0, pad_to_multiple_of=tgt_c_len, padding_side="right")
-                        if old_per_token_logps is not None:
-                            old_per_token_logps = pad(list(old_per_token_logps.unbind(0)), padding_value=0.0, pad_to_multiple_of=tgt_c_len, padding_side="right")
-                        if ref_per_token_logps is not None:
-                            ref_per_token_logps = pad(list(ref_per_token_logps.unbind(0)), padding_value=0.0, pad_to_multiple_of=tgt_c_len, padding_side="right")
-
-                    # Assign replacements
-                    replace_groups = groups_without_variance.nonzero(as_tuple=True)[0].tolist()
-                    for s, gidx in zip(sampled, replace_groups):
-                        start = gidx * self.num_generations
-                        end = (gidx + 1) * self.num_generations
-                        # Pad sampled tensors up to target lens if needed
-                        def _pad_to(t, tgt_len, side):
-                            if t.size(1) < tgt_len:
-                                return pad(t, padding_value=(0 if t.dtype == torch.long else 0.0), pad_to_multiple_of=tgt_len, padding_side=side)
-                            return t
-                        sp_ids = _pad_to(s["prompt_ids"].to(prompt_ids.device), prompt_ids.size(1), "left") if "prompt_ids" in s else None
-                        sp_msk = _pad_to(s["prompt_mask"].to(prompt_mask.device), prompt_mask.size(1), "left") if "prompt_mask" in s else None
-                        sc_ids = _pad_to(s["completion_ids"].to(completion_ids.device), completion_ids.size(1), "right")
-                        sc_msk = _pad_to(s["completion_mask"].to(completion_mask.device), completion_mask.size(1), "right")
-                        s_adv = torch.tensor(s["advantages"], device=advantages.device, dtype=advantages.dtype)
-
-                        # For multimodal inputs, only replace completion part to maintain image token alignment
-                        if images is not None:
-                            # Only replace completion_ids, completion_mask, and advantages
-                            completion_ids[start:end] = sc_ids
-                            completion_mask[start:end] = sc_msk
-                            advantages[start:end] = s_adv
-                            if old_per_token_logps is not None and "old_per_token_logps" in s:
-                                old_per_token_logps[start:end] = _pad_to(s["old_per_token_logps"].to(old_per_token_logps.device), old_per_token_logps.size(1), "right")
-                            if ref_per_token_logps is not None and "ref_per_token_logps" in s:
-                                ref_per_token_logps[start:end] = _pad_to(s["ref_per_token_logps"].to(ref_per_token_logps.device), ref_per_token_logps.size(1), "right")
-                        else:
-                            # For text-only inputs, replace both prompt and completion
-                            if sp_ids is not None:
-                                prompt_ids[start:end] = sp_ids
-                            if sp_msk is not None:
-                                prompt_mask[start:end] = sp_msk
-                            completion_ids[start:end] = sc_ids
-                            completion_mask[start:end] = sc_msk
-                            advantages[start:end] = s_adv
-                            if old_per_token_logps is not None and "old_per_token_logps" in s:
-                                old_per_token_logps[start:end] = _pad_to(s["old_per_token_logps"].to(old_per_token_logps.device), old_per_token_logps.size(1), "right")
-                            if ref_per_token_logps is not None and "ref_per_token_logps" in s:
-                                ref_per_token_logps[start:end] = _pad_to(s["ref_per_token_logps"].to(ref_per_token_logps.device), ref_per_token_logps.size(1), "right")
-
-                        # 记录替换的组 span（用于就地重算优势）
-                        recompute_spans.append((start, end))
-
-                    # Update output with potentially modified tensors
-                    output["prompt_ids"] = prompt_ids
-                    output["prompt_mask"] = prompt_mask
-                    output["completion_ids"] = completion_ids
-                    output["completion_mask"] = completion_mask
-                    output["advantages"] = advantages
-                    if old_per_token_logps is not None:
-                        output["old_per_token_logps"] = old_per_token_logps
-                    if ref_per_token_logps is not None:
-                        output["ref_per_token_logps"] = ref_per_token_logps
-                    
-                    # Clear token_weights after replay buffer replacement to avoid shape mismatch
-                    # Replay samples may have different completion lengths than the original batch
-                    if "token_weights" in output:
-                        output["token_weights"] = None
-
-        # 替换后就地重算该组 advantages（可选）
-        if getattr(self.args, "replay_recompute_adv", True) and recompute_spans:
-            try:
-                mode_scale = self.scale_rewards
-                # prompts/completions_text 用于奖励函数
-                prompts_text = prompts_text
-                completions_text = completions_text
-                for (gs, ge) in recompute_spans:
-                    new_adv = self._recompute_group_advantages(inputs, prompts_text, completions_text, gs, ge, self.num_generations, mode_scale, completion_ids_list)
-                    if new_adv is not None and new_adv.numel() == (ge - gs):
-                        advantages[gs:ge] = new_adv.to(advantages.device)
-            except Exception:
-                pass
+        # Compute per-sequence filtered flags for logging only (VERL-style filtering marker)
+        filtered_flags = None
+        try:
+            # Use rewards as the metric for logging; groups with zero std are marked as filtered
+            group_ng_log = group_ng if group_ng and rewards.numel() % group_ng == 0 else 1
+            if group_ng_log > 1:
+                group_std_log = rewards.view(-1, group_ng_log).std(dim=1)
+                groups_filtered = (group_std_log == 0)
+                flags = torch.zeros_like(rewards, dtype=torch.bool)
+                for gidx, flg in enumerate(groups_filtered.tolist()):
+                    if flg:
+                        s = gidx * group_ng_log
+                        flags[s : s + group_ng_log] = True
+                filtered_flags = flags
+        except Exception:
+            filtered_flags = None
 
         # Emit rollout logs if enabled (moved to logging utils)
         perform_realtime_rollout_logging(
@@ -2181,10 +2093,12 @@ class DAPOTrainer(BaseTrainer):
             rewards_per_func_local=rewards_per_func[process_slice],
             total_rewards_local=rewards[process_slice],
             reward_names=self.reward_func_names,
+            advantages_tensor=advantages,
             token_weights_tensor=token_weights_tensor,
             completion_ids=completion_ids,
             completion_mask=completion_mask,
             process_slice=process_slice,
+            replay_mask=(filtered_flags if filtered_flags is None else filtered_flags),
         )
 
         return output
@@ -2249,6 +2163,8 @@ class DAPOTrainer(BaseTrainer):
         input_ids = torch.cat([prompt_ids, completion_ids], dim=1)
         attention_mask = torch.cat([prompt_mask, completion_mask], dim=1)
         logits_to_keep = completion_ids.size(1)  # we only need to compute the logits for the completion tokens
+
+        # Expect non-empty batch with valid completion tokens at this point
 
         # Compute the per_token_logps and the entropy at each position in the completion
         per_token_logps, entropies = self._get_per_token_logps_and_entropies(
@@ -2328,18 +2244,25 @@ class DAPOTrainer(BaseTrainer):
             except Exception:
                 adv_matrix = advantages.unsqueeze(1)
 
-        # Decoupled-Clip (optional) vs standard PPO/GRPO
-        if getattr(self.args, "decoupled_clip", False):
-            A = adv_matrix
-            A_pos = torch.clamp_min(A, 0.0)
-            A_neg = torch.clamp_max(A, 0.0)
-            r_pos = torch.minimum(coef_1, torch.tensor(1.0 + self.epsilon_high, device=coef_1.device))
-            r_neg = torch.maximum(coef_1, torch.tensor(1.0 - self.epsilon_low, device=coef_1.device))
-            per_token_loss = -(r_pos * A_pos + r_neg * A_neg)
-        else:
-            per_token_loss1 = coef_1 * adv_matrix
-            per_token_loss2 = coef_2 * adv_matrix
-            per_token_loss = -torch.min(per_token_loss1, per_token_loss2)
+        # VERL-style asymmetric clip (low/high) + dual-clip lower bound c for A<0
+        per_token_ratio = coef_1
+        pg_losses1 = -adv_matrix * per_token_ratio
+        pg_losses2 = -adv_matrix * coef_2
+        clip_pg_losses1 = torch.maximum(pg_losses1, pg_losses2)
+
+        c = float(getattr(self.args, "clip_ratio_c", 3.0) or 3.0)
+        if c <= 1.0:
+            c = 1.0001
+        pg_losses3 = -adv_matrix * c
+        per_token_loss = torch.where(adv_matrix < 0, torch.min(pg_losses3, clip_pg_losses1), clip_pg_losses1)
+        # For metrics: which tokens got clipped by high/low and by dual-clip lower bound
+        with torch.no_grad():
+            try:
+                pg_clipfrac = (pg_losses2 > pg_losses1).float()
+                pg_clipfrac_lower = (clip_pg_losses1 > pg_losses3).float() * (adv_matrix < 0).float()
+            except Exception:
+                pg_clipfrac = None
+                pg_clipfrac_lower = None
         if entropy_mask is not None:
             per_token_loss = per_token_loss * entropy_mask
 
@@ -2389,14 +2312,14 @@ class DAPOTrainer(BaseTrainer):
         mean_entropy = masked_batch_mean(entropies)
         self._metrics[mode]["entropy"].append(self.accelerator.gather(mean_entropy).nanmean().item())
 
-        # Compute the clipped probability ratios
-        is_low_clipped = (coef_1 < 1 - self.epsilon_low) & (advantages.unsqueeze(1) < 0)
-        is_high_clipped = (coef_1 > 1 + self.epsilon_high) & (advantages.unsqueeze(1) > 0)
+        # Compute clipping indicators for reporting
+        is_low_clipped = (per_token_ratio < 1 - self.epsilon_low) & (advantages.unsqueeze(1) < 0)
+        is_high_clipped = (per_token_ratio > 1 + self.epsilon_high) & (advantages.unsqueeze(1) > 0)
         is_region_clipped = is_low_clipped | is_high_clipped
 
         low_clip = masked_batch_mean(is_low_clipped.float())
         high_clip = masked_batch_mean(is_high_clipped.float())
-        clip_ratio = masked_batch_mean(is_region_clipped.float())
+        clip_region = masked_batch_mean(is_region_clipped.float())
 
         gathered_low_clip = self.accelerator.gather(low_clip)
         self._metrics[mode]["clip_ratio/low_mean"].append(gathered_low_clip.nanmean().item())
@@ -2404,13 +2327,28 @@ class DAPOTrainer(BaseTrainer):
         gathered_high_clip = self.accelerator.gather(high_clip)
         self._metrics[mode]["clip_ratio/high_mean"].append(gathered_high_clip.nanmean().item())
         self._metrics[mode]["clip_ratio/high_max"].append(nanmax(gathered_high_clip).item())
-        gathered_clip_ratio = self.accelerator.gather(clip_ratio)
-        self._metrics[mode]["clip_ratio/region_mean"].append(gathered_clip_ratio.nanmean().item())
+        gathered_clip_region = self.accelerator.gather(clip_region)
+        self._metrics[mode]["clip_ratio/region_mean"].append(gathered_clip_region.nanmean().item())
 
-        dec = 1.0 if getattr(self.args, "decoupled_clip", False) else 0.0
-        self._metrics[mode]["decoupled_clip"].append(dec)
+        # pg_clipfrac metrics
+        if 'pg_clipfrac' not in self._metrics[mode]:
+            self._metrics[mode]["pg_clipfrac"] = []
+        if 'pg_clipfrac_lower' not in self._metrics[mode]:
+            self._metrics[mode]["pg_clipfrac_lower"] = []
+        if pg_clipfrac is not None:
+            try:
+                val = (pg_clipfrac * completion_mask).sum() / completion_mask.sum().clamp(min=1.0)
+                self._metrics[mode]["pg_clipfrac"].append(self.accelerator.gather(val).nanmean().item())
+            except Exception:
+                pass
+        if pg_clipfrac_lower is not None:
+            try:
+                val = (pg_clipfrac_lower * completion_mask).sum() / completion_mask.sum().clamp(min=1.0)
+                self._metrics[mode]["pg_clipfrac_lower"].append(self.accelerator.gather(val).nanmean().item())
+            except Exception:
+                pass
+
         self._metrics[mode]["kl_beta_eff"].append(self._beta_eff)
-        self._metrics[mode]["clip/decoupled"].append(dec)
         self._metrics[mode]["kl/beta_eff"].append(self._beta_eff)
         return loss
 

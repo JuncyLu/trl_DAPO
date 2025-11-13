@@ -20,7 +20,8 @@ from src.trainer import DAPOConfig, DAPOTrainer
 from src.rewards import (
     accuracy_reward,
     think_format_reward,
-    get_accuracy_conditioned_length_reward,
+    tag_count_reward,
+    get_soft_overlong_punishment,
     vgr_reward,
     vgr_hard_negative,
 )
@@ -53,8 +54,8 @@ if __name__ == "__main__":
     ################
     # Dataset
     ################
-    # dataset = load_dataset("/home/lujunxi57/trl/dataset/dmd_split", split="train")
-    dataset = load_dataset("./dataset/aokvqa_openr1", split="train")
+    dataset = load_dataset("/home/lujunxi57/trl/dataset/dmd_split", split="train")
+    # dataset = load_dataset("./dataset/aokvqa_openr1", split="train")
     dataset = dataset.train_test_split(test_size=100, seed=42)
 
     SYSTEM_PROMPT = (
@@ -63,7 +64,7 @@ if __name__ == "__main__":
         "user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must "
         "be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. "
         "The response must end immediately after the closing </answer> tag. For example:\n"
-        "<think>\nThis is my reasoning.\n</think>\n<answer>C</answer>"
+        "<think>\nThis is my reasoning.\n</think>\n<answer>\nC\n</answer>"
     )
 
     def make_conversation(example):
@@ -101,11 +102,9 @@ if __name__ == "__main__":
     ################
     # Training
     ################
-    length_reward_func = get_accuracy_conditioned_length_reward(
+    # Use soft overlong punishment (DAPO Eq.13). L_cache = 0.7 * L_max by default.
+    length_reward_func = get_soft_overlong_punishment(
         max_completion_len=training_args.max_completion_length,
-        lower_ratio=0.2,
-        upper_ratio=0.5,
-        alpha=0.5,
     )
     
     vgr_func = vgr_hard_negative if getattr(training_args, "vgr_hard_negative", False) else vgr_reward
@@ -113,7 +112,7 @@ if __name__ == "__main__":
     trainer = DAPOTrainer(
         model=model_args.model_name_or_path,
         args=training_args,
-        reward_funcs=[accuracy_reward, vgr_func, think_format_reward, length_reward_func],
+        reward_funcs=[accuracy_reward, vgr_func, think_format_reward, tag_count_reward, length_reward_func],
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         peft_config=get_peft_config(model_args),

@@ -198,5 +198,9 @@ def calculate_reward_metrics(
                 std_rewards = 0.0
             metrics[f"rewards/{name}/mean"] = mean_rewards
             metrics[f"rewards/{name}/std"] = std_rewards
+            # 统一别名：将 VGR 奖励统一映射为 rewards/vgr/*
+            if name in ("vgr_reward", "vgr_hard_negative", "vgr_reward_as_additive"):
+                metrics["rewards/vgr/mean"] = mean_rewards
+                metrics["rewards/vgr/std"] = std_rewards
     
     return metrics

@@ -28,6 +28,7 @@ def emit_rollout_logs(
     epoch: float = 0.0,
     advantages_local: Optional[List[float]] = None,
     adv_desc: str = "unweighted",
+    replay_flags: Optional[List[Any]] = None,
 ) -> None:
     """将 rollout 信息写入 markdown。
 
@@ -54,6 +55,7 @@ def emit_rollout_logs(
         # 奖励值
         acc = 0.0
         fmt = 0.0
+        tag = 0.0
         length_val = 0.0
         vgr_val = 0.0
         
@@ -75,6 +77,10 @@ def emit_rollout_logs(
             if fmt_idx is not None and idx < rewards_per_func_local.shape[0]:
                 fmt = float(rewards_per_func_local[idx, fmt_idx].item())
 
+            tag_idx = any_index("tag_reward", "tag_count_reward")
+            if tag_idx is not None and idx < rewards_per_func_local.shape[0]:
+                tag = float(rewards_per_func_local[idx, tag_idx].item())
+
             length_idx = any_index("length_reward")
             if length_idx is not None and idx < rewards_per_func_local.shape[0]:
                 length_val = float(rewards_per_func_local[idx, length_idx].item())
@@ -90,7 +96,29 @@ def emit_rollout_logs(
                 adv_val = float(advantages_local[idx])
             except Exception:
                 adv_val = None
-        rows.append((idx + 1, preview_p, preview_c, solution or "", acc, fmt, length_val, vgr_val, tot, adv_val))
+        # Interpret replay_flags as "filtered" flags in VERL-style logging
+        is_filtered = False
+        if replay_flags is not None and idx < len(replay_flags):
+            try:
+                is_filtered = bool(replay_flags[idx])
+            except Exception:
+                is_filtered = False
+        rows.append(
+            {
+                "idx": idx + 1,
+                "prompt": preview_p,
+                "completion": preview_c,
+                "solution": solution or "",
+                "accuracy": acc,
+                "vgr": vgr_val,
+                "format": fmt,
+                "tag": tag,
+                "length": length_val,
+                "total": tot,
+                "advantage": adv_val,
+                "filtered": is_filtered,
+            }
+        )
     
     # 写入 rollout 日志
     if log_path:
@@ -106,11 +134,13 @@ def emit_rollout_logs(
                     f.write("|--------|-------|\n")
                     
                     # 计算统计
-                    accuracy_scores = [r[4] for r in rows]
-                    format_scores = [r[5] for r in rows]
-                    length_scores = [r[6] for r in rows]
-                    total_scores = [r[8] for r in rows]
-                    adv_scores = [r[9] for r in rows if r[9] is not None]
+                    accuracy_scores = [r["accuracy"] for r in rows]
+                    vgr_scores = [r["vgr"] for r in rows]
+                    format_scores = [r["format"] for r in rows]
+                    tag_scores = [r["tag"] for r in rows]
+                    length_scores = [r["length"] for r in rows]
+                    total_scores = [r["total"] for r in rows]
+                    adv_scores = [r["advantage"] for r in rows if r["advantage"] is not None]
                     # 来自 attention 的 VGR 原始指标（若可用）
                     vgr_raw_list = []
                     if vgr_info:
@@ -120,47 +150,68 @@ def emit_rollout_logs(
                             except Exception:
                                 pass
                     
-                    f.write(f"| Accuracy Mean | {np.mean(accuracy_scores):.3f} ± {np.std(accuracy_scores):.3f} |\n")
-                    f.write(f"| Format Mean | {np.mean(format_scores):.3f} ± {np.std(format_scores):.3f} |\n")
-                    f.write(f"| Length Mean | {np.mean(length_scores):.3f} ± {np.std(length_scores):.3f} |\n")
-                    f.write(f"| Total Reward Mean | {np.mean(total_scores):.3f} ± {np.std(total_scores):.3f} |\n")
-                    f.write(f"| Accuracy Rate | {np.mean([1 if s > 0 else 0 for s in accuracy_scores]):.3f} |\n")
-                    f.write(f"| Format Rate | {np.mean([1 if s > 0 else 0 for s in format_scores]):.3f} |\n")
-                    f.write(f"| Success Rate | {np.mean([1 if s > 0 else 0 for s in total_scores]):.3f} |\n\n")
+                    if accuracy_scores:
+                        f.write(f"| Accuracy Mean | {np.mean(accuracy_scores):.3f} ± {np.std(accuracy_scores):.3f} |\n")
+                        f.write(f"| Accuracy Rate | {np.mean([1 if s > 0 else 0 for s in accuracy_scores]):.3f} |\n")
+                    if vgr_scores:
+                        f.write(f"| VGR Mean | {np.mean(vgr_scores):.3f} ± {np.std(vgr_scores):.3f} |\n")
+                    if format_scores:
+                        f.write(f"| Format Mean | {np.mean(format_scores):.3f} ± {np.std(format_scores):.3f} |\n")
+                        f.write(f"| Format Rate | {np.mean([1 if s > 0 else 0 for s in format_scores]):.3f} |\n")
+                    if tag_scores:
+                        f.write(f"| Tag Mean | {np.mean(tag_scores):.3f} ± {np.std(tag_scores):.3f} |\n")
+                        f.write(f"| Tag Rate | {np.mean([1 if s > 0 else 0 for s in tag_scores]):.3f} |\n")
+                    if length_scores:
+                        f.write(f"| Length Mean | {np.mean(length_scores):.3f} ± {np.std(length_scores):.3f} |\n")
+                    if total_scores:
+                        f.write(f"| Total Reward Mean | {np.mean(total_scores):.3f} ± {np.std(total_scores):.3f} |\n")
+                        f.write(f"| Success Rate | {np.mean([1 if s > 0 else 0 for s in total_scores]):.3f} |\n\n")
                     if adv_scores:
                         f.write(f"| Advantage ({adv_desc}) Mean | {np.mean(adv_scores):.3f} ± {np.std(adv_scores):.3f} |\n")
+                    filtered_count = sum(1 for r in rows if r.get("filtered"))
+                    if filtered_count:
+                        f.write(f"| Filtered Samples | {filtered_count} |\n")
+                    if adv_scores or filtered_count:
                         f.write("\n")
-                    # 汇总 VGR 原始指标
+                    # 汇总 vgr_raw（原始VGR）
                     if vgr_raw_list:
                         try:
                             vgr_mean = float(np.nanmean(vgr_raw_list))
                             vgr_std = float(np.nanstd(vgr_raw_list))
-                            f.write(f"| VGR (raw) Mean | {vgr_mean:.3f} ± {vgr_std:.3f} |\n\n")
+                            f.write(f"| vgr_raw Mean | {vgr_mean:.3f} ± {vgr_std:.3f} |\n\n")
                         except Exception:
                             pass
                     
                     # Attention statistics removed (AEI unused)
                 
                 # 样本明细
-                for i, (r, info) in enumerate(zip(rows, vgr_info), start=1):
-                    f.write(f"### Sample {i}\n\n")
-                    f.write(f"**Prompt:** {r[1]}\n\n")
-                    f.write(f"**Completion:** {r[2]}\n\n")
-                    f.write(f"**Solution:** {r[3]}\n\n")
+                for i, (row, info) in enumerate(zip(rows, vgr_info), start=1):
+                    label = " (Filtered)" if row.get("filtered") else ""
+                    f.write(f"### Sample {i}{label}\n\n")
+                    f.write(f"**Prompt:** {row['prompt']}\n\n")
+                    f.write(f"**Completion:** {row['completion']}\n\n")
+                    f.write(f"**Solution:** {row['solution']}\n\n")
                     
                     # 按 VGR 使用方式显示标签
                     true_vgr = info.get("vgr", 0.0) if info else 0.0
                     
-                    if vgr_as_coefficient == 1:
-                        # VGR作为系数
-                        f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, vgr_coe={r[7]:.3f}, vgr={true_vgr:.3f}, total={r[8]:.3f}\n\n")
-                    else:
-                        # VGR作为加法项
-                        f.write(f"**Rewards:** accuracy={r[4]:.3f}, format={r[5]:.3f}, length={r[6]:.3f}, vgr_add={r[7]:.3f}, vgr={true_vgr:.3f}, total={r[8]:.3f}\n\n")
+                    # 统一命名：奖励一律用 vgr，原始值用 vgr_raw
+                    f.write(
+                        "**Rewards:** accuracy={:.3f}, vgr={:.3f}, format={:.3f}, tag={:.3f}, length={:.3f}, "
+                        "vgr_raw={:.3f}, total={:.3f}\n\n".format(
+                            row["accuracy"],
+                            row["vgr"],
+                            row["format"],
+                            row["tag"],
+                            row["length"],
+                            float(true_vgr),
+                            row["total"],
+                        )
+                    )
 
                     # Advantage（若提供则展示；若为 token_weights 实验，建议传入加权后的优势）
-                    if r[9] is not None:
-                        f.write(f"**Advantage ({adv_desc}):** {float(r[9]):.4f}\n\n")
+                    if row["advantage"] is not None:
+                        f.write(f"**Advantage ({adv_desc}):** {float(row['advantage']):.4f}\n\n")
                     
                     # 详细 metrics：补充 VGR 原始指标
                     if info:
@@ -188,20 +239,22 @@ def emit_rollout_logs(
 
                         detailed_metrics = {
                             "rewards": {
-                                "accuracy": float(r[4]),
-                                "format": float(r[5]),
-                                "length": float(r[6]),
-                                "vgr": float(r[7]),
-                                "total": float(r[8])
+                                "accuracy": float(row["accuracy"]),
+                                "vgr": float(row["vgr"]),
+                                "format": float(row["format"]),
+                                "tag": float(row["tag"]),
+                                "length": float(row["length"]),
+                                "total": float(row["total"]),
                             },
-                            "advantage": float(r[9]) if r[9] is not None else None,
+                            "advantage": float(row["advantage"]) if row["advantage"] is not None else None,
+                            "filtered": bool(row.get("filtered", False)),
                             "token_counts": {
                                 "vision_tokens": float(info.get("num_vision_tokens", 0) or 0),
                                 "text_tokens": float(info.get("num_text_tokens", 0) or 0),
                                 "total_tokens": float((info.get("num_vision_tokens", 0) or 0) + (info.get("num_text_tokens", 0) or 0)),
                             },
                             "vgr_metrics": {
-                                "vgr_raw": float(info.get("vgr", 0.0) or 0.0),
+                                "vgr_raw": float(_vgr_val) if isinstance(_vgr_val, (int, float)) else None,
                                 "attention_text": _attn_text,
                                 "attention_vision": _attn_vision,
                                 "density_text": density_text,
@@ -252,6 +305,23 @@ def emit_eval_logs(
         
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
         
+        def _strip_system_from_chatml(text: str) -> str:
+            try:
+                marker_start = "<|im_start|>system"
+                marker_end = "<|im_end|>"
+                out = str(text)
+                while True:
+                    s = out.find(marker_start)
+                    if s == -1:
+                        break
+                    e = out.find(marker_end, s)
+                    if e == -1:
+                        break
+                    out = out[:s] + out[e + len(marker_end):]
+                return out.strip()
+            except Exception:
+                return text
+
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"\n## {header} | {ts}\n\n")
             
@@ -261,36 +331,22 @@ def emit_eval_logs(
             f.write("|--------|-------|\n")
             
             # 核心指标
+            # 统一：VGR 奖励使用 rewards/vgr/mean
+            eval_vgr_val = logs.get("eval_rewards/vgr/mean", logs.get("rewards/vgr/mean"))
             core_metrics = {
                 "eval_loss": logs.get("eval_loss", 0.0),
                 "eval_reward": metrics.get("eval_reward", 0.0),
                 "eval_accuracy": metrics.get("eval_accuracy", 0.0),
                 "eval_format": metrics.get("eval_format", 0.0),
                 "eval_length": metrics.get("eval_length", 0.0),
-                "eval_vgr": metrics.get("eval_vgr", 0.0),
+                "eval_vgr": eval_vgr_val if eval_vgr_val is not None else None,
             }
             
             for key, value in core_metrics.items():
                 if value is not None:
                     f.write(f"| {key} | {value:.4f} |\n")
 
-            # 若样本包含 vgr 原始指标，则补充聚合值
-            try:
-                vgr_vals = []
-                for sample in (eval_samples or []):
-                    dm = sample.get("detailed_metrics", {}) if isinstance(sample, dict) else {}
-                    vm = dm.get("vgr_metrics", {}) if isinstance(dm, dict) else {}
-                    v = vm.get("vgr_raw", None)
-                    if isinstance(v, (int, float)):
-                        vgr_vals.append(float(v))
-                if vgr_vals:
-                    vgr_mean = float(np.nanmean(vgr_vals))
-                    vgr_std = float(np.nanstd(vgr_vals))
-                    f.write(f"| eval_vgr_raw | {vgr_mean:.4f} ± {vgr_std:.4f} |\n")
-            except Exception:
-                pass
-            
-            # 注意力指标（AEI 移除）
+            # 不再聚合输出 vgr 原始指标
             
             # 样本数据
             if eval_samples:
@@ -300,7 +356,12 @@ def emit_eval_logs(
                     f.write(f"### Sample {i}\n\n")
                     
                     # 显示prompt
-                    f.write(f"**Prompt:** {sample.get('prompt', 'N/A')}\n\n")
+                    if 'problem' in sample and isinstance(sample['problem'], str) and sample['problem']:
+                        _prompt_str = sample['problem']
+                    else:
+                        _raw_prompt = sample.get('prompt', 'N/A')
+                        _prompt_str = _strip_system_from_chatml(_raw_prompt) if isinstance(_raw_prompt, str) else _raw_prompt
+                    f.write(f"**Prompt:** {_prompt_str}\n\n")
                     
                     # 显示completion
                     f.write(f"**Completion:** {sample.get('completion', 'N/A')}\n\n")
@@ -540,10 +601,12 @@ def perform_realtime_rollout_logging(
     rewards_per_func_local: torch.Tensor,
     total_rewards_local: torch.Tensor,
     reward_names: List[str],
+    advantages_tensor: Optional[torch.Tensor],
     token_weights_tensor: Optional[torch.Tensor],
     completion_ids: torch.Tensor,
     completion_mask: torch.Tensor,
     process_slice: slice,
+    replay_mask: Optional[torch.Tensor] = None,
 ) -> None:
     """Unified realtime rollout logging pipeline moved out of the trainer."""
     try:
@@ -574,26 +637,42 @@ def perform_realtime_rollout_logging(
         # Solutions (if present)
         solutions = [inp.get("solution", "") for inp in inputs]
 
-        # Compose prompts text with chat template if needed
-        if is_conversational(inputs[0]):
-            log_prompts_text = [apply_chat_template({"prompt": p}, processing_class)["prompt"] for p in prompts]
-        else:
-            log_prompts_text = prompts_text
+        # Compose prompts text for logs: prefer 'problem' if available; otherwise render user-only chat without system
+        problems: List[Optional[str]] = []
+        try:
+            problems = [inp.get("problem", None) for inp in inputs]
+        except Exception:
+            problems = [None] * len(prompts)
 
-        # Prepare advantage values for table
+        if is_conversational(inputs[0]):
+            prompts_user_only: List[List[Dict[str, Any]]] = []
+            for p in prompts:
+                try:
+                    p2 = [m for m in p if isinstance(m, dict) and m.get("role") == "user"]
+                    if not p2:
+                        p2 = [m for m in p if isinstance(m, dict) and m.get("role") != "system"] or p
+                except Exception:
+                    p2 = p
+                prompts_user_only.append(p2)
+            rendered = [apply_chat_template({"prompt": p2}, processing_class)["prompt"] for p2 in prompts_user_only]
+        else:
+            rendered = prompts_text
+
+        log_prompts_text = []
+        for i in range(len(rendered)):
+            val = problems[i] if i < len(problems) and isinstance(problems[i], str) and problems[i] else rendered[i]
+            log_prompts_text.append(val)
+
+        # Prepare advantage values for table: always log group (reward-based) advantages
         advantages_for_log = None
         try:
-            # `advantages` is not passed; instead consume per-row from total_rewards? keep None for simplicity
-            if getattr(args, "token_weights", False) and token_weights_tensor is not None:
-                tw_local = token_weights_tensor[process_slice]
-                cm_local = completion_mask[process_slice].float()
-                valid = cm_local.sum(dim=1).clamp(min=1.0)
-                mean_w = (tw_local * cm_local).sum(dim=1) / valid
-                advantages_for_log = mean_w.detach().cpu().tolist()
+            if advantages_tensor is not None:
+                advantages_for_log = advantages_tensor.detach().cpu().tolist()
         except Exception:
             advantages_for_log = None
 
         # Emit markdown rollout log
+        adv_label = "group-normalized"
         emit_rollout_logs(
             prompts_text=log_prompts_text,
             completions_text=completions_text,
@@ -609,6 +688,8 @@ def perform_realtime_rollout_logging(
             step=state_step,
             epoch=state_epoch,
             advantages_local=advantages_for_log,
+            adv_desc=adv_label,
+            replay_flags=replay_mask[process_slice].detach().cpu().tolist() if replay_mask is not None else None,
         )
 
         # Token weight logs (coarse stats)
@@ -661,19 +742,23 @@ def print_compact_logs(logs: Dict[str, float], mode: str, use_hard_negative: boo
         # Rewards line
         r_acc = logs.get("rewards/accuracy_reward/mean", logs.get("eval_rewards/accuracy_reward/mean"))
         r_fmt = logs.get("rewards/think_format_reward/mean", logs.get("eval_rewards/think_format_reward/mean"))
-        # Prefer new VGR reward key; fall back to legacy additive key if present
-        if use_hard_negative:
-            r_vgr = logs.get("rewards/vgr_hard_negative/mean", logs.get("eval_rewards/vgr_hard_negative/mean"))
-        else:
-            r_vgr = logs.get("rewards/vgr_reward/mean", logs.get("eval_rewards/vgr_reward/mean"))
-            if r_vgr is None:
-                r_vgr = logs.get("rewards/vgr_reward_as_additive/mean", logs.get("eval_rewards/vgr_reward_as_additive/mean"))
+        r_tag = logs.get("rewards/tag_count_reward/mean", logs.get("eval_rewards/tag_count_reward/mean"))
+        # 统一优先读取 rewards/vgr/mean；兼容旧键名
+        r_vgr = logs.get("rewards/vgr/mean", logs.get("eval_rewards/vgr/mean"))
+        if r_vgr is None:
+            if use_hard_negative:
+                r_vgr = logs.get("rewards/vgr_hard_negative/mean", logs.get("eval_rewards/vgr_hard_negative/mean"))
+            else:
+                r_vgr = logs.get("rewards/vgr_reward/mean", logs.get("eval_rewards/vgr_reward/mean"))
+                if r_vgr is None:
+                    r_vgr = logs.get("rewards/vgr_reward_as_additive/mean", logs.get("eval_rewards/vgr_reward_as_additive/mean"))
         r_len = logs.get("rewards/length_reward/mean", logs.get("eval_rewards/length_reward/mean"))
         r_total = logs.get("reward", logs.get("eval_reward"))
         rewards_line = []
         if r_acc is not None: rewards_line.append(f"acc={r_acc:.3f}")
-        if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
         if r_vgr is not None: rewards_line.append(f"vgr={r_vgr:.3f}")
+        if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
+        if r_tag is not None: rewards_line.append(f"tag={r_tag:.3f}")
         if r_len is not None: rewards_line.append(f"len={r_len:.3f}")
         if r_total is not None: rewards_line.append(f"total={r_total:.3f}")
         if rewards_line:
@@ -739,11 +824,22 @@ def perform_eval_logging(
         eval_samples: List[Dict[str, Any]] = []
         for i in range(sample_count):
             rewards_map: Dict[str, float] = {}
+            # 统一命名映射：accuracy、vgr、format、tag、length
+            name_map = {
+                "accuracy_reward": "accuracy",
+                "vgr_reward": "vgr",
+                "vgr_reward_as_additive": "vgr",
+                "vgr_hard_negative": "vgr",
+                "think_format_reward": "format",
+                "tag_count_reward": "tag",
+                "length_reward": "length",
+            }
             for name in reward_names:
                 vals = reward_lists.get(name, [])
                 if i < len(vals):
                     try:
-                        rewards_map[name] = float(vals[i])
+                        disp = name_map.get(name, name)
+                        rewards_map[disp] = float(vals[i])
                     except Exception:
                         pass
             total_val = 0.0
@@ -759,7 +855,7 @@ def perform_eval_logging(
                 "rewards": rewards_map,
                 "total_reward": total_val,
             }
-            # 注入详细 VGR 原始指标（若可用）
+            # 注入详细 VGR 原始指标（若可用），并在 rewards 中加入 vgr_raw
             if vgr_info and i < len(vgr_info) and vgr_info[i]:
                 info = vgr_info[i]
                 try:
@@ -777,6 +873,12 @@ def perform_eval_logging(
                 try:
                     text_ratio = vgr_raw / (1.0 + vgr_raw)
                     vision_ratio = 1.0 / (1.0 + vgr_raw)
+                except Exception:
+                    pass
+
+                # 将 vgr_raw 作为奖励行中的一个显示项（统一命名）
+                try:
+                    rewards_map["vgr_raw"] = float(vgr_raw)
                 except Exception:
                     pass
 

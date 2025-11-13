@@ -27,7 +27,7 @@ accelerate launch \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
   --max_completion_length 384 \
-  --per_device_train_batch_size 4 \
+  --per_device_train_batch_size 8 \
   --gradient_accumulation_steps 4 \
   --num_generations 8 \
   --num_train_epochs 2 \
@@ -38,18 +38,15 @@ accelerate launch \
   --eval_strategy steps \
   --eval_steps 10 \
   --eval_num_generations 4 \
-  --per_device_eval_batch_size 8 \
+  --per_device_eval_batch_size 4 \
   --save_strategy steps \
   --save_steps 400 \
   --learning_rate 1e-5 \
   --lr_scheduler_type cosine \
   --warmup_ratio 0.05 \
   --max_grad_norm 1.0 \
-  --replay_buffer_size 64 \
-  --filter_min_reward 1.5 \
-  --replay_var_epsilon 1e-6 \
-  --reward_weights 2.5 1.0 0.5 1.0 \
-  --early_reward_weights 1.0 1.0 2.0 1.0 \
+  --reward_weights 4.0 2.0 1.0 1.0 0.0 \
+  --early_reward_weights 1.0 1.0 4.0 2.0 0.0 \
   --max_steps 20 \
   --use_peft \
   --lora_target_modules "q_proj", "v_proj" \

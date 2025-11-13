@@ -82,10 +82,9 @@ Answer:
           - 评估：--do_eval --eval_strategy steps --eval_steps 10 --eval_num_generations 4 --per_device_eval_batch_size 8
           - 保存：--save_strategy steps --save_steps 400
           - 优化器超参：--learning_rate 1e-5 --lr_scheduler_type cosine --warmup_ratio 0.05 --max_grad_norm 1.0
-          - 重放缓冲（replay buffer）：--replay_buffer_size 64 --filter_min_reward 1.5 --replay_var_epsilon 1e-6
           - 长度惩罚缓存：--soft_punish_cache 50
-          - 奖励权重（顺序对应 reward 列表）：--reward_weights 2.5 0.0 0.5 1.0 --early_reward_weights 1.0 0.0 2.0 1.0
-              - 显式将 VGR 权重设为 0（第二位 0.0），表示不引入 VGR 奖励影响（但仍会计算注意力指标）。
+          - 奖励权重（顺序对应 reward 列表）：--reward_weights 2.5 0.0 0.5 0.5 1.0 --early_reward_weights 1.0 0.0 2.0 2.0 1.0
+              - 第 4 个权重对应新增的 tag_count_reward，默认与格式奖励相同；第 2 个权重仍设为 0（跳过 VGR 加权）。
           - 日志系统：--report_to wandb --log_completions --logging_steps 1.0
       - 标准输出重定向：>> training_logs/$TS/train.log 2>&1
 
@@ -121,7 +120,8 @@ Answer:
           1. accuracy_reward（src/rewards/accuracy_rewards.py:12）
           2. vgr_reward（src/rewards/attention_rewards.py:18）
           3. think_format_reward（src/rewards/format_rewards.py:4）
-          4. length_reward_func（src/rewards/length_rewards.py:19/50）
+          4. tag_count_reward（src/rewards/format_rewards.py:50）
+          5. length_reward_func（src/rewards/length_rewards.py:19/50）
   - Trainer 实例化 → DAPOTrainer(...)（src/scripts/train_grpo_vlm.py:175）
       - model=model_args.model_name_or_path
       - args=training_args（DAPOConfig 子类）
@@ -141,7 +141,6 @@ Answer:
           - 依据 --reward_weights 与 --early_reward_weights、--warmup_ratio 返回“当前权重向量”
           - 每步更新一次，早期阶段用 early，后期用 default（src/trainer/dapo_trainer.py:1555）
   - 训练内部状态与度量
-      - 重放缓冲：若 --replay_buffer_size > 0 → 初始化 _ReplayBuffer（堆+采样）（src/trainer/dapo_trainer.py:506）
       - 指标字典：self._metrics = {"train": defaultdict(list), "eval": defaultdict(list)}
       - 注意力：若 args.compute_attention_metrics=True（默认）→ 准备 _logs["attention"] 队列（src/trainer/dapo_trainer.py:551）
   - 生成配置衍生（DAPOConfig.post_init）
@@ -175,6 +174,7 @@ Answer:
       - accuracy_reward：从 completion 文本解析 <answer> 或关键词行，匹配 solution → {0,1}
       - vgr_reward：组内分位数映射（VGR 越小越好，映射到 [0,1]），但本实验权重=0（不计入总奖励）
       - think_format_reward：输出格式规则（细节略）
+      - tag_count_reward：逐项检查 `<think>`/`</think>` 与 `<answer>`/`</answer>` 是否正确出现一次，按 4 个子条件累加 0.25
       - length_reward：仅保留 accuracy_conditioned_length_reward 变体
       - 汇总：rewards_per_func 张量（BG, #funcs）→ gather（分布式）→ 由 RewardWeightManager 按当前权重线性加权求 rewards（BG,）
   - 优势与归一化（src/trainer/dapo_trainer.py:1739）
@@ -320,12 +320,6 @@ B) **答案**：用要点式中文，直接给出判断结论与理由。若实�
   - 是否存在 KL 正则项（即使默认系数为 0），可在早期/局部开启。
   - 若没有解耦剪裁，请指出应在何处（具体行）插入分路逻辑，给最小补丁思路。
 
-## 问题 2：重放缓冲替换后是否**重算该组优势/奖励**
-- 定位重放缓冲的实现及“替换”逻辑函数（如 `_maybe_replace_with_replay` 或相同含义函数），粘贴实现。
-- 核查要点：
-  - 替换完成后，是否**重新计算**该组的 `rewards → group mean/std → advantages`，以避免统计口径不一致。
-  - 若否，指出应添加重算流程的位置与必要的张量对齐处理（给出数行伪代码式补丁）。
-
 ## 问题 3：奖励权重管理器的“早期/常规”切换与**单独奖励晚开/小开**能力
 - 粘贴 `create_reward_weight_manager(...)` 及其被调用处（含切换时机），以及当前权重向量的构造代码。
 - 核查要点：
@@ -440,87 +434,7 @@ A:
       2. 仅上界（正优势）：r_pos = torch.minimum(coef_1, torch.tensor(1.0+self.epsilon_high, device=coef_1.device))
       3. 仅下界（负优势）：r_neg = torch.maximum(coef_1, torch.tensor(1.0-self.epsilon_low, device=coef_1.device))
       4. 合成：per_token_loss = -(r_pos*A_pos + r_neg*A_neg)（其后与现有熵掩码/KL/聚合同步）
-
-  ———
-
-  ## 问题 2：重放缓冲替换后是否重算该组优势/奖励
-
-  A) 代码片段
-  文件: src/trainer/dapo_trainer.py:1900–2066（粗略）
-
-  # ...上文为生成/奖励/优势计算...
-  # 动态采样重放缓冲（仅训练态）
-  num_groups = completion_ids.size(0) // self.num_generations
-  group_adv = advantages.view(num_groups, self.num_generations)
-  local_rewards = rewards[process_slice]
-  group_rewards = local_rewards.view(num_groups, self.num_generations)
-  group_std = group_rewards.std(dim=1)
-  eps_var = float(getattr(self.args, "replay_var_epsilon", 1e-6))
-  groups_with_variance = group_std > eps_var
-
-  # 只入队均值奖励足够的组
-  filter_min = getattr(self.args, "filter_min_reward", None)
-  if filter_min is not None:
-      group_mean = group_rewards.mean(dim=1)
-      groups_with_variance = groups_with_variance & (group_mean > float(filter_min))
-
-  # 入队（score = sum(|adv|)*std）
-  if groups_with_variance.any():
-      scores = (group_adv.abs().sum(dim=1) * group_std)
-      buffered_items = []
-      for group_idx in groups_with_variance.nonzero(as_tuple=True)[0].tolist():
-          start = group_idx * self.num_generations
-          end   = (group_idx + 1) * self.num_generations
-          # 组内最大有效长度（右侧 pad）
-          group_completion_mask = completion_mask[start:end]
-          group_max_len = group_completion_mask.sum(dim=1).max().item() or 1
-          prompt_max_len = prompt_mask[start:end].sum(dim=1).max().item() or 1
-          item = {
-              "prompt_ids":      prompt_ids[start:end, :prompt_max_len],
-              "prompt_mask":     prompt_mask[start:end, :prompt_max_len],
-              "completion_ids":  completion_ids[start:end, :group_max_len],
-              "completion_mask": completion_mask[start:end, :group_max_len],
-              "advantages":      group_adv[group_idx].detach().cpu().tolist(),
-          }
-          # 可选：存 old/ref_per_token_logps
-          buffered_items.append(item)
-      self.replay_buffer.add(scores[groups_with_variance].detach().cpu().tolist(), buffered_items)
-
-  # 替换“零/低方差”的组
-  groups_without_variance = (~groups_with_variance)
-  num_to_replace = int(groups_without_variance.sum().item())
-  if num_to_replace > 0:
-      sampled = self.replay_buffer.sample(num_to_replace)
-      if sampled:
-          # ...计算 pad 目标长度，统一 pad sampled 张量...
-          # 替换（多模态仅替换 completion）
-          if images is not None:
-              completion_ids[start:end]   = sc_ids
-              completion_mask[start:end]  = sc_msk
-              advantages[start:end]       = s_adv
-              # 可选：old/ref_per_token_logps
-          else:
-              # 纯文本时替换 prompt+completion
-              prompt_ids[start:end]       = sp_ids
-              prompt_mask[start:end]      = sp_msk
-              completion_ids[start:end]   = sc_ids
-              completion_mask[start:end]  = sc_msk
-              advantages[start:end]       = s_adv
-          # 更新输出字典（output[...] = ...）
-
-  B) 答案
-
-  - 结论：替换后未见对该组的 rewards → group mean/std → advantages 的“重算”。代码直接将 advantages[start:end] = s_adv（来自缓冲的快
-    照），并未按“当前 step 的奖励/组统计”重建优势。
-  - 风险：统计口径不一致。当前 step 的 rewards、日志中的均值/方差与被替换组的 advantages 有可能不一致，可能带来训练/日志不稳定。
-  - 最小补丁建议（替换完成后，在当前张量上重算替换组的优势/奖励）：
-      1. 重新计算替换组的 rewards_per_func → rewards（可复用 _calculate_rewards 的逻辑，但对替换组子 batch 调用，或缓存其 rewards）
-      2. 组内均值/方差：mean = rewards_group.view(-1,G).mean(dim=1)、std = ...，更新到当前组
-      3. advantages[start:end] = (rewards_group - mean)./std（按当前 scale_rewards 策略）
-         （注意与分布式 gather 的一致性，可仅本地使用）
-
-  ———
-
+      
   ## 问题 3：奖励权重管理器的“早期/常规”切换与单独奖励晚开/小开能力
 
   A) 代码片段

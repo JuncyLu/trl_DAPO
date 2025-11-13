@@ -15,7 +15,43 @@
 
 from collections.abc import Callable
 
- 
+
+def get_soft_overlong_punishment(max_completion_len: int) -> Callable:
+    # docstyle-ignore
+    r"""
+    Reward function that penalizes overlong completions. It is used to penalize overlong completions, but not to reward
+    shorter completions. Reference: Eq. (13) from the DAPO paper (https://huggingface.co/papers/2503.14476)
+
+    $$
+    R_{\text{length}}(y) = \begin{cases}
+    0, & |y| \le L_{\max} - L_{\text{cache}} \\
+    \dfrac{(L_{\max} - L_{\text{cache}}) - |y|}{L_{\text{cache}}}, & L_{\max} - L_{\text{cache}} < |y| \le L_{\max} \\
+    -1, & L_{\max} < |y|
+    \end{cases}
+    $$
+
+    We set L_cache = round(0.7 * L_max) by default, so callers do not need to pass it.
+    """
+
+    L_max = int(max(1, max_completion_len))
+    L_cache = max(1, int(round(0.7 * L_max)))
+    threshold = L_max - L_cache
+    denom = float(L_cache)
+
+    def soft_overlong_punishment_reward(completion_ids: list[list[int]], **kwargs) -> list[float]:
+        rewards: list[float] = []
+        for ids in completion_ids:
+            completion_length = len(ids)
+            if completion_length <= threshold:
+                rewards.append(0.0)
+            elif completion_length <= L_max:
+                rewards.append((threshold - completion_length) / denom)
+            else:
+                rewards.append(-1.0)
+        return rewards
+
+    soft_overlong_punishment_reward.__name__ = "length_reward"
+    return soft_overlong_punishment_reward
 
 
 def get_accuracy_conditioned_length_reward(

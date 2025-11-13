@@ -540,33 +540,6 @@ class DAPOConfig(TrainingArguments):
             "If not specified, `reward_weights` is used throughout training."
         },
     )
-    soft_punish_cache: int = field(
-        default=50,
-        metadata={
-            "help": "Cache size for soft overlong punishment. Used in length reward function to define the soft "
-            "penalty zone. Completions longer than (max_completion_length - soft_punish_cache) will be penalized."
-        },
-    )
-
-    # --- Dynamic sampling buffer (replay buffer) ---
-    replay_buffer_size: int = field(
-        default=0,
-        metadata={
-            "help": "Size of the replay buffer. 0 disables buffering (keeps current behavior)."
-        },
-    )
-    filter_min_reward: float = field(
-        default=2.0,
-        metadata={
-            "help": "Group mean reward threshold. Groups with mean reward <= this value are filtered out from the buffer."
-        },
-    )
-    replay_var_epsilon: float = field(
-        default=1e-6,
-        metadata={
-            "help": "Minimum variance threshold to consider a group as having variance. Helps avoid numerical noise."
-        },
-    )
 
     scale_rewards: str = field(
         default="group",
@@ -738,19 +711,18 @@ class DAPOConfig(TrainingArguments):
         metadata={"help": "token 权重高斯平滑 sigma=0 关闭"},
     )
 
-    decoupled_clip: bool = field(
-        default=False,
-        metadata={"help": "启用正/负优势分路的解耦剪裁（Clip-Higher 变体）。默认 False 使用标准 -min(r*A, r_clip*A)。"},
+    # Dual-clip lower bound constant (VERL-style PPO variant): applies only for A<0
+    clip_ratio_c: float = field(
+        default=3.0,
+        metadata={"help": "Dual-clip PPO lower bound constant c (>1). Applied only on negative-advantage samples: "
+        "loss = where(A<0, min(-A*c, max(-A*r, -A*clip(r)))), else max(-A*r, -A*clip(r))."},
     )
     kl_beta_schedule: str = field(
         default="off",
         metadata={"help": "轻量 KL 调度：'off' 或 'linear10'（前10%步线性从0.02降至0）。"},
     )
 
-    replay_recompute_adv: bool = field(
-        default=True,
-        metadata={"help": "重放替换后是否就地重算该组 rewards/advantages。"},
-    )
+    # (removed) replay_recompute_adv: deprecated with VERL-style filtering
 
     token_weight_quantile: float = field(
         default=0.95,
