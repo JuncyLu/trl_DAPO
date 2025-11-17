@@ -2,7 +2,8 @@ dataset/
 runs/
 training_logs/
 old_logs/
-verl/
+repo/
+docs/
 *.bak
 .gitattributes
 .last_checked

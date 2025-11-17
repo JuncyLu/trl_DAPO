@@ -21,6 +21,7 @@ from ..import_utils import _LazyModule
 
 _import_structure = {
     "accuracy_rewards": ["accuracy_reward"],
+    "accuracy_rewards_v2": ["accuracy_reward", "normalize_answer"],
     "format_rewards": ["think_format_reward", "tag_count_reward"],
     "length_rewards": ["get_soft_overlong_punishment"],
     "attention_rewards": ["vgr_reward", "vgr_hard_negative"],

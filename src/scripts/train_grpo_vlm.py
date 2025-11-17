@@ -54,18 +54,63 @@ if __name__ == "__main__":
     ################
     # Dataset
     ################
-    dataset = load_dataset("/home/lujunxi57/trl/dataset/dmd_split", split="train")
+    dataset = load_dataset("/home/lujunxi57/trl/dataset/aokvqa", split="train")
     # dataset = load_dataset("./dataset/aokvqa_openr1", split="train")
     dataset = dataset.train_test_split(test_size=100, seed=42)
 
-    SYSTEM_PROMPT = (
-        "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the "
-        "assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the "
-        "user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must "
-        "be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. "
-        "The response must end immediately after the closing </answer> tag. For example:\n"
-        "<think>\nThis is my reasoning.\n</think>\n<answer>\nC\n</answer>"
-    )
+    # SYSTEM_PROMPT = (
+    #     "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the "
+    #     "assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the "
+    #     "user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must "
+    #     "be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. "
+    #     "The response must end immediately after the closing </answer> tag. For example:\n"
+    #     "<think>\nThis is my reasoning.\n</think>\n<answer>\nC\n</answer>"
+    # )
+    # SYSTEM_PROMPT = (
+    #     "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it.\n"
+    #     "The assistant first thinks about the reasoning process in the mind and then provides the user with the answer.\n"
+    #     "Inside the <think> ... </think> block, follow this flow:\n"
+    #     "Describe the overall scene—lighting, setting, main activity.\n"
+    #     "List the primary objects and their key attributes such as colour, quantity, and positions.\n"
+    #     "Map each option (A–F) to visual evidence for or against it.\n"
+    #     "Conclude which option is best supported by the evidence.\n"
+    #     "The final answer must be enclosed within <answer></answer> tags as exactly one capital letter from A to F with no extra text or symbols.\n"
+    #     "The response must end immediately after the closing </answer> tag.\n"
+    #     "For example:\n<think>\nThis is my reasoning.\n</think>\n<answer>\nC\n</answer>"
+    # )
+    SYSTEM_PROMPT = """You MUST respond in this EXACT format:
+
+    <think>
+    [reasoning - be thorough and detailed]
+    </think>
+    <answer>
+    [brief answer - 1-5 words]
+    </answer>
+
+    FORMAT RULES:
+    • Start with <think>, end with </answer>
+    • NO text outside these tags
+
+    THINKING GUIDELINES (write 3-4+ sentences):
+    1. Describe the scene: setting, lighting, main subjects
+    2. Identify key objects: colors, quantities, positions, states
+    3. Analyze visual evidence that supports your answer
+    4. Reason step-by-step to reach the conclusion
+
+    ANSWER GUIDELINES:
+    • Keep it short: 1-5 words preferred
+
+    EXAMPLES:
+
+    Question: What is the man holding?
+    <think>
+    The image shows a man standing outdoors in daylight. He is wearing casual clothing and appears to be in a park setting. In his right hand, he is holding a red disc-shaped object. The object has the characteristic flat, circular shape of a frisbee, commonly used for outdoor recreational activities. The bright red color makes it stand out against the background.
+    </think>
+    <answer>
+    frisbee
+    </answer>
+
+    Think thoroughly and support your answer with visual evidence"""
 
     def make_conversation(example):
         prompt = [

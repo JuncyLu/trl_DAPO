@@ -13,17 +13,19 @@
 # limitations under the License.
 
 import inspect
-import math
 import os
 import textwrap
+import time
 import warnings
 from collections import defaultdict, deque
+from collections.abc import Callable
 from contextlib import nullcontext
 from functools import partial
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Union
+from typing import Any
 
 import datasets
+import pandas as pd
 import torch
 import torch.utils.data
 import transformers
@@ -43,43 +45,28 @@ from transformers import (
     PreTrainedTokenizerBase,
     ProcessorMixin,
     TrainerCallback,
+    is_bitsandbytes_available,
+    is_trackio_available,
     is_wandb_available,
 )
 from transformers.trainer_utils import seed_worker
 from transformers.utils import is_datasets_available, is_peft_available, is_rich_available
 
-from trl.data_utils import (
+from ..data_utils import (
     apply_chat_template,
     is_conversational,
     prepare_multimodal_messages,
     prepare_multimodal_messages_vllm,
 )
-from trl.extras.profiling import profiling_context, profiling_decorator
-from trl.extras.vllm_client import VLLMClient
-from trl.import_utils import is_liger_kernel_available, is_vllm_available
-from trl.models import prepare_deepspeed, prepare_fsdp, prepare_peft_model, unwrap_model_for_generation
-from trl.models.utils import _ForwardRedirection
-from trl.trainer.base_trainer import BaseTrainer
-from trl.trainer.callbacks import SyncRefModelCallback
-from .dapo_config import DAPOConfig
-from ..rewards.reward_utils import create_reward_weight_manager, calculate_reward_metrics
-from ..utils.attention_metrics import (
-    compute_qwen_attention_metrics_for_batch,
-    AttentionSampleResult,
-    process_attention_context,
-)
-from ..utils import build_token_vgr_weights_for_batch
-from ..rewards.accuracy_rewards_v2 import accuracy_reward
-from ..utils.dapo_logging import (
-    emit_eval_logs,
-    compute_real_vgr_metrics,
-    perform_realtime_rollout_logging,
-    print_compact_logs,
-    perform_eval_logging,
-    record_vgr_raw_stats,
-)
-from contextlib import contextmanager
-from trl.trainer.utils import (
+from ..extras.profiling import profiling_context, profiling_decorator
+from ..extras.vllm_client import VLLMClient
+from ..import_utils import is_liger_kernel_available, is_vllm_available
+from ..models import prepare_deepspeed, prepare_fsdp, prepare_peft_model, unwrap_model_for_generation
+from ..models.utils import _ForwardRedirection
+from .base_trainer import BaseTrainer
+from .callbacks import SyncRefModelCallback
+from .grpo_config import GRPOConfig
+from .utils import (
     RepeatSampler,
     disable_dropout_in_model,
     ensure_master_addr_port,
@@ -112,22 +99,27 @@ if is_vllm_available():
 if is_wandb_available():
     import wandb
 
+if is_trackio_available():
+    import trackio
+
+if is_bitsandbytes_available():
+    import bitsandbytes as bnb
 
 logger = logging.get_logger(__name__)
 
 # What we call a reward function is a callable that takes a list of prompts and completions and returns a list of
 # rewards. When it's a string, it's a model ID, so it's loaded as a pretrained model.
-RewardFunc = Union[str, PreTrainedModel, Callable[[list, list], list[float]]]
+RewardFunc = str | PreTrainedModel | Callable[[list, list], list[float]]
 
-# What we call a rollout function is a callable that takes prompts (list), args (GRPOConfig), and processing_class as
-# parameters and returns a dict of generation results. Those results must include "prompt_ids", "completion_ids", and
-# "logprobs" fields. Any extra fields (per-completion) are forwarded to the reward functions.
-RolloutFunc = Callable[[list[str], Any, Any], dict[str, Any]]
+# What we call a rollout function is a callable that takes prompts (list) and the trainer instance as parameters and
+# returns a dict of generation results. Those results must include "prompt_ids", "completion_ids", and "logprobs"
+# fields. Any extra fields (per-completion) are forwarded to the reward functions.
+RolloutFunc = Callable[[list[str], "GRPOTrainer"], dict[str, Any]]
 
 
-class DAPOTrainer(BaseTrainer):
+class GRPOTrainer(BaseTrainer):
     """
-    Trainer for the DAPO (Data-Augmented Policy Optimization) method. This algorithm was initially proposed in the
+    Trainer for the Group Relative Policy Optimization (GRPO) method. This algorithm was initially proposed in the
     paper [DeepSeekMath: Pushing the Limits of Mathematical Reasoning in Open Language
     Models](https://huggingface.co/papers/2402.03300).
 
@@ -136,26 +128,20 @@ class DAPOTrainer(BaseTrainer):
     ```python
     from datasets import load_dataset
     from trl import GRPOTrainer
+    from trl.rewards import accuracy_reward
 
-    dataset = load_dataset("trl-lib/tldr", split="train")
-
-
-    def reward_func(completions, **kwargs):
-        # Dummy reward function that rewards completions with more unique letters.
-        return [float(len(set(completion))) for completion in completions]
-
+    dataset = load_dataset("trl-lib/DeepMath-103K", split="train")
 
     trainer = GRPOTrainer(
         model="Qwen/Qwen2-0.5B-Instruct",
-        reward_funcs=reward_func,
+        reward_funcs=accuracy_reward,
         train_dataset=dataset,
     )
-
     trainer.train()
     ```
 
     Args:
-        model (`Union[str, PreTrainedModel]`):
+        model (`str | PreTrainedModel`):
             Model to be trained. Can be either:
 
             - A string, being the *model id* of a pretrained model hosted inside a model repo on huggingface.co, or a
@@ -164,7 +150,7 @@ class DAPOTrainer(BaseTrainer):
               using [`~transformers.AutoModelForCausalLM.from_pretrained`] with the keyword arguments in
               `args.model_init_kwargs`.
             - A [`~transformers.PreTrainedModel`] object. Only causal language models are supported.
-        reward_funcs (`Union[RewardFunc, list[RewardFunc]]`):
+        reward_funcs (`RewardFunc | list[RewardFunc]`):
             Reward functions to be used for computing the rewards. To compute the rewards, we call all the reward
             functions with the prompts and completions and sum the rewards. Can be either:
 
@@ -188,7 +174,7 @@ class DAPOTrainer(BaseTrainer):
                   reward function's signature.
             - A list of reward functions, where each item can independently be any of the above types. Mixing different
             types within the list (e.g., a string model ID and a custom reward function) is allowed.
-        args ([`DAPOConfig`], *optional*):
+        args ([`GRPOConfig`], *optional*):
             Configuration for this trainer. If `None`, a default configuration is used.
         train_dataset ([`~datasets.Dataset`] or [`~datasets.IterableDataset`]):
             Dataset to use for training. It must include a column `"prompt"`. Any additional columns in the dataset is
@@ -197,7 +183,7 @@ class DAPOTrainer(BaseTrainer):
             - [Standard](dataset_formats#standard): Each sample contains plain text.
             - [Conversational](dataset_formats#conversational): Each sample contains structured messages (e.g., role
               and content).
-        eval_dataset ([`~datasets.Dataset`], [`~datasets.IterableDataset`] or `dict[str, Union[Dataset, IterableDataset]]`):
+        eval_dataset ([`~datasets.Dataset`], [`~datasets.IterableDataset`] or `dict[str, Dataset | IterableDataset]`):
             Dataset to use for evaluation. It must meet the same requirements as `train_dataset`.
         processing_class ([`~transformers.PreTrainedTokenizerBase`], [`~transformers.ProcessorMixin`], *optional*):
             Processing class used to process the data. The padding side must be set to "left". If `None`, the
@@ -226,10 +212,10 @@ class DAPOTrainer(BaseTrainer):
         peft_config ([`~peft.PeftConfig`], *optional*):
             PEFT configuration used to wrap the model. If `None`, the model is not wrapped.
         rollout_func (`RolloutFunc`, *optional*):
-            Function to use for generating completions. It must take prompts, args, and processing_class as parameters
-            and return a dict with `"prompt_ids"`, `"completion_ids"`, and `"logprobs"` fields. Any other fields that
-            are forwarded to the reward functions. This feature is experimental and may change or be removed at any
-            time without prior notice.
+            Function to use for generating completions. It receives the list of prompts allocated to the current
+            process and the trainer instance. It must return a dict with `"prompt_ids"`, `"completion_ids"`, and
+            `"logprobs"` fields. Any other fields are forwarded to the reward functions. This feature is experimental
+            and may change or be removed at any time without prior notice.
     """
 
     _tag_names = ["trl", "grpo"]
@@ -250,30 +236,30 @@ class DAPOTrainer(BaseTrainer):
 
     def __init__(
         self,
-        model: Union[str, PreTrainedModel],
-        reward_funcs: Union[RewardFunc, list[RewardFunc]],
-        args: Optional[DAPOConfig] = None,
-        train_dataset: Optional[Union[Dataset, IterableDataset]] = None,
-        eval_dataset: Optional[Union[Dataset, IterableDataset, dict[str, Union[Dataset, IterableDataset]]]] = None,
-        processing_class: Optional[Union[PreTrainedTokenizerBase, ProcessorMixin]] = None,
-        reward_processing_classes: Optional[Union[PreTrainedTokenizerBase, list[PreTrainedTokenizerBase]]] = None,
-        callbacks: Optional[list[TrainerCallback]] = None,
-        optimizers: tuple[Optional[torch.optim.Optimizer], Optional[torch.optim.lr_scheduler.LambdaLR]] = (None, None),
-        peft_config: Optional["PeftConfig"] = None,
-        rollout_func: Optional[RolloutFunc] = None,
+        model: str | PreTrainedModel,
+        reward_funcs: RewardFunc | list[RewardFunc],
+        args: GRPOConfig | None = None,
+        train_dataset: Dataset | IterableDataset | None = None,
+        eval_dataset: Dataset | IterableDataset | dict[str, Dataset | IterableDataset] | None = None,
+        processing_class: PreTrainedTokenizerBase | ProcessorMixin | None = None,
+        reward_processing_classes: PreTrainedTokenizerBase | list[PreTrainedTokenizerBase] | None = None,
+        callbacks: list[TrainerCallback] | None = None,
+        optimizers: tuple[torch.optim.Optimizer | None, torch.optim.lr_scheduler.LambdaLR | None] = (None, None),
+        peft_config: "PeftConfig | None" = None,
+        rollout_func: RolloutFunc | None = None,
     ):
         # Args
         if args is None:
             model_name = model if isinstance(model, str) else get_config_model_id(model.config)
             model_name = model_name.split("/")[-1]
-            args = DAPOConfig(f"{model_name}-DAPO")
+            args = GRPOConfig(f"{model_name}-GRPO")
 
         # Models
         # Trained model
         model_init_kwargs = args.model_init_kwargs or {}
         if isinstance(model, str):
             model_id = model
-            dtype = model_init_kwargs.get("dtype")
+            dtype = model_init_kwargs.get("dtype", "auto")
             if isinstance(dtype, torch.dtype) or dtype == "auto" or dtype is None:
                 pass  # dtype is already a torch.dtype or "auto" or None
             elif isinstance(dtype, str):  # it's a str, but not "auto"
@@ -281,10 +267,10 @@ class DAPOTrainer(BaseTrainer):
                 model_init_kwargs["dtype"] = dtype
             else:
                 raise ValueError(
-                    "Invalid `dtype` passed to `DAPOConfig`. Expected either 'auto' or a string representing "
+                    "Invalid `dtype` passed to `GRPOConfig`. Expected either 'auto' or a string representing "
                     f"a `torch.dtype` (e.g., 'float32'), but got {dtype}."
                 )
-            # Disable caching if gradient checkpointing is enabled (not supported)
+            model_init_kwargs["device_map"] = model_init_kwargs.get("device_map", "auto")
             config = AutoConfig.from_pretrained(model_id)
             architecture = getattr(transformers, config.architectures[0])
             model = architecture.from_pretrained(model_id, **model_init_kwargs)
@@ -292,7 +278,7 @@ class DAPOTrainer(BaseTrainer):
             model_id = get_config_model_id(model.config)
             if args.model_init_kwargs is not None:
                 logger.warning(
-                    "You passed `model_init_kwargs` to the `DAPOConfig`, but your model is already instantiated. "
+                    "You passed `model_init_kwargs` to the `GRPOConfig`, but your model is already instantiated. "
                     "The `model_init_kwargs` will be ignored."
                 )
 
@@ -309,11 +295,7 @@ class DAPOTrainer(BaseTrainer):
 
         # Processing class
         if processing_class is None:
-            processing_class = AutoProcessor.from_pretrained(
-                get_config_model_id(model.config), 
-                truncation_side="left",
-                use_fast=False  # 强制使用 slow processor，避免图像 token 计算不一致
-            )
+            processing_class = AutoProcessor.from_pretrained(get_config_model_id(model.config), truncation_side="left")
 
         # Handle pad token for processors or tokenizers
         if isinstance(processing_class, ProcessorMixin):
@@ -345,14 +327,16 @@ class DAPOTrainer(BaseTrainer):
                 self.reward_func_names.append(reward_funcs[i].__name__)
         self.reward_funcs = reward_funcs
 
-        # Initialize reward weight manager
-        self.reward_weight_manager = create_reward_weight_manager(
-            reward_weights=args.reward_weights,
-            early_weights=args.early_reward_weights,
-            warmup_ratio=args.warmup_ratio,
-            reward_func_names=self.reward_func_names,
-            reward_weight_schedule=getattr(args, "reward_weight_schedule", None),
-        )
+        # Reward weights
+        if args.reward_weights is not None:
+            if len(args.reward_weights) != len(reward_funcs):
+                raise ValueError(
+                    f"Number of reward weights ({len(args.reward_weights)}) must match number of reward "
+                    f"functions ({len(reward_funcs)})"
+                )
+            self.reward_weights = torch.tensor(args.reward_weights, dtype=torch.float32)
+        else:
+            self.reward_weights = torch.ones(len(reward_funcs), dtype=torch.float32)
 
         # Reward processing class
         if reward_processing_classes is None:
@@ -365,7 +349,9 @@ class DAPOTrainer(BaseTrainer):
                 f"reward functions ({len(reward_funcs)})."
             )
 
-        for i, (reward_processing_class, reward_func) in enumerate(zip(reward_processing_classes, reward_funcs)):
+        for i, (reward_processing_class, reward_func) in enumerate(
+            zip(reward_processing_classes, reward_funcs, strict=True)
+        ):
             if isinstance(reward_func, PreTrainedModel):
                 if reward_processing_class is None:
                     reward_processing_class = AutoTokenizer.from_pretrained(get_config_model_id(reward_func.config))
@@ -393,6 +379,7 @@ class DAPOTrainer(BaseTrainer):
         self.max_prompt_length = args.max_prompt_length
         self.max_completion_length = args.max_completion_length  # = |o_i| in the GRPO paper
         self.num_generations = args.num_generations  # = G in the GRPO paper
+        self.chat_template_kwargs = args.chat_template_kwargs or {}
         self.temperature = args.temperature
         self.top_p = args.top_p
         self.top_k = args.top_k
@@ -405,17 +392,17 @@ class DAPOTrainer(BaseTrainer):
         self.vllm_tensor_parallel_size = args.vllm_tensor_parallel_size  # only applies to colocation mode
         self.vllm_importance_sampling_correction = args.vllm_importance_sampling_correction
         self.vllm_importance_sampling_cap = args.vllm_importance_sampling_cap
-        self.use_liger_loss = args.use_liger_loss
+        self.use_liger_kernel = args.use_liger_kernel
         self.loss_type = args.loss_type
         self.scale_rewards = args.scale_rewards
         self.importance_sampling_level = args.importance_sampling_level
         self.mask_truncated_completions = args.mask_truncated_completions
         self.top_entropy_quantile = args.top_entropy_quantile
-        if self.use_liger_loss and self.top_entropy_quantile < 1.0:
+        if self.use_liger_kernel and self.top_entropy_quantile < 1.0:
             raise NotImplementedError(
                 "Liger Kernels don't currently support masking token positions based on entropy."
             )
-        if self.use_liger_loss and not self.importance_sampling_level == "token":
+        if self.use_liger_kernel and not self.importance_sampling_level == "token":
             raise NotImplementedError(
                 "Liger Kernels currently only support token-level importance sampling. Please set"
                 "`importance_sampling_level` to 'token'."
@@ -465,7 +452,7 @@ class DAPOTrainer(BaseTrainer):
             optimizers=optimizers,
             # In Trainer, `training_step` scales the loss by `gradient_accumulation_steps` only if `compute_loss_func`
             # is None. For DAPO, loss scaling instead depends on the total number of completions tokens across the
-            # global accumulated batch. To control scaling ourselves, we must disable Trainer's built-in scaling. The
+            # global accumulated batch. To control scaling ourselves, we must disable Trainer’s built-in scaling. The
             # simplest (though a bit hacky) way is to set `compute_loss_func` to any non-None value, which bypasses
             # that behavior without rewriting `training_step`.
             compute_loss_func="non-None value to disable scaling",
@@ -492,11 +479,39 @@ class DAPOTrainer(BaseTrainer):
             if self.ref_model is not None:
                 disable_dropout_in_model(self.ref_model)
 
+        # Cast LM Head To FP32
+        if args.cast_lm_head_to_fp32:
+
+            def _cast_lm_head_to_fp32(target_model: PreTrainedModel):
+                """Cast lm_head to fp32 while preserving embedding output dtype if tied."""
+
+                def cast_inputs_to_fp32(module, inputs):
+                    # Preserve other positional args and kwargs untouched
+                    if not inputs:
+                        return inputs
+                    return (inputs[0].to(torch.float32),) + inputs[1:]
+
+                original_dtype_local = target_model.lm_head.weight.dtype
+                target_model.lm_head = target_model.lm_head.float()
+                target_model.lm_head.register_forward_pre_hook(cast_inputs_to_fp32)
+
+                if target_model.config.tie_word_embeddings:
+
+                    def cast_outputs_to_original_dtype(module, args, output):
+                        return output.to(original_dtype_local)
+
+                    # Only cast activations; weights are now fp32 (intentional for numerical stability of logits)
+                    target_model.model.embed_tokens.register_forward_hook(cast_outputs_to_original_dtype)
+
+            _cast_lm_head_to_fp32(model)
+            if self.ref_model is not None:
+                _cast_lm_head_to_fp32(self.ref_model)
+
         # Liger loss
-        if self.use_liger_loss:
+        if self.use_liger_kernel:
             if not is_liger_kernel_available():
                 raise ImportError(
-                    "Liger is required to use `liger_loss` as the GRPO loss. Run `pip install liger-kernel`."
+                    "Liger is required to use `use_liger_kernel` as the GRPO loss. Run `pip install liger-kernel`."
                 )
             # redirect the model.module forward to the model forward to ensure pre-forward hooks are called
             self._forward_redirection = _ForwardRedirection()
@@ -513,32 +528,19 @@ class DAPOTrainer(BaseTrainer):
 
         # Initialize the metrics
         self._metrics = {"train": defaultdict(list), "eval": defaultdict(list)}
-        # Effective KL beta (with schedule if enabled)
-        self._beta_eff = float(self.beta) if hasattr(self, "beta") else 0.0
         self._total_train_tokens = 0
+        self._current_train_step_time = 0.0
         self.log_completions = args.log_completions
-        self.wandb_log_unique_prompts = args.wandb_log_unique_prompts
+        self.log_unique_prompts = args.log_unique_prompts
         self.num_completions_to_print = args.num_completions_to_print
-        # Evaluation can use a different number of generations per sample
-        self.eval_num_generations = getattr(args, "eval_num_generations", 2) or 2
         # Keep logs sized to the generation batch to record only outputs from the latest model update.
         self._logs = {
             "images": deque(maxlen=args.generation_batch_size),
             "prompt": deque(maxlen=args.generation_batch_size),
             "completion": deque(maxlen=args.generation_batch_size),
-            "prompt_chatml": deque(maxlen=args.generation_batch_size),
             "rewards": defaultdict(lambda: deque(maxlen=args.generation_batch_size)),
             "advantages": deque(maxlen=args.generation_batch_size),
         }
-
-        # Initialize attention tracking
-        self.compute_attention_metrics = args.compute_attention_metrics
-        if self.compute_attention_metrics:
-            self._logs["attention"] = deque(maxlen=1000)
-            self._attention_skip_reasons = deque(maxlen=1000)
-        # Initialize token weights tracking (optional)
-        if getattr(args, "token_weights", False):
-            self._logs["token_weights"] = deque(maxlen=1000)
 
         # Ensure each process receives a unique seed to prevent duplicate completions when generating with
         # transformers if num_generations exceeds per_device_train_batch_size. We could skip it if we use vLLM, but
@@ -591,6 +593,15 @@ class DAPOTrainer(BaseTrainer):
                     max_model_len = self.max_prompt_length + self.max_completion_length
                 else:
                     max_model_len = None
+
+                vllm_quantization = None
+                if is_bitsandbytes_available():
+                    for _, module in model.named_modules():
+                        if isinstance(module, bnb.nn.Linear4bit):
+                            vllm_quantization = "bitsandbytes"
+                            break
+                        elif isinstance(module, bnb.nn.Linear8bitLt):
+                            raise ValueError("vLLM does not support in-flight 8-bit quantization.")
                 self.llm = LLM(
                     model=model.name_or_path,
                     tensor_parallel_size=args.vllm_tensor_parallel_size,
@@ -608,6 +619,7 @@ class DAPOTrainer(BaseTrainer):
                     enable_sleep_mode=self.args.vllm_enable_sleep_mode,
                     # Important so temperature scaling/logit tweaking affects the TIS log probs
                     logprobs_mode="processed_logprobs",
+                    quantization=vllm_quantization,
                 )
                 if self.args.vllm_enable_sleep_mode:
                     self.llm.sleep(level=2)
@@ -718,7 +730,7 @@ class DAPOTrainer(BaseTrainer):
 
         return self.accelerator.prepare(DataLoader(train_dataset, **dataloader_params))
 
-    def _get_train_sampler(self, dataset: Optional[Dataset] = None) -> Sampler:
+    def _get_train_sampler(self, dataset: Dataset | None = None) -> Sampler:
         # Returns a sampler that
         # 1. ensures each prompt is repeated across multiple processes. This guarantees that identical prompts are
         #    distributed to different GPUs, allowing rewards to be computed and normalized correctly within each prompt
@@ -758,7 +770,7 @@ class DAPOTrainer(BaseTrainer):
         # See _get_train_sampler for an explanation of the sampler.
         return RepeatSampler(
             data_source=eval_dataset,
-            mini_repeat_count=self.eval_num_generations,
+            mini_repeat_count=self.num_generations,
             seed=self.args.seed,
         )
 
@@ -860,19 +872,9 @@ class DAPOTrainer(BaseTrainer):
         pixel_attention_mask=None,
         image_sizes=None,
         token_type_ids=None,
-    ) -> dict[str, Optional[torch.Tensor]]:
+    ) -> dict[str, torch.Tensor | None]:
         """Compute log-probs and (optionally) entropies for each token."""
-        # Handle empty batch early to avoid zero step in range() and downstream indexing
-        if input_ids.size(0) == 0:
-            empty = torch.empty((0, logits_to_keep), dtype=torch.float32, device=input_ids.device)
-            return empty, (empty if compute_entropy else None)
-
-        # Chunk inputs into smaller batches to reduce memory peak; ensure positive step
-        if batch_size is None or int(batch_size) <= 0:
-            # If caller didn't pass a valid batch_size, default to process all available rows
-            batch_size = int(max(1, input_ids.size(0)))
-        else:
-            batch_size = int(batch_size)
+        batch_size = batch_size or input_ids.size(0)  # Chunk inputs into smaller batches to reduce memory peak
         all_logps = []
         all_entropies = []
         for start in range(0, input_ids.size(0), batch_size):
@@ -886,11 +888,10 @@ class DAPOTrainer(BaseTrainer):
                 rows_per_sample = torch.split(rows_per_image, num_images)
                 rows_per_sample = torch.stack([s.sum() for s in rows_per_sample])
                 cum_rows = torch.cat([torch.tensor([0], device=rows_per_sample.device), rows_per_sample.cumsum(0)])
-                end_idx = min(start + batch_size, input_ids.size(0))
-                row_start, row_end = cum_rows[start].item(), cum_rows[end_idx].item()
+                row_start, row_end = cum_rows[start].item(), cum_rows[start + batch_size].item()
                 model_inputs["pixel_values"] = pixel_values[row_start:row_end]
                 cum_imgs = torch.tensor([0] + num_images).cumsum(0)
-                img_start, img_end = cum_imgs[start], cum_imgs[end_idx]
+                img_start, img_end = cum_imgs[start], cum_imgs[start + batch_size]
                 model_inputs["image_grid_thw"] = image_grid_thw[img_start:img_end]
             elif pixel_values is not None:
                 model_inputs["pixel_values"] = pixel_values[start : start + batch_size]
@@ -916,7 +917,6 @@ class DAPOTrainer(BaseTrainer):
             # Divide logits by sampling temperature.
             # See https://huggingface.co/blog/the_n_implementation_details_of_rlhf_with_ppo#policy-training-implementation-details
             logits = logits / self.temperature
-
             completion_ids = input_ids_batch[:, -logits_to_keep:]
             logps = selective_log_softmax(logits, completion_ids)  # compute logprobs
             all_logps.append(logps)
@@ -930,7 +930,7 @@ class DAPOTrainer(BaseTrainer):
         entropies = torch.cat(all_entropies, dim=0) if compute_entropy else None
         return logps, entropies
 
-    def _fix_param_name_to_vllm(self, name, extra_prefixes: Optional[list[str]] = None):
+    def _fix_param_name_to_vllm(self, name, extra_prefixes: list[str] | None = None):
         extra_prefixes = extra_prefixes or []
         prefixes = ["_checkpoint_wrapped_module."] + extra_prefixes
         for prefix in prefixes:
@@ -1053,10 +1053,19 @@ class DAPOTrainer(BaseTrainer):
         elif self.vllm_mode == "colocate":
             self.llm.reset_prefix_cache()
 
+    def training_step(self, model, inputs, num_items_in_batch):
+        time_before = time.perf_counter()
+        output = super().training_step(model, inputs, num_items_in_batch)
+        self._step += 1
+        time_after = time.perf_counter()
+        self._current_train_step_time += time_after - time_before
+        if self._step % self.current_gradient_accumulation_steps == 0:
+            self._metrics["train"]["step_time"].append(self._current_train_step_time)
+            self._current_train_step_time = 0.0
+        return output
+
     @profiling_decorator
-    def _prepare_inputs(
-        self, generation_batch: dict[str, Union[torch.Tensor, Any]]
-    ) -> dict[str, Union[torch.Tensor, Any]]:
+    def _prepare_inputs(self, generation_batch: dict[str, torch.Tensor | Any]) -> dict[str, torch.Tensor | Any]:
         # Prepares inputs for model training/evaluation by managing completion generation and batch handling.
         # During training:
         #   - Receives the local generation batch (Per-GPU batch size × steps per generation)
@@ -1072,52 +1081,23 @@ class DAPOTrainer(BaseTrainer):
 
         mode = "train" if self.model.training else "eval"
         if mode == "train":
-            assert isinstance(generation_batch, list), "GRPO expects identity-collated list of dicts."
             generate_every = self.args.steps_per_generation * self.num_iterations
             if self._step % generate_every == 0 or self._buffered_inputs is None:
-                try:
-                    processed_batch = self._generate_and_score_completions(generation_batch)
-                except RuntimeError as e:
-                    if getattr(self.args, "oom_backoff_enable", False) and "out of memory" in str(e).lower():
-                        if self.accelerator.is_main_process:
-                            print("[OOM backoff] Generation failed due to OOM; clearing cache and re-raising")
-                        torch.cuda.empty_cache()
-                    raise
-
-                processed_batch = split_pixel_values_by_grid(processed_batch)
-                processed_batch = shuffle_sequence_dict(processed_batch)
-                generation_batches = split_tensor_dict(processed_batch, self.args.steps_per_generation)
+                # self._buffered_inputs=None can occur when resuming from a checkpoint
+                generation_batch = self._generate_and_score_completions(generation_batch)
+                generation_batch = split_pixel_values_by_grid(generation_batch)
+                generation_batch = shuffle_sequence_dict(generation_batch)
+                generation_batches = split_tensor_dict(generation_batch, self.args.steps_per_generation)
                 self._buffered_inputs = [unsplit_pixel_values_by_grid(batch) for batch in generation_batches]
-
-            step_index = self._step % self.args.steps_per_generation
-            inputs = self._buffered_inputs[step_index]
-            self._step += 1
+            inputs = self._buffered_inputs[self._step % self.args.steps_per_generation]
         else:
             # In evaluation, there is neither batch grouping for generation, nor multiple iterations, hence
             # local generation batch == local eval batch
             inputs = self._generate_and_score_completions(generation_batch)
-
-        # Recompute num_items_in_batch to reflect filtered batch: use global completion token count
-        # CRITICAL: This gather must execute unconditionally on ALL ranks
-        completion_mask = inputs.get("completion_mask")
-        if completion_mask is None or not isinstance(completion_mask, torch.Tensor):
-            # Create dummy tensor for gather synchronization
-            local_tokens = torch.tensor(0, dtype=torch.long, device=self.accelerator.device)
-        else:
-            local_tokens = completion_mask.sum().to(self.accelerator.device)
-        
-        # Unconditional gather - all ranks must participate
-        try:
-            global_tokens = self.accelerator.gather(local_tokens).sum()
-        except Exception:
-            global_tokens = local_tokens * self.world_size
-        inputs["num_items_in_batch"] = global_tokens
-
         return inputs
 
     @profiling_decorator
     def _calculate_rewards(self, inputs, prompts, completions, completion_ids_list):
-        mode = "train" if self.model.training else "eval"
         device = self.accelerator.device
         rewards_per_func = torch.zeros(len(prompts), len(self.reward_funcs), device=device)
 
@@ -1128,58 +1108,19 @@ class DAPOTrainer(BaseTrainer):
         # This allows for dynamic reward shaping based on training progress.
         reward_kwargs["trainer_state"] = self.state
 
-        # Add num_generations for group-wise reward calculation
-        reward_kwargs["num_generations"] = self.num_generations if self.model.training else self.eval_num_generations
-
-        # Add attention data for reward functions if available
-        if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
-            att_list = list(self._logs['attention'])
-            
-            if att_list:
-                # Get the most recent attention results for this batch
-                sample_results = att_list[-len(prompts):]
-                
-                # Align skip reasons with the same recent slice
-                if hasattr(self, '_attention_skip_reasons'):
-                    skips = list(self._attention_skip_reasons)
-                    skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
-                else:
-                    skip_slice = [None] * len(sample_results)
-                    
-                vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
-                
-                reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in vgr_metrics]
-                reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in vgr_metrics]
-                reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in vgr_metrics]
-                reward_kwargs["num_vision_tokens"] = [m.get("num_vision_tokens", 0) for m in vgr_metrics]
-                record_vgr_raw_stats(vgr_metrics, self._metrics, mode, self.accelerator)
-
-        # 计算逐样本准确率，并传递给奖励函数（供 vgr_accuracy_reward 使用）
-        try:
-            solutions_for_batch = reward_kwargs.get("solution", None)
-            if solutions_for_batch is None:
-                solutions_for_batch = reward_kwargs.get("solutions", None)
-
-            if solutions_for_batch is not None:
-                acc_scores = accuracy_reward(
-                    completions=completions,
-                    solution=solutions_for_batch,
-                )
-                # 将 None 安全转为 0.0
-                reward_kwargs["accuracies"] = [float(x) if x is not None else 0.0 for x in acc_scores]
-        except Exception:
-            pass
-
         for i, (reward_func, reward_processing_class, reward_func_name) in enumerate(
-            zip(self.reward_funcs, self.reward_processing_classes, self.reward_func_names)
+            zip(self.reward_funcs, self.reward_processing_classes, self.reward_func_names, strict=True)
         ):
             with profiling_context(self, reward_func_name):
                 if isinstance(reward_func, nn.Module):  # Module (no PretrainedModel) for compat with compiled models
                     if is_conversational(inputs[0]):
-                        messages = [{"messages": p + c} for p, c in zip(prompts, completions)]
-                        texts = [apply_chat_template(x, reward_processing_class)["text"] for x in messages]
+                        messages = [{"messages": p + c} for p, c in zip(prompts, completions, strict=True)]
+                        texts = [
+                            apply_chat_template(x, reward_processing_class, **self.chat_template_kwargs)["text"]
+                            for x in messages
+                        ]
                     else:
-                        texts = [p + c for p, c in zip(prompts, completions)]
+                        texts = [p + c for p, c in zip(prompts, completions, strict=True)]
                     reward_inputs = reward_processing_class(
                         text=texts, return_tensors="pt", padding=True, padding_side="right", add_special_tokens=False
                     )
@@ -1213,86 +1154,8 @@ class DAPOTrainer(BaseTrainer):
         rewards_per_func = gather(rewards_per_func)
         return rewards_per_func
 
-    def _recompute_group_advantages(self, inputs, prompts, completions, start: int, end: int, group_ng: int,
-                                    scale_mode: str, completion_ids_list: list) -> torch.Tensor:
-        """Recompute advantages for the group slice [start:end) locally (no all-gather).
-        This avoids statistical inconsistency after replay replacement.
-        """
+    def _generate_single_turn(self, prompts: list):
         device = self.accelerator.device
-        size = end - start
-        if size <= 0:
-            return inputs["advantages"][start:end]
-        # 构造子批
-        sub_prompts = prompts[start:end]
-        sub_completions = completions[start:end]
-        # 局部奖励计算（不 gather）
-        rewards_per_func = torch.zeros(size, len(self.reward_funcs), device=device)
-        # 从 inputs 取子列作为 kwargs（保持 _calculate_rewards 的签名）
-        keys = [key for key in inputs[0] if key not in ["prompt", "completion", "completion_ids"]]
-        reward_kwargs = {key: [example[key] for example in inputs] for key in keys}
-        reward_kwargs["trainer_state"] = self.state
-        reward_kwargs["num_generations"] = group_ng
-        # 注意力额外字段（若可用）
-        try:
-            if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
-                att_list = list(self._logs['attention'])
-                if att_list:
-                    sample_results = att_list[-len(prompts):]
-                    if hasattr(self, '_attention_skip_reasons'):
-                        skips = list(self._attention_skip_reasons)
-                        skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
-                    else:
-                        skip_slice = [None] * len(sample_results)
-                    vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
-                    reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in vgr_metrics][start:end]
-                    reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in vgr_metrics][start:end]
-                    reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in vgr_metrics][start:end]
-                    reward_kwargs["num_vision_tokens"] = [m.get("num_vision_tokens", 0) for m in vgr_metrics][start:end]
-        except Exception:
-            pass
-        # 逐函数计算（本地）
-        for i, (reward_func, reward_processing_class, reward_func_name) in enumerate(
-            zip(self.reward_funcs, self.reward_processing_classes, self.reward_func_names)
-        ):
-            if isinstance(reward_func, nn.Module):
-                if is_conversational(inputs[0]):
-                    messages = [{"messages": p + c} for p, c in zip(sub_prompts, sub_completions)]
-                    texts = [apply_chat_template(x, reward_processing_class)["text"] for x in messages]
-                else:
-                    texts = [p + c for p, c in zip(sub_prompts, sub_completions)]
-                reward_inputs = reward_processing_class(
-                    text=texts, return_tensors="pt", padding=True, padding_side="right", add_special_tokens=False
-                )
-                reward_inputs = super()._prepare_inputs(reward_inputs)
-                with torch.inference_mode():
-                    rewards_per_func[:, i] = reward_func(**reward_inputs).logits[:, 0]
-            else:
-                out = reward_func(
-                    prompts=sub_prompts, completions=sub_completions, completion_ids=[cid for cid in completion_ids_list[start:end]], **reward_kwargs
-                )
-                out = [val if val is not None else torch.nan for val in out]
-                rewards_per_func[:, i] = torch.tensor(out, dtype=torch.float32, device=device)
-        # 权重合成
-        weights = self.reward_weight_manager.get_current_weights().to(device)
-        rewards = (rewards_per_func * weights.unsqueeze(0)).nansum(dim=1)
-        # 组内均值/方差与优势
-        rewards_group = rewards.view(-1, group_ng)
-        mean_group = rewards_group.mean(dim=1).repeat_interleave(group_ng)
-        adv = rewards - mean_group
-        if scale_mode in ["group", "none"]:
-            std = rewards_group.std(dim=1).repeat_interleave(group_ng)
-        elif scale_mode == "batch":
-            std = rewards.std().expand_as(rewards)
-        else:
-            std = torch.zeros_like(rewards)
-        if scale_mode != "none":
-            adv = adv / (std + 1e-4)
-        return adv.detach()
-
-    def _generate_single_turn(self, prompts: list, images: Optional[list] = None):
-        device = self.accelerator.device
-        # Use eval-specific generations when not training
-        ng = self.num_generations if self.model.training else self.eval_num_generations
 
         # Generate completions using either vLLM or regular generation
         if self.use_vllm:
@@ -1311,22 +1174,16 @@ class DAPOTrainer(BaseTrainer):
 
             # Generate completions using vLLM: gather all prompts and use them in a single call in the main process
             if self.vllm_mode == "server":
-                # Ensure grouping alignment when requesting n>1 generations per unique prompt
-                if ng > 1 and len(prompts) % ng != 0:
-                    prompts = prompts[: len(prompts) - (len(prompts) % ng)]
                 all_prompts = gather_object(prompts)
 
                 if self.accelerator.is_main_process:
                     # Since 'prompts' contains 'num_generations' duplicates, we first take unique prompts, and generate
                     # num_generations outputs for each one. This is faster than generating outputs for each duplicate
                     # prompt individually.
-                    # Drop any trailing incomplete group to keep alignment across processes
-                    total = len(all_prompts)
-                    num_unique = total // ng if ng > 0 else total
-                    ordered_set_of_prompts = [all_prompts[i * ng] for i in range(num_unique)]
+                    ordered_set_of_prompts = all_prompts[:: self.num_generations]
 
                     sampling_params = {
-                        "n": ng,
+                        "n": self.num_generations,
                         "repetition_penalty": self.repetition_penalty,
                         "temperature": self.temperature,
                         "top_p": self.top_p,
@@ -1339,20 +1196,22 @@ class DAPOTrainer(BaseTrainer):
                     }
                     with profiling_context(self, "vLLM.generate"):
                         if self.rollout_func is not None:
-                            if is_conversational({"prompt": ordered_set_of_prompts[0]}):
-                                ordered_set_of_prompts = [
-                                    apply_chat_template({"prompt": p}, self.processing_class)["prompt"]
-                                    for p in ordered_set_of_prompts
+                            rollout_prompts = ordered_set_of_prompts
+                            if rollout_prompts and is_conversational({"prompt": rollout_prompts[0]}):
+                                rollout_prompts = [
+                                    apply_chat_template(
+                                        {"prompt": p}, self.processing_class, **self.chat_template_kwargs
+                                    )["prompt"]
+                                    for p in rollout_prompts
                                 ]
-                            output = self.rollout_func(
-                                ordered_set_of_prompts,
-                                self.args,
-                                self.processing_class,
-                            )
+                            output = self.rollout_func(rollout_prompts, self)
                         else:
                             if is_conversational({"prompt": ordered_set_of_prompts[0]}):
-                                # FIXME: this endpoint doesn't exist in vllm_client
-                                output = self.vllm_client.chat(prompts=ordered_set_of_prompts, **sampling_params)
+                                output = self.vllm_client.chat(
+                                    messages=ordered_set_of_prompts,
+                                    **sampling_params,
+                                    chat_template_kwargs=self.chat_template_kwargs,
+                                )
                             else:
                                 output = self.vllm_client.generate(prompts=ordered_set_of_prompts, **sampling_params)
                         # Extract required fields and collect any extra fields for reward functions
@@ -1367,8 +1226,8 @@ class DAPOTrainer(BaseTrainer):
                 broadcast_object_list(obj_list, from_process=0)
                 all_prompt_ids, all_completion_ids, all_logprobs, all_extra_fields = obj_list[0]
 
-                # At this point, we only get 1 copy of each prompt, so we need to repeat them ng times
-                all_prompt_ids = [ids for ids in all_prompt_ids for _ in range(ng)]
+                # At this point, we only get 1 copy of each prompt, so we need to repeat them num_generations times
+                all_prompt_ids = [ids for ids in all_prompt_ids for _ in range(self.num_generations)]
 
                 process_slice = slice(
                     self.accelerator.process_index * len(prompts),
@@ -1385,96 +1244,110 @@ class DAPOTrainer(BaseTrainer):
                         extra_fields[key] = values[process_slice]
                     else:
                         extra_fields[key] = values
-                attention_context = None  # vLLM server doesn't support attention output
 
             # Generate completions using colocated vLLM instances: each device holds vLLM copy and work on their own batch of prompts
             elif self.vllm_mode == "colocate":
-                if self.guided_decoding_regex:
-                    guided_decoding = GuidedDecodingParams(regex=self.guided_decoding_regex)
+                if self.rollout_func is not None:
+                    rollout_prompts = prompts
+                    if rollout_prompts and is_conversational({"prompt": rollout_prompts[0]}):
+                        rollout_prompts = [
+                            apply_chat_template(
+                                {"prompt": prompt}, self.processing_class, **self.chat_template_kwargs
+                            )["prompt"]
+                            for prompt in rollout_prompts
+                        ]
+                    output = self.rollout_func(rollout_prompts, self)
+                    required_keys = {"prompt_ids", "completion_ids", "logprobs"}
+                    extra_fields = {k: v for k, v in output.items() if k not in required_keys}
+                    prompt_ids = output["prompt_ids"]
+                    completion_ids = output["completion_ids"]
+                    logprobs = output["logprobs"]
                 else:
-                    guided_decoding = None
-
-                generation_kwargs = {
-                    "n": 1,  # vLLM on each GPU generates only 1 in colocate mode
-                    "repetition_penalty": self.repetition_penalty,
-                    "temperature": self.temperature,
-                    "top_p": self.top_p,
-                    "top_k": -1 if self.top_k is None else self.top_k,
-                    "min_p": 0.0 if self.min_p is None else self.min_p,
-                    "max_tokens": self.max_completion_length,
-                    "truncate_prompt_tokens": self.max_prompt_length,
-                    "guided_decoding": guided_decoding,
-                    "logprobs": 0,  # only return the logprob of the generated token
-                }
-                if self.args.generation_kwargs is not None:
-                    generation_kwargs.update(self.args.generation_kwargs)
-                sampling_params = SamplingParams(**generation_kwargs)
-
-                if self.vllm_tensor_parallel_size > 1:
-                    # Gather prompts from all ranks in the TP group and flatten.
-                    # Each rank starts with its own prompts; after gathering, all ranks see the full group set.
-                    orig_size = len(prompts)
-                    gathered_prompts = [None for _ in range(self.vllm_tensor_parallel_size)]
-                    torch.distributed.all_gather_object(gathered_prompts, prompts, group=self.tp_group)
-                    all_prompts = [p for sublist in gathered_prompts for p in sublist]
-                else:
-                    all_prompts = prompts
-
-                if self.args.vllm_enable_sleep_mode:
-                    self.llm.wake_up(tags=["kv_cache"])
-
-                with profiling_context(self, "vLLM.generate"):
-                    if is_conversational({"prompt": prompts[0]}):
-                        all_outputs = self.llm.chat(all_prompts, sampling_params=sampling_params, use_tqdm=False)
+                    if self.guided_decoding_regex:
+                        guided_decoding = GuidedDecodingParams(regex=self.guided_decoding_regex)
                     else:
-                        all_outputs = self.llm.generate(all_prompts, sampling_params=sampling_params, use_tqdm=False)
+                        guided_decoding = None
 
-                all_prompt_ids = [output.prompt_token_ids for output in all_outputs]
-                all_completion_ids = [output.token_ids for outputs in all_outputs for output in outputs.outputs]
-                all_logprobs = [
-                    [next(iter(lp.values())).logprob for lp in output.logprobs]
-                    for outputs in all_outputs
-                    for output in outputs.outputs
-                ]
+                    generation_kwargs = {
+                        "n": 1,  # vLLM on each GPU generates only 1 in colocate mode
+                        "repetition_penalty": self.repetition_penalty,
+                        "temperature": self.temperature,
+                        "top_p": self.top_p,
+                        "top_k": -1 if self.top_k is None else self.top_k,
+                        "min_p": 0.0 if self.min_p is None else self.min_p,
+                        "max_tokens": self.max_completion_length,
+                        "truncate_prompt_tokens": self.max_prompt_length,
+                        "guided_decoding": guided_decoding,
+                        "logprobs": 0,  # enable returning log probabilities; 0 means for the sampled tokens only
+                    }
+                    if self.args.generation_kwargs is not None:
+                        generation_kwargs.update(self.args.generation_kwargs)
+                    sampling_params = SamplingParams(**generation_kwargs)
 
-                if self.vllm_tensor_parallel_size > 1:
-                    # Slice completions for this rank within its TP group.
-                    # Each rank generates all outputs — we keep only our share.
-                    local_rank_in_group = torch.distributed.get_rank(group=self.tp_group)
-                    tp_slice = slice(local_rank_in_group * orig_size, (local_rank_in_group + 1) * orig_size)
-                    prompt_ids = all_prompt_ids[tp_slice]
-                    completion_ids = all_completion_ids[tp_slice]
-                    logprobs = all_logprobs[tp_slice]
-                else:
-                    prompt_ids = all_prompt_ids
-                    completion_ids = all_completion_ids
-                    logprobs = all_logprobs
+                    if self.vllm_tensor_parallel_size > 1:
+                        # Gather prompts from all ranks in the TP group and flatten.
+                        # Each rank starts with its own prompts; after gathering, all ranks see the full group set.
+                        orig_size = len(prompts)
+                        gathered_prompts = [None for _ in range(self.vllm_tensor_parallel_size)]
+                        torch.distributed.all_gather_object(gathered_prompts, prompts, group=self.tp_group)
+                        all_prompts = [p for sublist in gathered_prompts for p in sublist]
+                    else:
+                        all_prompts = prompts
 
-                extra_fields = {}  # No extra fields for colocate mode
-                attention_context = None  # vLLM doesn't support attention output
+                    if self.args.vllm_enable_sleep_mode:
+                        self.llm.wake_up(tags=["kv_cache"])
 
-                if self.args.vllm_enable_sleep_mode:
-                    self.llm.sleep(level=2)
+                    with profiling_context(self, "vLLM.generate"):
+                        if is_conversational({"prompt": prompts[0]}):
+                            all_outputs = self.llm.chat(all_prompts, sampling_params=sampling_params, use_tqdm=False)
+                        else:
+                            all_outputs = self.llm.generate(
+                                all_prompts, sampling_params=sampling_params, use_tqdm=False
+                            )
+
+                    all_prompt_ids = [output.prompt_token_ids for output in all_outputs]
+                    all_completion_ids = [output.token_ids for outputs in all_outputs for output in outputs.outputs]
+                    all_logprobs = [
+                        [next(iter(lp.values())).logprob for lp in output.logprobs]
+                        for outputs in all_outputs
+                        for output in outputs.outputs
+                    ]
+
+                    if self.vllm_tensor_parallel_size > 1:
+                        # Slice completions for this rank within its TP group.
+                        # Each rank generates all outputs — we keep only our share.
+                        local_rank_in_group = torch.distributed.get_rank(group=self.tp_group)
+                        tp_slice = slice(local_rank_in_group * orig_size, (local_rank_in_group + 1) * orig_size)
+                        prompt_ids = all_prompt_ids[tp_slice]
+                        completion_ids = all_completion_ids[tp_slice]
+                        logprobs = all_logprobs[tp_slice]
+                    else:
+                        prompt_ids = all_prompt_ids
+                        completion_ids = all_completion_ids
+                        logprobs = all_logprobs
+
+                    extra_fields = {}  # No extra fields for colocate mode
+
+                    if self.args.vllm_enable_sleep_mode:
+                        self.llm.sleep(level=2)
 
         elif self.use_transformers_paged:
-            processor_kwargs = {"max_length": self.max_prompt_length, "truncation": True, "add_special_tokens": False}
+            processor_kwargs = {
+                "max_length": self.max_prompt_length,
+                "truncation": True,
+                "add_special_tokens": False,
+            }
             if is_conversational({"prompt": prompts[0]}):
-                generate_inputs = self.processing_class.apply_chat_template(
-                    conversation=prompts, add_generation_prompt=True, **processor_kwargs, tokenize=True, return_dict=True
+                processor_outputs = self.processing_class.apply_chat_template(
+                    conversation=prompts,
+                    **processor_kwargs,
+                    add_generation_prompt=True,
+                    tokenize=True,
+                    return_dict=True,
+                    **self.chat_template_kwargs,
                 )
             else:
-                generate_inputs = self.processing_class(text=prompts, **processor_kwargs)
-            generate_inputs["inputs"] = generate_inputs.pop("input_ids")
-
-            # 打印 prompt token 数统计，帮助排查 OOM
-            try:
-                _lens = [len(ids) for ids in generate_inputs["input_ids"]]
-                if _lens:
-                    _min, _max = min(_lens), max(_lens)
-                    _mean = sum(_lens) / len(_lens)
-                    print(f"[PromptToken] batch_size={len(_lens)} min/mean/max={_min}/{_mean:.1f}/{_max}")
-            except Exception:
-                pass
+                processor_outputs = self.processing_class(text=prompts, **processor_kwargs)
 
             with (
                 profiling_context(self, "transformers.generate_batch"),
@@ -1489,16 +1362,18 @@ class DAPOTrainer(BaseTrainer):
                     unwrapped_model.to(torch.bfloat16)
                 elif self.args.fp16:
                     unwrapped_model.to(torch.float16)
+                if self.args.cast_lm_head_to_fp32:
+                    unwrapped_model.lm_head.to(torch.float32)
                 with torch.inference_mode():
+                    # Continuous batching API expects 'inputs' arg only
                     all_outputs = unwrapped_model.generate_batch(
-                        **generate_inputs, generation_config=self.generation_config, progress_bar=False
+                        processor_outputs["input_ids"], generation_config=self.generation_config, progress_bar=False
                     )
                     unwrapped_model.train()  # restore training mode, as generate_batch forces eval mode
             completion_ids = [output.generated_tokens for output in all_outputs.values()]
-            prompt_ids = generate_inputs["inputs"]
+            prompt_ids = processor_outputs["input_ids"]
             logprobs = None  # not used in this case
             extra_fields = {}  # No extra fields for paged mode
-            attention_context = None  # paged mode doesn't support attention output
 
         else:
             # Regular generation path
@@ -1510,15 +1385,17 @@ class DAPOTrainer(BaseTrainer):
                 "truncation": True,
                 "add_special_tokens": False,
             }
-            # Build text with chat template and include images if provided
-            prompts_text = [
-                apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"]
-                for prompt in prompts
-            ]
-            if images is not None:
-                generate_inputs = self.processing_class(text=prompts_text, images=images, **processor_kwargs)
+            if is_conversational({"prompt": prompts[0]}):
+                generate_inputs = self.processing_class.apply_chat_template(
+                    conversation=prompts,
+                    **processor_kwargs,
+                    add_generation_prompt=True,
+                    tokenize=True,
+                    return_dict=True,
+                    **self.chat_template_kwargs,
+                )
             else:
-                generate_inputs = self.processing_class(text=prompts_text, **processor_kwargs)
+                generate_inputs = self.processing_class(text=prompts, **processor_kwargs)
             generate_inputs = super()._prepare_inputs(generate_inputs)
 
             with (
@@ -1529,58 +1406,9 @@ class DAPOTrainer(BaseTrainer):
                 torch.no_grad(),
                 FSDP.summon_full_params(self.model_wrapped, recurse=False) if self.is_fsdp_enabled else nullcontext(),
             ):
-                # Collect attention data if enabled
-                attention_context = None
-                if self.compute_attention_metrics:
-                    # Store original values
-                    cfg = getattr(unwrapped_model, "config", None)
-                    lm_cfg = getattr(unwrapped_model.language_model, "config", None) if hasattr(unwrapped_model, "language_model") else None
-                    
-                    prev_main = getattr(cfg, "_attn_implementation", None) if cfg else None
-                    prev_lm = getattr(lm_cfg, "_attn_implementation", None) if lm_cfg else None
-                    
-                    try:
-                        # Set to eager
-                        if cfg:
-                            setattr(cfg, "_attn_implementation", "eager")
-                        if lm_cfg:
-                            setattr(lm_cfg, "_attn_implementation", "eager")
-                        
-                        with self._attn_last_k_layers_only(
-                            unwrapped_model, last_k_layers=getattr(self.args, "attention_last_k_layers", 6)
-                        ):
-                            attention_outputs = unwrapped_model.generate(
-                                **generate_inputs,
-                                generation_config=self.generation_config,
-                                disable_compile=True,
-                                return_dict_in_generate=True,
-                                output_attentions=True,
-                            )
-                    finally:
-                        # Restore original values
-                        if cfg:
-                            if prev_main is None:
-                                try:
-                                    delattr(cfg, "_attn_implementation")
-                                except Exception:
-                                    pass
-                            else:
-                                setattr(cfg, "_attn_implementation", prev_main)
-                        if lm_cfg:
-                            if prev_lm is None:
-                                try:
-                                    delattr(lm_cfg, "_attn_implementation")
-                                except Exception:
-                                    pass
-                            else:
-                                setattr(lm_cfg, "_attn_implementation", prev_lm)
-                    
-                    prompt_completion_ids = attention_outputs.sequences
-                    attention_context = {"outputs": attention_outputs, "inputs": generate_inputs}
-                else:
-                    prompt_completion_ids = unwrapped_model.generate(
-                        **generate_inputs, generation_config=self.generation_config, disable_compile=True
-                    )
+                prompt_completion_ids = unwrapped_model.generate(
+                    **generate_inputs, generation_config=self.generation_config, disable_compile=True
+                )
             # Compute prompt length and extract completion ids
             prompt_ids, prompt_mask = generate_inputs["input_ids"], generate_inputs["attention_mask"]
             prompt_length = prompt_ids.size(1)
@@ -1592,20 +1420,18 @@ class DAPOTrainer(BaseTrainer):
             eos_idx[is_eos.any(dim=1)] = is_eos.int().argmax(dim=1)[is_eos.any(dim=1)]
             sequence_indices = torch.arange(is_eos.size(1), device=device).expand(is_eos.size(0), -1)
             completion_mask = (sequence_indices <= eos_idx.unsqueeze(1)).int()
-            prompt_ids = [p[m].tolist() for p, m in zip(prompt_ids, prompt_mask.bool())]
-            completion_ids = [c[m].tolist() for c, m in zip(completion_ids, completion_mask.bool())]
+            prompt_ids = [p[m].tolist() for p, m in zip(prompt_ids, prompt_mask.bool(), strict=True)]
+            completion_ids = [c[m].tolist() for c, m in zip(completion_ids, completion_mask.bool(), strict=True)]
             logprobs = None  # not used in this case
             extra_fields = {}  # No extra fields for non-rollout_func paths
 
-        return prompt_ids, completion_ids, logprobs, extra_fields, attention_context
+        return prompt_ids, completion_ids, logprobs, extra_fields
 
-    def _generate(self, prompts: list, images: Optional[list] = None):
+    def _generate(self, prompts: list):
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
 
-        prompt_ids, completion_ids, logprobs, extra_fields, attention_context = self._generate_single_turn(
-            prompts, images
-        )
+        prompt_ids, completion_ids, logprobs, extra_fields = self._generate_single_turn(prompts)
 
         # Get completion length per sequence, used for logging
         prompt_lengths = torch.tensor([len(ids) for ids in prompt_ids], device=device)
@@ -1637,39 +1463,22 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode]["completions/min_terminated_length"].append(term_completion_lengths.float().min().item())
         self._metrics[mode]["completions/max_terminated_length"].append(term_completion_lengths.float().max().item())
 
-        # Process attention metrics if available
-        if attention_context is not None:
-            self._process_attention_metrics(attention_context, mode)
-
         return prompt_ids, completion_ids, total_completion_tokens, logprobs, extra_fields
 
     def _generate_and_score_completions(
-        self, inputs: list[dict[str, Union[torch.Tensor, Any]]]
-    ) -> dict[str, Union[torch.Tensor, Any]]:
+        self, inputs: list[dict[str, torch.Tensor | Any]]
+    ) -> dict[str, torch.Tensor | Any]:
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
-        # Preferred generations per prompt for current mode
-        preferred_num_generations = self.num_generations if mode == "train" else self.eval_num_generations
-        
-        # 更新分段权重（仅在训练模式下）
-        if mode == "train":
-            weight_metrics = self.reward_weight_manager.update_weights(
-                self.state.global_step, 
-                self.args.max_steps if self.args.max_steps > 0 else self.state.max_steps
-            )
-            # 将权重指标添加到metrics中
-            for key, value in weight_metrics.items():
-                self._metrics[mode][key].append(value)
 
         prompts = [x["prompt"] for x in inputs]
-        
+
         if "images" in inputs[0]:
             images = [example.get("images") for example in inputs]
         elif "image" in inputs[0]:
             images = [[example.get("image")] if example.get("image") is not None else None for example in inputs]
         else:
             images = None
-            
         # Transformers requires at least one image in the batch, otherwise it throws an error
         if images is not None and all(img_list == [] for img_list in images):
             images = None
@@ -1678,10 +1487,13 @@ class DAPOTrainer(BaseTrainer):
         # [{"role": "user", "content": "What color is the sky?"}] to
         # [{"role": "user", "content": [{"type": "image", "image": <Image>}, {"type": "text", "text": "What color is the sky?"}]}]
         if images is not None:
-            prompts = [prepare_multimodal_messages(prompt, image_list) for prompt, image_list in zip(prompts, images)]
-        
+            prompts = [
+                prepare_multimodal_messages(prompt, image_list)
+                for prompt, image_list in zip(prompts, images, strict=True)
+            ]
+
         prompt_ids_list, completion_ids_list, num_items_in_batch, sampling_per_token_logps_list, extra_fields = (
-            self._generate(prompts, images)
+            self._generate(prompts)
         )
 
         # Convert lists of token IDs to padded tensors
@@ -1717,7 +1529,8 @@ class DAPOTrainer(BaseTrainer):
         # Get forward_kwargs for models with multimodal inputs
         if images is not None:
             prompts_text = [
-                apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"] for prompt in prompts
+                apply_chat_template({"prompt": prompt}, self.processing_class, **self.chat_template_kwargs)["prompt"]
+                for prompt in prompts
             ]
             prompt_inputs = self.processing_class(images=images, text=prompts_text, padding=True, return_tensors="pt")
             prompt_inputs = super()._prepare_inputs(prompt_inputs)
@@ -1789,56 +1602,16 @@ class DAPOTrainer(BaseTrainer):
             else:
                 ref_per_token_logps = None
 
-        # Optionally compute sequence-level KL for filtering (seq_final_reward)
-        seq_kl = None
-        want_final = getattr(self.args, "filter_metric", "seq_reward") == "seq_final_reward"
-        if want_final and self.beta != 0.0 and ref_per_token_logps is not None:
-            # Use current model per-token logps; if we already computed old_per_token_logps, reuse it when aligned
-            try:
-                model_logps_for_filter = old_per_token_logps
-                if model_logps_for_filter is None:
-                    model_logps_for_filter, _ = self._get_per_token_logps_and_entropies(
-                        self.model,
-                        prompt_completion_ids,
-                        attention_mask,
-                        logits_to_keep,
-                        batch_size=batch_size,
-                        num_images=num_images,
-                        **forward_kwargs,
-                    )
-                per_token_kl = torch.exp(ref_per_token_logps - model_logps_for_filter) - (
-                    ref_per_token_logps - model_logps_for_filter
-                ) - 1.0
-                seq_kl = (per_token_kl * completion_mask).sum(dim=1)
-            except Exception:
-                seq_kl = None
-
         # Decode
-        prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=False)
-        # Model outputs kept as plain text (no special tokens)
-        # Filter out invalid token IDs that are out of vocabulary range
-        vocab_size = len(self.processing_class.tokenizer)
-        completion_ids_filtered = []
-        has_invalid_tokens = False
-        for batch_idx, ids in enumerate(completion_ids):
-            # Convert to list and filter out invalid token IDs
-            ids_list = ids.cpu().tolist() if torch.is_tensor(ids) else ids
-            invalid_ids = [id for id in ids_list if not (0 <= id < vocab_size)]
-            if invalid_ids:
-                has_invalid_tokens = True
-                if self.accelerator.is_main_process:
-                    print(f"[Warning] Found {len(invalid_ids)} invalid token IDs in batch {batch_idx}: {invalid_ids[:10]}")  # Show first 10
-            filtered_ids = [id for id in ids_list if 0 <= id < vocab_size]
-            completion_ids_filtered.append(filtered_ids)
-        
-        if has_invalid_tokens and self.accelerator.is_main_process:
-            print(f"[Warning] Vocabulary size: {vocab_size}, filtered invalid tokens before decoding")
-        
-        completions_text = self.processing_class.batch_decode(completion_ids_filtered, skip_special_tokens=True)
+        prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=True)
+        completions_text = self.processing_class.batch_decode(completion_ids, skip_special_tokens=True)
         if is_conversational(inputs[0]):
             completions = []
-            for prompt, completion in zip(prompts, completions_text):
+            for prompt, completion in zip(prompts, completions_text, strict=True):
                 bootstrap = prompt.pop()["content"] if prompt[-1]["role"] == "assistant" else ""
+                if isinstance(bootstrap, list):  # for VLM, the format might be [{"type": "text", "text": "..."}]
+                    assert len(bootstrap) == 1 and bootstrap[0]["type"] == "text"
+                    bootstrap = bootstrap[0]["text"]
                 completions.append([{"role": "assistant", "content": bootstrap + completion}])
         else:
             completions = completions_text
@@ -1857,26 +1630,20 @@ class DAPOTrainer(BaseTrainer):
         # rewards_per_func to extract each process's subset.
         rewards_per_func = self._calculate_rewards(inputs, prompts, completions, completion_ids_list)
 
-        # Apply weights to each reward function's output and sum using reward weight manager
-        rewards = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
+        # Apply weights to each reward function's output and sum
+        rewards = (rewards_per_func * self.reward_weights.to(device).unsqueeze(0)).nansum(dim=1)
 
         # Compute grouped-wise rewards
-        group_ng = preferred_num_generations
-        if group_ng is None or group_ng < 1:
-            group_ng = 1
-        # If the current batch size is not divisible by group_ng (can happen in eval), fall back to 1
-        if rewards.numel() % group_ng != 0:
-            group_ng = 1
-        mean_grouped_rewards = rewards.view(-1, group_ng).mean(dim=1)
+        mean_grouped_rewards = rewards.view(-1, self.num_generations).mean(dim=1)
 
         # Normalize the rewards to compute the advantages
-        mean_grouped_rewards = mean_grouped_rewards.repeat_interleave(group_ng, dim=0)
+        mean_grouped_rewards = mean_grouped_rewards.repeat_interleave(self.num_generations, dim=0)
         advantages = rewards - mean_grouped_rewards
 
         if self.scale_rewards in ["group", "none"]:
             # If self.scale_rewards = "none", we'll still log group level std
-            std_rewards = rewards.view(-1, group_ng).std(dim=1)
-            std_rewards = std_rewards.repeat_interleave(group_ng, dim=0)
+            std_rewards = rewards.view(-1, self.num_generations).std(dim=1)
+            std_rewards = std_rewards.repeat_interleave(self.num_generations, dim=0)
         elif self.scale_rewards == "batch":
             # Compute global std
             std_rewards = rewards.std().expand_as(rewards)
@@ -1897,59 +1664,22 @@ class DAPOTrainer(BaseTrainer):
         all_process_advantages = advantages.clone()  # keep the aggregated advantages for logging
         advantages = advantages[process_slice]
 
-        # Calculate reward metrics using utility function
-        reward_metrics = calculate_reward_metrics(rewards_per_func, self.reward_func_names, device)
-        for key, value in reward_metrics.items():
-            self._metrics[mode][key].append(value)
+        # Calculate mean reward per function, but only for samples where the function was applied (non-NaN values)
+        for i, reward_func_name in enumerate(self.reward_func_names):
+            mean_rewards = torch.nanmean(rewards_per_func[:, i]).item()
+            self._metrics[mode][f"rewards/{reward_func_name}/mean"].append(mean_rewards)
+            std_func_rewards = nanstd(rewards_per_func[:, i]).item()
+            self._metrics[mode][f"rewards/{reward_func_name}/std"].append(std_func_rewards)
         self._metrics[mode]["reward"].append(mean_grouped_rewards.mean().item())
         self._metrics[mode]["reward_std"].append(std_rewards.mean().item())
         self._metrics[mode]["frac_reward_zero_std"].append(is_std_zero.float().mean().item())
 
-        # 追加统一的 VGR 奖励别名（用于 W&B 指标统一显示）
-        try:
-            vgr_mean_alias = None
-            vgr_std_alias = None
-            # prefer the unified key produced by calculate_reward_metrics; else fallback
-            vgr_mean_alias = reward_metrics.get("rewards/vgr/mean")
-            vgr_std_alias = reward_metrics.get("rewards/vgr/std")
-            if vgr_mean_alias is None:
-                # fallback to underlying keys
-                if getattr(self.args, "vgr_hard_negative", False):
-                    vgr_mean_alias = reward_metrics.get("rewards/vgr_hard_negative/mean")
-                    vgr_std_alias = reward_metrics.get("rewards/vgr_hard_negative/std")
-                else:
-                    vgr_mean_alias = reward_metrics.get("rewards/vgr_reward/mean", reward_metrics.get("rewards/vgr_reward_as_additive/mean"))
-                    vgr_std_alias = reward_metrics.get("rewards/vgr_reward/std", reward_metrics.get("rewards/vgr_reward_as_additive/std"))
-            if vgr_mean_alias is not None:
-                self._metrics[mode]["rewards/vgr/mean"].append(float(vgr_mean_alias))
-            if vgr_std_alias is not None:
-                self._metrics[mode]["rewards/vgr/std"].append(float(vgr_std_alias))
-        except Exception:
-            pass
-
-        # Build ChatML prompt strings for logging; keep completion as plain text
-        try:
-            if is_conversational(inputs[0]):
-                rendered_prompts = [
-                    apply_chat_template({"prompt": p}, self.processing_class)["prompt"] for p in prompts
-                ]
-            else:
-                rendered_prompts = prompts_text
-        except Exception:
-            rendered_prompts = prompts_text
-
-        # Log prompt and completion texts (ChatML prompt, plain completion)
+        # Log prompt and completion texts
         self._logs["prompt"].extend(gather_object(prompts_text))
         self._logs["completion"].extend(gather_object(completions_text))
-        self._logs["prompt_chatml"].extend(gather_object(rendered_prompts))
         for i, name in enumerate(self.reward_func_names):
             self._logs["rewards"][name].extend(rewards_per_func[:, i].tolist())
-        self._logs["rewards"]["total"].extend(rewards.tolist())
         self._logs["advantages"].extend(all_process_advantages.tolist())
-        # Also log mean rewards for each group (for better understanding of advantages)
-        if "mean_reward" not in self._logs:
-            self._logs["mean_reward"] = deque(maxlen=self.args.generation_batch_size)
-        self._logs["mean_reward"].extend(mean_grouped_rewards.tolist())
 
         if images is not None:
             self._logs["images"].extend(gather_object(images))
@@ -1986,27 +1716,6 @@ class DAPOTrainer(BaseTrainer):
                 nanmax(self.accelerator.gather(max_importance_sampling_ratio)).item()
             )
 
-        # Optional: fetch token_weights for this batch and shape to (B, T)
-        token_weights_tensor = None
-        try:
-            if getattr(self.args, "token_weights", False) and self.compute_attention_metrics and "token_weights" in self._logs:
-                tw_all = list(self._logs["token_weights"]) if isinstance(self._logs.get("token_weights"), deque) else []
-                if tw_all:
-                    last_tw = tw_all[-len(prompts):] if len(tw_all) >= len(prompts) else []
-                    if last_tw and len(last_tw) == len(prompts):
-                        T = completion_ids.size(1)
-                        tw_tensors = []
-                        for w in last_tw:
-                            w = w or []
-                            t = torch.ones(T, dtype=torch.float32, device=device)
-                            n = min(len(w), T)
-                            if n > 0:
-                                t[:n] = torch.tensor(w[:n], dtype=torch.float32, device=device)
-                            tw_tensors.append(t)
-                        token_weights_tensor = torch.stack(tw_tensors, dim=0)
-        except Exception:
-            token_weights_tensor = None
-
         output = {
             "prompt_ids": prompt_ids,
             "prompt_mask": prompt_mask,
@@ -2015,10 +1724,6 @@ class DAPOTrainer(BaseTrainer):
             "advantages": advantages,
             "num_items_in_batch": num_items_in_batch,
         }
-        # Expose per-sequence reward for local process to enable filtering
-        output["seq_reward"] = rewards[process_slice]
-        if seq_kl is not None:
-            output["seq_kl"] = seq_kl[process_slice]
         if old_per_token_logps is not None:
             output["old_per_token_logps"] = old_per_token_logps
         if self.use_vllm and self.vllm_importance_sampling_correction:
@@ -2037,52 +1742,6 @@ class DAPOTrainer(BaseTrainer):
             output["token_type_ids"] = forward_kwargs["token_type_ids"]
         if images is not None:
             output["num_images"] = num_images
-        if token_weights_tensor is not None:
-            output["token_weights"] = token_weights_tensor
-
-        # Compute per-sequence filtered flags for logging only (VERL-style filtering marker)
-        filtered_flags = None
-        try:
-            # Use rewards as the metric for logging; groups with zero std are marked as filtered
-            group_ng_log = group_ng if group_ng and rewards.numel() % group_ng == 0 else 1
-            if group_ng_log > 1:
-                group_std_log = rewards.view(-1, group_ng_log).std(dim=1)
-                groups_filtered = (group_std_log == 0)
-                flags = torch.zeros_like(rewards, dtype=torch.bool)
-                for gidx, flg in enumerate(groups_filtered.tolist()):
-                    if flg:
-                        s = gidx * group_ng_log
-                        flags[s : s + group_ng_log] = True
-                filtered_flags = flags
-        except Exception:
-            filtered_flags = None
-
-        # Emit rollout logs if enabled (moved to logging utils)
-        perform_realtime_rollout_logging(
-            is_main_process=self.accelerator.is_main_process,
-            mode=mode,
-            args=self.args,
-            state_step=self.state.global_step,
-            state_epoch=self.state.epoch,
-            compute_attention_metrics=self.compute_attention_metrics,
-            attention_logs=self._logs.get("attention") if hasattr(self, "_logs") else None,
-            attention_skip_reasons=getattr(self, "_attention_skip_reasons", None),
-            processing_class=self.processing_class,
-            prompts=prompts,
-            inputs=inputs,
-            prompts_text=prompts_text,
-            completions_text=completions_text,
-            rewards_per_func_local=rewards_per_func[process_slice],
-            total_rewards_local=rewards[process_slice],
-            reward_names=self.reward_func_names,
-            advantages_tensor=advantages,
-            token_weights_tensor=token_weights_tensor,
-            completion_ids=completion_ids,
-            completion_mask=completion_mask,
-            process_slice=process_slice,
-            replay_mask=(filtered_flags if filtered_flags is None else filtered_flags),
-        )
-
         return output
 
     def compute_liger_loss(self, unwrapped_model, inputs):
@@ -2131,7 +1790,7 @@ class DAPOTrainer(BaseTrainer):
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         if return_outputs:
             raise ValueError("The GRPOTrainer does not support returning outputs")
-        if self.use_liger_loss:
+        if self.use_liger_kernel:
             # Compute the loss using the liger grpo loss
             unwrapped_model = self.accelerator.unwrap_model(model)
             return self._forward_redirection(model, unwrapped_model, self.compute_liger_loss, unwrapped_model, inputs)
@@ -2145,8 +1804,6 @@ class DAPOTrainer(BaseTrainer):
         input_ids = torch.cat([prompt_ids, completion_ids], dim=1)
         attention_mask = torch.cat([prompt_mask, completion_mask], dim=1)
         logits_to_keep = completion_ids.size(1)  # we only need to compute the logits for the completion tokens
-
-        # Expect non-empty batch with valid completion tokens at this point
 
         # Compute the per_token_logps and the entropy at each position in the completion
         per_token_logps, entropies = self._get_per_token_logps_and_entropies(
@@ -2177,7 +1834,10 @@ class DAPOTrainer(BaseTrainer):
 
         # Compute the loss
         advantages = inputs["advantages"]
-        
+        # In the base GRPO implementation, advantages are expected to have shape (B,). To support subclasses that
+        # provide advantages with shape (B, T) (e.g., MiniLLM), we *conditionally* unsqueeze the tensor.
+        if advantages.dim() == 1:
+            advantages = advantages.unsqueeze(1)
         # When num_iterations == 1 and steps_per_generation <= gradient_accumulation_steps,
         # old_per_token_logps == per_token_logps. In this case we can skip its computation
         # (see _generate_and_score_completions) and instead use per_token_logps.detach().
@@ -2197,69 +1857,34 @@ class DAPOTrainer(BaseTrainer):
                 f"Unknown importance sampling level: {self.importance_sampling_level}. Possible values are 'token' "
                 "and 'sequence'."
             )
-        # From here, log_importance_weights (and all subsequent tensors, coef_1, coef_2, etc.) shape depends on
-        # importance_sampling_level: "token" level: (B, T); "sequence" level: (B, 1)
 
         coef_1 = torch.exp(log_importance_weights)
-        coef_2 = torch.clamp(coef_1, 1 - self.epsilon_low, 1 + self.epsilon_high)
 
-        # Two-sided clipping (upper bound on r)
-        if self.args.delta is not None:
-            coef_1 = torch.clamp(coef_1, max=self.args.delta)
+        # From here, log_importance_weights (and all subsequent tensors, coef_1, coef_2, etc.) shape depends on
+        # importance_sampling_level: "token" level: (B, T); "sequence" level: (B, 1)
+        if self.loss_type == "cispo":
+            clamped_ratios = torch.clamp(coef_1, max=self.epsilon_high).detach()
+            per_token_loss = -clamped_ratios * advantages * per_token_logps
+        elif self.loss_type in ["grpo", "bnpo", "dr_grpo", "dapo"]:
+            coef_2 = torch.clamp(coef_1, 1 - self.epsilon_low, 1 + self.epsilon_high)
+            # Two-sided clipping
+            if self.args.delta is not None:
+                coef_1 = torch.clamp(coef_1, max=self.args.delta)
 
-        # Token-weighted advantage guardrails (optional)
-        adv_matrix = advantages.unsqueeze(1)
-        if getattr(self.args, "token_weights", False) and ("token_weights" in inputs) and (inputs["token_weights"] is not None):
-            try:
-                w = inputs["token_weights"].to(coef_1.device)
-                # Per-sequence normalization
-                row_sum = w.sum(dim=1, keepdim=True).clamp_min(1e-6)
-                w = w / row_sum
-                # Upper-quantile clipping per sequence
-                q = torch.quantile(w, float(getattr(self.args, "token_weight_quantile", 0.95)), dim=1, keepdim=True)
-                w = torch.minimum(w, q)
-                # Scale negative-advantage sequences
-                pos = (advantages > 0).float().unsqueeze(1)
-                neg = 1.0 - pos
-                scale = pos + neg * float(getattr(self.args, "neg_adv_token_scale", 0.5))
-                adv_matrix = advantages.unsqueeze(1) * w * scale
-            except Exception:
-                adv_matrix = advantages.unsqueeze(1)
+            per_token_loss1 = coef_1 * advantages
+            per_token_loss2 = coef_2 * advantages
+            per_token_loss = -torch.min(per_token_loss1, per_token_loss2)
+        else:
+            raise ValueError(f"Unknown loss type: {self.loss_type}")
 
-        # VERL-style asymmetric clip (low/high) + dual-clip lower bound c for A<0
-        per_token_ratio = coef_1
-        pg_losses1 = -adv_matrix * per_token_ratio
-        pg_losses2 = -adv_matrix * coef_2
-        clip_pg_losses1 = torch.maximum(pg_losses1, pg_losses2)
-
-        c = float(getattr(self.args, "clip_ratio_c", 3.0) or 3.0)
-        if c <= 1.0:
-            c = 1.0001
-        pg_losses3 = -adv_matrix * c
-        per_token_loss = torch.where(adv_matrix < 0, torch.min(pg_losses3, clip_pg_losses1), clip_pg_losses1)
-        # For metrics: which tokens got clipped by high/low and by dual-clip lower bound
-        with torch.no_grad():
-            try:
-                pg_clipfrac = (pg_losses2 > pg_losses1).float()
-                pg_clipfrac_lower = (clip_pg_losses1 > pg_losses3).float() * (adv_matrix < 0).float()
-            except Exception:
-                pg_clipfrac = None
-                pg_clipfrac_lower = None
         if entropy_mask is not None:
             per_token_loss = per_token_loss * entropy_mask
 
         if self.use_vllm and self.vllm_importance_sampling_correction:
             per_token_loss = per_token_loss * inputs["importance_sampling_ratio"]
 
-        # Lightweight KL schedule
-        beta_eff = float(self.beta)
-        if getattr(self.args, "kl_beta_schedule", "off") == "linear10" and (self.state.max_steps or 0) > 0:
-            warm = max(1, int(0.1 * self.state.max_steps))
-            t = min(1.0, self.state.global_step / warm)
-            beta_eff = float((1.0 - t) * 0.02)
-        self._beta_eff = beta_eff
-        if beta_eff != 0.0 and self.beta != 0.0:
-            per_token_loss = per_token_loss + beta_eff * per_token_kl
+        if self.beta != 0.0:
+            per_token_loss = per_token_loss + self.beta * per_token_kl
 
         if self.loss_type == "grpo":
             loss = ((per_token_loss * completion_mask).sum(-1) / completion_mask.sum(-1).clamp(min=1.0)).mean()
@@ -2270,7 +1895,7 @@ class DAPOTrainer(BaseTrainer):
         elif self.loss_type == "dr_grpo":
             loss = (per_token_loss * completion_mask).sum() / (per_token_loss.size(0) * self.max_completion_length)
             loss = loss / self.current_gradient_accumulation_steps
-        elif self.loss_type == "dapo":
+        elif self.loss_type in ["cispo", "dapo"]:
             normalizer = inputs["num_items_in_batch"] / self.accelerator.num_processes
             loss = (per_token_loss * completion_mask).sum() / normalizer
         else:
@@ -2294,63 +1919,41 @@ class DAPOTrainer(BaseTrainer):
         mean_entropy = masked_batch_mean(entropies)
         self._metrics[mode]["entropy"].append(self.accelerator.gather(mean_entropy).nanmean().item())
 
-        # Compute clipping indicators for reporting
-        is_low_clipped = (per_token_ratio < 1 - self.epsilon_low) & (advantages.unsqueeze(1) < 0)
-        is_high_clipped = (per_token_ratio > 1 + self.epsilon_high) & (advantages.unsqueeze(1) > 0)
-        is_region_clipped = is_low_clipped | is_high_clipped
+        if self.loss_type in ["grpo", "bnpo", "dr_grpo", "dapo"]:
+            # Compute the clipped probability ratios
+            is_low_clipped = (coef_1 < 1 - self.epsilon_low) & (advantages < 0)
+            is_high_clipped = (coef_1 > 1 + self.epsilon_high) & (advantages > 0)
+            is_region_clipped = is_low_clipped | is_high_clipped
 
-        low_clip = masked_batch_mean(is_low_clipped.float())
-        high_clip = masked_batch_mean(is_high_clipped.float())
-        clip_region = masked_batch_mean(is_region_clipped.float())
+            low_clip = masked_batch_mean(is_low_clipped.float())
+            high_clip = masked_batch_mean(is_high_clipped.float())
+            clip_ratio = masked_batch_mean(is_region_clipped.float())
 
-        gathered_low_clip = self.accelerator.gather(low_clip)
-        self._metrics[mode]["clip_ratio/low_mean"].append(gathered_low_clip.nanmean().item())
-        self._metrics[mode]["clip_ratio/low_min"].append(nanmin(gathered_low_clip).item())
-        gathered_high_clip = self.accelerator.gather(high_clip)
-        self._metrics[mode]["clip_ratio/high_mean"].append(gathered_high_clip.nanmean().item())
-        self._metrics[mode]["clip_ratio/high_max"].append(nanmax(gathered_high_clip).item())
-        gathered_clip_region = self.accelerator.gather(clip_region)
-        self._metrics[mode]["clip_ratio/region_mean"].append(gathered_clip_region.nanmean().item())
+            gathered_low_clip = self.accelerator.gather(low_clip)
+            self._metrics[mode]["clip_ratio/low_mean"].append(gathered_low_clip.nanmean().item())
+            self._metrics[mode]["clip_ratio/low_min"].append(nanmin(gathered_low_clip).item())
+            gathered_high_clip = self.accelerator.gather(high_clip)
+            self._metrics[mode]["clip_ratio/high_mean"].append(gathered_high_clip.nanmean().item())
+            self._metrics[mode]["clip_ratio/high_max"].append(nanmax(gathered_high_clip).item())
+            gathered_clip_ratio = self.accelerator.gather(clip_ratio)
+            self._metrics[mode]["clip_ratio/region_mean"].append(gathered_clip_ratio.nanmean().item())
+        elif self.loss_type == "cispo":
+            is_cispo_clipped = (coef_1 > self.epsilon_high) & (advantages > 0)
+            cispo_clip_ratio = masked_batch_mean(is_cispo_clipped.float())
+            gathered_cispo_clip_ratio = self.accelerator.gather(cispo_clip_ratio)
+            self._metrics[mode]["cispo_clip_ratio"].append(gathered_cispo_clip_ratio.nanmean().item())
 
-        # pg_clipfrac metrics
-        if 'pg_clipfrac' not in self._metrics[mode]:
-            self._metrics[mode]["pg_clipfrac"] = []
-        if 'pg_clipfrac_lower' not in self._metrics[mode]:
-            self._metrics[mode]["pg_clipfrac_lower"] = []
-        if pg_clipfrac is not None:
-            try:
-                val = (pg_clipfrac * completion_mask).sum() / completion_mask.sum().clamp(min=1.0)
-                self._metrics[mode]["pg_clipfrac"].append(self.accelerator.gather(val).nanmean().item())
-            except Exception:
-                pass
-        if pg_clipfrac_lower is not None:
-            try:
-                val = (pg_clipfrac_lower * completion_mask).sum() / completion_mask.sum().clamp(min=1.0)
-                self._metrics[mode]["pg_clipfrac_lower"].append(self.accelerator.gather(val).nanmean().item())
-            except Exception:
-                pass
-
-        self._metrics[mode]["kl_beta_eff"].append(self._beta_eff)
-        self._metrics[mode]["kl/beta_eff"].append(self._beta_eff)
         return loss
 
-    def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys: Optional[list[str]] = None):
+    def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys: list[str] | None = None):
         inputs = self._prepare_inputs(inputs)
-        # For DeepSpeed ZeRO-3, we need to gather parameters during evaluation
-        # Use the same ds3_gather_for_generation setting as in generation
-        gather_params = self.args.ds3_gather_for_generation if self.is_deepspeed_enabled else False
-        with (
-            torch.no_grad(),
-            unwrap_model_for_generation(
-                self.model_wrapped, self.accelerator, gather_deepspeed3_params=gather_params
-            ) if gather_params else nullcontext(),
-        ):
+        with torch.no_grad():
             with self.compute_loss_context_manager():
                 loss = self.compute_loss(model, inputs)
             loss = loss.mean().detach()
         return loss, None, None
 
-    def log(self, logs: dict[str, float], start_time: Optional[float] = None) -> None:
+    def log(self, logs: dict[str, float], start_time: float | None = None) -> None:
         mode = "train" if self.model.training else "eval"
         metrics = {key: sum(val) / len(val) for key, val in self._metrics[mode].items()}  # average the metrics
 
@@ -2360,97 +1963,54 @@ class DAPOTrainer(BaseTrainer):
             metrics = {f"eval_{key}": val for key, val in metrics.items()}
 
         logs = {**logs, **metrics}
-
-        # Pretty print compact grouped logs to terminal (moved to logging utils)
-        if self.accelerator.is_main_process:
-            try:
-                print_compact_logs(logs, mode, use_hard_negative=getattr(self.args, "vgr_hard_negative", False))
-                # Emit evaluation markdown logs: moved to logging utils
-                perform_eval_logging(
-                    is_main_process=self.accelerator.is_main_process,
-                    mode=mode,
-                    args=self.args,
-                    state_step=self.state.global_step,
-                    state_epoch=self.state.epoch,
-                    metrics=metrics,
-                    logs=logs,
-                    internal_logs=self._logs,
-                    reward_names=self.reward_func_names,
-                )
-            except Exception:
-                pass
-
         super().log(logs, start_time)
         self._metrics[mode].clear()
 
         if self.accelerator.is_main_process and self.log_completions:
-            # 注释掉 wandb table 记录，避免网络超时和数据量过大问题
-            pass
-            # 注释掉终端打印
-            # if is_rich_available():
-            #     print_prompt_completions_sample(
-            #         self._logs["prompt"],
-            #         self._logs["completion"],
-            #         self._logs["rewards"],
-            #         self._logs["advantages"],
-            #         self.state.global_step,
-            #         self.num_completions_to_print,
-            #     )
+            if is_rich_available():
+                print_prompt_completions_sample(
+                    self._logs["prompt"],
+                    self._logs["completion"],
+                    self._logs["rewards"],
+                    self._logs["advantages"],
+                    self.state.global_step,
+                    self.num_completions_to_print,
+                )
 
-            # 注释掉详细的 wandb table 记录
-            # if self.args.report_to and "wandb" in self.args.report_to and wandb.run is not None:
-            #     import pandas as pd
+            logging_backends = []
+            if self.args.report_to and "wandb" in self.args.report_to and wandb.run is not None:
+                logging_backends.append(wandb)
+            if self.args.report_to and "trackio" in self.args.report_to:
+                logging_backends.append(trackio)
 
-            #     # Wandb: ChatML prompt + plain completion
-            #     prompts_wb = list(self._logs.get("prompt_chatml", [])) or list(self._logs.get("prompt", []))
-            #     completions_wb = list(self._logs.get("completion", []))
+            table = {
+                "step": [str(self.state.global_step)] * len(self._logs["prompt"]),
+                "prompt": self._logs["prompt"],
+                "completion": self._logs["completion"],
+                **self._logs["rewards"],
+                "advantage": self._logs["advantages"],
+            }
 
-            #     n_rows = min(len(prompts_wb), len(completions_wb))
-            #     prompts_wb = prompts_wb[:n_rows]
-            #     completions_wb = completions_wb[:n_rows]
+            df_base = pd.DataFrame(table)
+            images_raw = self._logs["images"] or []
 
-            #     table = {
-            #         "step": [str(self.state.global_step)] * n_rows,
-            #         "prompt": prompts_wb,
-            #         "completion": completions_wb,
-            #     }
+            for logging_backend in logging_backends:
+                if images_raw:
+                    images = []
+                    for image_list in self._logs["images"]:
+                        images.append([logging_backend.Image(image) for image in image_list])
+                    df = pd.concat(
+                        [df_base, pd.Series(images, name="image")],
+                        axis=1,
+                        copy=False,
+                    )
+                else:
+                    df = df_base
 
-            #     # Add rewards columns, sliced to n_rows for consistency
-            #     for k, v in self._logs["rewards"].items():
-            #         vals = list(v)
-            #         table[k] = vals[:n_rows]
+                if self.log_unique_prompts:
+                    df = df.drop_duplicates(subset=["prompt"])
 
-            #     # Add advantages, sliced
-            #     advantages_list = list(self._logs["advantages"])[:n_rows]
-            #     table["advantage"] = advantages_list
-                
-            #     # Add mean rewards for context
-            #     if "mean_reward" in self._logs:
-            #         mean_rewards_list = list(self._logs["mean_reward"])[:n_rows]
-            #         table["mean_reward"] = mean_rewards_list
-                
-            #     # Add advantage labels for easy identification
-            #     advantage_labels = []
-            #     for adv in advantages_list:
-            #         if adv > 0:
-            #             advantage_labels.append("✅ 加分")
-            #         elif adv < 0:
-            #             advantage_labels.append("❌ 减分")
-            #         else:
-            #             advantage_labels.append("⚪ 中性")
-            #     table["advantage_label"] = advantage_labels
-
-            #     # Add images if present, sliced
-            #     if self._logs["images"]:
-            #         images_col = []
-            #         for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
-            #             images_col.append([wandb.Image(image) for image in image_list])
-            #         table["images"] = images_col
-
-            #     df = pd.DataFrame(table)
-            #     if self.wandb_log_unique_prompts:
-            #         df = df.drop_duplicates(subset=["prompt"])
-            #     wandb.log({"completions": wandb.Table(dataframe=df)})
+                logging_backend.log({"completions": logging_backend.Table(dataframe=df)})
 
     # Ensure the model card is saved along with the checkpoint
     def _save_checkpoint(self, model, trial):
@@ -2460,175 +2020,3 @@ class DAPOTrainer(BaseTrainer):
             model_name = self.args.hub_model_id.split("/")[-1]
         self.create_model_card(model_name=model_name)
         super()._save_checkpoint(model, trial)
-
-    def _unwrap_model_for_config(self, model=None):
-        """Return the base unwrapped model for config access."""
-        if model is None:
-            model = self.model
-        return unwrap_model_for_generation(model, self.accelerator)
-    
-    @contextmanager
-    def _temporary_attn_impl(self, attn_impl: str = "eager"):
-        """
-        Temporarily switch attention implementation on the base model config.
-        For vision-language models like Qwen2VL, also set on language_model submodule.
-        """
-        if not self.compute_attention_metrics:
-            yield
-            return
-
-        base = self._unwrap_model_for_config()
-        cfg = getattr(base, "config", None)
-        if cfg is None:
-            yield
-            return
-        
-        # Store previous values
-        prev_main = getattr(cfg, "_attn_implementation", None)
-        prev_lm = None
-        lm_cfg = None
-        
-        # For vision-language models, also set on language_model
-        if hasattr(base, "language_model"):
-            lm_cfg = getattr(base.language_model, "config", None)
-            if lm_cfg is not None:
-                prev_lm = getattr(lm_cfg, "_attn_implementation", None)
-        
-        try:
-            setattr(cfg, "_attn_implementation", attn_impl)
-            if lm_cfg is not None:
-                setattr(lm_cfg, "_attn_implementation", attn_impl)
-            yield
-        finally:
-            # Restore main config
-            if prev_main is None:
-                try:
-                    delattr(cfg, "_attn_implementation")
-                except Exception:
-                    pass
-            else:
-                setattr(cfg, "_attn_implementation", prev_main)
-            
-            # Restore language_model config
-            if lm_cfg is not None:
-                if prev_lm is None:
-                    try:
-                        delattr(lm_cfg, "_attn_implementation")
-                    except Exception:
-                        pass
-                else:
-                    setattr(lm_cfg, "_attn_implementation", prev_lm)
-
-    @contextmanager
-    def _attn_last_k_layers_only(self, model: nn.Module, last_k_layers: Optional[int] = None):
-        """
-        Temporarily limit returned attentions to the last-K decoder layers by wrapping layer/attention forwards.
-        Does not alter computations; only prevents returning/storing attention weights for earlier layers.
-        """
-        if not self.compute_attention_metrics or not last_k_layers or last_k_layers <= 0:
-            yield
-            return
-
-        def _get_attr(obj, path: str):
-            cur = obj
-            for p in path.split('.'):
-                if not hasattr(cur, p):
-                    return None
-                cur = getattr(cur, p)
-            return cur
-
-        # Candidate decoder layer paths
-        candidates = [
-            "language_model.model.layers",
-            "model.layers",
-            "model.decoder.layers",
-            "gpt_neox.layers",
-            "transformer.h",
-        ]
-        layers = None
-        for cand in candidates:
-            lst = _get_attr(model, cand)
-            if lst is not None and hasattr(lst, "__len__") and len(lst) > 0:
-                layers = lst
-                break
-        if layers is None:
-            for _, module in model.named_modules():
-                if isinstance(module, torch.nn.ModuleList) and len(module) > 0:
-                    # Heuristic: treat as decoder layers only if majority of items look like decoder blocks
-                    hits = 0
-                    total = len(module)
-                    for item in module:
-                        for nm in ["self_attn", "attn", "attention", "mha", "self_attention"]:
-                            if hasattr(item, nm):
-                                hits += 1
-                                break
-                    if hits >= max(1, total // 2):
-                        layers = module
-                        break
-
-        if layers is None or len(layers) == 0:
-            yield
-            return
-
-        num_layers = len(layers)
-        keep = max(1, min(int(last_k_layers), num_layers))
-        keep_indices = set(range(num_layers - keep, num_layers))
-
-        attn_attr_names = ["self_attn", "attn", "attention", "mha", "self_attention"]
-        patched = []
-
-        try:
-            for idx, layer in enumerate(layers):
-                keep_flag = idx in keep_indices
-
-                # Patch attention submodule forward if present
-                for name in attn_attr_names:
-                    if hasattr(layer, name):
-                        attn_mod = getattr(layer, name)
-                        if hasattr(attn_mod, "forward"):
-                            orig = attn_mod.forward
-                            def make_attn_wrapper(ofn, kf):
-                                def _wrapped(*args, **kwargs):
-                                    if not kf and "output_attentions" in kwargs:
-                                        kwargs = dict(kwargs)
-                                        kwargs["output_attentions"] = False
-                                    return ofn(*args, **kwargs)
-                                return _wrapped
-                            attn_mod.forward = make_attn_wrapper(orig, keep_flag)
-                            patched.append((attn_mod, "forward", orig))
-                        break
-
-                # Also patch layer forward (force per-layer output_attentions=False for early layers)
-                if hasattr(layer, "forward"):
-                    orig_layer = layer.forward
-                    def make_layer_wrapper(ofn, kf):
-                        def _wrapped(*args, **kwargs):
-                            if not kf and "output_attentions" in kwargs:
-                                kwargs = dict(kwargs)
-                                kwargs["output_attentions"] = False
-                            return ofn(*args, **kwargs)
-                        return _wrapped
-                    layer.forward = make_layer_wrapper(orig_layer, keep_flag)
-                    patched.append((layer, "forward", orig_layer))
-
-            yield
-        finally:
-            for mod, attr, orig in patched:
-                try:
-                    setattr(mod, attr, orig)
-                except Exception:
-                    pass
-
-    # Attention metrics processing moved to utils (no AEI, only last-K aggregation)
-    def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> None:
-        if not self.compute_attention_metrics or attention_context is None:
-            return
-        process_attention_context(
-            attention_context=attention_context,
-            model=self.model,
-            processor=self.processing_class,
-            args=self.args,
-            attention_deque=self._logs.get("attention") if hasattr(self, "_logs") else None,
-            attention_skip_reasons_deque=getattr(self, "_attention_skip_reasons", None),
-            token_weights_deque=self._logs.get("token_weights") if hasattr(self, "_logs") else None,
-        )

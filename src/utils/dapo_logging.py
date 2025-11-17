@@ -11,6 +11,57 @@ import torch
 from trl.data_utils import is_conversational, apply_chat_template
 
 
+def record_vgr_raw_stats(
+    vgr_metrics: List[Dict[str, Any]],
+    metrics_store: Dict[str, Any],
+    mode: str,
+    accelerator,
+) -> None:
+    """
+    聚合一批 attention 导出的 vgr 原始值，并写入 metrics_store[mode]，供 wandb/tensorboard 记录。
+    """
+    if not vgr_metrics:
+        return
+    try:
+        values: List[float] = []
+        for entry in vgr_metrics:
+            if not entry:
+                continue
+            val = entry.get("vgr")
+            if not isinstance(val, (int, float)):
+                continue
+            val_f = float(val)
+            if val_f <= 0 or not math.isfinite(val_f):
+                continue
+            values.append(val_f)
+        if not values:
+            return
+        device = accelerator.device
+        vals_tensor = torch.tensor(values, dtype=torch.float32, device=device)
+        local_count = torch.tensor([float(vals_tensor.numel())], dtype=torch.float32, device=device)
+        local_sum = vals_tensor.sum().unsqueeze(0)
+        local_sq_sum = (vals_tensor * vals_tensor).sum().unsqueeze(0)
+        try:
+            total_count = accelerator.gather(local_count).sum()
+            total_sum = accelerator.gather(local_sum).sum()
+            total_sq_sum = accelerator.gather(local_sq_sum).sum()
+        except Exception:
+            total_count = local_count.sum()
+            total_sum = local_sum.sum()
+            total_sq_sum = local_sq_sum.sum()
+        if total_count.item() <= 0:
+            return
+        mean = (total_sum / total_count).item()
+        variance = (total_sq_sum / total_count).item() - mean**2
+        if variance < 0:
+            variance = 0.0
+        std = math.sqrt(variance)
+        metrics_store[mode]["attention/vgr_raw/mean"].append(mean)
+        metrics_store[mode]["attention/vgr_raw/std"].append(std)
+    except Exception:
+        pass
+
+
 
 def emit_rollout_logs(
     prompts_text: List[str],
@@ -51,6 +102,13 @@ def emit_rollout_logs(
         # 预览文本
         preview_p = prompt[:prompt_preview_chars] + "..." if len(prompt) > prompt_preview_chars else prompt
         preview_c = completion[:completion_preview_chars] + "..." if len(completion) > completion_preview_chars else completion
+        
+        # 格式化 solution：如果是列表（10 个答案），显示所有非空答案
+        if isinstance(solution, (list, tuple)):
+            non_empty = [s for s in solution if s and str(s).strip()]
+            solution_str = " | ".join(non_empty[:10]) if non_empty else ""
+        else:
+            solution_str = str(solution) if solution else ""
         
         # 奖励值
         acc = 0.0
@@ -108,7 +166,7 @@ def emit_rollout_logs(
                 "idx": idx + 1,
                 "prompt": preview_p,
                 "completion": preview_c,
-                "solution": solution or "",
+                "solution": solution_str,
                 "accuracy": acc,
                 "vgr": vgr_val,
                 "format": fmt,
