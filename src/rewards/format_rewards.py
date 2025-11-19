@@ -10,7 +10,6 @@ def _collect_text(node: Any) -> list[str]:
         return [node]
     if isinstance(node, dict):
         texts = []
-        # Prioritize explicit text fields if present
         if "text" in node:
             texts.extend(_collect_text(node["text"]))
         if "content" in node:
@@ -29,8 +28,10 @@ def _collect_text(node: Any) -> list[str]:
 def think_format_reward(completions: list[Any], **kwargs) -> list[float]:
     """Reward function that checks if the reasoning process is enclosed within <think> and </think> tags, while the final answer is enclosed within <answer> and </answer> tags."""
     pattern = re.compile(
-        r"^<think>\n.*?\n</think>\n<answer>\n.*?\n</answer>$",
-        re.DOTALL | re.MULTILINE,
+        # r"^<think>\n.*?\n</think>\n<answer>\n.*?\n</answer>$",
+        # re.DOTALL | re.MULTILINE,
+        r"<think>.*?</think>\s*<answer>.*?</answer>",
+        re.DOTALL,
     )
 
     rewards: list[float] = []
@@ -53,14 +54,22 @@ def tag_count_reward(completions, **kwargs) -> list[float]:
         if any(tag not in {"think", "/think", "answer", "/answer"} for tag in illegal):
             return 0.0
         count = 0.0
-        if text.count("<think>\n") == 1:
+        if text.count("<think>") == 1:
             count += 0.25
-        if text.count("\n</think>\n") == 1:
+        if text.count("</think>") == 1:
             count += 0.25
-        if text.count("\n<answer>\n") == 1:
+        if text.count("<answer>") == 1:
             count += 0.25
-        if text.count("\n</answer>") == 1:
+        if text.count("</answer>") == 1:
             count += 0.25
+        # if text.count("<think>\n") == 1:
+        #     count += 0.25
+        # if text.count("\n</think>\n") == 1:
+        #     count += 0.25
+        # if text.count("\n<answer>\n") == 1:
+        #     count += 0.25
+        # if text.count("\n</answer>") == 1:
+        #     count += 0.25
         return count
 
     contents = [completion[0]["content"] for completion in completions]

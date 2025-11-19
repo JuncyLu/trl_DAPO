@@ -59,14 +59,6 @@ if __name__ == "__main__":
     dataset = dataset.train_test_split(test_size=100, seed=42)
 
     # SYSTEM_PROMPT = (
-    #     "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the "
-    #     "assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the "
-    #     "user with the answer. The reasoning process is enclosed within <think></think> tags, and the final answer must "
-    #     "be enclosed within <answer></answer> tags as exactly one capital letter from A to J with no extra text or symbols. "
-    #     "The response must end immediately after the closing </answer> tag. For example:\n"
-    #     "<think>\nThis is my reasoning.\n</think>\n<answer>\nC\n</answer>"
-    # )
-    # SYSTEM_PROMPT = (
     #     "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it.\n"
     #     "The assistant first thinks about the reasoning process in the mind and then provides the user with the answer.\n"
     #     "Inside the <think> ... </think> block, follow this flow:\n"
@@ -78,40 +70,62 @@ if __name__ == "__main__":
     #     "The response must end immediately after the closing </answer> tag.\n"
     #     "For example:\n<think>\nThis is my reasoning.\n</think>\n<answer>\nC\n</answer>"
     # )
-    SYSTEM_PROMPT = """You MUST respond in this EXACT format:
+    # SYSTEM_PROMPT = """You MUST respond in this EXACT format:
 
-    <think>
-    [reasoning - be thorough and detailed]
-    </think>
-    <answer>
-    [brief answer - 1-5 words]
-    </answer>
+    # <think>
+    # [reasoning - be thorough and detailed]
+    # </think>
+    # <answer>
+    # [brief answer - 1-5 words]
+    # </answer>
 
-    FORMAT RULES:
-    • Start with <think>, end with </answer>
-    • NO text outside these tags
+    # FORMAT RULES:
+    # • Start with <think>, end with </answer>
+    # • NO text outside these tags
 
-    THINKING GUIDELINES (write 3-4+ sentences):
-    1. Describe the scene: setting, lighting, main subjects
-    2. Identify key objects: colors, quantities, positions, states
-    3. Analyze visual evidence that supports your answer
-    4. Reason step-by-step to reach the conclusion
+    # THINKING GUIDELINES (write 3-4+ sentences):
+    # 1. Describe the scene: setting, lighting, main subjects
+    # 2. Identify key objects: colors, quantities, positions, states
+    # 3. Analyze visual evidence that supports your answer
+    # 4. Reason step-by-step to reach the conclusion
 
-    ANSWER GUIDELINES:
-    • Keep it short: 1-5 words preferred
+    # ANSWER GUIDELINES:
+    # • Keep it short: 1-5 words preferred
 
-    EXAMPLES:
+    # EXAMPLES:
 
-    Question: What is the man holding?
-    <think>
-    The image shows a man standing outdoors in daylight. He is wearing casual clothing and appears to be in a park setting. In his right hand, he is holding a red disc-shaped object. The object has the characteristic flat, circular shape of a frisbee, commonly used for outdoor recreational activities. The bright red color makes it stand out against the background.
-    </think>
-    <answer>
-    frisbee
-    </answer>
+    # Question: What is the man holding?
+    # <think>
+    # The image shows a man standing outdoors in daylight. He is wearing casual clothing and appears to be in a park setting. In his right hand, he is holding a red disc-shaped object. The object has the characteristic flat, circular shape of a frisbee, commonly used for outdoor recreational activities. The bright red color makes it stand out against the background.
+    # </think>
+    # <answer>
+    # frisbee
+    # </answer>
 
-    Think thoroughly and support your answer with visual evidence"""
+    # Think thoroughly and support your answer with visual evidence"""
+    SYSTEM_PROMPT = """You are tasked with analyzing an image to answer a question. Your response should include a detailed reasoning process and a concise answer. The reasoning process should be enclosed within <think>...</think> tags, and the final answer should be enclosed within <answer>...</answer> tags. The response format consists of the reasoning section followed by the answer section, with no text outside these tags.
 
+The following example demonstrates the expected response format:
+<think>[detailed reasoning process]</think>
+<answer>[brief answer]</answer>
+
+THINKING GUIDELINES (write 3-4+ sentences):
+1. First, provide an exhaustive and detailed description of the image: extract and describe all possible information including objects, numbers, text, colors, quantities, positions, states, relationships between elements, setting, lighting, and main subjects. Capture every nuance and detail.
+2. Then, analyze the detailed description and provide step-by-step reasoning for the given question based on the extracted information and visual evidence.
+3. Conclude with a clear answer supported by the visual evidence you identified.
+
+ANSWER GUIDELINES:
+• Keep the answer as short as possible - prefer 1-3 words
+• Use only essential keywords
+• Avoid unnecessary descriptions or modifiers
+
+EXAMPLES:
+
+Question: What is the man holding?
+<think>The image shows a man standing outdoors in daylight. He is wearing casual clothing and appears to be in a park setting. In his right hand, he is holding a red disc-shaped object. The object has the characteristic flat, circular shape of a frisbee, commonly used for outdoor recreational activities. The bright red color makes it stand out against the background.</think>
+<answer>frisbee</answer>
+
+Think thoroughly and support your answer with visual evidence"""
     def make_conversation(example):
         prompt = [
             {"role": "system", "content": SYSTEM_PROMPT},

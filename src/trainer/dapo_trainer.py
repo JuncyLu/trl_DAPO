@@ -909,6 +909,17 @@ class DAPOTrainer(BaseTrainer):
             model_inputs["use_cache"] = False  # only used in generation; set False to suppress warnings
 
             logits = model(**model_inputs).logits
+            
+            # 🔍 DEBUG: Print logits statistics before processing
+            if self.state.global_step % 4 == 0 and start == 0:  # Log every 4 steps, only first batch
+                logits_max = logits.max().item()
+                logits_min = logits.min().item()
+                logits_mean = logits.mean().item()
+                logits_std = logits.std().item()
+                has_inf = torch.isinf(logits).any().item()
+                has_nan = torch.isnan(logits).any().item()
+                print(f"🔍 [Step {self.state.global_step}] Logits BEFORE temp - Max: {logits_max:.4f}, Min: {logits_min:.4f}, Mean: {logits_mean:.4f}, Std: {logits_std:.4f}, HasInf: {has_inf}, HasNaN: {has_nan}")
+            
             # Exclude the last value: it corresponds to the next token pred
             logits = logits[:, :-1, :]  # (B, L-1, H)
             # Only keep the last logits_to_keep. For model that support logits_to_keep, this is a no-op.
@@ -916,9 +927,29 @@ class DAPOTrainer(BaseTrainer):
             # Divide logits by sampling temperature.
             # See https://huggingface.co/blog/the_n_implementation_details_of_rlhf_with_ppo#policy-training-implementation-details
             logits = logits / self.temperature
+            
+            # 🔍 DEBUG: Print logits statistics after temperature scaling
+            if self.state.global_step % 4 == 0 and start == 0:
+                logits_max = logits.max().item()
+                logits_min = logits.min().item()
+                logits_mean = logits.mean().item()
+                logits_std = logits.std().item()
+                has_inf = torch.isinf(logits).any().item()
+                has_nan = torch.isnan(logits).any().item()
+                print(f"🔍 [Step {self.state.global_step}] Logits AFTER temp={self.temperature:.2f} - Max: {logits_max:.4f}, Min: {logits_min:.4f}, Mean: {logits_mean:.4f}, Std: {logits_std:.4f}, HasInf: {has_inf}, HasNaN: {has_nan}")
 
             completion_ids = input_ids_batch[:, -logits_to_keep:]
             logps = selective_log_softmax(logits, completion_ids)  # compute logprobs
+            
+            # 🔍 DEBUG: Check log probabilities for numerical issues
+            if self.state.global_step % 4 == 0 and start == 0:
+                logps_max = logps.max().item()
+                logps_min = logps.min().item()
+                logps_mean = logps.mean().item()
+                has_inf = torch.isinf(logps).any().item()
+                has_nan = torch.isnan(logps).any().item()
+                print(f"🔍 [Step {self.state.global_step}] LogProbs - Max: {logps_max:.4f}, Min: {logps_min:.4f}, Mean: {logps_mean:.4f}, HasInf: {has_inf}, HasNaN: {has_nan}")
+            
             all_logps.append(logps)
 
             if compute_entropy:
@@ -1549,13 +1580,37 @@ class DAPOTrainer(BaseTrainer):
                         with self._attn_last_k_layers_only(
                             unwrapped_model, last_k_layers=getattr(self.args, "attention_last_k_layers", 6)
                         ):
-                            attention_outputs = unwrapped_model.generate(
-                                **generate_inputs,
-                                generation_config=self.generation_config,
-                                disable_compile=True,
-                                return_dict_in_generate=True,
-                                output_attentions=True,
-                            )
+                            # 🔍 DEBUG: Print model weight norms before generation
+                            if self.state.global_step % 4 == 0:  # Log every 4 steps
+                                total_norm = 0.0
+                                max_norm = 0.0
+                                for name, param in unwrapped_model.named_parameters():
+                                    if param.requires_grad and param.grad is not None:
+                                        param_norm = param.data.norm(2).item()
+                                        total_norm += param_norm ** 2
+                                        max_norm = max(max_norm, param_norm)
+                                total_norm = total_norm ** 0.5
+                                print(f"🔍 [Step {self.state.global_step}] Weight Norms - Total: {total_norm:.4f}, Max: {max_norm:.4f}")
+                                print(f"🔍 [Step {self.state.global_step}] Generation Config - Temperature: {self.temperature}, Top_p: {self.top_p}, Top_k: {self.top_k}")
+                            
+                            try:
+                                attention_outputs = unwrapped_model.generate(
+                                    **generate_inputs,
+                                    generation_config=self.generation_config,
+                                    disable_compile=True,
+                                    return_dict_in_generate=True,
+                                    output_attentions=True,
+                                )
+                                if self.state.global_step % 4 == 0:
+                                    print(f"✅ [Step {self.state.global_step}] Generation completed successfully")
+                            except RuntimeError as e:
+                                print(f"❌ [Step {self.state.global_step}] Generation failed with RuntimeError: {str(e)}")
+                                # Print more diagnostic info
+                                print(f"🔍 Input shape: {generate_inputs['input_ids'].shape}")
+                                print(f"🔍 Input dtype: {generate_inputs['input_ids'].dtype}")
+                                if 'pixel_values' in generate_inputs:
+                                    print(f"🔍 Pixel values shape: {generate_inputs['pixel_values'].shape}")
+                                raise
                     finally:
                         # Restore original values
                         if cfg:
@@ -1578,9 +1633,17 @@ class DAPOTrainer(BaseTrainer):
                     prompt_completion_ids = attention_outputs.sequences
                     attention_context = {"outputs": attention_outputs, "inputs": generate_inputs}
                 else:
-                    prompt_completion_ids = unwrapped_model.generate(
-                        **generate_inputs, generation_config=self.generation_config, disable_compile=True
-                    )
+                    if self.state.global_step % 4 == 0:
+                        print(f"🔍 [Step {self.state.global_step}] Running generation without attention tracking")
+                    try:
+                        prompt_completion_ids = unwrapped_model.generate(
+                            **generate_inputs, generation_config=self.generation_config, disable_compile=True
+                        )
+                        if self.state.global_step % 4 == 0:
+                            print(f"✅ [Step {self.state.global_step}] Standard generation completed successfully")
+                    except RuntimeError as e:
+                        print(f"❌ [Step {self.state.global_step}] Standard generation failed: {str(e)}")
+                        raise
             # Compute prompt length and extract completion ids
             prompt_ids, prompt_mask = generate_inputs["input_ids"], generate_inputs["attention_mask"]
             prompt_length = prompt_ids.size(1)

@@ -36,7 +36,6 @@ def normalize_answer(answer: str) -> str:
     return ' '.join(out_words)
 
 def accuracy_reward(completions: list[list[dict[str, str]]], solution: list[list[str]], **kwargs) -> list[float]:
-    """VQA 评分：仅当 10 个答案有差异时才标准化"""
     scores = []
     for comp, refs in zip(completions, solution):
         try:
@@ -63,10 +62,8 @@ def accuracy_reward(completions: list[list[dict[str, str]]], solution: list[list
             
             pred = match.group(1).strip().replace('\n', ' ').replace('\t', ' ').strip()
             
-            # 官方逻辑：仅当 10 个答案不完全相同时才标准化
-            if len(set(refs)) > 1:
-                pred = normalize_answer(pred)
-                refs = [normalize_answer(r) for r in refs]
+            pred = normalize_answer(pred)
+            refs = [normalize_answer(r) for r in refs]
             
             match_count = sum(1 for r in refs if r == pred)
             scores.append(min(1.0, match_count / 3.0))
