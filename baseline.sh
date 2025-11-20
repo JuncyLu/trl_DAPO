@@ -27,8 +27,8 @@ accelerate launch \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
   --max_completion_length 512 \
-  --per_device_train_batch_size 2 \
-  --gradient_accumulation_steps 8 \
+  --per_device_train_batch_size 4 \
+  --gradient_accumulation_steps 4 \
   --num_generations 8 \
   --num_train_epochs 1 \
   --report_to wandb \
@@ -36,16 +36,17 @@ accelerate launch \
   --logging_steps 2.0 \
   --do_eval \
   --eval_strategy steps \
-  --eval_steps 100 \
+  --eval_steps 50 \
   --eval_num_generations 2 \
   --per_device_eval_batch_size 4 \
   --save_strategy steps \
-  --save_steps 400 \
-  --learning_rate 1e-7 \
+  --save_steps 500 \
+  --learning_rate 5e-6 \
   --lr_scheduler_type cosine \
-  --warmup_ratio 0.1 \
+  --warmup_ratio 0.05 \
   --max_grad_norm 1.0 \
-  --reward_weights 4.0 0.0 1.0 1.0 0.0 \
+  --reward_weights 4.0 2.0 1.0 1.0 0.0 \
+  --dynamic_sample \
   >> training_logs/$TS/train.log 2>&1
 
 

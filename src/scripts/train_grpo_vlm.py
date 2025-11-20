@@ -56,7 +56,7 @@ if __name__ == "__main__":
     ################
     dataset = load_dataset("/home/lujunxi57/trl/dataset/aokvqa", split="train")
     # dataset = load_dataset("./dataset/aokvqa_openr1", split="train")
-    dataset = dataset.train_test_split(test_size=100, seed=42)
+    dataset = dataset.train_test_split(test_size=40, seed=42)
 
     # SYSTEM_PROMPT = (
     #     "A conversation between user and assistant. The user asks a multiple-choice question about an image, and the assistant solves it.\n"
@@ -161,7 +161,6 @@ Think thoroughly and support your answer with visual evidence"""
     ################
     # Training
     ################
-    # Use soft overlong punishment (DAPO Eq.13). L_cache = 0.7 * L_max by default.
     length_reward_func = get_soft_overlong_punishment(
         max_completion_len=training_args.max_completion_length,
     )

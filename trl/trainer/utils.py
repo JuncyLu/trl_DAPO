@@ -1792,7 +1792,9 @@ def split_tensor_dict(
     return chunks
 
 
-def shuffle_sequence_dict(seq_dict: dict[str, Optional[Sequence]]) -> dict[str, Optional[Sequence]]:
+def shuffle_sequence_dict(
+    seq_dict: dict[str, Optional[Sequence]], return_permutation: bool = False
+) -> Union[dict[str, Optional[Sequence]], tuple[dict[str, Optional[Sequence]], torch.Tensor]]:
     """
     Shuffles all sequence-like values in a dictionary along the first dimension in unison.
 
@@ -1809,19 +1811,52 @@ def shuffle_sequence_dict(seq_dict: dict[str, Optional[Sequence]]) -> dict[str, 
     ```
     """
     # Determine batch size from the first non-None sequence
-    batch_size = len(next(v for v in seq_dict.values() if v is not None))
+    first_non_empty = next((v for v in seq_dict.values() if v is not None), None)
+    if first_non_empty is None:
+        raise ValueError("[shuffle_sequence_dict] All entries are None; cannot determine batch size.")
+    batch_size = len(first_non_empty)
     permutation = torch.randperm(batch_size)
+    indices = permutation.tolist()
 
-    def permute(v: Optional[Sequence]) -> Optional[Sequence]:
+    def permute(key: str, v: Optional[Sequence]) -> Optional[Sequence]:
         if v is None:
             return None
-        if isinstance(v, torch.Tensor) and v.ndim == 0:
+        current_len: Optional[int]
+        if isinstance(v, torch.Tensor):
+            if v.ndim == 0:
+                return v  # scalars stay untouched
+            current_len = v.shape[0]
+            if key == "advantages" and current_len == 0:
+                # Broadcast empty advantages to expected shape instead of shuffling
+                return torch.zeros(batch_size, dtype=v.dtype, device=v.device)
+        else:
+            try:
+                current_len = len(v)
+            except Exception:
+                current_len = None
+        if current_len != batch_size:
+            # length mismatch (e.g. scalars or metadata), leave as-is
+            if current_len not in (None, batch_size):
+                print(
+                    f"[shuffle_sequence_dict] length mismatch for key='{key}': "
+                    f"expected {batch_size}, got {current_len}"
+                )
             return v
-        if isinstance(v, torch.Tensor) and v.ndim >= 1:
+        if isinstance(v, torch.Tensor):
             return v[permutation]
-        return [v[i] for i in permutation]
+        if isinstance(v, list):
+            return [v[i] for i in indices]
+        if isinstance(v, tuple):
+            return tuple(v[i] for i in indices)
+        try:
+            return v[permutation]
+        except Exception:
+            return [v[i] for i in indices]
 
-    return {key: permute(val) for key, val in seq_dict.items()}
+    shuffled = {key: permute(key, val) for key, val in seq_dict.items()}
+    if return_permutation:
+        return shuffled, permutation
+    return shuffled
 
 
 def nanmin(tensor: torch.Tensor) -> torch.Tensor:

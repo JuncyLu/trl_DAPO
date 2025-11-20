@@ -87,62 +87,14 @@ class DAPOConfig(TrainingArguments):
             tokens.
         use_transformers_paged (`bool`, *optional*, defaults to `False`):
             Whether to use the `transformers` paged implementation for generation. If set to `True`, the `transformers`
-            paged implementation will be used for generation instead of the default padded implementation. This
-            parameter is only effective when `use_vllm` is set to `False`.
+            paged implementation will be used for generation instead of the default padded implementation.
         cache_implementation (`str`, *optional*):
-            Implementation of the cache method for faster generation when `use_vllm` is set to `False`.
+            Implementation of the cache method for faster generation.
         generation_kwargs (`dict[str, Any]`, *optional*):
-            Additional keyword arguments to pass to [`~transformers.GenerationConfig`] (if using transformers) or
-            `SamplingParams` (if using vLLM) when sampling completions. This can be used to further customize the
-            generation behavior, such as setting `suppress_tokens`, `num_beams`, etc. If it contains keys that conflict
-            with the other generation parameters (like `min_p`, `top_p`, etc.), they will override them.
-
-        > Parameters that control generation acceleration powered by vLLM
-
-        use_vllm (`bool`, *optional*, defaults to `False`):
-            Whether to use vLLM for generating completions. If set to `True`, the trainer will use vLLM for generation
-            instead of the default model.generate(). Requires `vllm` to be installed.
-        vllm_mode (`str`, *optional*, defaults to `"server"`):
-            Mode to use for vLLM integration when `use_vllm` is set to `True`. Must be one of `"server"` or
-            `"colocate"`.
-
-            - `"server"`: The trainer will send generation requests to a separate vLLM server. Make sure a TRL vLLM
-              server is running (start with `trl vllm-serve`).
-            - `"colocate"`: vLLM will run in the same process and share the training GPUs. This avoids the need for a
-              separate server but may cause resource contention with training.
-        vllm_model_impl (`str`, *optional*, defaults to `"vllm"`):
-            Model implementation to use for vLLM. Must be one of `"transformers"` or `"vllm"`. `"transformers"`: Use
-            the `transformers` backend for model implementation. `"vllm"`: Use the `vllm` library for model
-            implementation.
-        vllm_guided_decoding_regex (`str`, *optional*):
-            Regex for vLLM guided decoding. If `None` (default), guided decoding is disabled.
-
-        > Parameters that control the vLLM server (only used when `vllm_mode` is `"server"`)
-
-        vllm_server_base_url (`str`, *optional*):
-            Base URL for the vLLM server (e.g., `"http://localhost:8000"`). If provided, `vllm_server_host` and
-            `vllm_server_port` are ignored.
-        vllm_server_host (`str`, *optional*, defaults to `"0.0.0.0"`):
-            Host of the vLLM server to connect to. Ignored if `vllm_server_base_url` is provided.
-        vllm_server_port (`int`, *optional*, defaults to `8000`):
-            Port of the vLLM server to connect to. Ignored if `vllm_server_base_url` is provided.
-        vllm_server_timeout (`float`, *optional*, defaults to `240.0`):
-            Total timeout duration in seconds to wait for the vLLM server to be up. If the server is not up after the
-            timeout, a `ConnectionError` is raised.
-
-        > Parameters that control colocated vLLM execution (only used when `vllm_mode` is `"colocate"`)
-
-        vllm_gpu_memory_utilization (`float`, *optional*, defaults to `0.3`):
-            Control the GPU memory utilization for vLLM. This setting only applies when `vllm_mode` is set to
-            `"colocate"`. If you are using `vllm_mode="server"`, this parameter must be passed separately when
-            launching the vLLM server via the `--vllm_gpu_memory_utilization` flag.
-        vllm_tensor_parallel_size (`int`, *optional*, defaults to `1`):
-            Control the tensor parallel size for vLLM. This setting only applies when `vllm_mode` is set to
-            `"colocate"`. If you are using `vllm_mode="server"`, this parameter must be passed separately when
-            launching the vLLM server via the `--vllm_tensor_parallel_size` flag.
-        vllm_enable_sleep_mode (`bool`, *optional*, defaults to `False`):
-            Whether to enable sleep mode for vLLM. If `True`, vLLM will sleep during the optimization step and woken
-            for weight sync and generation.
+            Additional keyword arguments to pass to [`~transformers.GenerationConfig`] when sampling completions. This
+            can be used to further customize the generation behavior, such as setting `suppress_tokens`, `num_beams`,
+            etc. If it contains keys that conflict with the other generation parameters (like `min_p`, `top_p`, etc.),
+            they will override them.
 
         > Parameters that control the training
 
@@ -220,15 +172,6 @@ class DAPOConfig(TrainingArguments):
             `mask_truncated_completions=True`, only tokens from non-truncated completions are considered.
         use_liger_loss (`bool`, *optional*, defaults to `False`):
             Whether to use the Liger GRPO loss.
-        vllm_importance_sampling_correction (`bool`, *optional*, defaults to `True`):
-            Whether to apply Truncated Importance Sampling (TIS) between vLLM completion logprobs and recomputed
-            logprobs. [Your Efficient RL Framework Secretly Brings You Off-Policy RL
-            Training](https://fengyao.notion.site/off-policy-rl) highlights that using a separate generation framework
-            (such as vLLM) can introduce off-policy effects due to subtle implementation differences between generation
-            and training backends. TIS is proposed as a remedy for this issue.
-        vllm_importance_sampling_cap (`float`, *optional*, defaults to `2.0`):
-            Truncation parameter C for Truncated Importance Sampling (TIS). This sets an upper bound on the importance
-            sampling ratio, improving training stability.
 
         > Parameters that control the logging
 
@@ -375,10 +318,10 @@ class DAPOConfig(TrainingArguments):
     generation_kwargs: Optional[dict] = field(
         default=None,
         metadata={
-            "help": "Additional keyword arguments to pass to `GenerationConfig` (if using transformers) or "
-            "`SamplingParams` (if using vLLM) when sampling completions. This can be used to further customize the "
-            "generation behavior, such as setting `suppress_tokens`, `num_beams`, etc. If it contains keys that "
-            "conflict with the other generation parameters (like `min_p`, `top_p`, etc.), they will override them."
+            "help": "Additional keyword arguments to pass to `GenerationConfig` when sampling completions. "
+            "This can be used to further customize the generation behavior, such as setting `suppress_tokens`, "
+            "`num_beams`, etc. If it contains keys that conflict with the other generation parameters "
+            "(like `min_p`, `top_p`, etc.), they will override them."
         },
     )
     repetition_penalty: float = field(
@@ -394,92 +337,12 @@ class DAPOConfig(TrainingArguments):
         metadata={
             "help": "Whether to use the `transformers` paged implementation for generation. If set to `True`, the "
             "`transformers` paged implementation will be used for generation instead of the default padded "
-            "implementation. This parameter is only effective when `use_vllm` is set to `False`."
+            "implementation."
         },
     )
     cache_implementation: Optional[str] = field(
         default=None,
-        metadata={"help": "Implementation of the cache method for faster generation when use_vllm is set to False."},
-    )
-
-    # Parameters that control generation acceleration powered by vLLM
-    use_vllm: bool = field(
-        default=False,
-        metadata={
-            "help": "Whether to use vLLM for generating completions. If set to `True`, the trainer will use vLLM for "
-            "generation instead of the default model.generate(). Requires `vllm` to be installed."
-        },
-    )
-    vllm_mode: str = field(
-        default="server",
-        metadata={
-            "help": "Mode to use for vLLM integration when `use_vllm` is set to `True`. Must be one of `'server'` or "
-            "`'colocate'`. `'server'`: The trainer will send generation requests to a separate vLLM server. Make sure "
-            "a TRL vLLM server is running (start with `trl vllm-serve`). `'colocate'`: vLLM will run in the same "
-            "process and share the training GPUs. This avoids the need for a separate server but may cause resource "
-            "contention with training."
-        },
-    )
-    vllm_model_impl: str = field(
-        default="vllm",
-        metadata={
-            "help": "Model implementation to use for vLLM. Must be one of `transformers` or `vllm`. `transformers`: "
-            "Use the `transformers` backend for model implementation. `vllm`: Use the `vllm` library for "
-            "model implementation."
-        },
-    )
-    vllm_enable_sleep_mode: bool = field(
-        default=False,
-        metadata={
-            "help": "Whether to enable sleep mode for vLLM. If `True`, vLLM will sleep during the optimization step "
-            "and woken for weight sync and generation."
-        },
-    )
-    vllm_guided_decoding_regex: Optional[str] = field(
-        default=None,
-        metadata={"help": "Regex for vLLM guided decoding. If `None` (default), guided decoding is disabled."},
-    )
-
-    # Parameters that control the vLLM server (only used when `vllm_mode` is `"server"`)
-    vllm_server_base_url: Optional[str] = field(
-        default=None,
-        metadata={
-            "help": "Base URL for the vLLM server (e.g., 'http://localhost:8000'). If provided, `vllm_server_host` "
-            "and `vllm_server_port` are ignored."
-        },
-    )
-    vllm_server_host: str = field(
-        default="0.0.0.0",
-        metadata={"help": "Host of the vLLM server to connect to. Ignored if vllm_server_base_url is provided."},
-    )
-    vllm_server_port: int = field(
-        default=8000,
-        metadata={"help": "Port of the vLLM server to connect to. Ignored if vllm_server_base_url is provided."},
-    )
-    vllm_server_timeout: float = field(
-        default=240.0,
-        metadata={
-            "help": "Total timeout duration in seconds to wait for the vLLM server to be up. If the server is not up "
-            "after the timeout, a `ConnectionError` is raised."
-        },
-    )
-
-    # Parameters that control colocated vLLM execution (only used when `vllm_mode` is `"colocate"`)
-    vllm_gpu_memory_utilization: float = field(
-        default=0.3,
-        metadata={
-            "help": "Control the GPU memory utilization for vLLM. This setting only applies when `vllm_mode` is set "
-            "to `'colocate'`. If you are using `vllm_mode='server'`, this parameter must be passed separately when "
-            "launching the vLLM server via the `--vllm_gpu_memory_utilization` flag."
-        },
-    )
-    vllm_tensor_parallel_size: int = field(
-        default=1,
-        metadata={
-            "help": "Control the tensor parallel size for vLLM. This setting only applies when `vllm_mode` is set "
-            "to `'colocate'`. If you are using `vllm_mode='server'`, this parameter must be passed separately when "
-            "launching the vLLM server via the `--vllm_tensor_parallel_size` flag."
-        },
+        metadata={"help": "Implementation of the KV-cache method for faster generation."},
     )
 
     # Parameters that control the training
@@ -616,23 +479,6 @@ class DAPOConfig(TrainingArguments):
         default=False,
         metadata={"help": "Whether to use the Liger GRPO loss."},
     )
-    vllm_importance_sampling_correction: bool = field(
-        default=True,
-        metadata={
-            "help": "Whether to apply Truncated Importance Sampling (TIS) between vLLM completion logprobs and "
-            "recomputed logprobs. Your Efficient RL Framework Secretly Brings You Off-Policy RL "
-            "Training highlights that using a separate generation framework (such as vLLM) can introduce off-policy "
-            "effects due to subtle implementation differences between generation and training backends. TIS is "
-            "proposed as a remedy for this issue."
-        },
-    )
-    vllm_importance_sampling_cap: float = field(
-        default=2.0,
-        metadata={
-            "help": "Truncation parameter C for Truncated Importance Sampling (TIS). This sets an upper bound on the "
-            "importance sampling ratio, improving training stability."
-        },
-    )
 
     # Parameters that control the logging
     log_completions: bool = field(
@@ -722,8 +568,6 @@ class DAPOConfig(TrainingArguments):
         metadata={"help": "轻量 KL 调度：'off' 或 'linear10'（前10%步线性从0.02降至0）。"},
     )
 
-    # (removed) replay_recompute_adv: deprecated with VERL-style filtering
-
     token_weight_quantile: float = field(
         default=0.95,
         metadata={"help": "对每序列 token 权重按该分位数做上截断（0~1）。仅 token_weights=True 时生效。"},
@@ -741,6 +585,15 @@ class DAPOConfig(TrainingArguments):
     reward_weight_schedule: Optional[List[Tuple[float, List[float]]]] = field(
         default=None,
         metadata={"help": "奖励权重表驱动调度，按 step_ratio 选择阶段；提供则覆盖 early/normal 逻辑。"},
+    )
+
+    dynamic_sample: bool = field(
+        default=False,
+        metadata={"help": "启用动态采样：过滤 std=0 的 group 并自动补采样（DAPO paper）。"},
+    )
+    max_resample_times: int = field(
+        default=3,
+        metadata={"help": "动态采样最大重试次数（默认 3）。"},
     )
 
     def __post_init__(self):

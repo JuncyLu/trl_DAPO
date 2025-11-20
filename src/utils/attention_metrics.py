@@ -458,20 +458,23 @@ def process_attention_context(
     attention_deque: Optional[Any] = None,
     attention_skip_reasons_deque: Optional[Any] = None,
     token_weights_deque: Optional[Any] = None,
-) -> None:
+) -> Optional[list]:
     """Process attention outputs: compute per-sample metrics and optional token weights, update deques.
 
     This function mutates the passed deques in-place (if provided) and clears heavy attention tensors in the context.
+    
+    Returns:
+        Optional[list]: Token weights list for the current batch if token_weights is enabled, None otherwise.
     """
     if attention_context is None:
-        return
+        return None
     try:
         outputs = attention_context.get("outputs")
         generate_inputs = attention_context.get("inputs")
         if outputs is None or getattr(outputs, "attentions", None) is None:
-            return
+            return None
         if generate_inputs is None or "input_ids" not in generate_inputs:
-            return
+            return None
 
         input_ids = generate_inputs["input_ids"].detach().cpu()
         sequences = outputs.sequences.detach().cpu()
@@ -495,6 +498,7 @@ def process_attention_context(
             skip_reasons = [None] * len(sample_results)
 
         # Optional token weights
+        tw_list = None
         try:
             if getattr(args, "token_weights", False):
                 from .attention_token_weights import build_token_vgr_weights_for_batch
@@ -523,9 +527,13 @@ def process_attention_context(
             attention_deque.extend(sample_results)
         if skip_reasons and attention_skip_reasons_deque is not None and hasattr(attention_skip_reasons_deque, "extend"):
             attention_skip_reasons_deque.extend(skip_reasons)
+        
+        return tw_list
     except Exception:
         # Swallow diagnostics exceptions to avoid training failure
         pass
+    
+    return None
 
 
 def get_qwen_special_token_ids(processor) -> Dict[str, int]:

@@ -18,6 +18,7 @@ import os
 import textwrap
 import warnings
 from collections import defaultdict, deque
+from copy import deepcopy
 from contextlib import nullcontext
 from functools import partial
 from pathlib import Path
@@ -28,7 +29,60 @@ import torch
 import torch.utils.data
 import transformers
 from accelerate import logging
-from accelerate.utils import broadcast_object_list, gather, gather_object, is_peft_model, set_seed
+from accelerate.utils import gather, gather_object, is_peft_model, set_seed
+
+
+def safe_gather_object(data, max_items=None, max_str_len=1000):
+    """
+    Safe wrapper for gather_object that prevents OOM by limiting data size.
+    
+    Args:
+        data: List of items to gather across ranks
+        max_items: Maximum number of items to gather (None = no limit)
+        max_str_len: Maximum string length for text items
+    
+    Returns:
+        Gathered list of items, or local data if gathering fails
+    """
+    try:
+        # Truncate strings if they're too long
+        if isinstance(data, list) and len(data) > 0 and isinstance(data[0], str):
+            data = [s[:max_str_len] if isinstance(s, str) else s for s in data]
+        
+        # Limit number of items if specified
+        if max_items is not None and len(data) > max_items:
+            data = data[:max_items]
+        
+        # Try to gather
+        result = gather_object(data)
+        return result
+    except (RuntimeError, torch.OutOfMemoryError) as e:
+        # If gather fails due to OOM or other issues, return local data only
+        return data
+    except Exception:
+        # For any other errors, return local data
+        return data
+
+
+def log_memory_usage(accelerator, prefix=""):
+    """
+    Log current GPU memory usage.
+    
+    Args:
+        accelerator: Accelerator instance
+        prefix: Prefix for log message
+    """
+    if torch.cuda.is_available() and accelerator.is_main_process:
+        try:
+            allocated = torch.cuda.memory_allocated() / 1024**3  # GB
+            reserved = torch.cuda.memory_reserved() / 1024**3  # GB
+            max_allocated = torch.cuda.max_memory_allocated() / 1024**3  # GB
+            logger.info(
+                f"{prefix}GPU Memory: allocated={allocated:.2f}GB, "
+                f"reserved={reserved:.2f}GB, max_allocated={max_allocated:.2f}GB"
+            )
+        except Exception:
+            pass
 from datasets import Dataset, IterableDataset
 from torch import nn
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
@@ -52,11 +106,9 @@ from trl.data_utils import (
     apply_chat_template,
     is_conversational,
     prepare_multimodal_messages,
-    prepare_multimodal_messages_vllm,
 )
 from trl.extras.profiling import profiling_context, profiling_decorator
-from trl.extras.vllm_client import VLLMClient
-from trl.import_utils import is_liger_kernel_available, is_vllm_available
+from trl.import_utils import is_liger_kernel_available
 from trl.models import prepare_deepspeed, prepare_fsdp, prepare_peft_model, unwrap_model_for_generation
 from trl.models.utils import _ForwardRedirection
 from trl.trainer.base_trainer import BaseTrainer
@@ -82,7 +134,6 @@ from contextlib import contextmanager
 from trl.trainer.utils import (
     RepeatSampler,
     disable_dropout_in_model,
-    ensure_master_addr_port,
     entropy_from_logits,
     get_config_model_id,
     identity,
@@ -104,10 +155,6 @@ if is_peft_available():
 
 if is_liger_kernel_available():
     from liger_kernel.chunked_loss import LigerFusedLinearGRPOLoss
-
-if is_vllm_available():
-    from vllm import LLM, SamplingParams
-    from vllm.sampling_params import GuidedDecodingParams
 
 if is_wandb_available():
     import wandb
@@ -312,7 +359,7 @@ class DAPOTrainer(BaseTrainer):
             processing_class = AutoProcessor.from_pretrained(
                 get_config_model_id(model.config), 
                 truncation_side="left",
-                use_fast=False  # 强制使用 slow processor，避免图像 token 计算不一致
+                use_fast=False
             )
 
         # Handle pad token for processors or tokenizers
@@ -399,12 +446,6 @@ class DAPOTrainer(BaseTrainer):
         self.min_p = args.min_p
         self.repetition_penalty = args.repetition_penalty
         self.use_transformers_paged = args.use_transformers_paged
-        self.use_vllm = args.use_vllm
-        self.vllm_mode = args.vllm_mode
-        self.vllm_gpu_memory_utilization = args.vllm_gpu_memory_utilization  # only applies to colocation mode
-        self.vllm_tensor_parallel_size = args.vllm_tensor_parallel_size  # only applies to colocation mode
-        self.vllm_importance_sampling_correction = args.vllm_importance_sampling_correction
-        self.vllm_importance_sampling_cap = args.vllm_importance_sampling_cap
         self.use_liger_loss = args.use_liger_loss
         self.loss_type = args.loss_type
         self.scale_rewards = args.scale_rewards
@@ -445,6 +486,10 @@ class DAPOTrainer(BaseTrainer):
         # Buffer the batch to reuse generated outputs across multiple updates. For more details, see
         # `_get_train_sampler` and `_prepare_inputs`.
         self._buffered_inputs = None
+
+        # Dynamic sampling (DAPO paper)
+        self.dynamic_sample = args.dynamic_sample
+        self.max_resample_times = args.max_resample_times
 
         # The trainer estimates the number of FLOPs (floating-point operations) using the number of elements in the
         # input tensor associated with the key "input_ids". However, in GRPO, the sampled data does not include the
@@ -540,106 +585,25 @@ class DAPOTrainer(BaseTrainer):
         if getattr(args, "token_weights", False):
             self._logs["token_weights"] = deque(maxlen=1000)
 
-        # Ensure each process receives a unique seed to prevent duplicate completions when generating with
-        # transformers if num_generations exceeds per_device_train_batch_size. We could skip it if we use vLLM, but
-        # it's safer to set it in all cases.
+        # Ensure each process receives a unique seed to prevent duplicate completions when generating.
         set_seed(args.seed, device_specific=True)
 
-        if self.use_vllm:
-            if not is_vllm_available():
-                raise ImportError(
-                    "vLLM is not available and `use_vllm` is set to True. Please install vLLM with "
-                    "`pip install trl[vllm]` to use it."
-                )
-
-            if self.vllm_mode == "server":
-                if self.accelerator.is_main_process:
-                    if args.vllm_server_base_url is not None:
-                        base_url = args.vllm_server_base_url
-                    else:
-                        base_url = f"http://{args.vllm_server_host}:{args.vllm_server_port}"
-                    self.vllm_client = VLLMClient(base_url=base_url, connection_timeout=args.vllm_server_timeout)
-                    self.vllm_client.init_communicator(device=torch.cuda.current_device())
-
-            elif self.vllm_mode == "colocate":
-                # Make sure vllm_tensor_parallel_size group size evenly divides the world size - each group should have
-                # the same number of ranks
-                if not self.accelerator.num_processes % self.vllm_tensor_parallel_size == 0:
-                    raise ValueError(
-                        f"vllm_tensor_parallel_size ({self.vllm_tensor_parallel_size}) must divide world size "
-                        f"({self.accelerator.num_processes}) evenly."
-                    )
-
-                if self.vllm_tensor_parallel_size > 1:
-                    # Create subgroups of ranks for TP, each group with `vllm_tensor_parallel_size` ranks.
-                    # For example, if world_size=8 and vllm_tensor_parallel_size=2 → groups: [0,1], [2,3], [4,5], [6,7]
-                    self.tp_group, _ = torch.distributed.new_subgroups_by_enumeration(
-                        [
-                            list(range(i * self.vllm_tensor_parallel_size, (i + 1) * self.vllm_tensor_parallel_size))
-                            for i in range(self.accelerator.num_processes // self.vllm_tensor_parallel_size)
-                        ]
-                    )
-
-                # vLLM requires the environment variables to be set for distributed training.
-                os.environ["RANK"] = str(self.accelerator.process_index)
-                os.environ["LOCAL_RANK"] = str(self.accelerator.local_process_index)
-                os.environ["WORLD_SIZE"] = str(self.accelerator.num_processes)
-                # Ensure distributed rendezvous variables are set without colliding across concurrent runs
-                ensure_master_addr_port()
-
-                if self.max_prompt_length is not None and self.max_completion_length is not None:
-                    max_model_len = self.max_prompt_length + self.max_completion_length
-                else:
-                    max_model_len = None
-                self.llm = LLM(
-                    model=model.name_or_path,
-                    tensor_parallel_size=args.vllm_tensor_parallel_size,
-                    gpu_memory_utilization=self.vllm_gpu_memory_utilization,
-                    max_num_seqs=self.args.per_device_train_batch_size
-                    * self.vllm_tensor_parallel_size
-                    * self.args.steps_per_generation,
-                    max_model_len=max_model_len,
-                    distributed_executor_backend="external_launcher",
-                    # Feed identical seed for tp groups to ensure sampling results are the same across workers
-                    seed=self.accelerator.process_index // self.vllm_tensor_parallel_size,
-                    # Latest vLLM v1 memory profiler is misled by the high default value (i.e., 32768) - thinking there's not enough memory
-                    max_num_batched_tokens=4096,
-                    model_impl=self.args.vllm_model_impl,
-                    enable_sleep_mode=self.args.vllm_enable_sleep_mode,
-                    # Important so temperature scaling/logit tweaking affects the TIS log probs
-                    logprobs_mode="processed_logprobs",
-                )
-                if self.args.vllm_enable_sleep_mode:
-                    self.llm.sleep(level=2)
-            else:
-                raise ValueError(f"vllm_mode must be either 'server' or 'colocate', got '{self.vllm_mode}'.")
-
-            # vLLM specific sampling arguments
-            self.guided_decoding_regex = args.vllm_guided_decoding_regex
-
-            self._last_loaded_step = -1  # tag to avoid useless loading during grad accumulation
-
-            # When using vLLM, the main process is responsible for loading the model weights. This can cause process
-            # desynchronization and seems to lead to DeepSpeed hanging during initialization. To prevent this, we
-            # synchronize all processes after vLLM has been fully initialized.
-            self.accelerator.wait_for_everyone()
-        else:
-            generation_kwargs = {
-                "max_new_tokens": self.max_completion_length,
-                "do_sample": True,
-                "pad_token_id": tokenizer.pad_token_id,
-                "bos_token_id": tokenizer.bos_token_id,
-                "eos_token_id": tokenizer.eos_token_id,
-                "temperature": self.temperature,
-                "top_p": self.top_p,
-                "top_k": self.top_k,
-                "min_p": self.min_p,
-                "repetition_penalty": self.repetition_penalty,
-                "cache_implementation": args.cache_implementation,
-            }
-            if args.generation_kwargs is not None:
-                generation_kwargs.update(args.generation_kwargs)
-            self.generation_config = GenerationConfig(**generation_kwargs)
+        generation_kwargs = {
+            "max_new_tokens": self.max_completion_length,
+            "do_sample": True,
+            "pad_token_id": tokenizer.pad_token_id,
+            "bos_token_id": tokenizer.bos_token_id,
+            "eos_token_id": tokenizer.eos_token_id,
+            "temperature": self.temperature,
+            "top_p": self.top_p,
+            "top_k": self.top_k,
+            "min_p": self.min_p,
+            "repetition_penalty": self.repetition_penalty,
+            "cache_implementation": args.cache_implementation,
+        }
+        if args.generation_kwargs is not None:
+            generation_kwargs.update(args.generation_kwargs)
+        self.generation_config = GenerationConfig(**generation_kwargs)
 
         # Gradient accumulation requires scaled loss. Normally, loss scaling in the parent class depends on whether the
         # model accepts loss-related kwargs. Since we compute our own loss, this check is irrelevant. We set
@@ -669,6 +633,26 @@ class DAPOTrainer(BaseTrainer):
                     self.reward_funcs[i] = self.accelerator.prepare_model(
                         reward_func, evaluation_mode=True, device_placement=True
                     )
+
+        # Initialize dynamic resampling iterator if enabled
+        if self.dynamic_sample:
+            self._prepare_dynamic_resample_iterator()
+
+    def _prepare_dynamic_resample_iterator(self):
+        """
+        Prepare a cyclic iterator for dynamic resampling.
+        Uses a different seed to ensure the resample dataset does not overlap with train_dataset.
+        """
+        def cyclic_iter(iterable):
+            while True:
+                for x in iterable:
+                    yield x
+
+        # Use a different seed (original + 1) to avoid overlap
+        original_seed = self.args.seed
+        self.args.seed = original_seed + 1
+        self.dynamic_resample_iterator = cyclic_iter(self.get_train_dataloader())
+        self.args.seed = original_seed  # restore
 
     def _set_signature_columns_if_needed(self):
         # If `self.args.remove_unused_columns` is True, non-signature columns are removed.
@@ -909,17 +893,6 @@ class DAPOTrainer(BaseTrainer):
             model_inputs["use_cache"] = False  # only used in generation; set False to suppress warnings
 
             logits = model(**model_inputs).logits
-            
-            # 🔍 DEBUG: Print logits statistics before processing
-            if self.state.global_step % 4 == 0 and start == 0:  # Log every 4 steps, only first batch
-                logits_max = logits.max().item()
-                logits_min = logits.min().item()
-                logits_mean = logits.mean().item()
-                logits_std = logits.std().item()
-                has_inf = torch.isinf(logits).any().item()
-                has_nan = torch.isnan(logits).any().item()
-                print(f"🔍 [Step {self.state.global_step}] Logits BEFORE temp - Max: {logits_max:.4f}, Min: {logits_min:.4f}, Mean: {logits_mean:.4f}, Std: {logits_std:.4f}, HasInf: {has_inf}, HasNaN: {has_nan}")
-            
             # Exclude the last value: it corresponds to the next token pred
             logits = logits[:, :-1, :]  # (B, L-1, H)
             # Only keep the last logits_to_keep. For model that support logits_to_keep, this is a no-op.
@@ -927,29 +900,9 @@ class DAPOTrainer(BaseTrainer):
             # Divide logits by sampling temperature.
             # See https://huggingface.co/blog/the_n_implementation_details_of_rlhf_with_ppo#policy-training-implementation-details
             logits = logits / self.temperature
-            
-            # 🔍 DEBUG: Print logits statistics after temperature scaling
-            if self.state.global_step % 4 == 0 and start == 0:
-                logits_max = logits.max().item()
-                logits_min = logits.min().item()
-                logits_mean = logits.mean().item()
-                logits_std = logits.std().item()
-                has_inf = torch.isinf(logits).any().item()
-                has_nan = torch.isnan(logits).any().item()
-                print(f"🔍 [Step {self.state.global_step}] Logits AFTER temp={self.temperature:.2f} - Max: {logits_max:.4f}, Min: {logits_min:.4f}, Mean: {logits_mean:.4f}, Std: {logits_std:.4f}, HasInf: {has_inf}, HasNaN: {has_nan}")
 
             completion_ids = input_ids_batch[:, -logits_to_keep:]
             logps = selective_log_softmax(logits, completion_ids)  # compute logprobs
-            
-            # 🔍 DEBUG: Check log probabilities for numerical issues
-            if self.state.global_step % 4 == 0 and start == 0:
-                logps_max = logps.max().item()
-                logps_min = logps.min().item()
-                logps_mean = logps.mean().item()
-                has_inf = torch.isinf(logps).any().item()
-                has_nan = torch.isnan(logps).any().item()
-                print(f"🔍 [Step {self.state.global_step}] LogProbs - Max: {logps_max:.4f}, Min: {logps_min:.4f}, Mean: {logps_mean:.4f}, HasInf: {has_inf}, HasNaN: {has_nan}")
-            
             all_logps.append(logps)
 
             if compute_entropy:
@@ -960,129 +913,6 @@ class DAPOTrainer(BaseTrainer):
         logps = torch.cat(all_logps, dim=0)
         entropies = torch.cat(all_entropies, dim=0) if compute_entropy else None
         return logps, entropies
-
-    def _fix_param_name_to_vllm(self, name, extra_prefixes: Optional[list[str]] = None):
-        extra_prefixes = extra_prefixes or []
-        prefixes = ["_checkpoint_wrapped_module."] + extra_prefixes
-        for prefix in prefixes:
-            name = name.replace(prefix, "")
-        return name
-
-    def _sync_fsdp1_params_to_vllm(self, module: nn.Module, prefix: str = "", visited=None):
-        """Memory-efficient post-order traversal of FSDP modules to extract full parameters and sync with vLLM."""
-        # For FSDP1, we need to recurse into children and also use summon_full_params
-        if visited is None:
-            visited = set()
-        for child_name, child_module in module.named_children():
-            child_prefix = f"{prefix}.{child_name}" if prefix else child_name
-            self._sync_fsdp1_params_to_vllm(
-                child_module, prefix=child_prefix, visited=visited
-            )  # recurse into the child
-
-        if isinstance(module, FSDP):
-            with FSDP.summon_full_params(module, recurse=False, writeback=False):
-                for param_name, param in module.named_parameters():
-                    full_name = f"{prefix}.{param_name}" if prefix else param_name
-                    full_name = self._fix_param_name_to_vllm(full_name, extra_prefixes=["_fsdp_wrapped_module."])
-
-                    if full_name in visited:
-                        continue  # skip FSDP subtrees already traversed
-                    visited.add(full_name)
-
-                    if self.vllm_mode == "server" and self.accelerator.is_main_process:
-                        self.vllm_client.update_named_param(full_name, param.data)
-                    elif self.vllm_mode == "colocate":
-                        llm_model = self.llm.llm_engine.model_executor.driver_worker.model_runner.model
-                        llm_model.load_weights([(full_name, param.data)])
-
-    def _sync_fsdp2_params_to_vllm(self, module: nn.Module):
-        # For FSDP2, module.state_dict() already covers all parameters, so no need for recursion
-        for name, param in module.state_dict().items():
-            if param.is_cpu:
-                param = param.to(torch.device("cuda"))
-            param = param.full_tensor()
-
-            if self.vllm_mode == "server" and self.accelerator.is_main_process:
-                self.vllm_client.update_named_param(name, param)
-            elif self.vllm_mode == "colocate":
-                llm_model = self.llm.llm_engine.model_executor.driver_worker.model_runner.model
-                llm_model.load_weights([(name, param)])
-
-    @profiling_decorator
-    def _move_model_to_vllm(self):
-        # For DeepSpeed ZeRO-3 and FSDP, we need to gather all parameters before operations
-        deepspeed_plugin = self.accelerator.state.deepspeed_plugin
-        zero_stage_3 = deepspeed_plugin is not None and deepspeed_plugin.zero_stage == 3
-        if zero_stage_3:
-            import deepspeed
-
-            gather_if_zero3 = deepspeed.zero.GatheredParameters
-        else:
-            gather_if_zero3 = nullcontext
-
-        if is_peft_model(self.model):
-            # With PEFT and FSDP/DeepSpeed ZeRO Stage 3, we must gather the full model at once before merging, as
-            # merging adapters in a sharded manner is not supported.
-            # TODO: does this work with FSDP?
-            with gather_if_zero3(list(self.model.parameters())):
-                self.model.merge_adapter()
-
-                # Update vLLM weights while parameters are gathered
-                if self.is_fsdp_enabled:  # note if using FSDP, gather_if_zero3 is nullcontext
-                    # Update vLLM weights while parameters are gathered
-                    # For PEFT with FSDP we need to use the memory efficient post-order traversal
-                    fsdp_plugin = getattr(self.accelerator.state, "fsdp_plugin", None)
-                    fsdp_version = getattr(fsdp_plugin, "fsdp_version", 1) if fsdp_plugin else 1
-                    if fsdp_version == 1:
-                        self._sync_fsdp1_params_to_vllm(
-                            self.model
-                        )  # use memory-efficient post-order traversal for FSDP
-                    elif fsdp_version == 2:
-                        self._sync_fsdp2_params_to_vllm(self.model)
-                else:
-                    # DeepSpeed ZeRO-3 with PEFT
-                    for name, param in self.model.named_parameters():
-                        # When using PEFT, we need to recover the original parameter name and discard some parameters
-                        name = name.removeprefix("base_model.model.").replace(".base_layer", "")
-                        if self.model.prefix in name:
-                            continue
-                        # When module to save, remove its prefix and discard the original module
-                        if "original_module" in name:
-                            continue
-                        name = self._fix_param_name_to_vllm(name, extra_prefixes=["modules_to_save.default."])
-
-                        if self.vllm_mode == "server" and self.accelerator.is_main_process:
-                            self.vllm_client.update_named_param(name, param.data)
-                        elif self.vllm_mode == "colocate":
-                            llm_model = self.llm.llm_engine.model_executor.driver_worker.model_runner.model
-                            llm_model.load_weights([(name, param.data)])
-                # Unmerge adapters while parameters are still gathered
-                self.model.unmerge_adapter()
-                # Parameters will automatically be repartitioned when exiting the context
-        else:
-            # For non-PEFT models, simply gather (if needed) and update each parameter individually.
-            if self.is_fsdp_enabled:
-                fsdp_plugin = getattr(self.accelerator.state, "fsdp_plugin", None)
-                fsdp_version = getattr(fsdp_plugin, "fsdp_version", 1) if fsdp_plugin else 1
-                if fsdp_version == 1:
-                    self._sync_fsdp1_params_to_vllm(self.model)  # use memory-efficient post-order traversal for FSDP
-                elif fsdp_version == 2:
-                    self._sync_fsdp2_params_to_vllm(self.model)
-            else:
-                for name, param in self.model.named_parameters():
-                    name = self._fix_param_name_to_vllm(name)
-                    with gather_if_zero3([param]):
-                        if self.vllm_mode == "server" and self.accelerator.is_main_process:
-                            self.vllm_client.update_named_param(name, param.data)
-                        elif self.vllm_mode == "colocate":
-                            llm_model = self.llm.llm_engine.model_executor.driver_worker.model_runner.model
-                            llm_model.load_weights([(name, param.data)])
-
-        # Reset cache on vLLM
-        if self.vllm_mode == "server" and self.accelerator.is_main_process:
-            self.vllm_client.reset_prefix_cache()
-        elif self.vllm_mode == "colocate":
-            self.llm.reset_prefix_cache()
 
     @profiling_decorator
     def _prepare_inputs(
@@ -1116,7 +946,28 @@ class DAPOTrainer(BaseTrainer):
                     raise
 
                 processed_batch = split_pixel_values_by_grid(processed_batch)
-                processed_batch = shuffle_sequence_dict(processed_batch)
+
+                # Remove metadata before shuffling tensors, then reapply permutation manually
+                metadata = {}
+                for meta_key in ("original_prompts", "original_images"):
+                    if meta_key in processed_batch:
+                        metadata[meta_key] = processed_batch.pop(meta_key)
+
+                if metadata:
+                    processed_batch, permutation = shuffle_sequence_dict(
+                        processed_batch, return_permutation=True
+                    )
+                    indices = permutation.tolist()
+
+                    for meta_key, meta_value in metadata.items():
+                        if meta_value is None:
+                            continue
+                        # Ensure we always store lists so split_tensor_dict can slice consistently
+                        shuffled_meta = [meta_value[i] for i in indices]
+                        processed_batch[meta_key] = shuffled_meta
+                else:
+                    processed_batch = shuffle_sequence_dict(processed_batch)
+
                 generation_batches = split_tensor_dict(processed_batch, self.args.steps_per_generation)
                 self._buffered_inputs = [unsplit_pixel_values_by_grid(batch) for batch in generation_batches]
 
@@ -1128,21 +979,10 @@ class DAPOTrainer(BaseTrainer):
             # local generation batch == local eval batch
             inputs = self._generate_and_score_completions(generation_batch)
 
-        # Recompute num_items_in_batch to reflect filtered batch: use global completion token count
-        # CRITICAL: This gather must execute unconditionally on ALL ranks
-        completion_mask = inputs.get("completion_mask")
-        if completion_mask is None or not isinstance(completion_mask, torch.Tensor):
-            # Create dummy tensor for gather synchronization
-            local_tokens = torch.tensor(0, dtype=torch.long, device=self.accelerator.device)
-        else:
-            local_tokens = completion_mask.sum().to(self.accelerator.device)
-        
-        # Unconditional gather - all ranks must participate
-        try:
-            global_tokens = self.accelerator.gather(local_tokens).sum()
-        except Exception:
-            global_tokens = local_tokens * self.world_size
-        inputs["num_items_in_batch"] = global_tokens
+        # Note: num_items_in_batch is already computed in _generate_and_score_completions
+        # It represents the total completion tokens across all processes for the entire generation batch.
+        # Do NOT recompute it here as that would break DAPO loss normalization semantics.
+        # The split_tensor_dict broadcast behavior ensures all mini-batches share this global value.
 
         return inputs
 
@@ -1163,22 +1003,25 @@ class DAPOTrainer(BaseTrainer):
         reward_kwargs["num_generations"] = self.num_generations if self.model.training else self.eval_num_generations
 
         # Add attention data for reward functions if available
-        if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
-            att_list = list(self._logs['attention'])
-            
+        if self.compute_attention_metrics and hasattr(self, "_logs") and "attention" in self._logs:
+            att_list = list(self._logs["attention"])
+
             if att_list:
                 # Get the most recent attention results for this batch
                 sample_results = att_list[-len(prompts):]
-                
+
                 # Align skip reasons with the same recent slice
-                if hasattr(self, '_attention_skip_reasons'):
+                if hasattr(self, "_attention_skip_reasons"):
                     skips = list(self._attention_skip_reasons)
-                    skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
+                    if len(skips) >= len(sample_results):
+                        skip_slice = skips[-len(sample_results):]
+                    else:
+                        skip_slice = [None] * len(sample_results)
                 else:
                     skip_slice = [None] * len(sample_results)
-                    
+
                 vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
-                
+
                 reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in vgr_metrics]
                 reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in vgr_metrics]
                 reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in vgr_metrics]
@@ -1239,255 +1082,390 @@ class DAPOTrainer(BaseTrainer):
                 "Please ensure that at least one reward function returns a valid reward."
             )
 
-        # Gather the reward per function: this part is crucial, because the rewards are normalized per group and the
-        # completions may be distributed across processes
-        rewards_per_func = gather(rewards_per_func)
+        # NOTE: Unlike the original implementation, we intentionally keep rewards_per_func local
+        # to each rank here. Dynamic sampling and logging operate per-rank, and global aggregation
+        # is handled separately via accelerator utilities where needed.
         return rewards_per_func
 
-    def _recompute_group_advantages(self, inputs, prompts, completions, start: int, end: int, group_ng: int,
-                                    scale_mode: str, completion_ids_list: list) -> torch.Tensor:
-        """Recompute advantages for the group slice [start:end) locally (no all-gather).
-        This avoids statistical inconsistency after replay replacement.
+    def _get_dynamic_sampling_scores(self, rewards_per_func: torch.Tensor) -> torch.Tensor:
+        """
+        Build scalar scores for dynamic sampling using a weighted sum of accuracy, vgr, and format rewards.
+        """
+        if rewards_per_func.numel() == 0:
+            return rewards_per_func.new_zeros(rewards_per_func.size(0))
+
+        device = rewards_per_func.device
+        weights = self.reward_weight_manager.get_current_weights().to(device)
+
+        target_groups = [
+            {"accuracy_reward", "accuracy_reward_v2"},
+            {"vgr_reward", "vgr_reward_as_additive", "vgr_hard_negative"},
+            {"think_format_reward", "format_reward"},
+        ]
+
+        selected_terms = []
+        for group in target_groups:
+            idx = next((i for i, name in enumerate(self.reward_func_names) if name in group), None)
+            if idx is not None and idx < rewards_per_func.size(1):
+                term = rewards_per_func[:, idx] * weights[idx]
+                term = torch.nan_to_num(term, nan=0.0)
+                selected_terms.append(term)
+
+        if selected_terms:
+            scores = torch.stack(selected_terms, dim=0).sum(dim=0)
+        else:
+            scores = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device=device)
+        return scores
+
+    def compute_group_validity(
+        self, scores: torch.Tensor, num_generations: int, tol: float = 1e-6
+    ) -> torch.Tensor:
+        """
+        Check if each group should be kept based on the variance of the provided scores.
+        Groups are invalid (0) if all scores inside the group are (near) identical.
+
+        Args:
+            scores: Tensor of shape (total_samples,) with scalar values to test variance on
+            num_generations: Number of generations per prompt group
+            tol: Numerical tolerance used to decide whether std≈0
+
+        Returns:
+            Tensor of shape (total_samples,) with 1 for valid groups, 0 for invalid groups
         """
         device = self.accelerator.device
-        size = end - start
-        if size <= 0:
-            return inputs["advantages"][start:end]
-        # 构造子批
-        sub_prompts = prompts[start:end]
-        sub_completions = completions[start:end]
-        # 局部奖励计算（不 gather）
-        rewards_per_func = torch.zeros(size, len(self.reward_funcs), device=device)
-        # 从 inputs 取子列作为 kwargs（保持 _calculate_rewards 的签名）
-        keys = [key for key in inputs[0] if key not in ["prompt", "completion", "completion_ids"]]
-        reward_kwargs = {key: [example[key] for example in inputs] for key in keys}
-        reward_kwargs["trainer_state"] = self.state
-        reward_kwargs["num_generations"] = group_ng
-        # 注意力额外字段（若可用）
-        try:
-            if self.compute_attention_metrics and hasattr(self, '_logs') and 'attention' in self._logs:
-                att_list = list(self._logs['attention'])
-                if att_list:
-                    sample_results = att_list[-len(prompts):]
-                    if hasattr(self, '_attention_skip_reasons'):
-                        skips = list(self._attention_skip_reasons)
-                        skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
-                    else:
-                        skip_slice = [None] * len(sample_results)
-                    vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
-                    reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in vgr_metrics][start:end]
-                    reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in vgr_metrics][start:end]
-                    reward_kwargs["num_text_tokens"] = [m.get("num_text_tokens", 0) for m in vgr_metrics][start:end]
-                    reward_kwargs["num_vision_tokens"] = [m.get("num_vision_tokens", 0) for m in vgr_metrics][start:end]
-        except Exception:
-            pass
-        # 逐函数计算（本地）
-        for i, (reward_func, reward_processing_class, reward_func_name) in enumerate(
-            zip(self.reward_funcs, self.reward_processing_classes, self.reward_func_names)
-        ):
-            if isinstance(reward_func, nn.Module):
-                if is_conversational(inputs[0]):
-                    messages = [{"messages": p + c} for p, c in zip(sub_prompts, sub_completions)]
-                    texts = [apply_chat_template(x, reward_processing_class)["text"] for x in messages]
-                else:
-                    texts = [p + c for p, c in zip(sub_prompts, sub_completions)]
-                reward_inputs = reward_processing_class(
-                    text=texts, return_tensors="pt", padding=True, padding_side="right", add_special_tokens=False
+
+        if scores.size(0) % num_generations != 0:
+            return torch.ones(scores.size(0), dtype=torch.float32, device=device)
+
+        safe_scores = torch.nan_to_num(scores, nan=0.0)
+        grouped = safe_scores.view(-1, num_generations)
+        std = grouped.std(dim=1, unbiased=False)
+        invalid_groups = std <= tol
+        valid_groups = ~invalid_groups
+        valid_mask = valid_groups.float().repeat_interleave(num_generations)
+        return valid_mask
+
+    @profiling_decorator
+    def _dynamic_sampling(
+        self,
+        inputs: list,
+        prompts: list,
+        completions: list,
+        prompt_ids_list: list[list[int]],
+        completion_ids_list: list[list[int]],
+            rewards_per_func: torch.Tensor,
+            total_rewards: torch.Tensor,
+            filter_scores: torch.Tensor,
+        images: Optional[list] = None,
+        token_weights_list: Optional[list] = None,
+    ):
+        """
+        Perform dynamic sampling by replacing flat total-reward groups with resampled data.
+
+        Args:
+            inputs: Local input samples (list[dict])
+            prompts: Prompts corresponding to the local samples
+            completions: Generated completions for the local samples
+            prompt_ids_list: Tokenized prompts produced during generation
+            completion_ids_list: Tokenized completions
+            rewards_per_func: Reward tensor for local samples on this rank
+            total_rewards: Weighted reward tensor for local samples
+            filter_scores: Scalar scores used to detect flat groups (accuracy + format)
+            images: Optional multimodal payload accompanying each sample
+            token_weights_list: Optional per-sample token weights
+
+        Returns:
+            Tuple containing potentially resampled (inputs, prompts, completions, prompt_ids_list, completion_ids_list,
+            rewards_per_func, total_rewards, filter_scores, images, token_weights_list) aligned across ranks.
+        """
+        device = self.accelerator.device
+        mode = "train" if self.model.training else "eval"
+        ng = self.num_generations if mode == "train" else self.eval_num_generations
+        local_target = len(inputs)
+
+        # Save original data for fallback
+        origin_data = (
+            inputs,
+            prompts,
+            completions,
+            prompt_ids_list,
+            completion_ids_list,
+            rewards_per_func,
+            total_rewards,
+            filter_scores,
+            images,
+            token_weights_list,
+        )
+
+        # Initialize containers for valid samples
+        resample_count = 0
+        valid_inputs: list = []
+        valid_prompts: list = []
+        valid_completions: list = []
+        valid_prompt_ids: list[list[int]] = []
+        valid_completion_ids: list[list[int]] = []
+        valid_rewards: list[torch.Tensor] = []
+        valid_totals: list[torch.Tensor] = []
+        valid_filter_scores: list[torch.Tensor] = []
+        valid_images: Optional[list] = [] if images is not None else None
+        valid_token_weights: Optional[list] = [] if token_weights_list is not None else None
+
+        if self.accelerator.is_main_process:
+            logger.info(
+                "[DynSample] step=%s start: local_samples=%s, target=%s, ng=%s",
+                getattr(self.state, "global_step", None),
+                len(inputs),
+                local_target,
+                ng,
+            )
+            log_memory_usage(self.accelerator, "[DynSample Start] ")
+
+        # Initial check: collect valid groups from original batch
+        validity_mask = self.compute_group_validity(filter_scores, ng) > 0
+        num_groups = filter_scores.numel() // max(1, ng)
+        initial_valid = validity_mask.sum().item() // max(1, ng)
+        
+        if self.accelerator.is_main_process:
+            logger.info(
+                f"[DynSample] Initial batch has {initial_valid}/{num_groups} valid groups"
+            )
+            # Debug: print full per-group stds and scores for this rank
+            if filter_scores.numel() > 0 and ng > 0 and filter_scores.numel() % ng == 0:
+                try:
+                    g_scores = filter_scores.view(-1, ng)
+                    g_std = g_scores.std(dim=1, unbiased=False)
+                    print(f"[DEBUG] Start - Group Stds: {g_std.tolist()}")
+                    print(f"[DEBUG] Start - Group Scores: {g_scores.tolist()}")
+                    if len(completions) > 0:
+                        print(f"[DEBUG] Start - First completion sample: {completions[0]}")
+                except Exception:
+                    pass
+
+        # Collect valid groups from original batch
+        for group_idx in range(num_groups):
+            start = group_idx * ng
+            end = start + ng
+            if validity_mask[start].item():
+                valid_inputs.extend(inputs[start:end])
+                valid_prompts.extend(prompts[start:end])
+                valid_completions.extend(completions[start:end])
+                valid_prompt_ids.extend(prompt_ids_list[start:end])
+                valid_completion_ids.extend(completion_ids_list[start:end])
+                valid_rewards.append(rewards_per_func[start:end])
+                valid_totals.append(total_rewards[start:end])
+                valid_filter_scores.append(filter_scores[start:end])
+                if images is not None and valid_images is not None:
+                    valid_images.extend(images[start:end])
+                if token_weights_list is not None and valid_token_weights is not None:
+                    valid_token_weights.extend(token_weights_list[start:end])
+
+        # Resample loop: try to fill up to local_target with valid groups
+        while len(valid_inputs) < local_target and resample_count < self.max_resample_times:
+            if self.accelerator.is_main_process:
+                deficit = local_target - len(valid_inputs)
+                logger.info(
+                    f"[DynSample] Resample #{resample_count + 1}/{self.max_resample_times}: "
+                    f"collected={len(valid_inputs)}/{local_target}, need {deficit} more"
                 )
-                reward_inputs = super()._prepare_inputs(reward_inputs)
-                with torch.inference_mode():
-                    rewards_per_func[:, i] = reward_func(**reward_inputs).logits[:, 0]
+
+            # Fetch new batch from iterator
+            try:
+                new_inputs = next(self.dynamic_resample_iterator)
+            except StopIteration:
+                if self.accelerator.is_main_process:
+                    logger.warning("[DynSample] Iterator exhausted, stopping resampling")
+                break
+                
+            new_prompts = [example["prompt"] for example in new_inputs]
+
+            # Extract multimodal payloads
+            if new_inputs and "images" in new_inputs[0]:
+                new_images = [example.get("images") for example in new_inputs]
+            elif new_inputs and "image" in new_inputs[0]:
+                new_images = [
+                    [example.get("image")] if example.get("image") is not None else None for example in new_inputs
+                ]
             else:
-                out = reward_func(
-                    prompts=sub_prompts, completions=sub_completions, completion_ids=[cid for cid in completion_ids_list[start:end]], **reward_kwargs
+                new_images = None
+            if new_images is not None and all(imgs in (None, []) for imgs in new_images):
+                new_images = None
+
+            mm_prompts = (
+                [
+                    prepare_multimodal_messages(prompt, image_list)
+                    for prompt, image_list in zip(new_prompts, new_images)
+                ]
+                if new_images is not None
+                else new_prompts
+            )
+
+            # Generate completions for new batch
+            new_prompt_ids_list, new_completion_ids_list, _, _, extra_fields = self._generate(mm_prompts, new_images)
+            new_token_weights_list = extra_fields.pop("token_weights", None) if extra_fields else None
+
+            # Decode completions
+            vocab_size = len(self.processing_class.tokenizer)
+            completion_ids_filtered = [
+                [token_id for token_id in ids if 0 <= token_id < vocab_size] for ids in new_completion_ids_list
+            ]
+            completions_decoded = self.processing_class.batch_decode(
+                completion_ids_filtered,
+                skip_special_tokens=True,
+            )
+
+            new_completions = completions_decoded
+            if new_inputs and is_conversational(new_inputs[0]):
+                new_completions_conv = []
+                for sample, completion_text in zip(new_inputs, completions_decoded):
+                    prompt_messages = sample["prompt"]
+                    bootstrap = prompt_messages[-1]["content"] if prompt_messages and prompt_messages[-1]["role"] == "assistant" else ""
+                    new_completions_conv.append([{"role": "assistant", "content": bootstrap + completion_text}])
+                new_completions = new_completions_conv
+
+            # Calculate rewards for new batch
+            new_rewards_per_func = self._calculate_rewards(
+                new_inputs, new_prompts, new_completions, new_completion_ids_list
+            )
+            new_total_rewards = self.reward_weight_manager.calculate_total_reward(new_rewards_per_func, device)
+            new_filter_scores = self._get_dynamic_sampling_scores(new_rewards_per_func)
+            
+            # Check validity of new groups
+            new_validity_mask = self.compute_group_validity(new_filter_scores, ng) > 0
+            new_num_groups = new_filter_scores.numel() // max(1, ng)
+            new_valid_groups = new_validity_mask.sum().item() // max(1, ng)
+            
+            if self.accelerator.is_main_process:
+                # Debug: full stds and scores for this resample batch
+                if new_filter_scores.numel() > 0 and ng > 0 and new_filter_scores.numel() % ng == 0:
+                    try:
+                        new_g_scores = new_filter_scores.view(-1, ng)
+                        new_g_std = new_g_scores.std(dim=1, unbiased=False)
+                        print(f"[DEBUG] Resample #{resample_count + 1} - Group Stds: {new_g_std.tolist()}")
+                        print(f"[DEBUG] Resample #{resample_count + 1} - Group Scores: {new_g_scores.tolist()}")
+                    except Exception:
+                        pass
+                logger.info(
+                    f"[DynSample] Resample #{resample_count + 1}: "
+                    f"new batch has {new_valid_groups}/{new_num_groups} valid groups"
                 )
-                out = [val if val is not None else torch.nan for val in out]
-                rewards_per_func[:, i] = torch.tensor(out, dtype=torch.float32, device=device)
-        # 权重合成
-        weights = self.reward_weight_manager.get_current_weights().to(device)
-        rewards = (rewards_per_func * weights.unsqueeze(0)).nansum(dim=1)
-        # 组内均值/方差与优势
-        rewards_group = rewards.view(-1, group_ng)
-        mean_group = rewards_group.mean(dim=1).repeat_interleave(group_ng)
-        adv = rewards - mean_group
-        if scale_mode in ["group", "none"]:
-            std = rewards_group.std(dim=1).repeat_interleave(group_ng)
-        elif scale_mode == "batch":
-            std = rewards.std().expand_as(rewards)
+
+            # Collect valid groups from new batch
+            for group_idx in range(new_num_groups):
+                if len(valid_inputs) >= local_target:
+                    break
+                start = group_idx * ng
+                end = start + ng
+                if new_validity_mask[start].item():
+                    valid_inputs.extend(new_inputs[start:end])
+                    valid_prompts.extend(new_prompts[start:end])
+                    valid_completions.extend(new_completions[start:end])
+                    valid_prompt_ids.extend(new_prompt_ids_list[start:end])
+                    valid_completion_ids.extend(new_completion_ids_list[start:end])
+                    valid_rewards.append(new_rewards_per_func[start:end])
+                    valid_totals.append(new_total_rewards[start:end])
+                    valid_filter_scores.append(new_filter_scores[start:end])
+                    if new_images is not None and valid_images is not None:
+                        valid_images.extend(new_images[start:end])
+                    if new_token_weights_list is not None and valid_token_weights is not None:
+                        valid_token_weights.extend(new_token_weights_list[start:end])
+
+            # Clean up intermediate tensors to prevent memory buildup
+            del new_rewards_per_func, new_total_rewards, new_filter_scores
+            del new_validity_mask
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            
+            # Log memory usage after cleanup
+            if self.accelerator.is_main_process and resample_count % 2 == 0:
+                log_memory_usage(self.accelerator, f"[DynSample Resample #{resample_count + 1}] ")
+            
+            resample_count += 1
+
+        # Finalize: decide whether to use collected samples or fall back
+        if len(valid_inputs) == 0:
+            # No valid samples collected at all – fall back to original batch
+            if self.accelerator.is_main_process:
+                logger.warning(
+                    f"[DynSample] ⚠️ No valid groups found after {resample_count} attempts. "
+                    "Falling back to original batch."
+                )
+            (
+                inputs,
+                prompts,
+                completions,
+                prompt_ids_list,
+                completion_ids_list,
+                rewards_per_func,
+                total_rewards,
+                filter_scores,
+                images,
+                token_weights_list,
+            ) = origin_data
         else:
-            std = torch.zeros_like(rewards)
-        if scale_mode != "none":
-            adv = adv / (std + 1e-4)
-        return adv.detach()
+            # Use collected valid samples (up to local_target)
+            keep_count = min(local_target, len(valid_inputs))
+            inputs = valid_inputs[:keep_count]
+            prompts = valid_prompts[:keep_count]
+            completions = valid_completions[:keep_count]
+            prompt_ids_list = valid_prompt_ids[:keep_count]
+            completion_ids_list = valid_completion_ids[:keep_count]
+            
+            # Concatenate reward tensors
+            if valid_rewards:
+                rewards_per_func = torch.cat(valid_rewards, dim=0)[:keep_count]
+                total_rewards = torch.cat(valid_totals, dim=0)[:keep_count]
+                filter_scores = torch.cat(valid_filter_scores, dim=0)[:keep_count]
+            else:
+                # Fallback if no rewards collected (shouldn't happen)
+                rewards_per_func = origin_data[5][:keep_count]
+                total_rewards = origin_data[6][:keep_count]
+                filter_scores = origin_data[7][:keep_count]
+            
+            images = valid_images[:keep_count] if valid_images is not None else None
+            token_weights_list = (
+                valid_token_weights[:keep_count] if valid_token_weights is not None else None
+            )
+
+            if self.accelerator.is_main_process:
+                final_valid_groups = keep_count // ng
+                logger.info(
+                    f"[DynSample] ✅ Using {keep_count} valid samples ({final_valid_groups} groups) "
+                    f"from {resample_count} resample(s)"
+                )
+
+        # Clean up to prevent memory leaks
+        del valid_inputs, valid_prompts, valid_completions
+        del valid_prompt_ids, valid_completion_ids
+        del valid_rewards, valid_totals, valid_filter_scores
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        
+        # Final memory check
+        if self.accelerator.is_main_process:
+            log_memory_usage(self.accelerator, "[DynSample End] ")
+
+        return (
+            inputs,
+            prompts,
+            completions,
+            prompt_ids_list,
+            completion_ids_list,
+            rewards_per_func,
+            total_rewards,
+            filter_scores,
+            images,
+            token_weights_list,
+        )
+
+    # _recompute_group_advantages removed - no longer needed with dynamic sampling
 
     def _generate_single_turn(self, prompts: list, images: Optional[list] = None):
         device = self.accelerator.device
         # Use eval-specific generations when not training
         ng = self.num_generations if self.model.training else self.eval_num_generations
 
-        # Generate completions using either vLLM or regular generation
-        if self.use_vllm:
-            if self.vllm_mode == "colocate" and self.args.vllm_enable_sleep_mode:
-                # wake up colocated vLLM instances if needed
-                torch.cuda.empty_cache()  # required to avoid OOM in some cases
-                self.llm.wake_up(tags=["weights"])
-
-            # First, update the vLLM weights if needed
-            if self.state.global_step != self._last_loaded_step:
-                self._move_model_to_vllm()
-                self._last_loaded_step = self.state.global_step
-
-            if is_conversational({"prompt": prompts[0]}):
-                prompts = [prepare_multimodal_messages_vllm(prompt) for prompt in prompts]
-
-            # Generate completions using vLLM: gather all prompts and use them in a single call in the main process
-            if self.vllm_mode == "server":
-                # Ensure grouping alignment when requesting n>1 generations per unique prompt
-                if ng > 1 and len(prompts) % ng != 0:
-                    prompts = prompts[: len(prompts) - (len(prompts) % ng)]
-                all_prompts = gather_object(prompts)
-
-                if self.accelerator.is_main_process:
-                    # Since 'prompts' contains 'num_generations' duplicates, we first take unique prompts, and generate
-                    # num_generations outputs for each one. This is faster than generating outputs for each duplicate
-                    # prompt individually.
-                    # Drop any trailing incomplete group to keep alignment across processes
-                    total = len(all_prompts)
-                    num_unique = total // ng if ng > 0 else total
-                    ordered_set_of_prompts = [all_prompts[i * ng] for i in range(num_unique)]
-
-                    sampling_params = {
-                        "n": ng,
-                        "repetition_penalty": self.repetition_penalty,
-                        "temperature": self.temperature,
-                        "top_p": self.top_p,
-                        "top_k": -1 if self.top_k is None else self.top_k,
-                        "min_p": 0.0 if self.min_p is None else self.min_p,
-                        "max_tokens": self.max_completion_length,
-                        "truncate_prompt_tokens": self.max_prompt_length,
-                        "guided_decoding_regex": self.guided_decoding_regex,
-                        "generation_kwargs": self.args.generation_kwargs,
-                    }
-                    with profiling_context(self, "vLLM.generate"):
-                        if self.rollout_func is not None:
-                            if is_conversational({"prompt": ordered_set_of_prompts[0]}):
-                                ordered_set_of_prompts = [
-                                    apply_chat_template({"prompt": p}, self.processing_class)["prompt"]
-                                    for p in ordered_set_of_prompts
-                                ]
-                            output = self.rollout_func(
-                                ordered_set_of_prompts,
-                                self.args,
-                                self.processing_class,
-                            )
-                        else:
-                            if is_conversational({"prompt": ordered_set_of_prompts[0]}):
-                                # FIXME: this endpoint doesn't exist in vllm_client
-                                output = self.vllm_client.chat(prompts=ordered_set_of_prompts, **sampling_params)
-                            else:
-                                output = self.vllm_client.generate(prompts=ordered_set_of_prompts, **sampling_params)
-                        # Extract required fields and collect any extra fields for reward functions
-                        required_keys = {"prompt_ids", "completion_ids", "logprobs"}
-                        extra_fields = {k: v for k, v in output.items() if k not in required_keys}
-                        payload = (output["prompt_ids"], output["completion_ids"], output["logprobs"], extra_fields)
-                else:
-                    payload = None
-
-                # Broadcast the completions from the main process to all processes, ensuring each process receives its corresponding slice.
-                obj_list = [payload]
-                broadcast_object_list(obj_list, from_process=0)
-                all_prompt_ids, all_completion_ids, all_logprobs, all_extra_fields = obj_list[0]
-
-                # At this point, we only get 1 copy of each prompt, so we need to repeat them ng times
-                all_prompt_ids = [ids for ids in all_prompt_ids for _ in range(ng)]
-
-                process_slice = slice(
-                    self.accelerator.process_index * len(prompts),
-                    (self.accelerator.process_index + 1) * len(prompts),
-                )
-                prompt_ids = all_prompt_ids[process_slice]
-                completion_ids = all_completion_ids[process_slice]
-                logprobs = all_logprobs[process_slice]
-
-                # Slice extra fields dict-of-lists per process (extra fields are per-completion, like completion_ids)
-                extra_fields = {}
-                for key, values in all_extra_fields.items():
-                    if isinstance(values, list):
-                        extra_fields[key] = values[process_slice]
-                    else:
-                        extra_fields[key] = values
-                attention_context = None  # vLLM server doesn't support attention output
-
-            # Generate completions using colocated vLLM instances: each device holds vLLM copy and work on their own batch of prompts
-            elif self.vllm_mode == "colocate":
-                if self.guided_decoding_regex:
-                    guided_decoding = GuidedDecodingParams(regex=self.guided_decoding_regex)
-                else:
-                    guided_decoding = None
-
-                generation_kwargs = {
-                    "n": 1,  # vLLM on each GPU generates only 1 in colocate mode
-                    "repetition_penalty": self.repetition_penalty,
-                    "temperature": self.temperature,
-                    "top_p": self.top_p,
-                    "top_k": -1 if self.top_k is None else self.top_k,
-                    "min_p": 0.0 if self.min_p is None else self.min_p,
-                    "max_tokens": self.max_completion_length,
-                    "truncate_prompt_tokens": self.max_prompt_length,
-                    "guided_decoding": guided_decoding,
-                    "logprobs": 0,  # only return the logprob of the generated token
-                }
-                if self.args.generation_kwargs is not None:
-                    generation_kwargs.update(self.args.generation_kwargs)
-                sampling_params = SamplingParams(**generation_kwargs)
-
-                if self.vllm_tensor_parallel_size > 1:
-                    # Gather prompts from all ranks in the TP group and flatten.
-                    # Each rank starts with its own prompts; after gathering, all ranks see the full group set.
-                    orig_size = len(prompts)
-                    gathered_prompts = [None for _ in range(self.vllm_tensor_parallel_size)]
-                    torch.distributed.all_gather_object(gathered_prompts, prompts, group=self.tp_group)
-                    all_prompts = [p for sublist in gathered_prompts for p in sublist]
-                else:
-                    all_prompts = prompts
-
-                if self.args.vllm_enable_sleep_mode:
-                    self.llm.wake_up(tags=["kv_cache"])
-
-                with profiling_context(self, "vLLM.generate"):
-                    if is_conversational({"prompt": prompts[0]}):
-                        all_outputs = self.llm.chat(all_prompts, sampling_params=sampling_params, use_tqdm=False)
-                    else:
-                        all_outputs = self.llm.generate(all_prompts, sampling_params=sampling_params, use_tqdm=False)
-
-                all_prompt_ids = [output.prompt_token_ids for output in all_outputs]
-                all_completion_ids = [output.token_ids for outputs in all_outputs for output in outputs.outputs]
-                all_logprobs = [
-                    [next(iter(lp.values())).logprob for lp in output.logprobs]
-                    for outputs in all_outputs
-                    for output in outputs.outputs
-                ]
-
-                if self.vllm_tensor_parallel_size > 1:
-                    # Slice completions for this rank within its TP group.
-                    # Each rank generates all outputs — we keep only our share.
-                    local_rank_in_group = torch.distributed.get_rank(group=self.tp_group)
-                    tp_slice = slice(local_rank_in_group * orig_size, (local_rank_in_group + 1) * orig_size)
-                    prompt_ids = all_prompt_ids[tp_slice]
-                    completion_ids = all_completion_ids[tp_slice]
-                    logprobs = all_logprobs[tp_slice]
-                else:
-                    prompt_ids = all_prompt_ids
-                    completion_ids = all_completion_ids
-                    logprobs = all_logprobs
-
-                extra_fields = {}  # No extra fields for colocate mode
-                attention_context = None  # vLLM doesn't support attention output
-
-                if self.args.vllm_enable_sleep_mode:
-                    self.llm.sleep(level=2)
-
-        elif self.use_transformers_paged:
+        # Generate completions using either paged transformers kernels or the regular path
+        if self.use_transformers_paged:
             processor_kwargs = {"max_length": self.max_prompt_length, "truncation": True, "add_special_tokens": False}
             if is_conversational({"prompt": prompts[0]}):
                 generate_inputs = self.processing_class.apply_chat_template(
@@ -1580,37 +1558,13 @@ class DAPOTrainer(BaseTrainer):
                         with self._attn_last_k_layers_only(
                             unwrapped_model, last_k_layers=getattr(self.args, "attention_last_k_layers", 6)
                         ):
-                            # 🔍 DEBUG: Print model weight norms before generation
-                            if self.state.global_step % 4 == 0:  # Log every 4 steps
-                                total_norm = 0.0
-                                max_norm = 0.0
-                                for name, param in unwrapped_model.named_parameters():
-                                    if param.requires_grad and param.grad is not None:
-                                        param_norm = param.data.norm(2).item()
-                                        total_norm += param_norm ** 2
-                                        max_norm = max(max_norm, param_norm)
-                                total_norm = total_norm ** 0.5
-                                print(f"🔍 [Step {self.state.global_step}] Weight Norms - Total: {total_norm:.4f}, Max: {max_norm:.4f}")
-                                print(f"🔍 [Step {self.state.global_step}] Generation Config - Temperature: {self.temperature}, Top_p: {self.top_p}, Top_k: {self.top_k}")
-                            
-                            try:
-                                attention_outputs = unwrapped_model.generate(
-                                    **generate_inputs,
-                                    generation_config=self.generation_config,
-                                    disable_compile=True,
-                                    return_dict_in_generate=True,
-                                    output_attentions=True,
-                                )
-                                if self.state.global_step % 4 == 0:
-                                    print(f"✅ [Step {self.state.global_step}] Generation completed successfully")
-                            except RuntimeError as e:
-                                print(f"❌ [Step {self.state.global_step}] Generation failed with RuntimeError: {str(e)}")
-                                # Print more diagnostic info
-                                print(f"🔍 Input shape: {generate_inputs['input_ids'].shape}")
-                                print(f"🔍 Input dtype: {generate_inputs['input_ids'].dtype}")
-                                if 'pixel_values' in generate_inputs:
-                                    print(f"🔍 Pixel values shape: {generate_inputs['pixel_values'].shape}")
-                                raise
+                            attention_outputs = unwrapped_model.generate(
+                                **generate_inputs,
+                                generation_config=self.generation_config,
+                                disable_compile=True,
+                                return_dict_in_generate=True,
+                                output_attentions=True,
+                            )
                     finally:
                         # Restore original values
                         if cfg:
@@ -1633,17 +1587,9 @@ class DAPOTrainer(BaseTrainer):
                     prompt_completion_ids = attention_outputs.sequences
                     attention_context = {"outputs": attention_outputs, "inputs": generate_inputs}
                 else:
-                    if self.state.global_step % 4 == 0:
-                        print(f"🔍 [Step {self.state.global_step}] Running generation without attention tracking")
-                    try:
-                        prompt_completion_ids = unwrapped_model.generate(
-                            **generate_inputs, generation_config=self.generation_config, disable_compile=True
-                        )
-                        if self.state.global_step % 4 == 0:
-                            print(f"✅ [Step {self.state.global_step}] Standard generation completed successfully")
-                    except RuntimeError as e:
-                        print(f"❌ [Step {self.state.global_step}] Standard generation failed: {str(e)}")
-                        raise
+                    prompt_completion_ids = unwrapped_model.generate(
+                        **generate_inputs, generation_config=self.generation_config, disable_compile=True
+                    )
             # Compute prompt length and extract completion ids
             prompt_ids, prompt_mask = generate_inputs["input_ids"], generate_inputs["attention_mask"]
             prompt_length = prompt_ids.size(1)
@@ -1700,9 +1646,11 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode]["completions/min_terminated_length"].append(term_completion_lengths.float().min().item())
         self._metrics[mode]["completions/max_terminated_length"].append(term_completion_lengths.float().max().item())
 
-        # Process attention metrics if available
-        if attention_context is not None:
-            self._process_attention_metrics(attention_context, mode)
+        # Process attention metrics if available and put token_weights into extra_fields
+        tw_list = self._process_attention_metrics(attention_context, mode)
+        if tw_list is not None:
+            extra_fields = extra_fields or {}
+            extra_fields["token_weights"] = tw_list
 
         return prompt_ids, completion_ids, total_completion_tokens, logprobs, extra_fields
 
@@ -1714,13 +1662,11 @@ class DAPOTrainer(BaseTrainer):
         # Preferred generations per prompt for current mode
         preferred_num_generations = self.num_generations if mode == "train" else self.eval_num_generations
         
-        # 更新分段权重（仅在训练模式下）
         if mode == "train":
             weight_metrics = self.reward_weight_manager.update_weights(
                 self.state.global_step, 
                 self.args.max_steps if self.args.max_steps > 0 else self.state.max_steps
             )
-            # 将权重指标添加到metrics中
             for key, value in weight_metrics.items():
                 self._metrics[mode][key].append(value)
 
@@ -1737,15 +1683,32 @@ class DAPOTrainer(BaseTrainer):
         if images is not None and all(img_list == [] for img_list in images):
             images = None
 
-        # If the prompts are conversational and the inputs contain images, we need to convert the prompts from
-        # [{"role": "user", "content": "What color is the sky?"}] to
-        # [{"role": "user", "content": [{"type": "image", "image": <Image>}, {"type": "text", "text": "What color is the sky?"}]}]
         if images is not None:
-            prompts = [prepare_multimodal_messages(prompt, image_list) for prompt, image_list in zip(prompts, images)]
+            mm_prompts = [prepare_multimodal_messages(prompt, image_list) for prompt, image_list in zip(prompts, images)]
+        else:
+            mm_prompts = prompts
         
+        if self.accelerator.is_main_process:
+            logger.info(
+                "[Debug][Generate] step=%s batch=%s images=%s dyn_sample=%s -> start _generate",
+                getattr(self.state, "global_step", None),
+                len(mm_prompts),
+                images is not None,
+                self.dynamic_sample,
+            )
         prompt_ids_list, completion_ids_list, num_items_in_batch, sampling_per_token_logps_list, extra_fields = (
-            self._generate(prompts, images)
+            self._generate(mm_prompts, images)
         )
+        if self.accelerator.is_main_process:
+            logger.info(
+                "[Debug][Generate] step=%s finished _generate prompt_lens_sample=%s completion_lens_sample=%s",
+                getattr(self.state, "global_step", None),
+                [len(ids) for ids in prompt_ids_list[:4]],
+                [len(ids) for ids in completion_ids_list[:4]],
+            )
+        
+        # Extract token_weights from extra_fields to keep it with samples
+        token_weights_list = extra_fields.pop("token_weights", None) if extra_fields else None
 
         # Convert lists of token IDs to padded tensors
         prompt_ids = [torch.tensor(ids, device=device) for ids in prompt_ids_list]
@@ -1775,38 +1738,14 @@ class DAPOTrainer(BaseTrainer):
         logits_to_keep = completion_ids.size(1)  # we only need to compute the logits for the completion tokens
         batch_size = self.args.per_device_train_batch_size if mode == "train" else self.args.per_device_eval_batch_size
 
-        num_images = [len(img_list) for img_list in images] if images is not None else None
-
-        # Get forward_kwargs for models with multimodal inputs
-        if images is not None:
-            prompts_text = [
-                apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"] for prompt in prompts
-            ]
-            prompt_inputs = self.processing_class(images=images, text=prompts_text, padding=True, return_tensors="pt")
-            prompt_inputs = super()._prepare_inputs(prompt_inputs)
-            forward_kwargs = {k: v for k, v in prompt_inputs.items() if k not in ["input_ids", "attention_mask"]}
-        else:
-            forward_kwargs = {}
-
-        # If token_type_ids are used, extend them with zeros for the completion part
-        if "token_type_ids" in forward_kwargs:
-            token_type_ids = forward_kwargs["token_type_ids"]
-            forward_kwargs["token_type_ids"] = torch.cat(
-                [token_type_ids, token_type_ids.new_zeros(completion_ids.shape)], dim=1
-            )
-
         with torch.no_grad():
             # If the generation and optimization steps are misaligned—i.e., if generation does not occur at the end of
             # a full optimizer step (when gradient_accumulation_steps is not a multiple of generate_every)—then the
             # samples may come from an earlier version of the model. In that case, we need to track old_per_token_logps
             # for importance sampling. If the steps are aligned, importance sampling isn't necessary and we set
             # old_per_token_logps to None.
-            # When using vLLM, we always compute old_per_token_logps for importance sampling, it was shown that the
-            # distribution mismatch between vLLM and the training model can be large and harm the training.
             generate_every = self.args.steps_per_generation * self.num_iterations  # generation frequency
-            if self.args.gradient_accumulation_steps % generate_every != 0 or (
-                self.use_vllm and self.vllm_importance_sampling_correction
-            ):
+            if self.args.gradient_accumulation_steps % generate_every != 0:
                 old_per_token_logps, _ = self._get_per_token_logps_and_entropies(
                     self.model,
                     prompt_completion_ids,
@@ -1818,13 +1757,6 @@ class DAPOTrainer(BaseTrainer):
                 )
             else:
                 old_per_token_logps = None
-
-            # Compute the importance sampling ratio when using vLLM, to correct for potential distribution mismatch
-            if self.use_vllm and self.vllm_importance_sampling_correction:
-                importance_sampling_ratio = torch.exp(old_per_token_logps - sampling_per_token_logps)
-                importance_sampling_ratio = torch.clamp(
-                    importance_sampling_ratio, max=self.vllm_importance_sampling_cap
-                )
 
             # Compute the per-token log probabilities for the reference model
             if self.beta != 0.0:
@@ -1851,30 +1783,6 @@ class DAPOTrainer(BaseTrainer):
                         )
             else:
                 ref_per_token_logps = None
-
-        # Optionally compute sequence-level KL for filtering (seq_final_reward)
-        seq_kl = None
-        want_final = getattr(self.args, "filter_metric", "seq_reward") == "seq_final_reward"
-        if want_final and self.beta != 0.0 and ref_per_token_logps is not None:
-            # Use current model per-token logps; if we already computed old_per_token_logps, reuse it when aligned
-            try:
-                model_logps_for_filter = old_per_token_logps
-                if model_logps_for_filter is None:
-                    model_logps_for_filter, _ = self._get_per_token_logps_and_entropies(
-                        self.model,
-                        prompt_completion_ids,
-                        attention_mask,
-                        logits_to_keep,
-                        batch_size=batch_size,
-                        num_images=num_images,
-                        **forward_kwargs,
-                    )
-                per_token_kl = torch.exp(ref_per_token_logps - model_logps_for_filter) - (
-                    ref_per_token_logps - model_logps_for_filter
-                ) - 1.0
-                seq_kl = (per_token_kl * completion_mask).sum(dim=1)
-            except Exception:
-                seq_kl = None
 
         # Decode
         prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=False)
@@ -1915,10 +1823,119 @@ class DAPOTrainer(BaseTrainer):
                     elif not isinstance(values, list):
                         inp[key] = values
 
-        # Calculate rewards for each reward function. rewards_per_func aggregates rewards across all processes. This is
-        # important because rewards will be normalized per group, and completions are distributed. We will later slice
-        # rewards_per_func to extract each process's subset.
+        # Prepare multimodal tensors aligned with the current prompts/images
+        num_images = [len(img_list) for img_list in images] if images is not None else None
+        forward_kwargs = {}
+        if images is not None:
+            prompts_text_for_processing = [
+                apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"] for prompt in prompts
+            ]
+            prompt_inputs = self.processing_class(
+                images=images, text=prompts_text_for_processing, padding=True, return_tensors="pt"
+            )
+            prompt_inputs = super()._prepare_inputs(prompt_inputs)
+            forward_kwargs = {k: v for k, v in prompt_inputs.items() if k not in ["input_ids", "attention_mask"]}
+
+        # Calculate rewards for each reward function. rewards_per_func is kept local to each rank;
+        # aggregation across processes (if needed) is handled separately by accelerator utilities.
         rewards_per_func = self._calculate_rewards(inputs, prompts, completions, completion_ids_list)
+        total_rewards_local = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
+        filter_scores = self._get_dynamic_sampling_scores(rewards_per_func)
+        # Dynamic sampling: filter out flat (accuracy + format + tag) groups and resample (only in training mode).
+        if self.dynamic_sample and mode == "train":
+            if self.accelerator.is_main_process:
+                logger.info(
+                    "[DynSample] step=%s enter: batch=%s rewards_shape=%s",
+                    getattr(self.state, "global_step", None),
+                    len(inputs),
+                    tuple(rewards_per_func.shape),
+                )
+                log_memory_usage(self.accelerator, "[Before DynSample] ")
+            
+            (
+                inputs,
+                prompts,
+                completions,
+                prompt_ids_list,
+                completion_ids_list,
+                rewards_per_func,
+                total_rewards_local,
+                filter_scores,
+                images,
+                token_weights_list,
+            ) = self._dynamic_sampling(
+                inputs,
+                prompts,
+                completions,
+                prompt_ids_list,
+                completion_ids_list,
+                rewards_per_func,
+                total_rewards_local,
+                filter_scores,
+                images,
+                token_weights_list,
+            )
+            if self.accelerator.is_main_process:
+                logger.info(
+                    "[DynSample] step=%s exit: batch=%s",
+                    getattr(self.state, "global_step", None),
+                    len(inputs),
+                )
+                log_memory_usage(self.accelerator, "[After DynSample] ")
+            
+            # After dynamic sampling, rebuild tensors/pixel inputs based on the new token ids
+            completion_ids_tensors = [torch.tensor(ids, device=device) for ids in completion_ids_list]
+            completion_mask = [torch.ones_like(ids, dtype=torch.long) for ids in completion_ids_tensors]
+            completion_ids = pad(completion_ids_tensors, padding_value=self.pad_token_id, padding_side="right")
+            completion_mask = pad(completion_mask, padding_value=0, padding_side="right")
+
+            prompt_id_tensors = [torch.tensor(ids, device=device) for ids in prompt_ids_list]
+            prompt_mask = [torch.ones_like(ids, dtype=torch.long) for ids in prompt_id_tensors]
+            prompt_ids = pad(prompt_id_tensors, padding_value=self.pad_token_id, padding_side="left")
+            prompt_mask = pad(prompt_mask, padding_value=0, padding_side="left")
+
+            prompt_completion_ids = torch.cat([prompt_ids, completion_ids], dim=1)
+            attention_mask = torch.cat([prompt_mask, completion_mask], dim=1)
+            logits_to_keep = completion_ids.size(1)
+
+            # Update decoded text for logging based on final tokens
+            prompts_text = self.processing_class.batch_decode(prompt_ids, skip_special_tokens=False)
+            vocab_size = len(self.processing_class.tokenizer)
+            completion_ids_filtered = []
+            for ids in completion_ids:
+                ids_list = ids.cpu().tolist()
+                valid_ids = [idx for idx in ids_list if 0 <= idx < vocab_size]
+                completion_ids_filtered.append(valid_ids)
+            completions_text = self.processing_class.batch_decode(
+                completion_ids_filtered,
+                skip_special_tokens=True,
+            )
+            if is_conversational(inputs[0]):
+                completions = []
+                for prompt, completion in zip(prompts, completions_text):
+                    bootstrap = prompt.pop()["content"] if prompt[-1]["role"] == "assistant" else ""
+                    completions.append([{"role": "assistant", "content": bootstrap + completion}])
+            else:
+                completions = completions_text
+
+            num_images = [len(img_list) for img_list in images] if images is not None else None
+            forward_kwargs = {}
+            if images is not None:
+                prompts_text_for_processing = [
+                    apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"] for prompt in prompts
+                ]
+                prompt_inputs = self.processing_class(
+                    images=images, text=prompts_text_for_processing, padding=True, return_tensors="pt"
+                )
+                prompt_inputs = super()._prepare_inputs(prompt_inputs)
+                forward_kwargs = {k: v for k, v in prompt_inputs.items() if k not in ["input_ids", "attention_mask"]}
+
+        # If token_type_ids are used, extend them with zeros for the completion part
+        if "token_type_ids" in forward_kwargs:
+            token_type_ids = forward_kwargs["token_type_ids"]
+            forward_kwargs["token_type_ids"] = torch.cat(
+                [token_type_ids, token_type_ids.new_zeros(completion_ids.shape)], dim=1
+            )
 
         # Apply weights to each reward function's output and sum using reward weight manager
         rewards = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
@@ -1938,7 +1955,7 @@ class DAPOTrainer(BaseTrainer):
 
         if self.scale_rewards in ["group", "none"]:
             # If self.scale_rewards = "none", we'll still log group level std
-            std_rewards = rewards.view(-1, group_ng).std(dim=1)
+            std_rewards = rewards.view(-1, group_ng).std(dim=1, unbiased=False)
             std_rewards = std_rewards.repeat_interleave(group_ng, dim=0)
         elif self.scale_rewards == "batch":
             # Compute global std
@@ -1952,13 +1969,9 @@ class DAPOTrainer(BaseTrainer):
         if self.scale_rewards != "none":
             advantages = advantages / (std_rewards + 1e-4)
 
-        # Slice to keep only the local part of the data
-        process_slice = slice(
-            self.accelerator.process_index * len(prompts),
-            (self.accelerator.process_index + 1) * len(prompts),
-        )
-        all_process_advantages = advantages.clone()  # keep the aggregated advantages for logging
-        advantages = advantages[process_slice]
+        # Keep advantages local to this rank. We no longer slice a globally-gathered
+        # tensor here, since dynamic sampling and reward computation are done per-rank.
+        all_process_advantages = advantages.clone()
 
         # Calculate reward metrics using utility function
         reward_metrics = calculate_reward_metrics(rewards_per_func, self.reward_func_names, device)
@@ -1968,7 +1981,6 @@ class DAPOTrainer(BaseTrainer):
         self._metrics[mode]["reward_std"].append(std_rewards.mean().item())
         self._metrics[mode]["frac_reward_zero_std"].append(is_std_zero.float().mean().item())
 
-        # 追加统一的 VGR 奖励别名（用于 W&B 指标统一显示）
         try:
             vgr_mean_alias = None
             vgr_std_alias = None
@@ -2002,9 +2014,10 @@ class DAPOTrainer(BaseTrainer):
             rendered_prompts = prompts_text
 
         # Log prompt and completion texts (ChatML prompt, plain completion)
-        self._logs["prompt"].extend(gather_object(prompts_text))
-        self._logs["completion"].extend(gather_object(completions_text))
-        self._logs["prompt_chatml"].extend(gather_object(rendered_prompts))
+        # Use safe_gather_object to prevent OOM from large text collections
+        self._logs["prompt"].extend(safe_gather_object(prompts_text, max_str_len=2000))
+        self._logs["completion"].extend(safe_gather_object(completions_text, max_str_len=2000))
+        self._logs["prompt_chatml"].extend(safe_gather_object(rendered_prompts, max_str_len=2000))
         for i, name in enumerate(self.reward_func_names):
             self._logs["rewards"][name].extend(rewards_per_func[:, i].tolist())
         self._logs["rewards"]["total"].extend(rewards.tolist())
@@ -2015,58 +2028,23 @@ class DAPOTrainer(BaseTrainer):
         self._logs["mean_reward"].extend(mean_grouped_rewards.tolist())
 
         if images is not None:
-            self._logs["images"].extend(gather_object(images))
+            # Don't gather images as they can be very large; keep local only
+            self._logs["images"].extend(images)
 
-        if self.use_vllm and self.vllm_importance_sampling_correction:
-            delta = torch.abs(old_per_token_logps - sampling_per_token_logps)
-            delta = delta[completion_mask.bool()]
-            mean_delta = torch.mean(delta) if delta.numel() > 0 else torch.tensor(0.0, device=device)
-            max_delta = torch.max(delta) if delta.numel() > 0 else torch.tensor(0.0, device=device)
-            self._metrics[mode]["sampling/sampling_logp_difference/mean"].append(
-                self.accelerator.gather(mean_delta).mean().item()
-            )
-            self._metrics[mode]["sampling/sampling_logp_difference/max"].append(
-                self.accelerator.gather(max_delta).max().item()
-            )
-
-            flat_is_ratio = importance_sampling_ratio[completion_mask.bool()]
-            min_importance_sampling_ratio = (
-                torch.min(flat_is_ratio) if flat_is_ratio.numel() > 0 else torch.tensor(0.0, device=device)
-            )
-            mean_importance_sampling_ratio = (
-                torch.mean(flat_is_ratio) if flat_is_ratio.numel() > 0 else torch.tensor(0.0, device=device)
-            )
-            max_importance_sampling_ratio = (
-                torch.max(flat_is_ratio) if flat_is_ratio.numel() > 0 else torch.tensor(0.0, device=device)
-            )
-            self._metrics[mode]["sampling/importance_sampling_ratio/min"].append(
-                nanmin(self.accelerator.gather(min_importance_sampling_ratio)).item()
-            )
-            self._metrics[mode]["sampling/importance_sampling_ratio/mean"].append(
-                self.accelerator.gather(mean_importance_sampling_ratio).nanmean().item()
-            )
-            self._metrics[mode]["sampling/importance_sampling_ratio/max"].append(
-                nanmax(self.accelerator.gather(max_importance_sampling_ratio)).item()
-            )
-
-        # Optional: fetch token_weights for this batch and shape to (B, T)
+        # Optional: construct token_weights_tensor from token_weights_list that flows with samples
         token_weights_tensor = None
         try:
-            if getattr(self.args, "token_weights", False) and self.compute_attention_metrics and "token_weights" in self._logs:
-                tw_all = list(self._logs["token_weights"]) if isinstance(self._logs.get("token_weights"), deque) else []
-                if tw_all:
-                    last_tw = tw_all[-len(prompts):] if len(tw_all) >= len(prompts) else []
-                    if last_tw and len(last_tw) == len(prompts):
-                        T = completion_ids.size(1)
-                        tw_tensors = []
-                        for w in last_tw:
-                            w = w or []
-                            t = torch.ones(T, dtype=torch.float32, device=device)
-                            n = min(len(w), T)
-                            if n > 0:
-                                t[:n] = torch.tensor(w[:n], dtype=torch.float32, device=device)
-                            tw_tensors.append(t)
-                        token_weights_tensor = torch.stack(tw_tensors, dim=0)
+            if getattr(self.args, "token_weights", False) and token_weights_list is not None:
+                T = completion_ids.size(1)
+                tw_tensors = []
+                for w in token_weights_list:
+                    w = w or []
+                    t = torch.ones(T, dtype=torch.float32, device=device)
+                    n = min(len(w), T)
+                    if n > 0:
+                        t[:n] = torch.tensor(w[:n], dtype=torch.float32, device=device)
+                    tw_tensors.append(t)
+                token_weights_tensor = torch.stack(tw_tensors, dim=0)
         except Exception:
             token_weights_tensor = None
 
@@ -2077,50 +2055,24 @@ class DAPOTrainer(BaseTrainer):
             "completion_mask": completion_mask,
             "advantages": advantages,
             "num_items_in_batch": num_items_in_batch,
+            # Save original data for re-encoding in compute_loss
+            "original_prompts": [deepcopy(p) for p in prompts],
         }
-        # Expose per-sequence reward for local process to enable filtering
-        output["seq_reward"] = rewards[process_slice]
-        if seq_kl is not None:
-            output["seq_kl"] = seq_kl[process_slice]
+        if images is not None:
+            output["original_images"] = deepcopy(images)
         if old_per_token_logps is not None:
             output["old_per_token_logps"] = old_per_token_logps
-        if self.use_vllm and self.vllm_importance_sampling_correction:
-            output["importance_sampling_ratio"] = importance_sampling_ratio
         if ref_per_token_logps is not None:
             output["ref_per_token_logps"] = ref_per_token_logps
-        if "pixel_values" in forward_kwargs:
-            output["pixel_values"] = forward_kwargs["pixel_values"]
-        if "image_grid_thw" in forward_kwargs:
-            output["image_grid_thw"] = forward_kwargs["image_grid_thw"]
-        if "pixel_attention_mask" in forward_kwargs:
-            output["pixel_attention_mask"] = forward_kwargs["pixel_attention_mask"]
-        if "image_sizes" in forward_kwargs:
-            output["image_sizes"] = forward_kwargs["image_sizes"]
-        if "token_type_ids" in forward_kwargs:
-            output["token_type_ids"] = forward_kwargs["token_type_ids"]
-        if images is not None:
-            output["num_images"] = num_images
+        # Note: pixel_values, image_grid_thw, num_images, etc. will be regenerated in compute_loss
+        # based on original_prompts and original_images, so we don't copy them here
         if token_weights_tensor is not None:
             output["token_weights"] = token_weights_tensor
 
-        # Compute per-sequence filtered flags for logging only (VERL-style filtering marker)
-        filtered_flags = None
-        try:
-            # Use rewards as the metric for logging; groups with zero std are marked as filtered
-            group_ng_log = group_ng if group_ng and rewards.numel() % group_ng == 0 else 1
-            if group_ng_log > 1:
-                group_std_log = rewards.view(-1, group_ng_log).std(dim=1)
-                groups_filtered = (group_std_log == 0)
-                flags = torch.zeros_like(rewards, dtype=torch.bool)
-                for gidx, flg in enumerate(groups_filtered.tolist()):
-                    if flg:
-                        s = gidx * group_ng_log
-                        flags[s : s + group_ng_log] = True
-                filtered_flags = flags
-        except Exception:
-            filtered_flags = None
-
         # Emit rollout logs if enabled (moved to logging utils)
+        # Note: removed filtered_flags logic - dynamic sampling handles this internally
+        # For per-rank logging we use the full local batch slice.
+        process_slice = slice(0, rewards_per_func.size(0))
         perform_realtime_rollout_logging(
             is_main_process=self.accelerator.is_main_process,
             mode=mode,
@@ -2135,15 +2087,14 @@ class DAPOTrainer(BaseTrainer):
             inputs=inputs,
             prompts_text=prompts_text,
             completions_text=completions_text,
-            rewards_per_func_local=rewards_per_func[process_slice],
-            total_rewards_local=rewards[process_slice],
+            rewards_per_func_local=rewards_per_func,
+            total_rewards_local=rewards,
             reward_names=self.reward_func_names,
             advantages_tensor=advantages,
             token_weights_tensor=token_weights_tensor,
             completion_ids=completion_ids,
             completion_mask=completion_mask,
             process_slice=process_slice,
-            replay_mask=(filtered_flags if filtered_flags is None else filtered_flags),
         )
 
         return output
@@ -2202,6 +2153,34 @@ class DAPOTrainer(BaseTrainer):
             return self._compute_loss(model, inputs)
 
     def _compute_loss(self, model, inputs):
+        # If multimodal data exists, re-encode to ensure consistency
+        if "original_images" in inputs and inputs["original_images"] is not None:
+            original_prompts = inputs["original_prompts"]
+            original_images = inputs["original_images"]
+            
+            # Re-encode prompts and images (matching logic from _generate_and_score_completions line 2068-2079)
+            from trl.data_utils import apply_chat_template
+            prompts_text = [
+                apply_chat_template({"prompt": prompt}, self.processing_class)["prompt"] 
+                for prompt in original_prompts
+            ]
+            mm_inputs = self.processing_class(
+                images=original_images, 
+                text=prompts_text, 
+                padding=True, 
+                return_tensors="pt"
+            )
+            # Use super()._prepare_inputs to ensure correct device and precision
+            mm_inputs = super(DAPOTrainer, self)._prepare_inputs(mm_inputs)
+            
+            # Update multimodal fields in inputs (only update encoding-related fields, preserve other fields)
+            for k in ["pixel_values", "image_grid_thw", "pixel_attention_mask", "image_sizes", "token_type_ids"]:
+                if k in mm_inputs:
+                    inputs[k] = mm_inputs[k]
+            
+            # Calculate num_images on the fly (no need to maintain in dynamic sampling)
+            inputs["num_images"] = [len(img_list) for img_list in original_images]
+        
         # Compute the per-token log probabilities for the model
         prompt_ids, prompt_mask = inputs["prompt_ids"], inputs["prompt_mask"]
         completion_ids, completion_mask = inputs["completion_ids"], inputs["completion_mask"]
@@ -2244,8 +2223,6 @@ class DAPOTrainer(BaseTrainer):
         # When num_iterations == 1 and steps_per_generation <= gradient_accumulation_steps,
         # old_per_token_logps == per_token_logps. In this case we can skip its computation
         # (see _generate_and_score_completions) and instead use per_token_logps.detach().
-        # The exception is when using vLLM, where we always compute old_per_token_logps
-        # for importance sampling
         old_per_token_logps = inputs.get("old_per_token_logps")
         old_per_token_logps = per_token_logps.detach() if old_per_token_logps is None else old_per_token_logps
 
@@ -2311,9 +2288,6 @@ class DAPOTrainer(BaseTrainer):
         if entropy_mask is not None:
             per_token_loss = per_token_loss * entropy_mask
 
-        if self.use_vllm and self.vllm_importance_sampling_correction:
-            per_token_loss = per_token_loss * inputs["importance_sampling_ratio"]
-
         # Lightweight KL schedule
         beta_eff = float(self.beta)
         if getattr(self.args, "kl_beta_schedule", "off") == "linear10" and (self.state.max_steps or 0) > 0:
@@ -2336,6 +2310,7 @@ class DAPOTrainer(BaseTrainer):
         elif self.loss_type == "dapo":
             normalizer = inputs["num_items_in_batch"] / self.accelerator.num_processes
             loss = (per_token_loss * completion_mask).sum() / normalizer
+            loss = loss / self.current_gradient_accumulation_steps
         else:
             raise ValueError(f"Unknown loss type: {self.loss_type}")
 
@@ -2446,74 +2421,6 @@ class DAPOTrainer(BaseTrainer):
         super().log(logs, start_time)
         self._metrics[mode].clear()
 
-        if self.accelerator.is_main_process and self.log_completions:
-            # 注释掉 wandb table 记录，避免网络超时和数据量过大问题
-            pass
-            # 注释掉终端打印
-            # if is_rich_available():
-            #     print_prompt_completions_sample(
-            #         self._logs["prompt"],
-            #         self._logs["completion"],
-            #         self._logs["rewards"],
-            #         self._logs["advantages"],
-            #         self.state.global_step,
-            #         self.num_completions_to_print,
-            #     )
-
-            # 注释掉详细的 wandb table 记录
-            # if self.args.report_to and "wandb" in self.args.report_to and wandb.run is not None:
-            #     import pandas as pd
-
-            #     # Wandb: ChatML prompt + plain completion
-            #     prompts_wb = list(self._logs.get("prompt_chatml", [])) or list(self._logs.get("prompt", []))
-            #     completions_wb = list(self._logs.get("completion", []))
-
-            #     n_rows = min(len(prompts_wb), len(completions_wb))
-            #     prompts_wb = prompts_wb[:n_rows]
-            #     completions_wb = completions_wb[:n_rows]
-
-            #     table = {
-            #         "step": [str(self.state.global_step)] * n_rows,
-            #         "prompt": prompts_wb,
-            #         "completion": completions_wb,
-            #     }
-
-            #     # Add rewards columns, sliced to n_rows for consistency
-            #     for k, v in self._logs["rewards"].items():
-            #         vals = list(v)
-            #         table[k] = vals[:n_rows]
-
-            #     # Add advantages, sliced
-            #     advantages_list = list(self._logs["advantages"])[:n_rows]
-            #     table["advantage"] = advantages_list
-                
-            #     # Add mean rewards for context
-            #     if "mean_reward" in self._logs:
-            #         mean_rewards_list = list(self._logs["mean_reward"])[:n_rows]
-            #         table["mean_reward"] = mean_rewards_list
-                
-            #     # Add advantage labels for easy identification
-            #     advantage_labels = []
-            #     for adv in advantages_list:
-            #         if adv > 0:
-            #             advantage_labels.append("✅ 加分")
-            #         elif adv < 0:
-            #             advantage_labels.append("❌ 减分")
-            #         else:
-            #             advantage_labels.append("⚪ 中性")
-            #     table["advantage_label"] = advantage_labels
-
-            #     # Add images if present, sliced
-            #     if self._logs["images"]:
-            #         images_col = []
-            #         for idx, image_list in enumerate(list(self._logs["images"])[:n_rows]):
-            #             images_col.append([wandb.Image(image) for image in image_list])
-            #         table["images"] = images_col
-
-            #     df = pd.DataFrame(table)
-            #     if self.wandb_log_unique_prompts:
-            #         df = df.drop_duplicates(subset=["prompt"])
-            #     wandb.log({"completions": wandb.Table(dataframe=df)})
 
     # Ensure the model card is saved along with the checkpoint
     def _save_checkpoint(self, model, trial):
@@ -2683,15 +2590,21 @@ class DAPOTrainer(BaseTrainer):
                     pass
 
     # Attention metrics processing moved to utils (no AEI, only last-K aggregation)
-    def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> None:
+    def _process_attention_metrics(self, attention_context: Optional[dict], mode: str) -> Optional[list]:
+        """Process attention metrics and return token weights list for current batch.
+        
+        Returns:
+            Optional[list]: Token weights list for the current batch if token_weights is enabled, None otherwise.
+        """
         if not self.compute_attention_metrics or attention_context is None:
-            return
-        process_attention_context(
+            return None
+        tw_list = process_attention_context(
             attention_context=attention_context,
             model=self.model,
             processor=self.processing_class,
             args=self.args,
             attention_deque=self._logs.get("attention") if hasattr(self, "_logs") else None,
             attention_skip_reasons_deque=getattr(self, "_attention_skip_reasons", None),
-            token_weights_deque=self._logs.get("token_weights") if hasattr(self, "_logs") else None,
+            token_weights_deque=None, 
         )
+        return tw_list

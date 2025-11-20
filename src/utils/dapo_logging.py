@@ -11,6 +11,26 @@ import torch
 from trl.data_utils import is_conversational, apply_chat_template
 
 
+def _debug_log(message: str, **kwargs: Any) -> None:
+    """
+    简单的调试输出，便于定位在日志写入流程中的阻塞点。
+    """
+    try:
+        details = ", ".join(f"{k}={v}" for k, v in kwargs.items())
+        suffix = f" ({details})" if details else ""
+        print(f"[DAPO-LOG DEBUG] {message}{suffix}")
+    except Exception:
+        print(f"[DAPO-LOG DEBUG] {message}")
+
+try:
+    # Optional accelerate imports for distributed logging. When unavailable
+    # (e.g., in lightweight environments), we fall back to local-only logs.
+    from accelerate.utils import gather as accel_gather, gather_object as accel_gather_object  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    accel_gather = None  # type: ignore
+    accel_gather_object = None  # type: ignore
+
+
 def record_vgr_raw_stats(
     vgr_metrics: List[Dict[str, Any]],
     metrics_store: Dict[str, Any],
@@ -79,13 +99,20 @@ def emit_rollout_logs(
     epoch: float = 0.0,
     advantages_local: Optional[List[float]] = None,
     adv_desc: str = "unweighted",
-    replay_flags: Optional[List[Any]] = None,
+    resampled_flags: Optional[List[bool]] = None,
 ) -> None:
     """将 rollout 信息写入 markdown。
 
     仅保留必要字段说明：rewards_per_func_local 与 reward_names 一一对应；vgr_info
     为 compute_real_vgr_metrics 输出，用于展示分段与汇总 VGR。
     """
+    _debug_log(
+        "emit_rollout_logs:start",
+        step=step,
+        epoch=epoch,
+        prompt_cnt=len(prompts_text),
+        completion_cnt=len(completions_text),
+    )
     # If caller provides a path, respect it; else fallback to default
     if not log_path:
         # 默认单独文件，避免与 rollout_results.md 混在一起
@@ -154,13 +181,13 @@ def emit_rollout_logs(
                 adv_val = float(advantages_local[idx])
             except Exception:
                 adv_val = None
-        # Interpret replay_flags as "filtered" flags in VERL-style logging
-        is_filtered = False
-        if replay_flags is not None and idx < len(replay_flags):
+        is_resampled = False
+        if resampled_flags is not None and idx < len(resampled_flags):
             try:
-                is_filtered = bool(replay_flags[idx])
+                is_resampled = bool(resampled_flags[idx])
             except Exception:
-                is_filtered = False
+                is_resampled = False
+
         rows.append(
             {
                 "idx": idx + 1,
@@ -174,13 +201,15 @@ def emit_rollout_logs(
                 "length": length_val,
                 "total": tot,
                 "advantage": adv_val,
-                "filtered": is_filtered,
+                "resampled": is_resampled,
             }
         )
+    _debug_log("emit_rollout_logs:rows_ready", rows=len(rows), log_path=log_path)
     
     # 写入 rollout 日志
     if log_path:
         try:
+            _debug_log("emit_rollout_logs:open_file", log_path=log_path)
             os.makedirs(os.path.dirname(log_path), exist_ok=True)
             with open(log_path, "a", encoding="utf-8") as f:
                 f.write(f"\n## {header} | {ts}\n\n")
@@ -226,10 +255,10 @@ def emit_rollout_logs(
                         f.write(f"| Success Rate | {np.mean([1 if s > 0 else 0 for s in total_scores]):.3f} |\n\n")
                     if adv_scores:
                         f.write(f"| Advantage ({adv_desc}) Mean | {np.mean(adv_scores):.3f} ± {np.std(adv_scores):.3f} |\n")
-                    filtered_count = sum(1 for r in rows if r.get("filtered"))
-                    if filtered_count:
-                        f.write(f"| Filtered Samples | {filtered_count} |\n")
-                    if adv_scores or filtered_count:
+                    resampled_count = sum(1 for r in rows if r.get("resampled"))
+                    if resampled_count:
+                        f.write(f"| Resampled Samples | {resampled_count} |\n")
+                    if adv_scores or resampled_count:
                         f.write("\n")
                     # 汇总 vgr_raw（原始VGR）
                     if vgr_raw_list:
@@ -242,9 +271,14 @@ def emit_rollout_logs(
                     
                     # Attention statistics removed (AEI unused)
                 
-                # 样本明细
-                for i, (row, info) in enumerate(zip(rows, vgr_info), start=1):
-                    label = " (Filtered)" if row.get("filtered") else ""
+                # 样本明细 - 确保 vgr_info 与 rows 长度一致
+                # 如果 vgr_info 长度不足，用空字典填充
+                vgr_info_padded = list(vgr_info) + [{}] * max(0, len(rows) - len(vgr_info))
+                for i, (row, info) in enumerate(zip(rows, vgr_info_padded), start=1):
+                    labels = []
+                    if row.get("resampled"):
+                        labels.append("Resampled")
+                    label = f" ({', '.join(labels)})" if labels else ""
                     f.write(f"### Sample {i}{label}\n\n")
                     f.write(f"**Prompt:** {row['prompt']}\n\n")
                     f.write(f"**Completion:** {row['completion']}\n\n")
@@ -305,7 +339,7 @@ def emit_rollout_logs(
                                 "total": float(row["total"]),
                             },
                             "advantage": float(row["advantage"]) if row["advantage"] is not None else None,
-                            "filtered": bool(row.get("filtered", False)),
+                            "resampled": bool(row.get("resampled", False)),
                             "token_counts": {
                                 "vision_tokens": float(info.get("num_vision_tokens", 0) or 0),
                                 "text_tokens": float(info.get("num_text_tokens", 0) or 0),
@@ -329,8 +363,10 @@ def emit_rollout_logs(
                         f.write("\n```\n\n")
                     
                     f.write("---\n\n")
+            _debug_log("emit_rollout_logs:write_done", log_path=log_path, rows=len(rows))
         except Exception as e:
             print(f"⚠️  Warning: Failed to write to rollout log file: {e}")
+            _debug_log("emit_rollout_logs:error", error=str(e))
 
 
 def emit_eval_logs(
@@ -352,6 +388,13 @@ def emit_eval_logs(
         step: 当前步数
         epoch: 当前轮次
     """
+    _debug_log(
+        "emit_eval_logs:start",
+        step=step,
+        epoch=epoch,
+        sample_cnt=len(eval_samples),
+        log_path=log_path,
+    )
     # If caller provides a path, respect it; else fallback to default
     if not log_path:
         log_path = os.path.join("training_logs", "eval_results.md")
@@ -445,8 +488,10 @@ def emit_eval_logs(
                         f.write("\n```\n\n")
                     
                     f.write("---\n\n")
+        _debug_log("emit_eval_logs:write_done", log_path=log_path, sample_cnt=len(eval_samples))
     except Exception as e:
         print(f"⚠️  Warning: Failed to write to eval log file: {e}")
+        _debug_log("emit_eval_logs:error", error=str(e))
 
 
 def compute_real_vgr_metrics(
@@ -541,7 +586,14 @@ def emit_token_weights_logs(
         max_preview_tokens: 每个样本预览的前若干 token 权重。
     """
     try:
+        _debug_log(
+            "emit_token_weights_logs:start",
+            step=step,
+            epoch=epoch,
+            log_path=log_path,
+        )
         if token_weights is None:
+            _debug_log("emit_token_weights_logs:skip_no_weights")
             return
         if not log_path:
             log_path = os.path.join("training_logs", "token_weights.md")
@@ -587,8 +639,10 @@ def emit_token_weights_logs(
                 f.write("\n")
             except Exception:
                 pass
+        _debug_log("emit_token_weights_logs:write_done", log_path=log_path, preview=min(tw.shape[0], 8) if tw.ndim >= 1 else 0)
     except Exception as e:
         print(f"⚠️  Warning: Failed to write token weights log: {e}")
+        _debug_log("emit_token_weights_logs:error", error=str(e))
 
 
 def emit_tokenwise_weights(
@@ -612,7 +666,15 @@ def emit_tokenwise_weights(
         max_preview_tokens: 每个样本最多展示多少个 token。
     """
     try:
+        _debug_log(
+            "emit_tokenwise_weights:start",
+            step=step,
+            epoch=epoch,
+            log_path=log_path,
+            sample_cnt=len(token_strings),
+        )
         if not token_strings or not token_weights:
+            _debug_log("emit_tokenwise_weights:skip_empty")
             return
         if not log_path:
             log_path = os.path.join("training_logs", "rollout_results.md")
@@ -639,6 +701,7 @@ def emit_tokenwise_weights(
                 f.write(f"Sample {i+1}: {line}\n")
     except Exception as e:
         print(f"⚠️  Warning: Failed to write tokenwise weights: {e}")
+        _debug_log("emit_tokenwise_weights:error", error=str(e))
 
 
 def perform_realtime_rollout_logging(
@@ -664,100 +727,237 @@ def perform_realtime_rollout_logging(
     completion_ids: torch.Tensor,
     completion_mask: torch.Tensor,
     process_slice: slice,
-    replay_mask: Optional[torch.Tensor] = None,
 ) -> None:
     """Unified realtime rollout logging pipeline moved out of the trainer."""
     try:
-        if not is_main_process:
-            return
+        _debug_log(
+            "perform_realtime_rollout_logging:start",
+            mode=mode,
+            step=state_step,
+            epoch=state_epoch,
+            is_main=is_main_process,
+            prompts=len(prompts),
+        )
         if not getattr(args, "realtime_rollout_logging", False):
+            _debug_log("perform_realtime_rollout_logging:disable_flag")
             return
         if mode != "train":
+            _debug_log("perform_realtime_rollout_logging:non_train_mode", mode=mode)
             return
 
-        # Build VGR info for logging (no AEI usage downstream)
-        vgr_info: List[Dict[str, Any]] = []
-        if compute_attention_metrics and attention_logs is not None:
-            try:
-                att_list = list(attention_logs)
-                if att_list:
-                    from .dapo_logging import compute_real_vgr_metrics as _compute_real_vgr_metrics
-                    sample_results = att_list[-len(prompts):]
-                    if attention_skip_reasons is not None:
-                        skips = list(attention_skip_reasons)
-                        skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
-                    else:
-                        skip_slice = [None] * len(sample_results)
-                    vgr_info = _compute_real_vgr_metrics(sample_results, skip_slice)
-            except Exception:
-                vgr_info = []
+        # Check for empty batch but don't return early since gather is collective
+        has_data = len(prompts) > 0 and rewards_per_func_local.numel() > 0 and total_rewards_local.numel() > 0
+        if not has_data:
+            _debug_log(
+                "perform_realtime_rollout_logging:empty_batch_will_participate_in_gather",
+                prompts=len(prompts),
+                rewards_numel=rewards_per_func_local.numel(),
+                total_numel=total_rewards_local.numel(),
+            )
 
-        # Solutions (if present)
-        solutions = [inp.get("solution", "") for inp in inputs]
-
-        # Compose prompts text for logs: prefer 'problem' if available; otherwise render user-only chat without system
-        problems: List[Optional[str]] = []
-        try:
-            problems = [inp.get("problem", None) for inp in inputs]
-        except Exception:
-            problems = [None] * len(prompts)
-
-        if is_conversational(inputs[0]):
-            prompts_user_only: List[List[Dict[str, Any]]] = []
-            for p in prompts:
+        # Build VGR info for logging (no AEI usage downstream) - only if has data
+        # Initialize with empty values matching the number of prompts (for gather consistency)
+        vgr_info: List[Dict[str, Any]] = [{}] * len(prompts)
+        solutions: List[str] = [""] * len(prompts)
+        log_prompts_text: List[str] = [""] * len(prompts)
+        advantages_for_log: Optional[List[float]] = None
+        resampled_flags_local: Optional[List[bool]] = None
+        
+        if has_data:
+            if compute_attention_metrics and attention_logs is not None:
                 try:
-                    p2 = [m for m in p if isinstance(m, dict) and m.get("role") == "user"]
-                    if not p2:
-                        p2 = [m for m in p if isinstance(m, dict) and m.get("role") != "system"] or p
+                    att_list = list(attention_logs)
+                    if att_list:
+                        from .dapo_logging import compute_real_vgr_metrics as _compute_real_vgr_metrics
+                        sample_results = att_list[-len(prompts):]
+                        if attention_skip_reasons is not None:
+                            skips = list(attention_skip_reasons)
+                            skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
+                        else:
+                            skip_slice = [None] * len(sample_results)
+                        vgr_info_computed = _compute_real_vgr_metrics(sample_results, skip_slice)
+                        # Only replace if we got valid results
+                        if vgr_info_computed:
+                            vgr_info = vgr_info_computed
                 except Exception:
-                    p2 = p
-                prompts_user_only.append(p2)
-            rendered = [apply_chat_template({"prompt": p2}, processing_class)["prompt"] for p2 in prompts_user_only]
-        else:
-            rendered = prompts_text
+                    pass  # Keep the default empty dict list
 
-        log_prompts_text = []
-        for i in range(len(rendered)):
-            val = problems[i] if i < len(problems) and isinstance(problems[i], str) and problems[i] else rendered[i]
-            log_prompts_text.append(val)
+            # Solutions (if present)
+            solutions = [inp.get("solution", "") for inp in inputs]
 
-        # Prepare advantage values for table: always log group (reward-based) advantages
-        advantages_for_log = None
-        try:
-            if advantages_tensor is not None:
-                advantages_for_log = advantages_tensor.detach().cpu().tolist()
-        except Exception:
-            advantages_for_log = None
+            # Compose prompts text for logs: prefer 'problem' if available; otherwise render user-only chat without system
+            problems: List[Optional[str]] = []
+            try:
+                problems = [inp.get("problem", None) for inp in inputs]
+            except Exception:
+                problems = [None] * len(prompts)
 
-        # Emit markdown rollout log
+            if is_conversational(inputs[0]):
+                prompts_user_only: List[List[Dict[str, Any]]] = []
+                for p in prompts:
+                    try:
+                        p2 = [m for m in p if isinstance(m, dict) and m.get("role") == "user"]
+                        if not p2:
+                            p2 = [m for m in p if isinstance(m, dict) and m.get("role") != "system"] or p
+                    except Exception:
+                        p2 = p
+                    prompts_user_only.append(p2)
+                rendered = [apply_chat_template({"prompt": p2}, processing_class)["prompt"] for p2 in prompts_user_only]
+            else:
+                rendered = prompts_text
+
+            log_prompts_text = []
+            for i in range(len(rendered)):
+                val = problems[i] if i < len(problems) and isinstance(problems[i], str) and problems[i] else rendered[i]
+                log_prompts_text.append(val)
+
+            # Prepare advantage values for table: always log group (reward-based) advantages
+            try:
+                if advantages_tensor is not None:
+                    advantages_for_log = advantages_tensor.detach().cpu().tolist()
+            except Exception:
+                advantages_for_log = None
+
+            # Resampled flags: mark which samples came from dynamic resampling
+            try:
+                resampled_flags_local = [bool(inp.get("resampled", False)) for inp in inputs]
+            except Exception:
+                resampled_flags_local = None
+
+        # Optionally gather data across all ranks so that rollout logs include
+        # prompt groups from every device, similar to Ray DAPO. We perform the
+        # collectives on all ranks, but only the main process writes to disk.
+        log_prompts_all = log_prompts_text
+        completions_all = completions_text
+        solutions_all = solutions
+        vgr_info_all = vgr_info
+        rewards_per_func_all = rewards_per_func_local
+        total_rewards_all = total_rewards_local
+        advantages_all = advantages_for_log
+        resampled_flags_all = resampled_flags_local
+
+        if accel_gather_object is not None and accel_gather is not None:
+            _debug_log(
+                "perform_realtime_rollout_logging:gather_start",
+                prompts=len(log_prompts_text),
+                completions=len(completions_text),
+                rewards_shape=tuple(rewards_per_func_local.shape),
+                total_shape=tuple(total_rewards_local.shape),
+            )
+            try:
+                # Lists / Python objects
+                log_prompts_all = accel_gather_object(log_prompts_text)
+                completions_all = accel_gather_object(completions_text)
+                solutions_all = accel_gather_object(solutions)
+                if resampled_flags_local is not None:
+                    resampled_flags_all = accel_gather_object(resampled_flags_local)
+                else:
+                    resampled_flags_all = None
+                # Gather vgr_info as well to match completions_all length
+                vgr_info_all = accel_gather_object(vgr_info)
+
+                # Rewards/advantages: these are already sliced per-rank by the trainer
+                # We need to gather them to get the full batch view
+                # Convert to list format first to handle variable-length per-rank data
+                rewards_list = rewards_per_func_local.detach().cpu().tolist() if rewards_per_func_local.numel() > 0 else []
+                total_list = total_rewards_local.detach().cpu().tolist() if total_rewards_local.numel() > 0 else []
+                
+                # Gather lists
+                rewards_all_lists = accel_gather_object(rewards_list)
+                total_all_lists = accel_gather_object(total_list)
+                
+                # Convert back to tensors on main process
+                if len(rewards_all_lists) > 0 and isinstance(rewards_all_lists[0], list):
+                    # rewards_all_lists is now a flat list from all ranks
+                    rewards_per_func_all = torch.tensor(rewards_all_lists, dtype=torch.float32, device=rewards_per_func_local.device)
+                else:
+                    rewards_per_func_all = rewards_per_func_local
+                    
+                if len(total_all_lists) > 0:
+                    total_rewards_all = torch.tensor(total_all_lists, dtype=torch.float32, device=total_rewards_local.device)
+                else:
+                    total_rewards_all = total_rewards_local
+
+                # Gather advantages similarly
+                if advantages_for_log is not None:
+                    advantages_all = accel_gather_object(advantages_for_log)
+                else:
+                    advantages_all = None
+            except Exception as e:
+                # Fall back to local-only logging on failure
+                _debug_log("perform_realtime_rollout_logging:gather_error", error=str(e))
+                log_prompts_all = log_prompts_text
+                completions_all = completions_text
+                solutions_all = solutions
+                vgr_info_all = vgr_info
+                rewards_per_func_all = rewards_per_func_local
+                total_rewards_all = total_rewards_local
+                advantages_all = advantages_for_log
+                resampled_flags_all = resampled_flags_local
+            else:
+                _debug_log(
+                    "perform_realtime_rollout_logging:gather_done",
+                    prompts=len(log_prompts_all),
+                    completions=len(completions_all),
+                    solutions=len(solutions_all),
+                    vgr_info=len(vgr_info_all),
+                    rewards_shape=tuple(rewards_per_func_all.shape) if torch.is_tensor(rewards_per_func_all) else f"list_{len(rewards_per_func_all) if isinstance(rewards_per_func_all, list) else 'unknown'}",
+                    total_shape=tuple(total_rewards_all.shape) if torch.is_tensor(total_rewards_all) else f"list_{len(total_rewards_all) if isinstance(total_rewards_all, list) else 'unknown'}",
+                )
+
+        _debug_log(
+            "perform_realtime_rollout_logging:prepared_data",
+            prompts=len(log_prompts_all),
+            completions=len(completions_all),
+        )
+        # Only the main process writes logs to disk.
+        if not is_main_process:
+            _debug_log("perform_realtime_rollout_logging:non_main_exit")
+            return
+        
+        # Skip writing if we have no data (can happen after gather on main process with empty ranks)
+        if len(log_prompts_all) == 0 or rewards_per_func_all.numel() == 0:
+            _debug_log("perform_realtime_rollout_logging:main_skip_no_data_after_gather")
+            return
+
         adv_label = "group-normalized"
+        _debug_log(
+            "perform_realtime_rollout_logging:emit_rollout_logs_enter",
+            prompts=len(log_prompts_all),
+            completions=len(completions_all),
+            rewards_shape=tuple(rewards_per_func_all.shape),
+            total_rewards_shape=tuple(total_rewards_all.shape),
+        )
         emit_rollout_logs(
-            prompts_text=log_prompts_text,
-            completions_text=completions_text,
-            solutions=solutions,
-            rewards_per_func_local=rewards_per_func_local,
-            total_rewards_local=total_rewards_local,
+            prompts_text=log_prompts_all,
+            completions_text=completions_all,
+            solutions=solutions_all,
+            rewards_per_func_local=rewards_per_func_all,
+            total_rewards_local=total_rewards_all,
             reward_names=reward_names,
-            vgr_info=vgr_info,
+            vgr_info=vgr_info_all,
             log_path=getattr(args, "rollout_log_path", None),
             prompt_preview_chars=getattr(args, "prompt_preview_chars", 2000),
             completion_preview_chars=getattr(args, "completion_preview_chars", 2000),
             vgr_as_coefficient=getattr(args, "vgr_as_coefficient", 0),
             step=state_step,
             epoch=state_epoch,
-            advantages_local=advantages_for_log,
+            advantages_local=advantages_all,
             adv_desc=adv_label,
-            replay_flags=replay_mask[process_slice].detach().cpu().tolist() if replay_mask is not None else None,
+            resampled_flags=resampled_flags_all,
         )
+        _debug_log("perform_realtime_rollout_logging:emit_rollout_logs_exit")
 
         # Token weight logs (coarse stats)
         if getattr(args, "token_weights", False) and token_weights_tensor is not None:
+            _debug_log("perform_realtime_rollout_logging:emit_token_weights_enter")
             emit_token_weights_logs(
                 token_weights=token_weights_tensor,
                 log_path=getattr(args, "rollout_log_path", None),
                 step=state_step,
                 epoch=state_epoch,
             )
+            _debug_log("perform_realtime_rollout_logging:emit_token_weights_exit")
 
             # Tokenwise preview with decoded tokens
             try:
@@ -790,8 +990,10 @@ def perform_realtime_rollout_logging(
                     )
             except Exception:
                 pass
+        _debug_log("perform_realtime_rollout_logging:done")
     except Exception as e:
         print(f"⚠️  Warning: realtime rollout logging failed: {e}")
+        _debug_log("perform_realtime_rollout_logging:error", error=str(e))
 
 
 def print_compact_logs(logs: Dict[str, float], mode: str, use_hard_negative: bool = False) -> None:
