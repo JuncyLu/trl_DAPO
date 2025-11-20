@@ -27,9 +27,9 @@ accelerate launch \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
   --max_completion_length 512 \
-  --per_device_train_batch_size 4 \
-  --gradient_accumulation_steps 4 \
-  --num_generations 8 \
+  --per_device_train_batch_size 2 \
+  --gradient_accumulation_steps 2 \
+  --num_generations 4 \
   --num_train_epochs 1 \
   --report_to wandb \
   --log_completions \

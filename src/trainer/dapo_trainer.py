@@ -33,54 +33,25 @@ from accelerate.utils import gather, gather_object, is_peft_model, set_seed
 
 
 def safe_gather_object(data, max_items=None, max_str_len=1000):
-    """
-    Safe wrapper for gather_object that prevents OOM by limiting data size.
-    
-    Args:
-        data: List of items to gather across ranks
-        max_items: Maximum number of items to gather (None = no limit)
-        max_str_len: Maximum string length for text items
-    
-    Returns:
-        Gathered list of items, or local data if gathering fails
-    """
+    """Wrapper for gather_object with OOM protection via size limits."""
     try:
-        # Truncate strings if they're too long
         if isinstance(data, list) and len(data) > 0 and isinstance(data[0], str):
             data = [s[:max_str_len] if isinstance(s, str) else s for s in data]
-        
-        # Limit number of items if specified
         if max_items is not None and len(data) > max_items:
             data = data[:max_items]
-        
-        # Try to gather
-        result = gather_object(data)
-        return result
-    except (RuntimeError, torch.OutOfMemoryError) as e:
-        # If gather fails due to OOM or other issues, return local data only
-        return data
-    except Exception:
-        # For any other errors, return local data
+        return gather_object(data)
+    except (RuntimeError, torch.OutOfMemoryError, Exception):
         return data
 
 
 def log_memory_usage(accelerator, prefix=""):
-    """
-    Log current GPU memory usage.
-    
-    Args:
-        accelerator: Accelerator instance
-        prefix: Prefix for log message
-    """
+    """Log current GPU memory usage."""
     if torch.cuda.is_available() and accelerator.is_main_process:
         try:
-            allocated = torch.cuda.memory_allocated() / 1024**3  # GB
-            reserved = torch.cuda.memory_reserved() / 1024**3  # GB
-            max_allocated = torch.cuda.max_memory_allocated() / 1024**3  # GB
-            logger.info(
-                f"{prefix}GPU Memory: allocated={allocated:.2f}GB, "
-                f"reserved={reserved:.2f}GB, max_allocated={max_allocated:.2f}GB"
-            )
+            allocated = torch.cuda.memory_allocated() / 1024**3
+            reserved = torch.cuda.memory_reserved() / 1024**3
+            max_allocated = torch.cuda.max_memory_allocated() / 1024**3
+            logger.info(f"{prefix}GPU Memory: allocated={allocated:.2f}GB, reserved={reserved:.2f}GB, max_allocated={max_allocated:.2f}GB")
         except Exception:
             pass
 from datasets import Dataset, IterableDataset
@@ -490,6 +461,9 @@ class DAPOTrainer(BaseTrainer):
         # Dynamic sampling (DAPO paper)
         self.dynamic_sample = args.dynamic_sample
         self.max_resample_times = args.max_resample_times
+        
+        # Debug: Confirm initialization - use print() to ensure visibility
+        print(f"[INIT] Dynamic sampling: enabled={self.dynamic_sample}, max_resample_times={self.max_resample_times}")
 
         # The trainer estimates the number of FLOPs (floating-point operations) using the number of elements in the
         # input tensor associated with the key "input_ids". However, in GRPO, the sampled data does not include the
@@ -1159,31 +1133,13 @@ class DAPOTrainer(BaseTrainer):
         images: Optional[list] = None,
         token_weights_list: Optional[list] = None,
     ):
-        """
-        Perform dynamic sampling by replacing flat total-reward groups with resampled data.
-
-        Args:
-            inputs: Local input samples (list[dict])
-            prompts: Prompts corresponding to the local samples
-            completions: Generated completions for the local samples
-            prompt_ids_list: Tokenized prompts produced during generation
-            completion_ids_list: Tokenized completions
-            rewards_per_func: Reward tensor for local samples on this rank
-            total_rewards: Weighted reward tensor for local samples
-            filter_scores: Scalar scores used to detect flat groups (accuracy + format)
-            images: Optional multimodal payload accompanying each sample
-            token_weights_list: Optional per-sample token weights
-
-        Returns:
-            Tuple containing potentially resampled (inputs, prompts, completions, prompt_ids_list, completion_ids_list,
-            rewards_per_func, total_rewards, filter_scores, images, token_weights_list) aligned across ranks.
-        """
+        """Replace groups with zero reward variance by resampling across all ranks."""
         device = self.accelerator.device
         mode = "train" if self.model.training else "eval"
         ng = self.num_generations if mode == "train" else self.eval_num_generations
         local_target = len(inputs)
+        global_target = local_target * self.accelerator.num_processes
 
-        # Save original data for fallback
         origin_data = (
             inputs,
             prompts,
@@ -1197,88 +1153,82 @@ class DAPOTrainer(BaseTrainer):
             token_weights_list,
         )
 
-        # Initialize containers for valid samples
         resample_count = 0
-        valid_inputs: list = []
-        valid_prompts: list = []
-        valid_completions: list = []
-        valid_prompt_ids: list[list[int]] = []
-        valid_completion_ids: list[list[int]] = []
-        valid_rewards: list[torch.Tensor] = []
-        valid_totals: list[torch.Tensor] = []
-        valid_filter_scores: list[torch.Tensor] = []
-        valid_images: Optional[list] = [] if images is not None else None
-        valid_token_weights: Optional[list] = [] if token_weights_list is not None else None
-
-        if self.accelerator.is_main_process:
-            logger.info(
-                "[DynSample] step=%s start: local_samples=%s, target=%s, ng=%s",
-                getattr(self.state, "global_step", None),
-                len(inputs),
-                local_target,
-                ng,
-            )
-            log_memory_usage(self.accelerator, "[DynSample Start] ")
-
-        # Initial check: collect valid groups from original batch
+        global_valid_samples: list = []
         validity_mask = self.compute_group_validity(filter_scores, ng) > 0
         num_groups = filter_scores.numel() // max(1, ng)
-        initial_valid = validity_mask.sum().item() // max(1, ng)
+        
+        try:
+            global_filter_scores = gather(filter_scores)
+            if self.accelerator.is_main_process and global_filter_scores is not None:
+                if global_filter_scores.numel() > 0 and global_filter_scores.numel() % ng == 0:
+                    gg_scores = global_filter_scores.view(-1, ng)
+                    gg_std = gg_scores.std(dim=1, unbiased=False)
+                    stds_formatted = [f"{s:.3f}" for s in gg_std.tolist()]
+                    print(f"[DynSample] Initial: stds=[{', '.join(stds_formatted)}]")
+                    for gi in range(gg_scores.size(0)):
+                        scores_formatted = [f"{s:.3f}" for s in gg_scores[gi].tolist()]
+                        print(f"  group{gi}: [{', '.join(scores_formatted)}]")
+        except Exception:
+            pass
+        
+        local_samples_with_validity = []
+        for idx in range(len(inputs)):
+            sample_dict = {
+                "input": inputs[idx],
+                "prompt": prompts[idx],
+                "completion": completions[idx],
+                "prompt_ids": prompt_ids_list[idx],
+                "completion_ids": completion_ids_list[idx],
+                "rewards_per_func": rewards_per_func[idx],
+                "total_reward": total_rewards[idx],
+                "filter_score": filter_scores[idx],
+                "image": images[idx] if images is not None else None,
+                "token_weights": token_weights_list[idx] if token_weights_list is not None else None,
+                "valid": validity_mask[idx].item(),  # Boolean indicating if this sample's group is valid
+            }
+            local_samples_with_validity.append(sample_dict)
+        
+        try:
+            all_samples_nested = safe_gather_object(local_samples_with_validity, max_items=50, max_str_len=500)
+            all_samples = []
+            if isinstance(all_samples_nested, list):
+                for rank_samples in all_samples_nested:
+                    if isinstance(rank_samples, list):
+                        all_samples.extend(rank_samples)
+                    else:
+                        all_samples.append(rank_samples)
+            else:
+                    all_samples = local_samples_with_validity
+        except Exception as e:
+            if self.accelerator.is_main_process:
+                logger.warning(f"[DynSample] Failed to gather samples across ranks: {e}")
+            all_samples = local_samples_with_validity
+        
+        for sample in all_samples:
+            if sample["valid"]:
+                global_valid_samples.append(sample)
         
         if self.accelerator.is_main_process:
-            logger.info(
-                f"[DynSample] Initial batch has {initial_valid}/{num_groups} valid groups"
-            )
-            # Debug: print full per-group stds and scores for this rank
-            if filter_scores.numel() > 0 and ng > 0 and filter_scores.numel() % ng == 0:
-                try:
-                    g_scores = filter_scores.view(-1, ng)
-                    g_std = g_scores.std(dim=1, unbiased=False)
-                    print(f"[DEBUG] Start - Group Stds: {g_std.tolist()}")
-                    print(f"[DEBUG] Start - Group Scores: {g_scores.tolist()}")
-                    if len(completions) > 0:
-                        print(f"[DEBUG] Start - First completion sample: {completions[0]}")
-                except Exception:
-                    pass
-
-        # Collect valid groups from original batch
-        for group_idx in range(num_groups):
-            start = group_idx * ng
-            end = start + ng
-            if validity_mask[start].item():
-                valid_inputs.extend(inputs[start:end])
-                valid_prompts.extend(prompts[start:end])
-                valid_completions.extend(completions[start:end])
-                valid_prompt_ids.extend(prompt_ids_list[start:end])
-                valid_completion_ids.extend(completion_ids_list[start:end])
-                valid_rewards.append(rewards_per_func[start:end])
-                valid_totals.append(total_rewards[start:end])
-                valid_filter_scores.append(filter_scores[start:end])
-                if images is not None and valid_images is not None:
-                    valid_images.extend(images[start:end])
-                if token_weights_list is not None and valid_token_weights is not None:
-                    valid_token_weights.extend(token_weights_list[start:end])
-
-        # Resample loop: try to fill up to local_target with valid groups
-        while len(valid_inputs) < local_target and resample_count < self.max_resample_times:
+            print(f"[DynSample] Collected {len(global_valid_samples)}/{global_target} valid samples")
+        
+        while len(global_valid_samples) < global_target and resample_count < self.max_resample_times:
             if self.accelerator.is_main_process:
-                deficit = local_target - len(valid_inputs)
-                logger.info(
-                    f"[DynSample] Resample #{resample_count + 1}/{self.max_resample_times}: "
-                    f"collected={len(valid_inputs)}/{local_target}, need {deficit} more"
-                )
+                print(f"[DynSample] Resampling #{resample_count + 1}/{self.max_resample_times}")
 
-            # Fetch new batch from iterator
             try:
                 new_inputs = next(self.dynamic_resample_iterator)
             except StopIteration:
                 if self.accelerator.is_main_process:
-                    logger.warning("[DynSample] Iterator exhausted, stopping resampling")
+                    logger.warning("[DynSample] Iterator exhausted during resampling")
+                break
+            except Exception as e:
+                if self.accelerator.is_main_process:
+                    logger.error(f"[DynSample] Error fetching batch: {e}")
                 break
                 
             new_prompts = [example["prompt"] for example in new_inputs]
 
-            # Extract multimodal payloads
             if new_inputs and "images" in new_inputs[0]:
                 new_images = [example.get("images") for example in new_inputs]
             elif new_inputs and "image" in new_inputs[0]:
@@ -1299,11 +1249,9 @@ class DAPOTrainer(BaseTrainer):
                 else new_prompts
             )
 
-            # Generate completions for new batch
             new_prompt_ids_list, new_completion_ids_list, _, _, extra_fields = self._generate(mm_prompts, new_images)
             new_token_weights_list = extra_fields.pop("token_weights", None) if extra_fields else None
 
-            # Decode completions
             vocab_size = len(self.processing_class.tokenizer)
             completion_ids_filtered = [
                 [token_id for token_id in ids if 0 <= token_id < vocab_size] for ids in new_completion_ids_list
@@ -1322,127 +1270,105 @@ class DAPOTrainer(BaseTrainer):
                     new_completions_conv.append([{"role": "assistant", "content": bootstrap + completion_text}])
                 new_completions = new_completions_conv
 
-            # Calculate rewards for new batch
             new_rewards_per_func = self._calculate_rewards(
                 new_inputs, new_prompts, new_completions, new_completion_ids_list
             )
             new_total_rewards = self.reward_weight_manager.calculate_total_reward(new_rewards_per_func, device)
             new_filter_scores = self._get_dynamic_sampling_scores(new_rewards_per_func)
-            
-            # Check validity of new groups
             new_validity_mask = self.compute_group_validity(new_filter_scores, ng) > 0
-            new_num_groups = new_filter_scores.numel() // max(1, ng)
-            new_valid_groups = new_validity_mask.sum().item() // max(1, ng)
             
-            if self.accelerator.is_main_process:
-                # Debug: full stds and scores for this resample batch
-                if new_filter_scores.numel() > 0 and ng > 0 and new_filter_scores.numel() % ng == 0:
-                    try:
-                        new_g_scores = new_filter_scores.view(-1, ng)
-                        new_g_std = new_g_scores.std(dim=1, unbiased=False)
-                        print(f"[DEBUG] Resample #{resample_count + 1} - Group Stds: {new_g_std.tolist()}")
-                        print(f"[DEBUG] Resample #{resample_count + 1} - Group Scores: {new_g_scores.tolist()}")
-                    except Exception:
-                        pass
-                logger.info(
-                    f"[DynSample] Resample #{resample_count + 1}: "
-                    f"new batch has {new_valid_groups}/{new_num_groups} valid groups"
-                )
+            try:
+                global_new_scores = gather(new_filter_scores)
+                if self.accelerator.is_main_process and global_new_scores is not None:
+                    if global_new_scores.numel() > 0 and global_new_scores.numel() % ng == 0:
+                        gg_new_scores = global_new_scores.view(-1, ng)
+                        gg_new_std = gg_new_scores.std(dim=1, unbiased=False)
+                        stds_formatted = [f"{s:.3f}" for s in gg_new_std.tolist()]
+                        print(f"[DynSample] Resample #{resample_count + 1}: stds=[{', '.join(stds_formatted)}]")
+                        for gi in range(gg_new_scores.size(0)):
+                            scores_formatted = [f"{s:.3f}" for s in gg_new_scores[gi].tolist()]
+                            print(f"  group{gi}: [{', '.join(scores_formatted)}]")
+            except Exception:
+                pass
+            
+            new_samples_with_validity = []
+            for idx in range(len(new_inputs)):
+                sample_dict = {
+                    "input": new_inputs[idx],
+                    "prompt": new_prompts[idx],
+                    "completion": new_completions[idx],
+                    "prompt_ids": new_prompt_ids_list[idx],
+                    "completion_ids": new_completion_ids_list[idx],
+                    "rewards_per_func": new_rewards_per_func[idx],
+                    "total_reward": new_total_rewards[idx],
+                    "filter_score": new_filter_scores[idx],
+                    "image": new_images[idx] if new_images is not None else None,
+                    "token_weights": new_token_weights_list[idx] if new_token_weights_list is not None else None,
+                    "valid": new_validity_mask[idx].item(),
+                }
+                new_samples_with_validity.append(sample_dict)
+            
+            try:
+                all_new_samples_nested = safe_gather_object(new_samples_with_validity, max_items=50, max_str_len=500)
+                # Flatten nested list
+                all_new_samples = []
+                if isinstance(all_new_samples_nested, list):
+                    for rank_samples in all_new_samples_nested:
+                        if isinstance(rank_samples, list):
+                            all_new_samples.extend(rank_samples)
+                        else:
+                            all_new_samples.append(rank_samples)
+                else:
+                    all_new_samples = new_samples_with_validity  # Fallback
+            except Exception as e:
+                if self.accelerator.is_main_process:
+                    logger.warning(f"[DynSample] Failed to gather new samples: {e}")
+                all_new_samples = new_samples_with_validity
+            
+            for sample in all_new_samples:
+                if sample["valid"] and len(global_valid_samples) < global_target:
+                    global_valid_samples.append(sample)
 
-            # Collect valid groups from new batch
-            for group_idx in range(new_num_groups):
-                if len(valid_inputs) >= local_target:
-                    break
-                start = group_idx * ng
-                end = start + ng
-                if new_validity_mask[start].item():
-                    valid_inputs.extend(new_inputs[start:end])
-                    valid_prompts.extend(new_prompts[start:end])
-                    valid_completions.extend(new_completions[start:end])
-                    valid_prompt_ids.extend(new_prompt_ids_list[start:end])
-                    valid_completion_ids.extend(new_completion_ids_list[start:end])
-                    valid_rewards.append(new_rewards_per_func[start:end])
-                    valid_totals.append(new_total_rewards[start:end])
-                    valid_filter_scores.append(new_filter_scores[start:end])
-                    if new_images is not None and valid_images is not None:
-                        valid_images.extend(new_images[start:end])
-                    if new_token_weights_list is not None and valid_token_weights is not None:
-                        valid_token_weights.extend(new_token_weights_list[start:end])
-
-            # Clean up intermediate tensors to prevent memory buildup
-            del new_rewards_per_func, new_total_rewards, new_filter_scores
-            del new_validity_mask
+            del new_rewards_per_func, new_total_rewards, new_filter_scores, new_validity_mask
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-            
-            # Log memory usage after cleanup
-            if self.accelerator.is_main_process and resample_count % 2 == 0:
-                log_memory_usage(self.accelerator, f"[DynSample Resample #{resample_count + 1}] ")
-            
             resample_count += 1
 
-        # Finalize: decide whether to use collected samples or fall back
-        if len(valid_inputs) == 0:
-            # No valid samples collected at all – fall back to original batch
+        if len(global_valid_samples) == 0:
             if self.accelerator.is_main_process:
-                logger.warning(
-                    f"[DynSample] ⚠️ No valid groups found after {resample_count} attempts. "
-                    "Falling back to original batch."
-                )
-            (
-                inputs,
-                prompts,
-                completions,
-                prompt_ids_list,
-                completion_ids_list,
-                rewards_per_func,
-                total_rewards,
-                filter_scores,
-                images,
-                token_weights_list,
-            ) = origin_data
+                logger.warning(f"[DynSample] No valid groups found after {resample_count} attempts, using original batch")
+            (inputs, prompts, completions, prompt_ids_list, completion_ids_list, 
+             rewards_per_func, total_rewards, filter_scores, images, token_weights_list) = origin_data
         else:
-            # Use collected valid samples (up to local_target)
-            keep_count = min(local_target, len(valid_inputs))
-            inputs = valid_inputs[:keep_count]
-            prompts = valid_prompts[:keep_count]
-            completions = valid_completions[:keep_count]
-            prompt_ids_list = valid_prompt_ids[:keep_count]
-            completion_ids_list = valid_completion_ids[:keep_count]
+            rank_idx = self.accelerator.process_index
+            start_idx = rank_idx * local_target
+            end_idx = min(start_idx + local_target, len(global_valid_samples))
             
-            # Concatenate reward tensors
-            if valid_rewards:
-                rewards_per_func = torch.cat(valid_rewards, dim=0)[:keep_count]
-                total_rewards = torch.cat(valid_totals, dim=0)[:keep_count]
-                filter_scores = torch.cat(valid_filter_scores, dim=0)[:keep_count]
+            if end_idx <= start_idx:
+                if self.accelerator.is_main_process:
+                    logger.warning("[DynSample] No samples available in global pool for this rank, using original batch")
+                (inputs, prompts, completions, prompt_ids_list, completion_ids_list, 
+                 rewards_per_func, total_rewards, filter_scores, images, token_weights_list) = origin_data
             else:
-                # Fallback if no rewards collected (shouldn't happen)
-                rewards_per_func = origin_data[5][:keep_count]
-                total_rewards = origin_data[6][:keep_count]
-                filter_scores = origin_data[7][:keep_count]
-            
-            images = valid_images[:keep_count] if valid_images is not None else None
-            token_weights_list = (
-                valid_token_weights[:keep_count] if valid_token_weights is not None else None
-            )
+                my_samples = global_valid_samples[start_idx:end_idx]
+                inputs = [s["input"] for s in my_samples]
+                prompts = [s["prompt"] for s in my_samples]
+                completions = [s["completion"] for s in my_samples]
+                prompt_ids_list = [s["prompt_ids"] for s in my_samples]
+                completion_ids_list = [s["completion_ids"] for s in my_samples]
+                rewards_per_func = torch.stack([s["rewards_per_func"].to(device) for s in my_samples])
+                total_rewards = torch.stack([s["total_reward"].to(device) for s in my_samples])
+                filter_scores = torch.stack([s["filter_score"].to(device) for s in my_samples])
+                images = [s["image"] for s in my_samples] if my_samples[0]["image"] is not None else None
+                token_weights_list = [s["token_weights"] for s in my_samples] if my_samples[0]["token_weights"] is not None else None
+                
+                if self.accelerator.is_main_process:
+                    final_groups = len(my_samples) // ng
+                    print(f"[DynSample] ✅ Using {len(my_samples)} valid samples ({final_groups} groups) after {resample_count} resample(s)")
 
-            if self.accelerator.is_main_process:
-                final_valid_groups = keep_count // ng
-                logger.info(
-                    f"[DynSample] ✅ Using {keep_count} valid samples ({final_valid_groups} groups) "
-                    f"from {resample_count} resample(s)"
-                )
-
-        # Clean up to prevent memory leaks
-        del valid_inputs, valid_prompts, valid_completions
-        del valid_prompt_ids, valid_completion_ids
-        del valid_rewards, valid_totals, valid_filter_scores
+        del global_valid_samples
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
-        
-        # Final memory check
-        if self.accelerator.is_main_process:
-            log_memory_usage(self.accelerator, "[DynSample End] ")
 
         return (
             inputs,
@@ -1841,17 +1767,22 @@ class DAPOTrainer(BaseTrainer):
         rewards_per_func = self._calculate_rewards(inputs, prompts, completions, completion_ids_list)
         total_rewards_local = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
         filter_scores = self._get_dynamic_sampling_scores(rewards_per_func)
+        
+        # Debug: Check dynamic_sample status - use print() to ensure visibility
+        if self.accelerator.is_main_process:
+            has_attr = hasattr(self, 'dynamic_sample')
+            ds_value = getattr(self, 'dynamic_sample', 'ATTRIBUTE_NOT_FOUND')
+            print(
+                f"[DEBUG_DYNSAMPLE] step={getattr(self.state, 'global_step', None)} "
+                f"has_dynamic_sample_attr={has_attr}, value={ds_value}, mode={mode}, "
+                f"len(inputs)={len(inputs)}, filter_scores_shape={filter_scores.shape}"
+            )
+            if has_attr and ds_value:
+                print(f"[DEBUG_DYNSAMPLE] Condition check: dynamic_sample={ds_value} AND mode==train ({mode == 'train'})")
+        
         # Dynamic sampling: filter out flat (accuracy + format + tag) groups and resample (only in training mode).
         if self.dynamic_sample and mode == "train":
-            if self.accelerator.is_main_process:
-                logger.info(
-                    "[DynSample] step=%s enter: batch=%s rewards_shape=%s",
-                    getattr(self.state, "global_step", None),
-                    len(inputs),
-                    tuple(rewards_per_func.shape),
-                )
-                log_memory_usage(self.accelerator, "[Before DynSample] ")
-            
+            # Apply dynamic sampling to replace invalid groups
             (
                 inputs,
                 prompts,
@@ -1875,13 +1806,6 @@ class DAPOTrainer(BaseTrainer):
                 images,
                 token_weights_list,
             )
-            if self.accelerator.is_main_process:
-                logger.info(
-                    "[DynSample] step=%s exit: batch=%s",
-                    getattr(self.state, "global_step", None),
-                    len(inputs),
-                )
-                log_memory_usage(self.accelerator, "[After DynSample] ")
             
             # After dynamic sampling, rebuild tensors/pixel inputs based on the new token ids
             completion_ids_tensors = [torch.tensor(ids, device=device) for ids in completion_ids_list]
