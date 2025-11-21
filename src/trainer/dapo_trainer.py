@@ -1215,9 +1215,6 @@ class DAPOTrainer(BaseTrainer):
         global_valid_samples: list = []  # Will hold dicts with all necessary data
         
         if self.accelerator.is_main_process:
-            print(f"[DynSample] step={getattr(self.state, 'global_step', None)} start: "
-                  f"local_samples={len(inputs)}, local_target={local_target}, "
-                  f"global_target={global_target}, ng={ng}")
             log_memory_usage(self.accelerator, "[DynSample Start] ")
 
         # Initial check: compute validity for current batch
@@ -1228,20 +1225,16 @@ class DAPOTrainer(BaseTrainer):
         try:
             global_filter_scores = gather(filter_scores)
             if self.accelerator.is_main_process and global_filter_scores is not None:
-                if global_filter_scores.numel() > 0 and global_filter_scores.numel() % ng == 0:
-                    gg_scores = global_filter_scores.view(-1, ng)
-                    gg_std = gg_scores.std(dim=1, unbiased=False)
-                    print(f"[DEBUG] Start(Global) step={getattr(self.state, 'global_step', None)} "
-                          f"num_groups={gg_scores.size(0)} stds={gg_std.tolist()}")
-                    for gi in range(min(8, gg_scores.size(0))):
-                        print(f"[DEBUG] Start(Global) group{gi} scores: {gg_scores[gi].tolist()}")
+                pass
         except Exception as e:
             if self.accelerator.is_main_process:
                 logger.warning(f"[DynSample] Failed to gather global stats: {e}")
         
         # Collect valid samples from ALL ranks (gather_object for cross-rank sharing)
         # Build a list of sample dicts, each containing all necessary data for one sample
+        # CRITICAL: Mark each sample with its source rank to prevent duplicates when a rank falls back
         local_samples_with_validity = []
+        current_rank = self.accelerator.process_index
         for idx in range(len(inputs)):
             sample_dict = {
                 "input": inputs[idx],
@@ -1255,6 +1248,7 @@ class DAPOTrainer(BaseTrainer):
                 "image": images[idx] if images is not None else None,
                 "token_weights": token_weights_list[idx] if token_weights_list is not None else None,
                 "valid": validity_mask[idx].item(),  # Boolean indicating if this sample's group is valid
+                "source_rank": current_rank,  # Mark which rank this sample came from
             }
             local_samples_with_validity.append(sample_dict)
         
@@ -1281,30 +1275,17 @@ class DAPOTrainer(BaseTrainer):
             if sample["valid"]:
                 global_valid_samples.append(sample)
         
-        if self.accelerator.is_main_process:
-            print(f"[DynSample] Initial batch: collected {len(global_valid_samples)}/{global_target} "
-                  f"valid samples globally")
         
         # Resample loop: ALL ranks enter synchronously to avoid dataloader deadlock
         # Continue until global pool has enough samples OR max attempts reached
         while len(global_valid_samples) < global_target and resample_count < self.max_resample_times:
-            if self.accelerator.is_main_process:
-                deficit = global_target - len(global_valid_samples)
-                print(
-                    f"[DynSample] Resample #{resample_count + 1}/{self.max_resample_times}: "
-                    f"global_collected={len(global_valid_samples)}/{global_target}, need {deficit} more"
-                )
 
             # CRITICAL: ALL ranks must call next() simultaneously to avoid deadlock!
             try:
-                print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Fetching new batch for resample #{resample_count + 1}")
                 new_inputs = next(self.dynamic_resample_iterator)
-                print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Fetched {len(new_inputs)} new samples")
             except StopIteration:
-                print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Iterator exhausted")
                 break
             except Exception as e:
-                print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Error fetching batch: {e}")
                 break
                 
             new_prompts = [example["prompt"] for example in new_inputs]
@@ -1331,9 +1312,7 @@ class DAPOTrainer(BaseTrainer):
             )
 
             # Generate completions for new batch (ALL ranks participate)
-            print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Starting generation for resample #{resample_count + 1}")
             new_prompt_ids_list, new_completion_ids_list, _, _, extra_fields = self._generate(mm_prompts, new_images)
-            print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Generation complete for resample #{resample_count + 1}")
             new_token_weights_list = extra_fields.pop("token_weights", None) if extra_fields else None
 
             # Decode completions
@@ -1356,7 +1335,6 @@ class DAPOTrainer(BaseTrainer):
                 new_completions = new_completions_conv
 
             # Calculate rewards for new batch (ALL ranks)
-            print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Calculating rewards for resample #{resample_count + 1}")
             new_rewards_per_func = self._calculate_rewards(
                 new_inputs, new_prompts, new_completions, new_completion_ids_list
             )
@@ -1370,19 +1348,15 @@ class DAPOTrainer(BaseTrainer):
             try:
                 global_new_scores = gather(new_filter_scores)
                 if self.accelerator.is_main_process and global_new_scores is not None:
-                    if global_new_scores.numel() > 0 and global_new_scores.numel() % ng == 0:
-                        gg_new_scores = global_new_scores.view(-1, ng)
-                        gg_new_std = gg_new_scores.std(dim=1, unbiased=False)
-                        print(f"[DEBUG] Resample(Global) #{resample_count + 1} step={getattr(self.state, 'global_step', None)} "
-                              f"num_groups={gg_new_scores.size(0)} stds={gg_new_std.tolist()}")
-                        for gi in range(min(8, gg_new_scores.size(0))):
-                            print(f"[DEBUG] Resample(Global) #{resample_count + 1} group{gi} scores: {gg_new_scores[gi].tolist()}")
+                    pass
             except Exception as e:
                 if self.accelerator.is_main_process:
                     logger.warning(f"[DynSample] Failed to gather resample stats: {e}")
             
             # Build sample dicts for this resample batch
+            # CRITICAL: Mark each sample with its source rank to prevent duplicates when a rank falls back
             new_samples_with_validity = []
+            current_rank = self.accelerator.process_index
             for idx in range(len(new_inputs)):
                 sample_dict = {
                     "input": new_inputs[idx],
@@ -1396,6 +1370,7 @@ class DAPOTrainer(BaseTrainer):
                     "image": new_images[idx] if new_images is not None else None,
                     "token_weights": new_token_weights_list[idx] if new_token_weights_list is not None else None,
                     "valid": new_validity_mask[idx].item(),
+                    "source_rank": current_rank,  # Mark which rank this sample came from
                 }
                 new_samples_with_validity.append(sample_dict)
             
@@ -1413,16 +1388,12 @@ class DAPOTrainer(BaseTrainer):
                 else:
                     all_new_samples = new_samples_with_validity  # Fallback
             except Exception as e:
-                print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: Failed to gather new samples: {e}")
                 all_new_samples = new_samples_with_validity  # Fallback to local only
             
             # Add valid samples to global pool
             for sample in all_new_samples:
                 if sample["valid"] and len(global_valid_samples) < global_target:
                     global_valid_samples.append(sample)
-            
-            print(f"[DynSample-SYNC] Rank {self.accelerator.process_index}: After resample #{resample_count + 1}, "
-                  f"global_pool={len(global_valid_samples)}/{global_target}")
 
             # Clean up intermediate tensors to prevent memory buildup
             del new_rewards_per_func, new_total_rewards, new_filter_scores
@@ -1439,7 +1410,6 @@ class DAPOTrainer(BaseTrainer):
         # Finalize: Distribute global valid samples to each rank
         if len(global_valid_samples) == 0:
             # No valid samples collected at all – fall back to original batch
-            print(f"[DynSample-FINAL] Rank {self.accelerator.process_index}: ⚠️ No valid groups found after {resample_count} attempts. Falling back to original batch.")
             (
                 inputs,
                 prompts,
@@ -1462,12 +1432,34 @@ class DAPOTrainer(BaseTrainer):
             # If global pool is smaller than target, take what we can
             if end_idx <= start_idx:
                 # This rank has no samples in the global pool - fallback to original
-                print(f"[DynSample-FINAL] Rank {self.accelerator.process_index}: No samples available in global pool for this rank. Falling back to original batch.")
-                (inputs, prompts, completions, prompt_ids_list, completion_ids_list, rewards_per_func, total_rewards, filter_scores, images, token_weights_list) = origin_data
+                # CRITICAL: To prevent duplicates, only use INVALID samples from origin_data
+                # (valid samples are already in global pool and used by other ranks)
+                
+                # Extract only invalid samples from origin_data
+                origin_inputs, origin_prompts, origin_completions, origin_prompt_ids, origin_completion_ids, \
+                    origin_rewards_per_func, origin_total_rewards, origin_filter_scores, origin_images, origin_token_weights = origin_data
+                
+                # Recompute validity mask for origin_data (in case it wasn't computed)
+                origin_validity_mask = self.compute_group_validity(origin_filter_scores, ng) > 0
+                invalid_indices = (~origin_validity_mask).nonzero(as_tuple=True)[0]
+                
+                if len(invalid_indices) > 0:
+                    # Use invalid samples only
+                    inputs = [origin_inputs[i] for i in invalid_indices]
+                    prompts = [origin_prompts[i] for i in invalid_indices]
+                    completions = [origin_completions[i] for i in invalid_indices]
+                    prompt_ids_list = [origin_prompt_ids[i] for i in invalid_indices]
+                    completion_ids_list = [origin_completion_ids[i] for i in invalid_indices]
+                    rewards_per_func = origin_rewards_per_func[invalid_indices]
+                    total_rewards = origin_total_rewards[invalid_indices]
+                    filter_scores = origin_filter_scores[invalid_indices]
+                    images = [origin_images[i] for i in invalid_indices] if origin_images is not None else None
+                    token_weights_list = [origin_token_weights[i] for i in invalid_indices] if origin_token_weights is not None else None
+                else:
+                    # No invalid samples available - use all origin_data (fallback of last resort)
+                    (inputs, prompts, completions, prompt_ids_list, completion_ids_list, rewards_per_func, total_rewards, filter_scores, images, token_weights_list) = origin_data
             else:
                 my_samples = global_valid_samples[start_idx:end_idx]
-                
-                print(f"[DynSample-FINAL] Rank {self.accelerator.process_index}: Slicing global pool [{start_idx}:{end_idx}], got {len(my_samples)} samples")
                 
                 # Unpack samples into separate lists
                 inputs = [s["input"] for s in my_samples]
@@ -1899,18 +1891,6 @@ class DAPOTrainer(BaseTrainer):
         rewards_per_func = self._calculate_rewards(inputs, prompts, completions, completion_ids_list)
         total_rewards_local = self.reward_weight_manager.calculate_total_reward(rewards_per_func, device)
         filter_scores = self._get_dynamic_sampling_scores(rewards_per_func)
-        
-        # Debug: Check dynamic_sample status - use print() to ensure visibility
-        if self.accelerator.is_main_process:
-            has_attr = hasattr(self, 'dynamic_sample')
-            ds_value = getattr(self, 'dynamic_sample', 'ATTRIBUTE_NOT_FOUND')
-            print(
-                f"[DEBUG_DYNSAMPLE] step={getattr(self.state, 'global_step', None)} "
-                f"has_dynamic_sample_attr={has_attr}, value={ds_value}, mode={mode}, "
-                f"len(inputs)={len(inputs)}, filter_scores_shape={filter_scores.shape}"
-            )
-            if has_attr and ds_value:
-                print(f"[DEBUG_DYNSAMPLE] Condition check: dynamic_sample={ds_value} AND mode==train ({mode == 'train'})")
         
         # Dynamic sampling: filter out flat (accuracy + format + tag) groups and resample (only in training mode).
         if self.dynamic_sample and mode == "train":

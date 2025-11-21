@@ -15,12 +15,7 @@ def _debug_log(message: str, **kwargs: Any) -> None:
     """
     简单的调试输出，便于定位在日志写入流程中的阻塞点。
     """
-    try:
-        details = ", ".join(f"{k}={v}" for k, v in kwargs.items())
-        suffix = f" ({details})" if details else ""
-        print(f"[DAPO-LOG DEBUG] {message}{suffix}")
-    except Exception:
-        print(f"[DAPO-LOG DEBUG] {message}")
+    pass  # 调试日志已禁用
 
 try:
     # Optional accelerate imports for distributed logging. When unavailable
