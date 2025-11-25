@@ -44,12 +44,13 @@ accelerate launch \
   --learning_rate 1e-6 \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \
-  --reward_weights 4.0 0.0 1.0 1.0 1.0 \
+  --vgr_hard_negative \
+  --reward_weights 4.0 2.0 1.0 1.0 0.0 \
   --dynamic_sample \
+  --max_pixels 1000000 \
   >> training_logs/$TS/train.log 2>&1
 
 
-  # --lr_scheduler_type cosine \
   # --early_reward_weights 1.0 0.0 4.0 1.0 0.0 \
   # --use_peft \
   # --lora_target_modules "q_proj", "v_proj" \

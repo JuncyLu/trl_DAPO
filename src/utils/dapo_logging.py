@@ -264,8 +264,6 @@ def emit_rollout_logs(
                         except Exception:
                             pass
                     
-                    # Attention statistics removed (AEI unused)
-                
                 # 样本明细 - 确保 vgr_info 与 rows 长度一致
                 # 如果 vgr_info 长度不足，用空字典填充
                 vgr_info_padded = list(vgr_info) + [{}] * max(0, len(rows) - len(vgr_info))
@@ -442,8 +440,6 @@ def emit_eval_logs(
                 if value is not None:
                     f.write(f"| {key} | {value:.4f} |\n")
 
-            # 不再聚合输出 vgr 原始指标
-            
             # 样本数据
             if eval_samples:
                 f.write(f"\n### Evaluation Samples ({len(eval_samples)} samples)\n\n")
@@ -472,8 +468,12 @@ def emit_eval_logs(
                     reward_parts = []
                     for key, value in rewards.items():
                         reward_parts.append(f"{key}={value:.3f}")
-                    f.write(", ".join(reward_parts))
-                    f.write(f", total={sample.get('total_reward', 0.0):.3f}\n\n")
+                    if reward_parts:
+                        f.write(", ".join(reward_parts))
+                        f.write(f", total={sample.get('total_reward', 0.0):.3f}\n\n")
+                    else:
+                        # 如果rewards为空，至少显示total
+                        f.write(f"total={sample.get('total_reward', 0.0):.3f}\n\n")
                     
                     # 显示详细指标（如果有）
                     if 'detailed_metrics' in sample:
@@ -1076,6 +1076,14 @@ def perform_eval_logging(
         # 对齐 vgr_info 长度
         if vgr_info:
             vgr_info = vgr_info[:sample_count]
+        
+        # 检查奖励数据长度，如果发现不一致则打印警告
+        if reward_names and sample_count > 0:
+            for name in reward_names:
+                vals = reward_lists.get(name, [])
+                if len(vals) < sample_count:
+                    print(f"⚠️  Warning: reward '{name}' has only {len(vals)} values but {sample_count} samples expected")
+        
         eval_samples: List[Dict[str, Any]] = []
         for i in range(sample_count):
             rewards_map: Dict[str, float] = {}
@@ -1097,6 +1105,11 @@ def perform_eval_logging(
                         rewards_map[disp] = float(vals[i])
                     except Exception:
                         pass
+                # 如果数据缺失，使用默认值0.0（可选，根据需求决定是否启用）
+                # else:
+                #     disp = name_map.get(name, name)
+                #     if disp not in rewards_map:  # 避免重复添加
+                #         rewards_map[disp] = 0.0
             total_val = 0.0
             if i < len(total_rewards):
                 try:

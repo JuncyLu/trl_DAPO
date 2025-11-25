@@ -1,9 +1,11 @@
 dataset/
-runs/
+eval/
 training_logs/
 old_logs/
 repo/
 docs/
+src/data/
+VLMvalKit/
 *.bak
 .gitattributes
 .last_checked

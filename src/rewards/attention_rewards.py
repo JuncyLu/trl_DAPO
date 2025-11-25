@@ -17,10 +17,11 @@ from typing import List
 
 def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     """
-    基于组内分位数归一化的 VGR (Vision-Text Gain Ratio) 奖励函数。
+    基于组内MAD标准化的 VGR (Vision-Text Gain Ratio) 奖励函数。
     - VGR 越小表示注意力越平衡，映射到更高的奖励
-    - 在同一 prompt 的多次采样内进行分位数归一化
-    - 分位差不足时返回中性奖励 0.5
+    - 在同一 prompt 的多次采样内使用 MAD (Median Absolute Deviation) 标准化
+    - 使用 tanh 函数映射到 [-0.5, 0.5] 范围
+    - MAD 不足时返回中性奖励 0.0
     
     需要 kwargs:
       - attention_text: List[float]   # A_T（所有输出 token 对文本 token 的总注意力）
@@ -28,7 +29,10 @@ def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
       - num_text_tokens: List[int]    # |T|
       - num_vision_tokens: List[int]  # |O|
       - num_generations: int          # 每个 prompt 的采样数
+      - vgr_sigma: float              # tanh 的缩放因子，默认 1.0
     """
+    import numpy as np
+    
     n = len(completions)
     if n == 0:
         return []
@@ -39,17 +43,18 @@ def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     N_T = kwargs.get("num_text_tokens", [])
     N_O = kwargs.get("num_vision_tokens", [])
     num_generations = kwargs.get("num_generations", 1)
+    sigma = kwargs.get("vgr_sigma", 1.0)  # 默认 sigma=1.0
     
     # 数据验证
     if not all([isinstance(x, list) for x in [A_T, A_O, N_T, N_O]]):
-        return [0.5] * n
+        return [0.0] * n
     
     m = min(len(A_T), len(A_O), len(N_T), len(N_O), n)
     if m == 0:
-        return [0.5] * n
+        return [0.0] * n
     
     # 计算每个样本的 VGR 值
-    eps = 1e-6
+    eps = 1e-8
     vgr_values = []
     for i in range(m):
         try:
@@ -74,14 +79,11 @@ def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     
     # 按 num_generations 分组
     if num_generations <= 1:
-        # 单采样，直接返回 0.5
-        return [0.5] * n
+        # 单采样，直接返回 0.0
+        return [0.0] * n
     
     num_groups = m // num_generations
     rewards = []
-    
-    alpha_abs = 5.0  # 绝对阈值
-    beta_rel = 0.10  # 相对阈值 10%
     
     for group_idx in range(num_groups):
         start_idx = group_idx * num_generations
@@ -92,62 +94,42 @@ def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
         valid_vgrs = [x for x in group_vgrs if x is not None]
         group_size = len(valid_vgrs)
         
-        # 判断分位差是否充足
-        if group_size < 3:
-            # 样本太少，返回 0.5
-            rewards.extend([0.5] * len(group_vgrs))
+        # 样本太少，无法稳定估计
+        if group_size < 2:
+            rewards.extend([0.0] * len(group_vgrs))
             continue
         
-        # 计算 IQR 和中位数，确定分位数位置
-        sorted_vgrs = sorted(valid_vgrs)
+        # 计算 Median 和 MAD
+        valid_vgrs_array = np.array(valid_vgrs)
+        median_v = np.median(valid_vgrs_array)
+        mad = np.median(np.abs(valid_vgrs_array - median_v))
         
-        if group_size < 10:
-            # 样本少，用 Q75-Q25
-            q_lo_idx = int(group_size * 0.25)
-            q_hi_idx = int(group_size * 0.75)
-        else:
-            # 样本多，用 Q90-Q10
-            q_lo_idx = int(group_size * 0.10)
-            q_hi_idx = int(group_size * 0.90)
-        
-        q_lo = sorted_vgrs[q_lo_idx]
-        q_hi = sorted_vgrs[q_hi_idx]
-        iqr = q_hi - q_lo
-        median = sorted_vgrs[group_size // 2]
-        
-        # 判断分位差是否充足
-        threshold = max(alpha_abs, beta_rel * median)
-        if iqr < threshold:
-            # 分位差不足
-            rewards.extend([0.5] * len(group_vgrs))
+        # MAD 过小，说明组内变异不足
+        if mad < eps:
+            rewards.extend([0.0] * len(group_vgrs))
             continue
         
-        # 分位差充足，使用分位数进行归一化
-        # 检查分母是否过小（兜底保护）
-        if iqr <= eps:
-            # 即使通过了阈值判定，分母仍可能为0，统一返回0.5
-            rewards.extend([0.5] * len(group_vgrs))
-            continue
-        
-        # 使用分位数映射：s = clip((Q_hi - VGR) / (Q_hi - Q_lo), 0, 1)
-        # VGR 越小 -> (Q_hi - VGR) 越大 -> s 越大（奖励越高）
+        # 使用 MAD 标准化 + tanh 映射
+        # z = (median - vgr) / (1.4826 * MAD)  # VGR 越小 -> z 越大 -> reward 越高
+        # reward = 0.5 * tanh(z / sigma)  # 映射到 [-0.5, 0.5]
         for vgr in group_vgrs:
             if vgr is None:
-                rewards.append(0.5)
+                rewards.append(0.0)
             else:
-                normalized = (q_hi - vgr) / iqr
-                # clip 到 [0, 1]
-                normalized = max(0.0, min(1.0, normalized))
-                rewards.append(float(normalized))
+                z = (median_v - vgr) / (1.4826 * mad + eps)
+                reward = 0.5 * np.tanh(z / sigma)
+                # clip 到 [-0.5, 0.5]
+                reward = float(np.clip(reward, -0.5, 0.5))
+                rewards.append(reward)
     
     # 处理剩余样本（不足一组的）
     remaining = m % num_generations
     if remaining > 0:
-        rewards.extend([0.5] * remaining)
+        rewards.extend([0.0] * remaining)
     
     # 对齐长度
     if len(rewards) < n:
-        rewards.extend([0.5] * (n - len(rewards)))
+        rewards.extend([0.0] * (n - len(rewards)))
     elif len(rewards) > n:
         rewards = rewards[:n]
     
@@ -156,10 +138,11 @@ def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
 
 def vgr_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
     """
-    基于组内分位数归一化的 VGR 奖惩（第二版）：
-    - 组内分位数映射仍基于「所有样本」的 VGR（与 vgr_reward 一致）
+    基于组内MAD标准化的 VGR 奖惩（Hard Negative版本）：
+    - 组内 MAD 映射基于「所有样本」的 VGR（与 vgr_reward 一致）
     - 但最终只对 acc=1 的样本应用该映射，acc=0 的样本返回 0（中性）
-    - 将 [0, 1] 线性平移为 [-0.5, 0.5] 作为奖惩值
+    - 使用 tanh 函数映射到 [-0.5, 0.5] 范围作为奖惩值
+    - 如果组内只有一个正确样本，返回 0（中性）
 
     需要 kwargs:
       - attention_text: List[float]
@@ -168,7 +151,10 @@ def vgr_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
       - num_vision_tokens: List[int]
       - num_generations: int
       - accuracies: List[float]  # 每个样本的准确率（0.0 或 1.0），与 completions 对齐
+      - vgr_sigma: float         # tanh 的缩放因子，默认 1.0
     """
+    import numpy as np
+    
     n = len(completions)
     if n == 0:
         return []
@@ -180,6 +166,7 @@ def vgr_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
     N_O = kwargs.get("num_vision_tokens", [])
     num_generations = kwargs.get("num_generations", 1)
     accuracies = kwargs.get("accuracies", None)
+    sigma = kwargs.get("vgr_sigma", 1.0)  # 默认 sigma=1.0
 
     # 数据验证
     if not all([isinstance(x, list) for x in [A_T, A_O, N_T, N_O]]):
@@ -193,7 +180,7 @@ def vgr_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
         return [0.0] * n
 
     # 计算每个样本的 VGR 值
-    eps = 1e-6
+    eps = 1e-8
     vgr_values: List[float] = []
     for i in range(m):
         try:
@@ -224,67 +211,57 @@ def vgr_hard_negative(completions: List[List[dict]], **kwargs) -> List[float]:
     num_groups = m // num_generations
     rewards: List[float] = []
 
-    alpha_abs = 5.0  # 绝对阈值
-    beta_rel = 0.10  # 相对阈值 10%
-
     for group_idx in range(num_groups):
         start_idx = group_idx * num_generations
         end_idx = start_idx + num_generations
         group_vgrs = vgr_values[start_idx:end_idx]
         group_accs = accuracies[start_idx:end_idx]
 
-        # 先基于「所有样本的有效 VGR」做分位统计
+        # 先基于「所有样本的有效 VGR」做统计
         valid_vgrs_all = [x for x in group_vgrs if x is not None]
         group_size_all = len(valid_vgrs_all)
 
         group_rewards = [0.0] * len(group_vgrs)  # 默认中性 0
 
-        if group_size_all < 3:
-            # 样本太少，无法稳定分位归一化：acc=1 也返回 0；acc=0 本就为 0
+        # 样本太少，无法稳定估计
+        if group_size_all < 2:
             rewards.extend(group_rewards)
             continue
 
-        sorted_vgrs = sorted(valid_vgrs_all)
-        if group_size_all < 10:
-            q_lo_idx = int(group_size_all * 0.25)
-            q_hi_idx = int(group_size_all * 0.75)
-        else:
-            q_lo_idx = int(group_size_all * 0.10)
-            q_hi_idx = int(group_size_all * 0.90)
+        # 计算 Median 和 MAD
+        valid_vgrs_array = np.array(valid_vgrs_all)
+        median_v = np.median(valid_vgrs_array)
+        mad = np.median(np.abs(valid_vgrs_array - median_v))
 
-        q_lo = sorted_vgrs[q_lo_idx]
-        q_hi = sorted_vgrs[q_hi_idx]
-        iqr = q_hi - q_lo
-        median = sorted_vgrs[group_size_all // 2]
-
-        threshold = max(alpha_abs, beta_rel * median)
-        if iqr < threshold or iqr <= eps:
-            # 分位差不足或分母过小：acc=1 返回 0；acc=0 仍为 0
+        # MAD 过小，说明组内变异不足
+        if mad < eps:
             rewards.extend(group_rewards)
             continue
 
-        # 组内对所有样本先计算映射值（基于所有样本的 VGR），但只赋给 acc=1
-        mapped_values = []
-        for vgr in group_vgrs:
-            if vgr is None:
-                mapped_values.append(None)
-            else:
-                normalized = (q_hi - vgr) / iqr  # 映射到 [0, 1]
-                normalized = max(0.0, min(1.0, float(normalized)))
-                mapped = normalized - 0.5  # 平移到 [-0.5, 0.5]
-                # clip 到 [-0.5, 0.5]
-                mapped_values.append(max(-0.5, min(0.5, mapped)))
-
-        # 如果组内仅有一个 acc=1，按约定该样本返回 0（中性）
+        # 统计组内正确样本数量
         acc1_count = sum(1 for x in group_accs if float(x) == 1.0)
+        
+        # 如果组内只有一个或没有正确样本，全部返回 0
+        if acc1_count < 2:
+            rewards.extend(group_rewards)
+            continue
 
-        for j, (acc, mapped) in enumerate(zip(group_accs, mapped_values)):
+        # 使用 MAD 标准化 + tanh 映射（与 vgr_reward 一致的逻辑）
+        # z = (median - vgr) / (1.4826 * MAD)  # VGR 越小 -> z 越大 -> reward 越高
+        # reward = 0.5 * tanh(z / sigma)  # 映射到 [-0.5, 0.5]
+        # 但只对 acc=1 的样本应用，acc=0 的样本保持 0
+        for j, (vgr, acc) in enumerate(zip(group_vgrs, group_accs)):
             if float(acc) == 1.0:
-                if acc1_count >= 2 and mapped is not None:
-                    group_rewards[j] = float(mapped)
-                else:
+                if vgr is None:
                     group_rewards[j] = 0.0
+                else:
+                    z = (median_v - vgr) / (1.4826 * mad + eps)
+                    reward = 0.5 * np.tanh(z / sigma)
+                    # clip 到 [-0.5, 0.5]
+                    reward = float(np.clip(reward, -0.5, 0.5))
+                    group_rewards[j] = reward
             else:
+                # acc=0 的样本保持 0
                 group_rewards[j] = 0.0
 
         rewards.extend(group_rewards)

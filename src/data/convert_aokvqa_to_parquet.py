@@ -3,7 +3,6 @@
 将 A-OKVQA 数据集转换成与 DMD 数据集相同 schema 的 Parquet（image/problem/solution）。
 
 特点：
-- 直接使用 HuggingFaceM4/A-OKVQA 中自带的图像字段（无需本地 COCO 路径）
 - image 列输出 struct { bytes, path }，与 dmd_rl.parquet 对齐
 - solution 取 direct_answers 的首个非空答案
 python3 src/data/convert_aokvqa_to_parquet.py \

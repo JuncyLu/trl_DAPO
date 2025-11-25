@@ -490,6 +490,7 @@ class DAPOTrainer(BaseTrainer):
         # Dynamic sampling (DAPO paper)
         self.dynamic_sample = args.dynamic_sample
         self.max_resample_times = args.max_resample_times
+        self._pending_dynsample_log = None  # Store DynSample log message for delayed output
         
         # Debug: Confirm initialization - use print() to ensure visibility
         print(f"[INIT] Dynamic sampling: enabled={self.dynamic_sample}, max_resample_times={self.max_resample_times}")
@@ -569,24 +570,9 @@ class DAPOTrainer(BaseTrainer):
         self.num_completions_to_print = args.num_completions_to_print
         # Evaluation can use a different number of generations per sample
         self.eval_num_generations = getattr(args, "eval_num_generations", 2) or 2
-        # Keep logs sized to the generation batch to record only outputs from the latest model update.
-        self._logs = {
-            "images": deque(maxlen=args.generation_batch_size),
-            "prompt": deque(maxlen=args.generation_batch_size),
-            "completion": deque(maxlen=args.generation_batch_size),
-            "prompt_chatml": deque(maxlen=args.generation_batch_size),
-            "rewards": defaultdict(lambda: deque(maxlen=args.generation_batch_size)),
-            "advantages": deque(maxlen=args.generation_batch_size),
-        }
-
-        # Initialize attention tracking
+        # Initialize attention/metrics flags and internal logs
         self.compute_attention_metrics = args.compute_attention_metrics
-        if self.compute_attention_metrics:
-            self._logs["attention"] = deque(maxlen=1000)
-            self._attention_skip_reasons = deque(maxlen=1000)
-        # Initialize token weights tracking (optional)
-        if getattr(args, "token_weights", False):
-            self._logs["token_weights"] = deque(maxlen=1000)
+        self._reset_internal_logs()
 
         # Ensure each process receives a unique seed to prevent duplicate completions when generating.
         set_seed(args.seed, device_specific=True)
@@ -640,22 +626,6 @@ class DAPOTrainer(BaseTrainer):
         # Initialize dynamic resampling iterator if enabled
         if self.dynamic_sample:
             self._prepare_dynamic_resample_iterator()
-
-    def _prepare_dynamic_resample_iterator(self):
-        """
-        Prepare a cyclic iterator for dynamic resampling.
-        Uses a different seed to ensure the resample dataset does not overlap with train_dataset.
-        """
-        def cyclic_iter(iterable):
-            while True:
-                for x in iterable:
-                    yield x
-
-        # Use a different seed (original + 1) to avoid overlap
-        original_seed = self.args.seed
-        self.args.seed = original_seed + 1
-        self.dynamic_resample_iterator = cyclic_iter(self.get_train_dataloader())
-        self.args.seed = original_seed  # restore
 
     def _set_signature_columns_if_needed(self):
         # If `self.args.remove_unused_columns` is True, non-signature columns are removed.
@@ -748,6 +718,23 @@ class DAPOTrainer(BaseTrainer):
             mini_repeat_count=self.eval_num_generations,
             seed=self.args.seed,
         )
+
+    def _prepare_dynamic_resample_iterator(self):
+        """
+        Prepare a cyclic iterator for dynamic resampling.
+        Uses a different seed to ensure the resample dataset does not overlap with train_dataset.
+        """
+
+        def cyclic_iter(iterable):
+            while True:
+                for x in iterable:
+                    yield x
+
+        # Use a different seed (original + 1) to avoid overlap
+        original_seed = self.args.seed
+        self.args.seed = original_seed + 1
+        self.dynamic_resample_iterator = cyclic_iter(self.get_train_dataloader())
+        self.args.seed = original_seed  # restore
 
     @profiling_decorator
     def _get_last_hidden_state(
@@ -1479,13 +1466,17 @@ class DAPOTrainer(BaseTrainer):
                 
                 if self.accelerator.is_main_process:
                     final_groups = len(my_samples) // ng
-                    print(
+                    # Store DynSample message for later output in log() method
+                    self._pending_dynsample_log = (
                         f"[DynSample] Rank {self.accelerator.process_index}: ✅ Using {len(my_samples)} valid samples "
                         f"({final_groups} groups) from global pool after {resample_count} resample(s)"
                     )
                     log_memory_usage(self.accelerator, f"[DynSample Success] ")
 
         # Clean up to prevent memory leaks
+        # Check if we need to clear pending log before deleting global_valid_samples
+        if self.accelerator.is_main_process and len(global_valid_samples) == 0:
+            self._pending_dynsample_log = None
         del global_valid_samples
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
@@ -1506,8 +1497,6 @@ class DAPOTrainer(BaseTrainer):
             images,
             token_weights_list,
         )
-
-    # _recompute_group_advantages removed - no longer needed with dynamic sampling
 
     def _generate_single_turn(self, prompts: list, images: Optional[list] = None):
         device = self.accelerator.device
@@ -2120,8 +2109,7 @@ class DAPOTrainer(BaseTrainer):
         if token_weights_tensor is not None:
             output["token_weights"] = token_weights_tensor
 
-        # Emit rollout logs if enabled (moved to logging utils)
-        # Note: removed filtered_flags logic - dynamic sampling handles this internally
+        # Emit rollout logs if enabled (moved to logging utils).
         # For per-rank logging we use the full local batch slice.
         process_slice = slice(0, rewards_per_func.size(0))
         perform_realtime_rollout_logging(
@@ -2453,6 +2441,13 @@ class DAPOTrainer(BaseTrainer):
         # Pretty print compact grouped logs to terminal (moved to logging utils)
         if self.accelerator.is_main_process:
             try:
+                # First output DynSample log if available (before Rewards/Optim)
+                if hasattr(self, '_pending_dynsample_log') and self._pending_dynsample_log is not None:
+                    print(self._pending_dynsample_log)
+                    self._pending_dynsample_log = None  # Clear after output
+                    import sys
+                    sys.stdout.flush()  # Ensure DynSample is printed before Rewards/Optim
+                
                 print_compact_logs(logs, mode, use_hard_negative=getattr(self.args, "vgr_hard_negative", False))
                 # Emit evaluation markdown logs: moved to logging utils
                 perform_eval_logging(
@@ -2487,58 +2482,6 @@ class DAPOTrainer(BaseTrainer):
         if model is None:
             model = self.model
         return unwrap_model_for_generation(model, self.accelerator)
-    
-    @contextmanager
-    def _temporary_attn_impl(self, attn_impl: str = "eager"):
-        """
-        Temporarily switch attention implementation on the base model config.
-        For vision-language models like Qwen2VL, also set on language_model submodule.
-        """
-        if not self.compute_attention_metrics:
-            yield
-            return
-
-        base = self._unwrap_model_for_config()
-        cfg = getattr(base, "config", None)
-        if cfg is None:
-            yield
-            return
-        
-        # Store previous values
-        prev_main = getattr(cfg, "_attn_implementation", None)
-        prev_lm = None
-        lm_cfg = None
-        
-        # For vision-language models, also set on language_model
-        if hasattr(base, "language_model"):
-            lm_cfg = getattr(base.language_model, "config", None)
-            if lm_cfg is not None:
-                prev_lm = getattr(lm_cfg, "_attn_implementation", None)
-        
-        try:
-            setattr(cfg, "_attn_implementation", attn_impl)
-            if lm_cfg is not None:
-                setattr(lm_cfg, "_attn_implementation", attn_impl)
-            yield
-        finally:
-            # Restore main config
-            if prev_main is None:
-                try:
-                    delattr(cfg, "_attn_implementation")
-                except Exception:
-                    pass
-            else:
-                setattr(cfg, "_attn_implementation", prev_main)
-            
-            # Restore language_model config
-            if lm_cfg is not None:
-                if prev_lm is None:
-                    try:
-                        delattr(lm_cfg, "_attn_implementation")
-                    except Exception:
-                        pass
-                else:
-                    setattr(lm_cfg, "_attn_implementation", prev_lm)
 
     @contextmanager
     def _attn_last_k_layers_only(self, model: nn.Module, last_k_layers: Optional[int] = None):
@@ -2659,3 +2602,81 @@ class DAPOTrainer(BaseTrainer):
             token_weights_deque=None, 
         )
         return tw_list
+
+    def _reset_internal_logs(self, force_eval_mode: bool = False) -> None:
+        """
+        Reset internal logging buffers used to assemble rollout/eval samples.
+        This is called at init time and when switching into evaluation to avoid
+        mixing train and eval samples inside the same deques.
+        
+        Args:
+            force_eval_mode: If True, use eval-sized buffers regardless of model.training state.
+                            This is useful when entering eval mode before model.eval() is called.
+        """
+        # Keep logs sized to the generation batch to record only outputs from the latest model update.
+        gbatch = self.args.generation_batch_size
+        
+        # For eval, use a larger buffer to accommodate multiple eval batches without data loss.
+        # For train, use standard generation_batch_size to only keep the latest rollout.
+        is_eval_mode = force_eval_mode or (hasattr(self, "model") and not self.model.training)
+        if is_eval_mode:
+            # Use a large buffer for eval to avoid losing samples across multiple batches
+            log_size = max(gbatch * 20, 1000)  # At least 1000 samples
+        else:
+            log_size = gbatch
+        
+        # Fix defaultdict lambda to properly capture log_size
+        def make_reward_deque():
+            return deque(maxlen=log_size)
+        
+        self._logs = {
+            "images": deque(maxlen=log_size),
+            "prompt": deque(maxlen=log_size),
+            "completion": deque(maxlen=log_size),
+            "prompt_chatml": deque(maxlen=log_size),
+            "rewards": defaultdict(make_reward_deque),
+            "advantages": deque(maxlen=log_size),
+        }
+        # Initialize attention tracking deques
+        if getattr(self, "compute_attention_metrics", False):
+            self._logs["attention"] = deque(maxlen=2000)  # Increased for eval
+            self._attention_skip_reasons = deque(maxlen=2000)
+        # Initialize token weights tracking (optional)
+        if getattr(self.args, "token_weights", False):
+            self._logs["token_weights"] = deque(maxlen=2000)
+
+    def evaluate(self, *args, **kwargs):
+        """
+        Run evaluation with a fresh set of internal logs so that eval markdown
+        logs and attention-based metrics are computed only from eval batches.
+        
+        This method clears internal logs before and after eval to prevent:
+        1. Train data contaminating eval logs (before eval)
+        2. Eval data contaminating next train batch rewards (after eval)
+        """
+        # Clear train history before eval to avoid mixing train/eval samples.
+        # Use force_eval_mode=True since model.eval() may not be called yet.
+        self._reset_internal_logs(force_eval_mode=True)
+        
+        try:
+            result = super().evaluate(*args, **kwargs)
+        finally:
+            # Clear eval history after eval to avoid polluting next train batch.
+            # This is critical: if we don't clear, the next train batch may use
+            # eval's attention data for VGR reward calculation.
+            self._reset_internal_logs(force_eval_mode=False)
+        
+        return result
+
+    def predict(self, *args, **kwargs):
+        """
+        Run prediction with a fresh set of internal logs, mirroring evaluate().
+        """
+        self._reset_internal_logs(force_eval_mode=True)
+        
+        try:
+            result = super().predict(*args, **kwargs)
+        finally:
+            self._reset_internal_logs(force_eval_mode=False)
+        
+        return result
