@@ -1,0 +1,622 @@
+(dapo) lujunxi57@instance-20251022-125445:~/trl$ python inference_vgr_entropy.py
+================================================================================
+开始推理脚本
+================================================================================
+
+1. 加载数据集...
+数据集大小: 9930
+第一个样本的keys: dict_keys(['image', 'problem', 'solution'])
+
+2. 加载模型和processor...
+正在加载模型: Qwen/Qwen2.5-VL-3B-Instruct
+Loading checkpoint shards: 100%|███████████████████████████████████████████| 2/2 [00:02<00:00,  1.24s/it]
+
+Prompt: What is the man by the bags awaiting?
+Image size: (640, 480)
+
+================================================================================
+开始第 1 次推理...
+================================================================================
+generate_inputs keys: ['input_ids', 'attention_mask', 'pixel_values', 'image_grid_thw']
+  pixel_values: shape=torch.Size([1564, 1176]), dtype=torch.bfloat16
+  image_grid_thw: shape=torch.Size([1, 3]), dtype=torch.int64
+  从scores获取logits: logits_list长度=108, 第一个logit shape=torch.Size([1, 151936])
+  堆叠后logits shape: torch.Size([1, 108, 151936])
+计算VGR指标...
+计算熵值...
+  logits shape: torch.Size([1, 108, 151936])
+  logits dtype: torch.float32
+  logits contains nan: False
+  logits contains inf: True
+  警告: logits包含nan或inf值
+  entropy_per_token shape: torch.Size([1, 108])
+  entropy_per_token contains nan: False
+
+================================================================================
+推理 1 结果
+================================================================================
+生成文本: The man by the bags, which include a suitcase and a duffel bag, is likely waiting for someone or something. He appears to be standing on the side of the road, possibly near a street or a parking area. The presence of the luggage suggests he might be traveling, either arriving or departing from a destination. The exact reason for his waiting is not clear from the image alone, but it could be for a ride, waiting for someone to pick him up, or perhaps he has just arrived and is preparing to leave.
+
+Token级别的VGR和熵值:
+Token                          VGR             Entropy        
+------------------------------------------------------------
+The                            34.9811         0.4114         
+ man                           37.7057         0.0000         
+ by                            33.4730         1.2964         
+ the                           17.7196         0.0000         
+ bags                          51.1716         0.0000         
+,                              15.6109         0.7780         
+ which                         27.8169         0.2110         
+ include                       5.1220          0.0000         
+ a                             2.8205          0.0000         
+ suitcase                      8.2519          0.3729         
+ and                           4.3713          0.0000         
+ a                             2.9052          0.0000         
+ d                             5.6630          0.2111         
+uff                            8.0132          0.0000         
+el                             8.2008          0.0000         
+ bag                           10.5878         0.0000         
+,                              68.5895         0.0000         
+ is                            38.4698         0.4511         
+ likely                        56.8599         0.0000         
+ waiting                       38.7286         0.6892         
+ for                           15.7341         0.0000         
+ someone                       21.5844         0.3729         
+ or                            20.0731         0.2685         
+ something                     28.4835         0.0000         
+.                              27.1919         0.0000         
+ He                            16.9295         1.0574         
+ appears                       12.7551         1.0294         
+ to                            16.9786         0.0000         
+ be                            9.8050          0.0000         
+ standing                      11.4420         1.0161         
+ on                            7.5195          0.4114         
+ the                           4.7861          0.6585         
+ side                          9.0814          0.6026         
+ of                            7.6245          0.0000         
+ the                           4.4265          0.6585         
+ road                          10.1674         0.0000         
+,                              9.7139          0.2385         
+ possibly                      11.9385         0.3603         
+ near                          5.8722          1.0875         
+ a                             3.5204          0.0000         
+ street                        5.1408          1.3187         
+ or                            4.0820          0.5968         
+ a                             4.1795          0.6482         
+ parking                       5.1414          0.0000         
+ area                          10.0840         0.4114         
+.                              27.6102         0.4910         
+ The                           11.9361         0.3729         
+ presence                      23.3777         0.0000         
+ of                            6.2387          0.0000         
+ the                           8.0738          0.4114         
+ luggage                       18.9676         0.6026         
+ suggests                      26.1175         0.0000         
+ he                            25.0361         0.6585         
+ might                         18.3528         0.0000         
+ be                            13.7528         0.0000         
+ traveling                     14.7535         0.9673         
+,                              13.3059         0.4114         
+ either                        9.0669          1.4855         
+ arriving                      12.4569         0.5132         
+ or                            10.3990         0.0000         
+ departing                     16.1248         0.5303         
+ from                          10.8307         1.0526         
+ a                             6.0615          0.0000         
+ destination                   18.3574         0.9295         
+.                              44.5664         0.0000         
+ The                           10.4633         1.0542         
+ exact                         50.0753         0.2685         
+ reason                        81.6617         0.0000         
+ for                           50.1918         0.0000         
+ his                           33.4473         0.0000         
+ waiting                       34.3500         0.6892         
+ is                            33.5292         0.4511         
+ not                           35.8873         0.0000         
+ clear                         40.2850         0.0000         
+ from                          31.1741         0.0000         
+ the                           19.7576         0.0000         
+ image                         67.2521         0.0000         
+ alone                         79.3062         0.0000         
+,                              35.2279         0.0000         
+ but                           27.1409         0.0000         
+ it                            39.6403         0.4910         
+ could                         26.2961         0.0000         
+ be                            22.5317         0.0000         
+ for                           14.7873         0.5071         
+ a                             7.4763          0.6585         
+ ride                          10.8357         1.2736         
+,                              9.3523          0.0000         
+ waiting                       13.5028         1.1344         
+ for                           9.3615          0.0000         
+ someone                       8.9928          0.6332         
+ to                            8.1371          0.5679         
+ pick                          16.8898         0.8542         
+ him                           10.3632         0.0000         
+ up                            14.3050         0.0000         
+,                              10.5206         0.0000         
+ or                            14.2368         0.0000         
+ perhaps                       12.0740         1.1940         
+ he                            14.9841         0.9658         
+ has                           7.5499          0.4910         
+ just                          6.1721          0.1636         
+ arrived                       12.6088         0.0000         
+ and                           18.1973         0.4114         
+ is                            16.4832         0.0000         
+ preparing                     19.2066         1.7642         
+ to                            8.7271          0.0000         
+ leave                         23.0326         1.5991         
+.                              41.6703         0.0000         
+<|im_end|>                     0.0000          0.0000         
+
+统计信息:
+  平均VGR: 20.0410
+  最大VGR: 81.6617
+  最小VGR: 2.8205
+  平均熵值: 0.3589
+  最大熵值: 1.7642
+  最小熵值: 0.0000
+
+================================================================================
+开始第 2 次推理...
+================================================================================
+generate_inputs keys: ['input_ids', 'attention_mask', 'pixel_values', 'image_grid_thw']
+  pixel_values: shape=torch.Size([1564, 1176]), dtype=torch.bfloat16
+  image_grid_thw: shape=torch.Size([1, 3]), dtype=torch.int64
+  从scores获取logits: logits_list长度=47, 第一个logit shape=torch.Size([1, 151936])
+  堆叠后logits shape: torch.Size([1, 47, 151936])
+计算VGR指标...
+计算熵值...
+  logits shape: torch.Size([1, 47, 151936])
+  logits dtype: torch.float32
+  logits contains nan: False
+  logits contains inf: True
+  警告: logits包含nan或inf值
+  entropy_per_token shape: torch.Size([1, 47])
+  entropy_per_token contains nan: False
+
+================================================================================
+推理 2 结果
+================================================================================
+生成文本: It is not clear what the man is awaiting. He could be waiting for someone, waiting for a bus, or waiting for a ride. It could also be that he is waiting for the luggage to be loaded into the vehicle.
+
+Token级别的VGR和熵值:
+Token                          VGR             Entropy        
+------------------------------------------------------------
+It                             88.0861         0.4114         
+ is                            70.5083         0.5303         
+ not                           74.8900         1.0158         
+ clear                         185.2308        0.5679         
+ what                          90.2566         0.5679         
+ the                           40.2603         0.0000         
+ man                           86.3193         0.0000         
+ is                            98.9535         0.6332         
+ awaiting                      89.8672         0.0000         
+.                              56.1455         0.0000         
+ He                            24.4808         0.7555         
+ could                         40.5608         0.3011         
+ be                            34.2867         0.0000         
+ waiting                       25.4308         0.0000         
+ for                           14.1584         0.0000         
+ someone                       22.2476         0.5679         
+,                              21.0489         0.4114         
+ waiting                       18.1373         1.4866         
+ for                           12.4047         0.3359         
+ a                             7.4915          0.7080         
+ bus                           17.7753         0.8549         
+,                              18.0419         0.0000         
+ or                            21.4365         0.4511         
+ waiting                       24.5897         0.8272         
+ for                           14.0679         0.4511         
+ a                             8.6079          0.7225         
+ ride                          44.0257         1.0649         
+.                              54.0807         0.0000         
+ It                            57.7860         0.2385         
+ could                         34.9892         0.5679         
+ also                          35.5376         0.0000         
+ be                            23.0518         0.0000         
+ that                          24.6176         0.6794         
+ he                            20.5792         0.0000         
+ is                            14.2632         0.0000         
+ waiting                       24.1432         1.1029         
+ for                           13.0169         0.0000         
+ the                           9.8189          1.5373         
+ luggage                       12.5802         1.7540         
+ to                            13.4696         0.0000         
+ be                            11.8731         0.4910         
+ loaded                        30.5622         1.4770         
+ into                          12.3292         0.9118         
+ the                           5.9676          0.6585         
+ vehicle                       28.1155         0.6585         
+.                              58.2101         0.0000         
+<|im_end|>                     0.0000          0.0000         
+
+统计信息:
+  平均VGR: 37.7022
+  最大VGR: 185.2308
+  最小VGR: 5.9676
+  平均熵值: 0.4839
+  最大熵值: 1.7540
+  最小熵值: 0.0000
+
+================================================================================
+两次推理结果对比
+================================================================================
+
+生成文本对比:
+  推理1: The man by the bags, which include a suitcase and a duffel bag, is likely waiting for someone or som...
+  推理2: It is not clear what the man is awaiting. He could be waiting for someone, waiting for a bus, or wai...
+
+VGR指标对比:
+  推理1平均VGR: 20.0410
+  推理2平均VGR: 37.7022
+
+熵值对比:
+  推理1平均熵值: 0.3589
+  推理2平均熵值: 0.4839
+
+脚本执行完成！
+(dapo) lujunxi57@instance-20251022-125445:~/trl$ python inference_vgr_entropy.py
+================================================================================
+开始推理脚本
+================================================================================
+
+1. 加载数据集...
+数据集大小: 9930
+第一个样本的keys: dict_keys(['image', 'problem', 'solution'])
+
+2. 加载模型和processor...
+正在加载模型: Qwen/Qwen2.5-VL-3B-Instruct
+Loading checkpoint shards: 100%|███████████████████████████████████████████| 2/2 [00:02<00:00,  1.25s/it]
+
+Prompt: What is the man by the bags awaiting?
+Image size: (640, 480)
+
+================================================================================
+开始第 1 次推理...
+================================================================================
+generate_inputs keys: ['input_ids', 'attention_mask', 'pixel_values', 'image_grid_thw']
+  pixel_values: shape=torch.Size([1564, 1176]), dtype=torch.bfloat16
+  image_grid_thw: shape=torch.Size([1, 3]), dtype=torch.int64
+  从scores获取logits: logits_list长度=146, 第一个logit shape=torch.Size([1, 151936])
+  堆叠后logits shape: torch.Size([1, 146, 151936])
+计算VGR指标...
+计算熵值...
+  logits shape: torch.Size([1, 146, 151936])
+  logits dtype: torch.float32
+  logits contains nan: False (count: 0)
+  logits contains inf: True (count: 22182313)
+  警告: logits包含nan或inf值，正在清理...
+  清理后: nan=0, inf=0
+  entropy_per_token shape: torch.Size([1, 146])
+  entropy_per_token contains nan: False
+  entropy_per_token range: [-0.0000, 2.2559]
+
+================================================================================
+推理 1 结果
+================================================================================
+生成文本: <think>The image shows a man standing on the side of a road, holding a red suitcase and a smaller suitcase with a black and orange stripe. He is facing away from the camera, looking towards the street. There are no visible signs of him waiting for someone or something in the image. The setting appears to be a quiet suburban area with a few cars parked along the street and trees in the background. The man's posture and the way he is holding the bags suggest he might be in the process of traveling, possibly waiting for transportation or having just arrived at his destination. However, there is no direct indication in the image that he is waiting for someone or something specific.</think>
+<answer>travel</answer>
+
+Token级别的VGR和熵值:
+Token                          VGR             Entropy        
+------------------------------------------------------------
+<th                            64.5930         -0.0000        
+ink                            47.5096         -0.0000        
+>The                           13.8941         0.6332         
+ image                         19.3715         0.3729         
+ shows                         9.2235          0.4511         
+ a                             6.1059          0.3359         
+ man                           7.6968          -0.0000        
+ standing                      9.0020          0.5303         
+ on                            4.2246          0.3011         
+ the                           3.3851          0.6775         
+ side                          7.3996          -0.0000        
+ of                            3.7769          -0.0000        
+ a                             1.9813          -0.0000        
+ road                          7.6281          0.4114         
+,                              7.9489          0.6332         
+ holding                       4.4703          0.5303         
+ a                             2.5520          -0.0000        
+ red                           3.6719          0.2685         
+ suitcase                      4.3809          0.7698         
+ and                           3.2633          0.9187         
+ a                             1.8778          0.4910         
+ smaller                       2.7061          1.2429         
+ suitcase                      4.4788          0.8052         
+ with                          1.4756          1.0227         
+ a                             1.3892          -0.0000        
+ black                         1.6153          1.5210         
+ and                           1.4715          0.6930         
+ orange                        2.3551          1.5686         
+ stripe                        5.2496          1.4775         
+.                              8.8982          -0.0000        
+ He                            9.0440          0.6026         
+ is                            5.9784          0.6892         
+ facing                        5.0507          1.0882         
+ away                          8.9383          -0.0000        
+ from                          8.0113          -0.0000        
+ the                           4.8725          -0.0000        
+ camera                        7.6801          -0.0000        
+,                              7.2649          -0.0000        
+ looking                       7.3284          0.4114         
+ towards                       2.3069          0.6985         
+ the                           2.9941          0.6026         
+ street                        4.0329          0.9410         
+.                              9.3717          -0.0000        
+ There                         7.4261          0.8518         
+ are                           3.5529          0.6585         
+ no                            10.3829         1.1428         
+ visible                       14.7915         0.4057         
+ signs                         20.6320         -0.0000        
+ of                            19.2856         0.6775         
+ him                           43.0325         1.7773         
+ waiting                       41.6493         0.3011         
+ for                           14.9107         -0.0000        
+ someone                       17.5946         0.6522         
+ or                            21.8982         0.4910         
+ something                     24.0748         0.4511         
+ in                            15.4705         1.2740         
+ the                           8.8593          -0.0000        
+ image                         20.1921         -0.0000        
+.                              14.9715         -0.0000        
+ The                           8.7475          0.1094         
+ setting                       9.5449          1.5066         
+ appears                       5.9419          -0.0000        
+ to                            8.7184          -0.0000        
+ be                            4.7812          -0.0000        
+ a                             2.4071          0.6026         
+ quiet                         2.3729          1.0360         
+ suburban                      2.7697          1.1601         
+ area                          4.4768          0.6026         
+ with                          1.1932          -0.0000        
+ a                             0.9334          1.2619         
+ few                           1.2984          1.7283         
+ cars                          2.2796          0.3729         
+ parked                        2.3355          0.4114         
+ along                         2.9402          0.8262         
+ the                           1.9225          -0.0000        
+ street                        4.5119          -0.0000        
+ and                           0.9978          0.9594         
+ trees                         2.1036          1.0949         
+ in                            2.7855          0.6892         
+ the                           2.1415          -0.0000        
+ background                    10.9715         -0.0000        
+.                              22.2811         0.6332         
+ The                           11.6271         0.3729         
+ man                           14.0977         -0.0000        
+'s                             7.6642          1.0843         
+ posture                       17.6386         0.7405         
+ and                           10.8096         0.3359         
+ the                           10.8018         -0.0000        
+ way                           16.3844         0.1861         
+ he                            7.9300          -0.0000        
+ is                            8.1788          -0.0000        
+ holding                       14.0885         0.2685         
+ the                           15.2283         -0.0000        
+ bags                          14.9998         0.4114         
+ suggest                       15.3216         -0.0000        
+ he                            13.4318         -0.0000        
+ might                         11.0016         0.2385         
+ be                            10.7753         -0.0000        
+ in                            8.2298          1.1638         
+ the                           7.6447          0.2385         
+ process                       12.5529         -0.0000        
+ of                            5.9476          -0.0000        
+ traveling                     8.9035          1.7901         
+,                              9.0716          0.4910         
+ possibly                      8.4115          0.6600         
+ waiting                       9.3556          1.9227         
+ for                           4.6755          -0.0000        
+ transportation                9.6021          0.9592         
+ or                            7.7779          0.1434         
+ having                        4.9337          2.2559         
+ just                          4.6175          -0.0000        
+ arrived                       8.7166          -0.0000        
+ at                            6.5729          1.2664         
+ his                           5.3223          0.6332         
+ destination                   15.0181         -0.0000        
+.                              27.4145         0.6332         
+ However                       29.8784         -0.0000        
+,                              25.7992         -0.0000        
+ there                         27.6332         0.9187         
+ is                            22.6205         0.6332         
+ no                            16.7374         -0.0000        
+ direct                        25.6395         1.4596         
+ indication                    36.9986         0.5679         
+ in                            23.2048         0.6332         
+ the                           12.9704         -0.0000        
+ image                         37.0537         -0.0000        
+ that                          50.2413         -0.0000        
+ he                            98.6682         -0.0000        
+ is                            84.5277         -0.0000        
+ waiting                       134.4049        0.5303         
+ for                           47.4272         -0.0000        
+ someone                       67.1686         1.2264         
+ or                            47.7643         -0.0000        
+ something                     46.8308         -0.0000        
+ specific                      54.1787         -0.0000        
+.</                            38.2083         0.2385         
+think                          81.5542         -0.0000        
+>
+                             54.6719         -0.0000        
+<                              29.6741         -0.0000        
+answer                         26.7297         -0.0000        
+>                              18.5816         -0.0000        
+travel                         23.9621         1.2536         
+</                             43.5501         0.4910         
+answer                         110.0722        -0.0000        
+>                              47.5828         -0.0000        
+<|im_end|>                     0.0000          -0.0000        
+
+统计信息:
+  平均VGR: 17.1223
+  最大VGR: 134.4049
+  最小VGR: 0.9334
+  平均熵值: 0.4528
+  最大熵值: 2.2559
+  最小熵值: -0.0000
+
+================================================================================
+开始第 2 次推理...
+================================================================================
+generate_inputs keys: ['input_ids', 'attention_mask', 'pixel_values', 'image_grid_thw']
+  pixel_values: shape=torch.Size([1564, 1176]), dtype=torch.bfloat16
+  image_grid_thw: shape=torch.Size([1, 3]), dtype=torch.int64
+  从scores获取logits: logits_list长度=106, 第一个logit shape=torch.Size([1, 151936])
+  堆叠后logits shape: torch.Size([1, 106, 151936])
+计算VGR指标...
+计算熵值...
+  logits shape: torch.Size([1, 106, 151936])
+  logits dtype: torch.float32
+  logits contains nan: False (count: 0)
+  logits contains inf: True (count: 16104941)
+  警告: logits包含nan或inf值，正在清理...
+  清理后: nan=0, inf=0
+  entropy_per_token shape: torch.Size([1, 106])
+  entropy_per_token contains nan: False
+  entropy_per_token range: [-0.0000, 2.2485]
+
+================================================================================
+推理 2 结果
+================================================================================
+生成文本: <think>Observing the image, the man is standing on the street with two bags: a suitcase and a duffel bag. He appears to be waiting for something or someone. The presence of these bags suggests he might be traveling or on the move. However, there is no clear indication of a specific event or destination, so the most accurate answer is that he is awaiting something or someone. The context of his situation is not fully clear from the image alone.</think>
+<answer>awaiting</answer>
+
+Token级别的VGR和熵值:
+Token                          VGR             Entropy        
+------------------------------------------------------------
+<th                            64.5930         -0.0000        
+ink                            47.5096         -0.0000        
+>                              19.2673         0.6332         
+Observ                         25.5915         1.5352         
+ing                            14.5027         -0.0000        
+ the                           10.0933         -0.0000        
+ image                         17.5969         -0.0000        
+,                              13.9137         -0.0000        
+ the                           11.2613         0.5697         
+ man                           11.0247         -0.0000        
+ is                            7.2018          0.3729         
+ standing                      8.7541          0.5376         
+ on                            4.3379          0.6202         
+ the                           3.2452          0.6775         
+ street                        6.6639          0.8953         
+ with                          4.9233          0.6482         
+ two                           7.9644          1.3633         
+ bags                          7.2880          0.3729         
+:                              3.7369          1.2607         
+ a                             1.7399          0.3729         
+ suitcase                      4.1288          1.2015         
+ and                           2.8426          -0.0000        
+ a                             1.9633          -0.0000        
+ d                             3.7274          0.5697         
+uff                            5.0781          -0.0000        
+el                             5.0922          -0.0000        
+ bag                           4.0781          -0.0000        
+.                              10.3334         -0.0000        
+ He                            9.5614          0.8869         
+ appears                       9.6911          0.6892         
+ to                            12.3008         -0.0000        
+ be                            11.8109         -0.0000        
+ waiting                       16.0210         0.4750         
+ for                           9.0401          0.8260         
+ something                     13.5992         0.6332         
+ or                            14.9662         -0.0000        
+ someone                       12.5201         -0.0000        
+.                              8.3150          0.6931         
+ The                           5.4082          0.7734         
+ presence                      12.0681         1.3712         
+ of                            3.8275          -0.0000        
+ these                         13.3514         0.9258         
+ bags                          16.0795         -0.0000        
+ suggests                      13.5830         -0.0000        
+ he                            14.3649         0.3729         
+ might                         13.6054         0.3011         
+ be                            10.9152         -0.0000        
+ traveling                     9.4010          0.6160         
+ or                            9.4665          0.3359         
+ on                            7.7667          1.5576         
+ the                           7.4827          0.2685         
+ move                          13.4878         -0.0000        
+.                              9.8979          0.4910         
+ However                       17.1294         1.0293         
+,                              14.7679         -0.0000        
+ there                         12.7955         1.0158         
+ is                            8.0025          0.6775         
+ no                            8.4590          -0.0000        
+ clear                         13.5122         1.2432         
+ indication                    18.9914         -0.0000        
+ of                            19.0681         -0.0000        
+ a                             12.0251         1.5241         
+ specific                      32.4770         -0.0000        
+ event                         36.6359         0.3603         
+ or                            15.5836         -0.0000        
+ destination                   30.5799         1.7667         
+,                              16.3298         1.3585         
+ so                            49.2981         0.7684         
+ the                           39.9138         0.8544         
+ most                          25.6420         1.0161         
+ accurate                      35.1610         1.4654         
+ answer                        43.1168         0.3011         
+ is                            32.8452         1.0587         
+ that                          38.3663         -0.0000        
+ he                            71.6698         0.6585         
+ is                            48.7888         -0.0000        
+ awaiting                      23.4099         0.6892         
+ something                     28.7619         1.7981         
+ or                            19.2383         1.0684         
+ someone                       25.3469         -0.0000        
+.                              13.2141         0.9479         
+ The                           5.4955          0.1636         
+ context                       11.4243         2.2485         
+ of                            9.4600          1.0525         
+ his                           8.9393          0.9486         
+ situation                     18.4449         2.0199         
+ is                            9.4350          0.7443         
+ not                           14.7150         -0.0000        
+ fully                         12.8874         1.0743         
+ clear                         15.3801         0.6602         
+ from                          11.2592         -0.0000        
+ the                           7.1752          -0.0000        
+ image                         22.1804         -0.0000        
+ alone                         33.2004         0.3729         
+.</                            36.9520         0.4910         
+think                          78.9126         -0.0000        
+>
+                             45.5291         -0.0000        
+<                              24.1733         -0.0000        
+answer                         44.2768         -0.0000        
+>                              22.3973         -0.0000        
+await                          40.2670         0.2685         
+ing                            24.0537         -0.0000        
+</                             37.1143         0.9966         
+answer                         119.4451        -0.0000        
+>                              60.6648         -0.0000        
+<|im_end|>                     0.0000          -0.0000        
+
+统计信息:
+  平均VGR: 19.7324
+  最大VGR: 119.4451
+  最小VGR: 1.7399
+  平均熵值: 0.5046
+  最大熵值: 2.2485
+  最小熵值: -0.0000
+
+================================================================================
+两次推理结果对比
+================================================================================
+
+生成文本对比:
+  推理1: <think>The image shows a man standing on the side of a road, holding a red suitcase and a smaller su...
+  推理2: <think>Observing the image, the man is standing on the street with two bags: a suitcase and a duffel...
+
+VGR指标对比:
+  推理1平均VGR: 17.1223
+  推理2平均VGR: 19.7324
+
+熵值对比:
+  推理1平均熵值: 0.4528
+  推理2平均熵值: 0.5046
+
+脚本执行完成！
+(dapo) lujunxi57@instance-20251022-125445:~/trl$ 

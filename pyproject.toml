@@ -120,6 +120,7 @@ dev = [
     "Pillow",
     "torchvision",
     "num2words==0.5.14"
+    "wandb"
 ]
 
 [tool.setuptools]

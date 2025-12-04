@@ -1099,17 +1099,18 @@ def perform_eval_logging(
             }
             for name in reward_names:
                 vals = reward_lists.get(name, [])
+                disp = name_map.get(name, name)
                 if i < len(vals):
                     try:
-                        disp = name_map.get(name, name)
                         rewards_map[disp] = float(vals[i])
                     except Exception:
-                        pass
-                # 如果数据缺失，使用默认值0.0（可选，根据需求决定是否启用）
-                # else:
-                #     disp = name_map.get(name, name)
-                #     if disp not in rewards_map:  # 避免重复添加
-                #         rewards_map[disp] = 0.0
+                        # 如果转换失败，使用默认值0.0
+                        if disp not in rewards_map:
+                            rewards_map[disp] = 0.0
+                else:
+                    # 如果数据缺失，使用默认值0.0，确保所有样本都有完整的奖励信息
+                    if disp not in rewards_map:
+                        rewards_map[disp] = 0.0
             total_val = 0.0
             if i < len(total_rewards):
                 try:

@@ -2058,10 +2058,14 @@ class DAPOTrainer(BaseTrainer):
         self._logs["prompt"].extend(safe_gather_object(prompts_text, max_str_len=2000))
         self._logs["completion"].extend(safe_gather_object(completions_text, max_str_len=2000))
         self._logs["prompt_chatml"].extend(safe_gather_object(rendered_prompts, max_str_len=2000))
+        # Gather rewards from all processes to match prompt/completion counts
         for i, name in enumerate(self.reward_func_names):
-            self._logs["rewards"][name].extend(rewards_per_func[:, i].tolist())
-        self._logs["rewards"]["total"].extend(rewards.tolist())
-        self._logs["advantages"].extend(all_process_advantages.tolist())
+            reward_values = rewards_per_func[:, i].tolist()
+            self._logs["rewards"][name].extend(safe_gather_object(reward_values, max_str_len=None))
+        total_reward_values = rewards.tolist()
+        self._logs["rewards"]["total"].extend(safe_gather_object(total_reward_values, max_str_len=None))
+        advantage_values = all_process_advantages.tolist()
+        self._logs["advantages"].extend(safe_gather_object(advantage_values, max_str_len=None))
         # Also log mean rewards for each group (for better understanding of advantages)
         if "mean_reward" not in self._logs:
             self._logs["mean_reward"] = deque(maxlen=self.args.generation_batch_size)
@@ -2072,6 +2076,7 @@ class DAPOTrainer(BaseTrainer):
             self._logs["images"].extend(images)
 
         # Optional: construct token_weights_tensor from token_weights_list that flows with samples
+        # Apply the same normalization/masking/clipping as in the loss, so logs reflect effective weights.
         token_weights_tensor = None
         try:
             if getattr(self.args, "token_weights", False) and token_weights_list is not None:
@@ -2085,6 +2090,7 @@ class DAPOTrainer(BaseTrainer):
                         t[:n] = torch.tensor(w[:n], dtype=torch.float32, device=device)
                     tw_tensors.append(t)
                 token_weights_tensor = torch.stack(tw_tensors, dim=0)
+                token_weights_tensor = self._postprocess_token_weights(token_weights_tensor, completion_ids)
         except Exception:
             token_weights_tensor = None
 
@@ -2137,6 +2143,139 @@ class DAPOTrainer(BaseTrainer):
         )
 
         return output
+
+    def _postprocess_token_weights(
+        self,
+        w: torch.Tensor,
+        completion_ids: Optional[torch.Tensor],
+    ) -> torch.Tensor:
+        """
+        Apply per-sequence normalization, formatting tag reweighting, hard/soft stopword
+        handling, and per-sequence upper-quantile clipping to token weights.
+
+        This is used both for logging (token_weights.md) and for training.
+        """
+        try:
+            if w is None:
+                return w
+
+            # Per-sequence normalization to keep mean scale ~1
+            if w.dim() == 2 and w.size(0) > 0:
+                row_mean = w.mean(dim=1, keepdim=True).clamp_min(1e-6)
+                w = w / row_mean
+
+            tokenizer = getattr(self.processing_class, "tokenizer", self.processing_class)
+
+            # Formatting tags (<think>, </think>, <answer>, </answer>, <|im_end|>, etc.)
+            try:
+                tag_token_ids = getattr(self, "_tag_token_ids", None)
+                if tag_token_ids is None:
+                    tag_strs = ["<", ">", "</", "<think", "</think", "<answer", "</answer", "<|im_end|>"]
+                    tag_token_ids = set()
+                    for s in tag_strs:
+                        try:
+                            encoded = tokenizer(s, add_special_tokens=False)
+                            input_ids = encoded["input_ids"] if isinstance(encoded, dict) else encoded.input_ids
+                            for tid in input_ids:
+                                tag_token_ids.add(int(tid))
+                        except Exception:
+                            continue
+                    self._tag_token_ids = tag_token_ids
+                if tag_token_ids and completion_ids is not None:
+                    tag_mask = torch.zeros_like(completion_ids, dtype=torch.bool, device=completion_ids.device)
+                    for tid in tag_token_ids:
+                        tag_mask |= completion_ids == tid
+                    tag_weight = float(getattr(self.args, "format_tag_weight", 1.5))
+                    w = torch.where(tag_mask.to(w.device), torch.full_like(w, tag_weight), w)
+            except Exception:
+                pass
+
+            # Hard stopwords: force w -> 1.0
+            try:
+                if completion_ids is not None:
+                    hard_stop_token_ids = getattr(self, "_hard_stop_token_ids", None)
+                    if hard_stop_token_ids is None:
+                        hard_stop_strs = [
+                            "a", "A", "an", "the", "The",
+                            "and", "of", "in", "on", "or",
+                            "to", "be", "is", "are", "it",
+                            ",", ".", "?", "!", ";", ":", "\"", "'", "'s",
+                            "(", ")", "-",
+                        ]
+                        hard_stop_token_ids = set()
+                        for s in hard_stop_strs:
+                            for variant in (s, f" {s}"):
+                                try:
+                                    enc = tokenizer(variant, add_special_tokens=False)
+                                    ids = enc["input_ids"] if isinstance(enc, dict) else enc.input_ids
+                                    for tid in ids:
+                                        hard_stop_token_ids.add(int(tid))
+                                except Exception:
+                                    continue
+                        self._hard_stop_token_ids = hard_stop_token_ids
+
+                    if hard_stop_token_ids:
+                        hard_mask = torch.zeros_like(completion_ids, dtype=torch.bool, device=completion_ids.device)
+                        for tid in hard_stop_token_ids:
+                            hard_mask |= completion_ids == tid
+                        if hard_mask.any():
+                            w = torch.where(hard_mask.to(w.device), torch.ones_like(w), w)
+            except Exception:
+                pass
+
+            # Soft stopwords: attenuate amplification (w>1), keep w >= 1.0
+            try:
+                if completion_ids is not None:
+                    soft_stop_token_ids = getattr(self, "_soft_stop_token_ids", None)
+                    if soft_stop_token_ids is None:
+                        soft_stop_strs = [
+                            "with", "by", "including", "from", "at",
+                            "into", "between", "within",
+                            "as", "have", "has", "being",
+                            "some", "many", "all", "both", "each",
+                            "over", "under", "where", "while", "during",
+                            "more", "less", "out", "its", "their",
+                        ]
+                        soft_stop_token_ids = set()
+                        for s in soft_stop_strs:
+                            for variant in (s, f" {s}"):
+                                try:
+                                    enc = tokenizer(variant, add_special_tokens=False)
+                                    ids = enc["input_ids"] if isinstance(enc, dict) else enc.input_ids
+                                    for tid in ids:
+                                        soft_stop_token_ids.add(int(tid))
+                                except Exception:
+                                    continue
+                        self._soft_stop_token_ids = soft_stop_token_ids
+
+                    if soft_stop_token_ids:
+                        soft_mask = torch.zeros_like(completion_ids, dtype=torch.bool, device=completion_ids.device)
+                        for tid in soft_stop_token_ids:
+                            soft_mask |= completion_ids == tid
+                        if soft_mask.any():
+                            alpha = 0.3
+                            w_soft = 1.0 + alpha * torch.relu(w - 1.0)
+                            w = torch.where(soft_mask.to(w.device), w_soft, w)
+            except Exception:
+                pass
+
+            # Upper-quantile clipping per sequence
+            try:
+                if w.dim() == 2 and w.size(0) > 0:
+                    q = torch.quantile(
+                        w,
+                        float(getattr(self.args, "token_weight_quantile", 0.95)),
+                        dim=1,
+                        keepdim=True,
+                    )
+                    w = torch.minimum(w, q)
+            except Exception:
+                pass
+
+        except Exception:
+            return w
+
+        return w
 
     def compute_liger_loss(self, unwrapped_model, inputs):
         # Compute the per-token log probabilities for the model
@@ -2291,12 +2430,6 @@ class DAPOTrainer(BaseTrainer):
         if getattr(self.args, "token_weights", False) and ("token_weights" in inputs) and (inputs["token_weights"] is not None):
             try:
                 w = inputs["token_weights"].to(coef_1.device)
-                # Per-sequence normalization
-                row_sum = w.sum(dim=1, keepdim=True).clamp_min(1e-6)
-                w = w / row_sum
-                # Upper-quantile clipping per sequence
-                q = torch.quantile(w, float(getattr(self.args, "token_weight_quantile", 0.95)), dim=1, keepdim=True)
-                w = torch.minimum(w, q)
                 # Scale negative-advantage sequences
                 pos = (advantages > 0).float().unsqueeze(1)
                 neg = 1.0 - pos
@@ -2661,9 +2794,6 @@ class DAPOTrainer(BaseTrainer):
         try:
             result = super().evaluate(*args, **kwargs)
         finally:
-            # Clear eval history after eval to avoid polluting next train batch.
-            # This is critical: if we don't clear, the next train batch may use
-            # eval's attention data for VGR reward calculation.
             self._reset_internal_logs(force_eval_mode=False)
         
         return result

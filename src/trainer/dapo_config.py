@@ -573,8 +573,12 @@ class DAPOConfig(TrainingArguments):
         metadata={"help": "对每序列 token 权重按该分位数做上截断（0~1）。仅 token_weights=True 时生效。"},
     )
     neg_adv_token_scale: float = field(
-        default=0.5,
+        default=1.0,
         metadata={"help": "对负优势样本的 token 权重缩放系数（0~1）。仅 token_weights=True 时生效。"},
+    )
+    format_tag_weight: float = field(
+        default=1.5,
+        metadata={"help": "格式化标签（<think>, <answer>等）的权重，归一化后设置。默认1.5，略高于平均值，确保format rewards有足够梯度信号。仅 token_weights=True 时生效。"},
     )
 
     oom_backoff_enable: bool = field(
