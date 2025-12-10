@@ -279,7 +279,7 @@ def _compute_segment_metrics(
     gen_row_start = max(num_prompt_queries, 0)
     if gen_row_start >= total_queries:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
-    
+
     generated_tokens = total_queries - num_prompt_queries
     if generated_tokens <= 0:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
@@ -325,7 +325,7 @@ def _compute_segment_metrics(
         attn_text_total += gen_attn_norm[:, text_keys_mask].sum().item()
         attn_vision_total += gen_attn_norm[:, vision_keys_mask].sum().item()
         num_layers_with_data += 1
-        
+
         del gen_attn, gen_attn_norm, text_keys_mask, vision_keys_mask
 
     if num_layers_with_data == 0:
@@ -341,6 +341,98 @@ def _compute_segment_metrics(
     return AttentionSegmentResult(vgr, attn_text_avg, attn_vision_avg)
 
 
+def _compute_token_weights_for_sample(
+    per_layer_attn: Dict[int, torch.Tensor],
+    instruction_mask: torch.Tensor,
+    vision_mask: torch.Tensor,
+    num_prompt_queries: int,
+    actual_prompt_length: int,
+    smooth_sigma: float,
+    clip_range: Tuple[float, float],
+) -> List[float]:
+    """Compute token-level VGR-based weights for a single sample."""
+    if not per_layer_attn:
+        return []
+
+    any_layer = next(iter(per_layer_attn.values()))
+    if any_layer is None or any_layer.numel() == 0:
+        return []
+
+    total_queries = int(any_layer.shape[0])
+    num_generated_tokens = max(total_queries - num_prompt_queries, 0)
+    if num_generated_tokens <= 0:
+        return []
+
+    attn_text = torch.zeros(num_generated_tokens, dtype=torch.float32)
+    attn_vision = torch.zeros(num_generated_tokens, dtype=torch.float32)
+    layers_with_data = 0
+
+    layer_indices_sorted = sorted(list(per_layer_attn.keys()))
+
+    for layer_idx in layer_indices_sorted:
+        attn = per_layer_attn.get(layer_idx)
+        if attn is None or attn.shape[0] == 0:
+            continue
+
+        prompt_cols = min(actual_prompt_length, attn.shape[1])
+        rows = attn[num_prompt_queries:, :prompt_cols]
+        if rows.numel() == 0:
+            continue
+
+        row_sum = rows.sum(dim=1, keepdim=True)
+        row_sum = torch.where(row_sum > 1e-12, row_sum, torch.ones_like(row_sum))
+        rows = rows / row_sum
+
+        vmask = vision_mask[:prompt_cols] if vision_mask.shape[0] != prompt_cols else vision_mask
+        imask = instruction_mask[:prompt_cols] if instruction_mask.shape[0] != prompt_cols else instruction_mask
+
+        vmask = vmask.to(dtype=torch.bool)
+        imask = imask.to(dtype=torch.bool)
+
+        attn_text += rows[:, imask].sum(dim=1)
+        attn_vision += rows[:, vmask].sum(dim=1)
+        layers_with_data += 1
+
+    if layers_with_data == 0:
+        return []
+
+    attn_text = attn_text / layers_with_data
+    attn_vision = attn_vision / layers_with_data
+
+    num_text_tokens = max(int(instruction_mask.sum().item()), 1)
+    num_vision_tokens = int(vision_mask.sum().item())
+
+    if num_vision_tokens <= 0:
+        return [1.0] * num_generated_tokens
+
+    eps = 1e-6
+    text_density = attn_text / max(num_text_tokens, 1)
+    vision_density = attn_vision / max(num_vision_tokens, 1)
+    vgr_tok = text_density / (vision_density + eps)
+    vgr_tok = torch.where(torch.isfinite(vgr_tok) & (vgr_tok > 0), vgr_tok, torch.ones_like(vgr_tok))
+
+    weights = 1.0 / (vgr_tok + eps)
+
+    if smooth_sigma > 0.0 and weights.numel() > 2:
+        half = max(1, int(3 * smooth_sigma))
+        xs = torch.arange(-half, half + 1, dtype=weights.dtype)
+        kernel = torch.exp(-0.5 * (xs / (smooth_sigma + 1e-6)) ** 2)
+        kernel = kernel / kernel.sum()
+        pad_left = half
+        pad_right = half
+        padded = torch.nn.functional.pad(weights[None, None, :], (pad_left, pad_right), mode="replicate")
+        smoothed = torch.nn.functional.conv1d(padded, kernel[None, None, :])[0, 0]
+        weights = smoothed
+
+    mean_w = weights.mean() if weights.numel() > 0 else torch.tensor(1.0)
+    if mean_w.abs() > 1e-12:
+        weights = weights / mean_w
+    lo, hi = clip_range
+    weights = torch.clamp(weights, min=lo, max=hi)
+
+    return weights.detach().cpu().tolist()
+
+
 def compute_qwen_attention_metrics_for_batch(
     _model,
     processor,
@@ -349,14 +441,22 @@ def compute_qwen_attention_metrics_for_batch(
     sequences: torch.Tensor,
     image_grid_thw: Optional[torch.Tensor] = None,
     last_k_layers: Optional[int] = None,
-) -> Tuple[List[Optional[AttentionSampleResult]], List[Optional[str]]]:
-    """Compute Qwen attention metrics for a batch of samples."""
+    compute_token_weights: bool = False,
+    token_weights_smooth_sigma: float = 0.0,
+    token_weights_clip: Tuple[float, float] = (0.2, 3.0),
+) -> Tuple[List[Optional[AttentionSampleResult]], List[Optional[str]], Optional[List[List[float]]]]:
+    """Compute Qwen attention metrics for a batch of samples.
+
+    When `compute_token_weights=True`, token-level VGR 权重会在同一次
+    attention 遍历中一并计算出来，避免额外的二次遍历。
+    """
     batch_size = input_ids.size(0)
     results: List[Optional[AttentionSampleResult]] = []
     skip_reasons: List[Optional[str]] = []
+    token_weights_batch: Optional[List[List[float]]] = [] if compute_token_weights else None
 
     if outputs_attentions is None or len(outputs_attentions) == 0:
-        return results, skip_reasons
+        return results, skip_reasons, token_weights_batch
 
     # Determine which layers to use: either all, or only the last-k layers
     total_layers = len(outputs_attentions[0])
@@ -379,14 +479,18 @@ def compute_qwen_attention_metrics_for_batch(
         grid_items = [None] * batch_size
 
     for batch_idx in range(batch_size):
-        per_layer_attn = _collect_llm_attention_for_sample(outputs_attentions, batch_idx, last_k_layers=last_k_layers)
+        per_layer_attn = _collect_llm_attention_for_sample(
+            outputs_attentions, batch_idx, last_k_layers=last_k_layers
+        )
         if not per_layer_attn:
             results.append(None)
             skip_reasons.append("no_attention")
+            if token_weights_batch is not None:
+                token_weights_batch.append([])
             continue
 
         input_ids_sample = input_ids[batch_idx].detach().cpu()
-        
+
         spans = extract_vision_token_spans_qwen(
             _model,
             processor,
@@ -403,7 +507,7 @@ def compute_qwen_attention_metrics_for_batch(
         num_text_tokens = int(instruction_mask.sum().item())
         num_vision_tokens = int(vision_mask.sum().item())
         actual_prompt_length = instruction_mask.numel()
-        
+
         num_prompt_queries = max(actual_prompt_length - 1, 0)
 
         total_queries = 0
@@ -415,10 +519,14 @@ def compute_qwen_attention_metrics_for_batch(
         if total_queries <= num_prompt_queries:
             results.append(None)
             skip_reasons.append("no_generated_queries")
+            if token_weights_batch is not None:
+                token_weights_batch.append([])
             continue
         if num_vision_tokens <= 0:
             results.append(None)
             skip_reasons.append("no_vision_tokens")
+            if token_weights_batch is not None:
+                token_weights_batch.append([])
             continue
 
         segment_results: Dict[str, AttentionSegmentResult] = {}
@@ -435,8 +543,8 @@ def compute_qwen_attention_metrics_for_batch(
         results.append(
             AttentionSampleResult(
                 segments=segment_results,
-                num_instruction_tokens=int(instruction_mask.sum().item()),
-                num_vision_tokens=int(vision_mask.sum().item()),
+                num_instruction_tokens=num_text_tokens,
+                num_vision_tokens=num_vision_tokens,
                 num_generated_tokens=num_generated_tokens,
                 num_prompt_queries=num_prompt_queries,
                 total_queries=total_queries,
@@ -444,10 +552,22 @@ def compute_qwen_attention_metrics_for_batch(
             )
         )
         skip_reasons.append(None)
-        
+
+        if token_weights_batch is not None:
+            weights = _compute_token_weights_for_sample(
+                per_layer_attn=per_layer_attn,
+                instruction_mask=instruction_mask,
+                vision_mask=vision_mask,
+                num_prompt_queries=num_prompt_queries,
+                actual_prompt_length=actual_prompt_length,
+                smooth_sigma=token_weights_smooth_sigma,
+                clip_range=token_weights_clip,
+            )
+            token_weights_batch.append(weights)
+
         del per_layer_attn, input_ids_sample, spans, instruction_mask, vision_mask
 
-    return results, skip_reasons
+    return results, skip_reasons, token_weights_batch
 
 
 def process_attention_context(
@@ -482,6 +602,7 @@ def process_attention_context(
         image_grid_thw_cpu = image_grid_thw.detach().cpu() if isinstance(image_grid_thw, torch.Tensor) else None
 
         last_k = getattr(args, "attention_last_k_layers", None)
+        want_token_weights = bool(getattr(args, "token_weights", False))
         samples_tuple = compute_qwen_attention_metrics_for_batch(
             model,
             processor,
@@ -490,33 +611,24 @@ def process_attention_context(
             sequences,
             image_grid_thw=image_grid_thw_cpu,
             last_k_layers=last_k,
+            compute_token_weights=want_token_weights,
+            token_weights_smooth_sigma=float(getattr(args, "token_weights_smooth_sigma", 0.0)),
+            token_weights_clip=tuple(getattr(args, "token_weights_clip", (0.2, 3.0))),
         )
+
+        # 解包（向后兼容：旧版本可能只返回两个元素）
+        tw_list = None
         if isinstance(samples_tuple, tuple):
-            sample_results, skip_reasons = samples_tuple
+            if len(samples_tuple) == 3:
+                sample_results, skip_reasons, tw_list = samples_tuple
+            else:
+                sample_results, skip_reasons = samples_tuple
         else:
             sample_results = samples_tuple
             skip_reasons = [None] * len(sample_results)
 
-        # Optional token weights
-        tw_list = None
-        try:
-            if getattr(args, "token_weights", False):
-                from .attention_token_weights import build_token_vgr_weights_for_batch
-                tw_list, _tw_debug = build_token_vgr_weights_for_batch(
-                    outputs_attentions=outputs.attentions,
-                    input_ids=input_ids,
-                    sequences=sequences,
-                    processor=processor,
-                    image_grid_thw=image_grid_thw_cpu,
-                    exclude_special=True,
-                    smooth_sigma=float(getattr(args, "token_weights_smooth_sigma", 0.0)),
-                    clip_range=tuple(getattr(args, "token_weights_clip", (0.2, 3.0))),
-                    last_k_layers=last_k,
-                )
-                if token_weights_deque is not None and hasattr(token_weights_deque, "extend") and tw_list:
-                    token_weights_deque.extend(tw_list)
-        except Exception:
-            pass
+        if token_weights_deque is not None and hasattr(token_weights_deque, "extend") and tw_list:
+            token_weights_deque.extend(tw_list)
 
         # Free heavy tensors promptly
         outputs.attentions = None
