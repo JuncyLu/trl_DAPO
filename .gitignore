@@ -5,7 +5,7 @@ old_logs/
 repo/
 docs/
 src/data/
-VLMvalKit/
+VLMEvalKit/
 *.bak
 .gitattributes
 .last_checked
