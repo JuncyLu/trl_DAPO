@@ -41,6 +41,7 @@ accelerate launch \
   --per_device_eval_batch_size 4 \
   --save_strategy steps \
   --save_steps 500 \
+  --save_only_model \
   --learning_rate 1e-6 \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \

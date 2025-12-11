@@ -41,13 +41,13 @@ accelerate launch \
   --per_device_eval_batch_size 4 \
   --save_strategy steps \
   --save_steps 500 \
-  --learning_rate 1e-6 \
+  --save_only_model \
+  --learning_rate 1e-5 \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \
   --vgr_hard_negative \
   --reward_weights 4.0 2.0 1.0 1.0 0.0 \
   --dynamic_sample \
-  --max_pixels 1000000 \
   >> training_logs/$TS/train.log 2>&1
 
 
