@@ -119,7 +119,7 @@ dev = [
     # vlm
     "Pillow",
     "torchvision",
-    "num2words==0.5.14"
+    "num2words==0.5.14",
     "wandb"
 ]
 

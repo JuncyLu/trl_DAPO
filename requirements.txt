@@ -1,0 +1,35 @@
+accelerate>=1.4.0
+datasets>=3.0.0
+transformers>=4.56.1
+
+# Dev dependencies (from [dev] optional-dependencies)
+scikit-learn
+joblib
+deepspeed>=0.14.4
+openai>=1.23.2
+llm-blender>=0.0.2
+liger-kernel>=0.6.2
+peft>=0.8.0
+pre-commit
+hf-doc-builder
+bitsandbytes
+pytest-cov
+pytest-rerunfailures==15.1
+pytest-xdist
+pytest
+Pillow
+torch
+torchvision
+num2words==0.5.14
+wandb
+
+# Note: torch and torchvision should be installed separately based on your CUDA/Python version
+# They are not included here to allow flexibility for different CUDA setups.
+# Example for CUDA 12.1:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+# Example for CUDA 11.8:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+# Example for CPU only:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# 
+# nvidia-* packages (cublas, cudnn, etc.) are automatically installed as torch dependencies
