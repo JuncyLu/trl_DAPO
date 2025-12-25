@@ -255,53 +255,6 @@ def _split_indices_to_segments(layer_indices: List[int]) -> Dict[str, List[int]]
     return {"all": list(layer_indices)}
 
 
-def _get_vgr_function_token_ids(processor) -> Set[int]:
-    """
-    Build a shared set of token IDs corresponding to high-weight function words / subwords.
-
-    This mirrors the hard/soft stopword lists used in DAPOTrainer._postprocess_token_weights
-    so that sequence-level VGR (for rewards) can ignore the same tokens when requested.
-    """
-    tokenizer = getattr(processor, "tokenizer", processor)
-    cached = getattr(tokenizer, "_vgr_function_token_ids", None)
-    if cached is not None:
-        return cached
-
-    # Keep this list in sync with DAPOTrainer._postprocess_token_weights
-    hard_stop_strs = [
-        "a", "A", "an", "the", "The",
-        "and", "of", "in", "on", "or",
-        "to", "be", "is", "are", "it",
-        ",", ".", "?", "!", ";", ":", "\"", "'", "'s",
-        "(", ")", "-",
-    ]
-    soft_stop_strs = [
-        "with", "by", "including", "from", "at",
-        "into", "between", "within",
-        "as", "have", "has", "being",
-        "some", "many", "all", "both", "each",
-        "over", "under", "where", "while", "during",
-        "more", "less", "out", "its", "their",
-    ]
-
-    token_ids: Set[int] = set()
-    all_strs = hard_stop_strs + soft_stop_strs
-    for s in all_strs:
-        for variant in (s, f" {s}"):
-            try:
-                enc = tokenizer(variant, add_special_tokens=False)
-                ids = enc["input_ids"] if isinstance(enc, dict) else getattr(enc, "input_ids", None)
-                if ids is None:
-                    continue
-                for tid in ids:
-                    token_ids.add(int(tid))
-            except Exception:
-                continue
-
-    setattr(tokenizer, "_vgr_function_token_ids", token_ids)
-    return token_ids
-
-
 def _compute_segment_metrics(
     per_layer_attn: Dict[int, torch.Tensor],
     instruction_mask: torch.Tensor,
@@ -489,7 +442,6 @@ def compute_qwen_attention_metrics_for_batch(
     image_grid_thw: Optional[torch.Tensor] = None,
     last_k_layers: Optional[int] = None,
     compute_token_weights: bool = False,
-    ignore_function_words_for_vgr: bool = False,
     token_weights_smooth_sigma: float = 0.0,
     token_weights_clip: Tuple[float, float] = (0.2, 3.0),
 ) -> Tuple[List[Optional[AttentionSampleResult]], List[Optional[str]], Optional[List[List[float]]]]:
@@ -518,13 +470,6 @@ def compute_qwen_attention_metrics_for_batch(
     else:
         segments = _split_layers_to_segments(total_layers)
     special_token_ids = get_qwen_special_token_ids(processor)
-    if ignore_function_words_for_vgr:
-        try:
-            function_token_ids = _get_vgr_function_token_ids(processor)
-        except Exception:
-            function_token_ids = set()
-    else:
-        function_token_ids = set()
 
     if image_grid_thw is not None and image_grid_thw.dim() == 3:
         grid_items = [image_grid_thw[i] for i in range(image_grid_thw.size(0))]
@@ -559,21 +504,7 @@ def compute_qwen_attention_metrics_for_batch(
             special_token_ids,
         )
 
-        # For sequence-level VGR used in rewards, we optionally drop high-weight
-        # function words from the "text token pool" so they do not dominate
-        # attention_text; token-level weights can still use the full mask.
-        instruction_mask_for_vgr = instruction_mask
-        if ignore_function_words_for_vgr and function_token_ids:
-            instruction_mask_for_vgr = instruction_mask.clone()
-            ids_list = input_ids_sample.tolist()
-            for idx, tid in enumerate(ids_list):
-                if tid in function_token_ids and instruction_mask_for_vgr[idx] and not vision_mask[idx]:
-                    instruction_mask_for_vgr[idx] = False
-            # Fallback: if everything is masked out, keep original to avoid degeneracy.
-            if instruction_mask_for_vgr.sum().item() <= 0:
-                instruction_mask_for_vgr = instruction_mask
-
-        num_text_tokens = int(instruction_mask_for_vgr.sum().item())
+        num_text_tokens = int(instruction_mask.sum().item())
         num_vision_tokens = int(vision_mask.sum().item())
         actual_prompt_length = instruction_mask.numel()
 
@@ -602,7 +533,7 @@ def compute_qwen_attention_metrics_for_batch(
         for segment_name, layer_indices in segments.items():
             segment_results[segment_name] = _compute_segment_metrics(
                 per_layer_attn,
-                instruction_mask_for_vgr,
+                instruction_mask,
                 vision_mask,
                 layer_indices,
                 num_prompt_queries=num_prompt_queries,
@@ -672,8 +603,6 @@ def process_attention_context(
 
         last_k = getattr(args, "attention_last_k_layers", None)
         want_token_weights = bool(getattr(args, "token_weights", False))
-        # Always ignore function words for sequence-level VGR (affects both vgr_reward and vgr_hard_negative)
-        ignore_fw_for_vgr = True
         samples_tuple = compute_qwen_attention_metrics_for_batch(
             model,
             processor,
@@ -683,7 +612,6 @@ def process_attention_context(
             image_grid_thw=image_grid_thw_cpu,
             last_k_layers=last_k,
             compute_token_weights=want_token_weights,
-            ignore_function_words_for_vgr=ignore_fw_for_vgr,
             token_weights_smooth_sigma=float(getattr(args, "token_weights_smooth_sigma", 0.0)),
             token_weights_clip=tuple(getattr(args, "token_weights_clip", (0.2, 3.0))),
         )

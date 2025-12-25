@@ -1011,7 +1011,7 @@ class DAPOTrainer(BaseTrainer):
                     skip_slice = [None] * len(sample_results)
 
                 vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
-                
+
                 # Attach metrics to inputs for consistent logging (important for dynamic sampling)
                 for idx, m in enumerate(vgr_metrics):
                     if idx < len(inputs):
