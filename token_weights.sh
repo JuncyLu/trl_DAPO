@@ -1,6 +1,7 @@
 TS=$(TZ='Asia/Shanghai' date +%Y%m%d_%H%M%S)
-mkdir -p training_logs/baseline-$TS
-export TRAINING_LOG_TS=baseline-$TS
+export TRAINING_LOG_TS=token_weights-$TS
+mkdir -p training_logs/$TRAINING_LOG_TS
+
 
 # 线程与并行
 export OMP_NUM_THREADS=6
@@ -20,9 +21,9 @@ accelerate launch \
   --config_file src/configs/deepspeed_zero2.yaml \
   src/scripts/train_grpo_vlm.py \
   --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-  --output_dir training_logs/baseline-$TS/runs/dapo-Qwen2.5-VL-3B-Instruct \
-  --rollout_log_path training_logs/baseline-$TS/rollout_results.md \
-  --eval_log_path training_logs/baseline-$TS/eval_results.md \
+  --output_dir training_logs/$TRAINING_LOG_TS/runs/dapo-Qwen2.5-VL-3B-Instruct \
+  --rollout_log_path training_logs/$TRAINING_LOG_TS/rollout_results.md \
+  --eval_log_path training_logs/$TRAINING_LOG_TS/eval_results.md \
   --dtype bfloat16 \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
@@ -47,5 +48,15 @@ accelerate launch \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \
   --reward_weights 4.0 0.0 1.0 1.0 1.0 \
-  --dynamic_sample
+  --dynamic_sample \
+  --token_weights \
   >> training_logs/$TRAINING_LOG_TS/train.log 2>&1
+
+
+  # --lr_scheduler_type cosine \
+  # --early_reward_weights 1.0 0.0 4.0 1.0 0.0 \
+  # --use_peft \
+  # --lora_target_modules "q_proj", "v_proj" \
+  # --use_vllm \
+  # --vllm_mode colocate \
+  # --vllm_gpu_memory_utilization 0.5

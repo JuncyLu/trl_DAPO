@@ -1,6 +1,6 @@
 TS=$(TZ='Asia/Shanghai' date +%Y%m%d_%H%M%S)
-mkdir -p training_logs/$TS
-export TRAINING_LOG_TS=$TS
+export TRAINING_LOG_TS=final-$TS
+mkdir -p training_logs/$TRAINING_LOG_TS
 
 # 线程与并行
 export OMP_NUM_THREADS=6
@@ -20,9 +20,9 @@ accelerate launch \
   --config_file src/configs/deepspeed_zero2.yaml \
   src/scripts/train_grpo_vlm.py \
   --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-  --output_dir training_logs/$TS/runs/dapo-Qwen2.5-VL-3B-Instruct \
-  --rollout_log_path training_logs/$TS/rollout_results.md \
-  --eval_log_path training_logs/$TS/eval_results.md \
+  --output_dir training_logs/ours-$TS/runs/dapo-Qwen2.5-VL-3B-Instruct \
+  --rollout_log_path training_logs/ours-$TS/rollout_results.md \
+  --eval_log_path training_logs/ours-$TS/eval_results.md \
   --dtype bfloat16 \
   --gradient_checkpointing \
   --max_prompt_length 1024 \
@@ -36,25 +36,18 @@ accelerate launch \
   --logging_steps 2.0 \
   --do_eval \
   --eval_strategy steps \
-  --eval_steps 25 \
-  --eval_num_generations 4 \
+  --eval_steps 50 \
+  --eval_num_generations 2 \
   --per_device_eval_batch_size 4 \
   --save_strategy steps \
   --save_steps 500 \
   --save_only_model \
   --learning_rate 1e-6 \
+  --lr_scheduler_type cosine \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \
-  --reward_weights 4.0 0.0 1.0 1.0 1.0 \
+  --vgr_hard_negative \
+  --reward_weights 4.0 4.0 1.0 1.0 1.0 \
   --dynamic_sample \
   --token_weights \
-  >> training_logs/$TS/train.log 2>&1
-
-
-  # --lr_scheduler_type cosine \
-  # --early_reward_weights 1.0 0.0 4.0 1.0 0.0 \
-  # --use_peft \
-  # --lora_target_modules "q_proj", "v_proj" \
-  # --use_vllm \
-  # --vllm_mode colocate \
-  # --vllm_gpu_memory_utilization 0.5
+  >> training_logs/$TRAINING_LOG_TS/train.log 2>&1

@@ -1,10 +1,10 @@
 dataset/
-eval/
 training_logs/
 old_logs/
 repo/
 docs/
 src/data/
+eval/
 VLMEvalKit/
 *.bak
 .gitattributes

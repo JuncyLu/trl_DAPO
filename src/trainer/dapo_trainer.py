@@ -1011,6 +1011,11 @@ class DAPOTrainer(BaseTrainer):
                     skip_slice = [None] * len(sample_results)
 
                 vgr_metrics = compute_real_vgr_metrics(sample_results, skip_slice)
+                
+                # Attach metrics to inputs for consistent logging (important for dynamic sampling)
+                for idx, m in enumerate(vgr_metrics):
+                    if idx < len(inputs):
+                        inputs[idx]["vgr_metrics"] = m
 
                 reward_kwargs["attention_text"] = [m.get("attention_text", 0.0) for m in vgr_metrics]
                 reward_kwargs["attention_vision"] = [m.get("attention_vision", 0.0) for m in vgr_metrics]
