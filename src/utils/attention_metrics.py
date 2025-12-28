@@ -331,8 +331,10 @@ def _compute_segment_metrics(
     if num_layers_with_data == 0:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
-    attn_text_avg = attn_text_total / num_layers_with_data
-    attn_vision_avg = attn_vision_total / num_layers_with_data
+    # Length-normalize by the number of generated queries so attention statistics
+    # are comparable across samples with different completion lengths.
+    attn_text_avg = attn_text_total / num_layers_with_data / generated_tokens
+    attn_vision_avg = attn_vision_total / num_layers_with_data / generated_tokens
 
     num_instruction = int(instruction_mask.sum().item())
     num_vision = int(vision_mask.sum().item())

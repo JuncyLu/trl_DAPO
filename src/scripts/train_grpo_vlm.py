@@ -162,7 +162,7 @@ Think thoroughly and support your answer with visual evidence"""
     # Training
     ################
     length_reward_func = get_soft_overlong_punishment(
-        max_completion_len=training_args.max_completion_length,
+        max_completion_len=int(training_args.max_completion_length * 0.8),
     )
     
     vgr_func = vgr_hard_negative if getattr(training_args, "vgr_hard_negative", False) else vgr_reward

@@ -24,8 +24,8 @@ def vgr_reward(completions: List[List[dict]], **kwargs) -> List[float]:
     - MAD 不足时返回中性奖励 0.0
     
     需要 kwargs:
-      - attention_text: List[float]   # A_T（所有输出 token 对文本 token 的总注意力）
-      - attention_vision: List[float] # A_O（所有输出 token 对非文本 token 的总注意力）
+      - attention_text: List[float]   # A_T（按层与生成长度归一后的：每个输出 token 对文本 token 的平均注意力）
+      - attention_vision: List[float] # A_O（按层与生成长度归一后的：每个输出 token 对非文本 token 的平均注意力）
       - num_text_tokens: List[int]    # |T|
       - num_vision_tokens: List[int]  # |O|
       - num_generations: int          # 每个 prompt 的采样数

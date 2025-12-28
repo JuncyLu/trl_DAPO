@@ -424,16 +424,45 @@ def emit_eval_logs(
             f.write("| Metric | Value |\n")
             f.write("|--------|-------|\n")
             
+            # 从样本数据中计算分项奖励的平均值
+            reward_keys = ["accuracy", "vgr", "format", "tag", "length"]
+            computed_means = {}
+            if eval_samples:
+                for key in reward_keys:
+                    values = []
+                    for sample in eval_samples:
+                        rewards = sample.get("rewards", {})
+                        if key in rewards:
+                            try:
+                                values.append(float(rewards[key]))
+                            except Exception:
+                                pass
+                    if values:
+                        computed_means[key] = sum(values) / len(values)
+                    else:
+                        computed_means[key] = 0.0
+                
+                # 计算总奖励的平均值
+                total_values = []
+                for sample in eval_samples:
+                    try:
+                        total_values.append(float(sample.get("total_reward", 0.0)))
+                    except Exception:
+                        pass
+                if total_values:
+                    computed_means["reward"] = sum(total_values) / len(total_values)
+                else:
+                    computed_means["reward"] = 0.0
+            
             # 核心指标
-            # 统一：VGR 奖励使用 rewards/vgr/mean
-            eval_vgr_val = logs.get("eval_rewards/vgr/mean", logs.get("rewards/vgr/mean"))
             core_metrics = {
                 "eval_loss": logs.get("eval_loss", 0.0),
-                "eval_reward": metrics.get("eval_reward", 0.0),
-                "eval_accuracy": metrics.get("eval_accuracy", 0.0),
-                "eval_format": metrics.get("eval_format", 0.0),
-                "eval_length": metrics.get("eval_length", 0.0),
-                "eval_vgr": eval_vgr_val if eval_vgr_val is not None else None,
+                "eval_reward": computed_means.get("reward", metrics.get("eval_reward", 0.0)),
+                "eval_accuracy": computed_means.get("accuracy", 0.0),
+                "eval_vgr": computed_means.get("vgr", 0.0),
+                "eval_format": computed_means.get("format", 0.0),
+                "eval_tag": computed_means.get("tag", 0.0),
+                "eval_length": computed_means.get("length", 0.0),
             }
             
             for key, value in core_metrics.items():
@@ -766,20 +795,20 @@ def perform_realtime_rollout_logging(
                     vgr_info = [m if m is not None else {} for m in vgr_info_from_inputs]
                 # Priority 2: Fallback to slicing the global attention_logs deque (prone to alignment issues)
                 elif attention_logs is not None:
-                    try:
-                        att_list = list(attention_logs)
-                        if att_list:
-                            from .dapo_logging import compute_real_vgr_metrics as _compute_real_vgr_metrics
-                            sample_results = att_list[-len(prompts):]
-                            if attention_skip_reasons is not None:
-                                skips = list(attention_skip_reasons)
-                                skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
-                            else:
-                                skip_slice = [None] * len(sample_results)
-                            vgr_info_computed = _compute_real_vgr_metrics(sample_results, skip_slice)
-                            if vgr_info_computed:
-                                vgr_info = vgr_info_computed
-                    except Exception:
+                try:
+                    att_list = list(attention_logs)
+                    if att_list:
+                        from .dapo_logging import compute_real_vgr_metrics as _compute_real_vgr_metrics
+                        sample_results = att_list[-len(prompts):]
+                        if attention_skip_reasons is not None:
+                            skips = list(attention_skip_reasons)
+                            skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
+                        else:
+                            skip_slice = [None] * len(sample_results)
+                        vgr_info_computed = _compute_real_vgr_metrics(sample_results, skip_slice)
+                        if vgr_info_computed:
+                            vgr_info = vgr_info_computed
+                except Exception:
                         pass
 
             # Solutions (if present)

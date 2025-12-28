@@ -2060,9 +2060,9 @@ class DAPOTrainer(BaseTrainer):
 
         # Log prompt and completion texts (ChatML prompt, plain completion)
         # Use safe_gather_object to prevent OOM from large text collections
-        self._logs["prompt"].extend(safe_gather_object(prompts_text, max_str_len=2000))
-        self._logs["completion"].extend(safe_gather_object(completions_text, max_str_len=2000))
-        self._logs["prompt_chatml"].extend(safe_gather_object(rendered_prompts, max_str_len=2000))
+        self._logs["prompt"].extend(safe_gather_object(prompts_text, max_str_len=8192))
+        self._logs["completion"].extend(safe_gather_object(completions_text, max_str_len=8192))
+        self._logs["prompt_chatml"].extend(safe_gather_object(rendered_prompts, max_str_len=8192))
         # Gather rewards from all processes to match prompt/completion counts
         for i, name in enumerate(self.reward_func_names):
             reward_values = rewards_per_func[:, i].tolist()
