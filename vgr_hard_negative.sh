@@ -25,8 +25,8 @@ accelerate launch \
   --eval_log_path training_logs/$TRAINING_LOG_TS/eval_results.md \
   --dtype bfloat16 \
   --gradient_checkpointing \
-  --max_prompt_length 1024 \
-  --max_completion_length 512 \
+  --max_prompt_length 2048 \
+  --max_completion_length 1024 \
   --per_device_train_batch_size 4 \
   --gradient_accumulation_steps 4 \
   --num_generations 8 \
@@ -47,7 +47,7 @@ accelerate launch \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \
   --vgr_hard_negative \
-  --reward_weights 4.0 2.0 1.0 1.0 1.0 \
+  --reward_weights 4.0 1.0 1.0 1.0 1.0 \
   --dynamic_sample \
   >> training_logs/$TRAINING_LOG_TS/train.log 2>&1
 
