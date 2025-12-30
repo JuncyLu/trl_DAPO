@@ -66,7 +66,15 @@ def accuracy_reward(completions: list[list[dict[str, str]]], solution: list[list
             refs = [normalize_answer(r) for r in refs]
             
             match_count = sum(1 for r in refs if r == pred)
-            scores.append(min(1.0, match_count / 3.0))
+            # 对一个0.2，两个0.5，全对1分
+            if match_count == 0:
+                scores.append(0.0)
+            elif match_count == 1:
+                scores.append(0.2)
+            elif match_count == 2:
+                scores.append(0.5)
+            else:  # match_count >= 3
+                scores.append(1.0)
             
         except Exception:
             scores.append(0.0)

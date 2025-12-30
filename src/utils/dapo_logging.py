@@ -778,9 +778,6 @@ def perform_realtime_rollout_logging(
                 rewards_numel=rewards_per_func_local.numel(),
                 total_numel=total_rewards_local.numel(),
             )
-
-        # Build VGR info for logging (no AEI usage downstream) - only if has data
-        # Initialize with empty values matching the number of prompts (for gather consistency)
         vgr_info: List[Dict[str, Any]] = [{}] * len(prompts)
         solutions: List[str] = [""] * len(prompts)
         log_prompts_text: List[str] = [""] * len(prompts)
@@ -795,20 +792,20 @@ def perform_realtime_rollout_logging(
                     vgr_info = [m if m is not None else {} for m in vgr_info_from_inputs]
                 # Priority 2: Fallback to slicing the global attention_logs deque (prone to alignment issues)
                 elif attention_logs is not None:
-                try:
-                    att_list = list(attention_logs)
-                    if att_list:
-                        from .dapo_logging import compute_real_vgr_metrics as _compute_real_vgr_metrics
-                        sample_results = att_list[-len(prompts):]
-                        if attention_skip_reasons is not None:
-                            skips = list(attention_skip_reasons)
-                            skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
-                        else:
-                            skip_slice = [None] * len(sample_results)
-                        vgr_info_computed = _compute_real_vgr_metrics(sample_results, skip_slice)
-                        if vgr_info_computed:
-                            vgr_info = vgr_info_computed
-                except Exception:
+                    try:
+                        att_list = list(attention_logs)
+                        if att_list:
+                            from .dapo_logging import compute_real_vgr_metrics as _compute_real_vgr_metrics
+                            sample_results = att_list[-len(prompts):]
+                            if attention_skip_reasons is not None:
+                                skips = list(attention_skip_reasons)
+                                skip_slice = skips[-len(sample_results):] if len(skips) >= len(sample_results) else [None] * len(sample_results)
+                            else:
+                                skip_slice = [None] * len(sample_results)
+                            vgr_info_computed = _compute_real_vgr_metrics(sample_results, skip_slice)
+                            if vgr_info_computed:
+                                vgr_info = vgr_info_computed
+                    except Exception:
                         pass
 
             # Solutions (if present)
