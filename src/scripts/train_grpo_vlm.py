@@ -103,29 +103,45 @@ if __name__ == "__main__":
     # </answer>
 
     # Think thoroughly and support your answer with visual evidence"""
-    SYSTEM_PROMPT = """You are tasked with analyzing an image to answer a question. Your response should include a detailed reasoning process and a concise answer. The reasoning process should be enclosed within <think>...</think> tags, and the final answer should be enclosed within <answer>...</answer> tags. The response format consists of the reasoning section followed by the answer section, with no text outside these tags.
 
-The following example demonstrates the expected response format:
-<think>[detailed reasoning process]</think>
-<answer>[brief answer]</answer>
+#     SYSTEM_PROMPT = """You are tasked with analyzing an image to answer a question. Your response should include a detailed reasoning process and a concise answer. The reasoning process should be enclosed within <think>...</think> tags, and the final answer should be enclosed within <answer>...</answer> tags. The response format consists of the reasoning section followed by the answer section, with no text outside these tags.
 
-THINKING GUIDELINES (write 3-4+ sentences):
-1. First, provide an exhaustive and detailed description of the image: extract and describe all possible information including objects, numbers, text, colors, quantities, positions, states, relationships between elements, setting, lighting, and main subjects. Capture every nuance and detail.
-2. Then, analyze the detailed description and provide step-by-step reasoning for the given question based on the extracted information and visual evidence.
-3. Conclude with a clear answer supported by the visual evidence you identified.
+# The following example demonstrates the expected response format:
+# <think>[detailed reasoning process]</think>
+# <answer>[brief answer]</answer>
 
-ANSWER GUIDELINES:
-• Keep the answer as short as possible - prefer 1-3 words
-• Use only essential keywords
-• Avoid unnecessary descriptions or modifiers
+# THINKING GUIDELINES (write 3-4+ sentences):
+# 1. First, provide an exhaustive and detailed description of the image: extract and describe all possible information including objects, numbers, text, colors, quantities, positions, states, relationships between elements, setting, lighting, and main subjects. Capture every nuance and detail.
+# 2. Then, analyze the detailed description and provide step-by-step reasoning for the given question based on the extracted information and visual evidence.
+# 3. Conclude with a clear answer supported by the visual evidence you identified.
 
-EXAMPLES:
+# ANSWER GUIDELINES:
+# • Keep the answer as short as possible - prefer 1-3 words
+# • Use only essential keywords
+# • Avoid unnecessary descriptions or modifiers
 
-Question: What is the man holding?
-<think>The image shows a man standing outdoors in daylight. He is wearing casual clothing and appears to be in a park setting. In his right hand, he is holding a red disc-shaped object. The object has the characteristic flat, circular shape of a frisbee, commonly used for outdoor recreational activities. The bright red color makes it stand out against the background.</think>
-<answer>frisbee</answer>
+# EXAMPLES:
 
-Think thoroughly and support your answer with visual evidence"""
+# Question: What is the man holding?
+# <think>The image shows a man standing outdoors in daylight. He is wearing casual clothing and appears to be in a park setting. In his right hand, he is holding a red disc-shaped object. The object has the characteristic flat, circular shape of a frisbee, commonly used for outdoor recreational activities. The bright red color makes it stand out against the background.</think>
+# <answer>frisbee</answer>
+
+# Think thoroughly and support your answer with visual evidence"""
+
+    # SYSTEM_PROMPT = (
+    #     "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
+    #     "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
+    #     "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
+    #     "<think> reasoning process here </think><answer> answer here </answer>. "
+    #     "The answer must be extremely concise (1-3 words) using only essential keywords."
+    # )
+    SYSTEM_PROMPT = (
+        "A conversation between User and Assistant. The user asks a question about an image, and the Assistant solves it. "
+        "The assistant must first think extensively by describing visual details and reasoning step-by-step within "
+        "<think> </think> tags, then provide a concise answer within <answer> </answer> tags. "
+        "The <think> section should be thorough and detailed to ensure accuracy, while the <answer> section "
+        "must be extremely short (1-3 words) using only essential keywords."
+    )
     def make_conversation(example):
         prompt = [
             {"role": "system", "content": SYSTEM_PROMPT},

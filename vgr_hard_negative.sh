@@ -2,6 +2,8 @@ TS=$(TZ='Asia/Shanghai' date +%Y%m%d_%H%M%S)
 mkdir -p training_logs/vgr_hard_negative-$TS
 export TRAINING_LOG_TS=vgr_hard_negative-$TS
 
+export WANDB_RUN_NAME=vgr_hard_negative-$TS
+
 # 线程与并行
 export OMP_NUM_THREADS=6
 export MKL_NUM_THREADS=6
@@ -47,7 +49,7 @@ accelerate launch \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \
   --vgr_hard_negative \
-  --reward_weights 4.0 1.0 1.0 1.0 1.0 \
+  --reward_weights 4.0 0.5 1.0 1.0 1.0 \
   --dynamic_sample \
   >> training_logs/$TRAINING_LOG_TS/train.log 2>&1
 
