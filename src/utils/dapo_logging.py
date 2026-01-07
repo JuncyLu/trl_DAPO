@@ -252,6 +252,8 @@ def emit_rollout_logs(
                         f.write(f"| Tag Rate | {np.mean([1 if s > 0 else 0 for s in tag_scores]):.3f} |\n")
                     if length_scores:
                         f.write(f"| Length Mean | {np.mean(length_scores):.3f} ± {np.std(length_scores):.3f} |\n")
+                    if repetition_scores:
+                        f.write(f"| Repetition Mean | {np.mean(repetition_scores):.3f} ± {np.std(repetition_scores):.3f} |\n")
                     if total_scores:
                         f.write(f"| Total Reward Mean | {np.mean(total_scores):.3f} ± {np.std(total_scores):.3f} |\n")
                         f.write(f"| Success Rate | {np.mean([1 if s > 0 else 0 for s in total_scores]):.3f} |\n\n")
@@ -290,12 +292,13 @@ def emit_rollout_logs(
                     # 统一命名：奖励一律用 vgr，原始值用 vgr_raw
                     f.write(
                         "**Rewards:** accuracy={:.3f}, vgr={:.3f}, format={:.3f}, tag={:.3f}, length={:.3f}, "
-                        "vgr_raw={:.3f}, total={:.3f}\n\n".format(
+                        "repetition={:.3f}, vgr_raw={:.3f}, total={:.3f}\n\n".format(
                             row["accuracy"],
                             row["vgr"],
                             row["format"],
                             row["tag"],
                             row["length"],
+                            row["repetition"],
                             float(true_vgr),
                             row["total"],
                         )
@@ -336,6 +339,7 @@ def emit_rollout_logs(
                                 "format": float(row["format"]),
                                 "tag": float(row["tag"]),
                                 "length": float(row["length"]),
+                                "repetition": float(row["repetition"]),
                                 "total": float(row["total"]),
                             },
                             "advantage": float(row["advantage"]) if row["advantage"] is not None else None,
@@ -470,6 +474,7 @@ def emit_eval_logs(
                 "eval_format": computed_means.get("format", 0.0),
                 "eval_tag": computed_means.get("tag", 0.0),
                 "eval_length": computed_means.get("length", 0.0),
+                "eval_repetition": computed_means.get("repetition", 0.0),
             }
             
             for key, value in core_metrics.items():
@@ -1046,6 +1051,7 @@ def print_compact_logs(logs: Dict[str, float], mode: str, use_hard_negative: boo
                 if r_vgr is None:
                     r_vgr = logs.get("rewards/vgr_reward_as_additive/mean", logs.get("eval_rewards/vgr_reward_as_additive/mean"))
         r_len = logs.get("rewards/length_reward/mean", logs.get("eval_rewards/length_reward/mean"))
+        r_rep = logs.get("rewards/repetition_reward/mean", logs.get("eval_rewards/repetition_reward/mean"))
         r_total = logs.get("reward", logs.get("eval_reward"))
         rewards_line = []
         if r_acc is not None: rewards_line.append(f"acc={r_acc:.3f}")
@@ -1053,6 +1059,7 @@ def print_compact_logs(logs: Dict[str, float], mode: str, use_hard_negative: boo
         if r_fmt is not None: rewards_line.append(f"fmt={r_fmt:.3f}")
         if r_tag is not None: rewards_line.append(f"tag={r_tag:.3f}")
         if r_len is not None: rewards_line.append(f"len={r_len:.3f}")
+        if r_rep is not None: rewards_line.append(f"rep={r_rep:.3f}")
         if r_total is not None: rewards_line.append(f"total={r_total:.3f}")
         if rewards_line:
             print("Rewards: " + ", ".join(rewards_line))
@@ -1125,7 +1132,7 @@ def perform_eval_logging(
         eval_samples: List[Dict[str, Any]] = []
         for i in range(sample_count):
             rewards_map: Dict[str, float] = {}
-            # 统一命名映射：accuracy、vgr、format、tag、length
+            # 统一命名映射：accuracy、vgr、format、tag、length、repetition
             name_map = {
                 "accuracy_reward": "accuracy",
                 "vgr_reward": "vgr",
@@ -1134,6 +1141,7 @@ def perform_eval_logging(
                 "think_format_reward": "format",
                 "tag_count_reward": "tag",
                 "length_reward": "length",
+                "repetition_reward": "repetition",
             }
             for name in reward_names:
                 vals = reward_lists.get(name, [])
