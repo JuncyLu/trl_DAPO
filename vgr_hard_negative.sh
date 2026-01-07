@@ -49,7 +49,6 @@ accelerate launch \
   --warmup_ratio 0.0 \
   --max_grad_norm 1.0 \
   --vgr_hard_negative \
-  --vgr_max_tokens_ratio 0.5 \
   --reward_weights 4.0 0.5 1.0 1.0 1.0 1.0 \
   --dynamic_sample \
   >> training_logs/$TRAINING_LOG_TS/train.log 2>&1
