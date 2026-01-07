@@ -32,7 +32,7 @@ accelerate launch \
   --gradient_accumulation_steps 4 \
   --num_generations 8 \
   --num_train_epochs 2 \
-  --report_to wandb \
+  --report_to tensorboard \
   --log_completions \
   --logging_steps 2.0 \
   --do_eval \
