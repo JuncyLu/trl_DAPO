@@ -168,6 +168,11 @@ def emit_rollout_logs(
             vgr_idx = any_index("vgr_hard_negative", "vgr_reward", "vgr_reward_as_additive")
             if vgr_idx is not None and idx < rewards_per_func_local.shape[0]:
                 vgr_val = float(rewards_per_func_local[idx, vgr_idx].item())
+            
+            repetition_val = 0.0
+            repetition_idx = any_index("repetition_reward")
+            if repetition_idx is not None and idx < rewards_per_func_local.shape[0]:
+                repetition_val = float(rewards_per_func_local[idx, repetition_idx].item())
         
         tot = float(total_rewards_local[idx].item()) if total_rewards_local.numel() > 0 else 0.0
         adv_val = None
@@ -194,6 +199,7 @@ def emit_rollout_logs(
                 "format": fmt,
                 "tag": tag,
                 "length": length_val,
+                "repetition": repetition_val,
                 "total": tot,
                 "advantage": adv_val,
                 "resampled": is_resampled,
@@ -221,6 +227,7 @@ def emit_rollout_logs(
                     format_scores = [r["format"] for r in rows]
                     tag_scores = [r["tag"] for r in rows]
                     length_scores = [r["length"] for r in rows]
+                    repetition_scores = [r["repetition"] for r in rows]
                     total_scores = [r["total"] for r in rows]
                     adv_scores = [r["advantage"] for r in rows if r["advantage"] is not None]
                     # 来自 attention 的 VGR 原始指标（若可用）

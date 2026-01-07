@@ -25,6 +25,7 @@ _import_structure = {
     "format_rewards": ["think_format_reward", "tag_count_reward"],
     "length_rewards": ["get_soft_overlong_punishment"],
     "attention_rewards": ["vgr_reward", "vgr_hard_negative"],
+    "repetition_rewards": ["repetition_reward"],
     "reward_utils": [
         "RewardWeightManager", 
         "RewardWeightConfig", 
@@ -39,6 +40,7 @@ if TYPE_CHECKING:
     from .format_rewards import think_format_reward, tag_count_reward
     from .length_rewards import get_soft_overlong_punishment
     from .attention_rewards import vgr_reward, vgr_hard_negative
+    from .repetition_rewards import repetition_reward
     from .reward_utils import (
         RewardWeightManager, 
         RewardWeightConfig, 

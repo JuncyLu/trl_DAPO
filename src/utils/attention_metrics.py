@@ -262,8 +262,14 @@ def _compute_segment_metrics(
     layer_indices: List[int],
     num_prompt_queries: int,
     actual_prompt_length: int,
+    max_tokens_ratio: float = 1.0,
 ) -> AttentionSegmentResult:
-    """Compute attention metrics for a specific layer segment using generation queries."""
+    """Compute attention metrics for a specific layer segment using generation queries.
+    
+    Args:
+        max_tokens_ratio: Only consider the first max_tokens_ratio * generated_tokens 
+                         for attention calculation (default 1.0 uses all tokens).
+    """
     if not layer_indices:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
@@ -284,6 +290,11 @@ def _compute_segment_metrics(
     if generated_tokens <= 0:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
+    # 只考虑前 max_tokens_ratio 比例的生成 token
+    max_tokens_ratio = max(0.0, min(1.0, max_tokens_ratio))  # 限制在 [0, 1] 范围内
+    effective_gen_tokens = max(1, int(generated_tokens * max_tokens_ratio))
+    gen_row_end = gen_row_start + effective_gen_tokens
+
     attn_text_total = 0.0
     attn_vision_total = 0.0
     num_layers_with_data = 0
@@ -293,7 +304,8 @@ def _compute_segment_metrics(
         if attn is None or attn.shape[0] == 0:
             continue
 
-        gen_attn = attn[gen_row_start:, :actual_prompt_length]
+        # 只取前 effective_gen_tokens 个生成 token 的注意力
+        gen_attn = attn[gen_row_start:gen_row_end, :actual_prompt_length]
 
         # 对齐到 prompt 长度
         if vision_mask.shape[0] != actual_prompt_length:
@@ -331,10 +343,10 @@ def _compute_segment_metrics(
     if num_layers_with_data == 0:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
-    # Length-normalize by the number of generated queries so attention statistics
-    # are comparable across samples with different completion lengths.
-    attn_text_avg = attn_text_total / num_layers_with_data / generated_tokens
-    attn_vision_avg = attn_vision_total / num_layers_with_data / generated_tokens
+    # Length-normalize by the number of effective generated queries (considering max_tokens_ratio)
+    # so attention statistics are comparable across samples with different completion lengths.
+    attn_text_avg = attn_text_total / num_layers_with_data / effective_gen_tokens
+    attn_vision_avg = attn_vision_total / num_layers_with_data / effective_gen_tokens
 
     num_instruction = int(instruction_mask.sum().item())
     num_vision = int(vision_mask.sum().item())
@@ -446,8 +458,13 @@ def compute_qwen_attention_metrics_for_batch(
     compute_token_weights: bool = False,
     token_weights_smooth_sigma: float = 0.0,
     token_weights_clip: Tuple[float, float] = (0.2, 3.0),
+    max_tokens_ratio: float = 1.0,
 ) -> Tuple[List[Optional[AttentionSampleResult]], List[Optional[str]], Optional[List[List[float]]]]:
     """Compute Qwen attention metrics for a batch of samples.
+
+    Args:
+        max_tokens_ratio: Only consider the first max_tokens_ratio * generated_tokens 
+                         for attention calculation (default 1.0 uses all tokens).
 
     When `compute_token_weights=True`, token-level VGR 权重会在同一次
     attention 遍历中一并计算出来，避免额外的二次遍历。
@@ -540,6 +557,7 @@ def compute_qwen_attention_metrics_for_batch(
                 layer_indices,
                 num_prompt_queries=num_prompt_queries,
                 actual_prompt_length=actual_prompt_length,
+                max_tokens_ratio=max_tokens_ratio,
             )
 
         results.append(
@@ -605,6 +623,7 @@ def process_attention_context(
 
         last_k = getattr(args, "attention_last_k_layers", None)
         want_token_weights = bool(getattr(args, "token_weights", False))
+        max_tokens_ratio = float(getattr(args, "vgr_max_tokens_ratio", 1.0))
         samples_tuple = compute_qwen_attention_metrics_for_batch(
             model,
             processor,
@@ -616,6 +635,7 @@ def process_attention_context(
             compute_token_weights=want_token_weights,
             token_weights_smooth_sigma=float(getattr(args, "token_weights_smooth_sigma", 0.0)),
             token_weights_clip=tuple(getattr(args, "token_weights_clip", (0.2, 3.0))),
+            max_tokens_ratio=max_tokens_ratio,
         )
 
         # 解包（向后兼容：旧版本可能只返回两个元素）

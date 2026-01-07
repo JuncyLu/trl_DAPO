@@ -1,5 +1,6 @@
 import sys
 import os
+from functools import partial
 
 import torch
 from datasets import load_dataset
@@ -24,6 +25,7 @@ from src.rewards import (
     get_soft_overlong_punishment,
     vgr_reward,
     vgr_hard_negative,
+    repetition_reward,
 )
 
 
@@ -182,11 +184,18 @@ if __name__ == "__main__":
     )
     
     vgr_func = vgr_hard_negative if getattr(training_args, "vgr_hard_negative", False) else vgr_reward
+    
+    # 创建带参数的 repetition_reward
+    repetition_reward_func = partial(
+        repetition_reward,
+        repetition_n_grams=getattr(training_args, "repetition_n_grams", 3),
+        repetition_max_penalty=getattr(training_args, "repetition_max_penalty", -1.0),
+    )
 
     trainer = DAPOTrainer(
         model=model_args.model_name_or_path,
         args=training_args,
-        reward_funcs=[accuracy_reward, vgr_func, think_format_reward, tag_count_reward, length_reward_func],
+        reward_funcs=[accuracy_reward, vgr_func, think_format_reward, tag_count_reward, length_reward_func, repetition_reward_func],
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         peft_config=get_peft_config(model_args),

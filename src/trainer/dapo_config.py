@@ -518,6 +518,28 @@ class DAPOConfig(TrainingArguments):
         default=False,
         metadata={"help": "Enable VGR hard-negative reward: groupwise VGR mapping applied only to acc=1 samples."}
     )
+    
+    vgr_max_tokens_ratio: float = field(
+        default=1.0,
+        metadata={
+            "help": "Maximum ratio of generated tokens to consider for VGR attention calculation. "
+            "Default is 1.0 (all tokens). Set to 0.5 to only consider the first 50%% of tokens."
+        }
+    )
+    
+    repetition_n_grams: int = field(
+        default=3,
+        metadata={
+            "help": "Size of n-gram used to detect repetition in repetition_reward. Default is 3."
+        }
+    )
+    
+    repetition_max_penalty: float = field(
+        default=-1.0,
+        metadata={
+            "help": "Maximum penalty value for repetition_reward, controlling the penalty strength. Default is -1.0."
+        }
+    )
 
     realtime_rollout_logging: bool = field(
         default=True,

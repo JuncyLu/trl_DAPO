@@ -389,7 +389,12 @@ class DAPOTrainer(BaseTrainer):
             if isinstance(reward_funcs[i], nn.Module):  # Use Module over PretrainedModel for compat w/ compiled models
                 self.reward_func_names.append(get_config_model_id(reward_funcs[i].config).split("/")[-1])
             else:
-                self.reward_func_names.append(reward_funcs[i].__name__)
+                # 处理 functools.partial 对象
+                if hasattr(reward_funcs[i], 'func'):
+                    # functools.partial 对象，获取包装的原始函数名
+                    self.reward_func_names.append(reward_funcs[i].func.__name__)
+                else:
+                    self.reward_func_names.append(reward_funcs[i].__name__)
         self.reward_funcs = reward_funcs
 
         # Initialize reward weight manager
