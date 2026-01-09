@@ -263,12 +263,13 @@ def _compute_segment_metrics(
     num_prompt_queries: int,
     actual_prompt_length: int,
     max_tokens_ratio: float = 1.0,
+    max_completion_length: Optional[int] = None,
 ) -> AttentionSegmentResult:
     """Compute attention metrics for a specific layer segment using generation queries.
     
     Args:
-        max_tokens_ratio: Only consider the first max_tokens_ratio * generated_tokens 
-                         for attention calculation (default 1.0 uses all tokens).
+        max_tokens_ratio: Ratio of generated tokens to consider (default 1.0 uses all tokens).
+        max_completion_length: Absolute maximum tokens to consider is 0.5 * max_completion_length.
     """
     if not layer_indices:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
@@ -290,9 +291,18 @@ def _compute_segment_metrics(
     if generated_tokens <= 0:
         return AttentionSegmentResult(float("nan"), 0.0, 0.0)
 
-    # 只考虑前 max_tokens_ratio 比例的生成 token
+    # 计算有效考虑的 token 数量
+    # 1. 按比例计算：generated_tokens * max_tokens_ratio
+    # 2. 但不超过绝对上限：0.5 * max_completion_length
     max_tokens_ratio = max(0.0, min(1.0, max_tokens_ratio))  # 限制在 [0, 1] 范围内
-    effective_gen_tokens = max(1, int(generated_tokens * max_tokens_ratio))
+    effective_gen_tokens = int(generated_tokens * max_tokens_ratio)
+    
+    # 应用绝对上限
+    if max_completion_length is not None:
+        absolute_max = int(0.5 * max_completion_length)
+        effective_gen_tokens = min(effective_gen_tokens, absolute_max)
+    
+    effective_gen_tokens = max(1, effective_gen_tokens)
     gen_row_end = gen_row_start + effective_gen_tokens
 
     attn_text_total = 0.0
@@ -459,12 +469,13 @@ def compute_qwen_attention_metrics_for_batch(
     token_weights_smooth_sigma: float = 0.0,
     token_weights_clip: Tuple[float, float] = (0.2, 3.0),
     max_tokens_ratio: float = 1.0,
+    max_completion_length: Optional[int] = None,
 ) -> Tuple[List[Optional[AttentionSampleResult]], List[Optional[str]], Optional[List[List[float]]]]:
     """Compute Qwen attention metrics for a batch of samples.
 
     Args:
-        max_tokens_ratio: Only consider the first max_tokens_ratio * generated_tokens 
-                         for attention calculation (default 1.0 uses all tokens).
+        max_tokens_ratio: Ratio of generated tokens to consider (default 1.0 uses all tokens).
+        max_completion_length: Absolute maximum tokens to consider is 0.5 * max_completion_length.
 
     When `compute_token_weights=True`, token-level VGR 权重会在同一次
     attention 遍历中一并计算出来，避免额外的二次遍历。
@@ -558,6 +569,7 @@ def compute_qwen_attention_metrics_for_batch(
                 num_prompt_queries=num_prompt_queries,
                 actual_prompt_length=actual_prompt_length,
                 max_tokens_ratio=max_tokens_ratio,
+                max_completion_length=max_completion_length,
             )
 
         results.append(
@@ -624,6 +636,7 @@ def process_attention_context(
         last_k = getattr(args, "attention_last_k_layers", None)
         want_token_weights = bool(getattr(args, "token_weights", False))
         max_tokens_ratio = float(getattr(args, "vgr_max_tokens_ratio", 1.0))
+        max_completion_length = getattr(args, "max_completion_length", None)
         samples_tuple = compute_qwen_attention_metrics_for_batch(
             model,
             processor,
@@ -636,6 +649,7 @@ def process_attention_context(
             token_weights_smooth_sigma=float(getattr(args, "token_weights_smooth_sigma", 0.0)),
             token_weights_clip=tuple(getattr(args, "token_weights_clip", (0.2, 3.0))),
             max_tokens_ratio=max_tokens_ratio,
+            max_completion_length=max_completion_length,
         )
 
         # 解包（向后兼容：旧版本可能只返回两个元素）

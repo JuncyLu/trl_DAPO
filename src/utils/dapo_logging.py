@@ -168,7 +168,7 @@ def emit_rollout_logs(
             vgr_idx = any_index("vgr_hard_negative", "vgr_reward", "vgr_reward_as_additive")
             if vgr_idx is not None and idx < rewards_per_func_local.shape[0]:
                 vgr_val = float(rewards_per_func_local[idx, vgr_idx].item())
-            
+        
             repetition_val = 0.0
             repetition_idx = any_index("repetition_reward")
             if repetition_idx is not None and idx < rewards_per_func_local.shape[0]:

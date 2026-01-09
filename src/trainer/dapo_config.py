@@ -518,12 +518,14 @@ class DAPOConfig(TrainingArguments):
         default=False,
         metadata={"help": "Enable VGR hard-negative reward: groupwise VGR mapping applied only to acc=1 samples."}
     )
-    
+
     vgr_max_tokens_ratio: float = field(
         default=1.0,
         metadata={
-            "help": "Maximum ratio of generated tokens to consider for VGR attention calculation. "
-            "Default is 1.0 (all tokens). Set to 0.5 to only consider the first 50%% of tokens."
+            "help": "Ratio of generated tokens to consider for VGR attention calculation. "
+            "The actual tokens considered = min(generated_tokens * ratio, 0.5 * max_completion_length). "
+            "Default is 1.0. Example: with max_completion_length=512 and ratio=0.7, "
+            "a 400-token completion considers 280 tokens, but capped at 256 (0.5*512)."
         }
     )
     
